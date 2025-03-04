@@ -19,7 +19,7 @@ import me.moirai.discordbot.core.application.usecase.discord.userdetails.request
 import me.moirai.discordbot.core.domain.userdetails.User;
 import me.moirai.discordbot.core.domain.userdetails.UserDomainRepository;
 import me.moirai.discordbot.core.domain.userdetails.UserFixture;
-import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
+import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

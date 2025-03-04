@@ -1,10 +1,8 @@
 package me.moirai.discordbot.core.domain.notification;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.MapUtils.isEmpty;
 
 import java.time.OffsetDateTime;
@@ -18,6 +16,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -43,6 +43,7 @@ public class Notification extends Asset {
     @Column(name = "receiver_discord_id", nullable = false)
     private String receiverDiscordId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private NotificationType type;
 
@@ -77,8 +78,7 @@ public class Notification extends Asset {
 
         this.metadata = new HashMap<>(isEmpty(builder.metadata) ? emptyMap() : builder.metadata);
 
-        this.notificationsRead = new HashSet<>(
-                isEmpty(builder.notificationsRead) ? emptyList() : builder.notificationsRead);
+        this.notificationsRead = new HashSet<>();
     }
 
     public static Builder builder() {
@@ -156,7 +156,6 @@ public class Notification extends Asset {
         private boolean isGlobal;
         private boolean isInteractable;
         private Map<String, Object> metadata;
-        private Set<NotificationRead> notificationsRead;
         private String creatorDiscordId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
@@ -207,12 +206,6 @@ public class Notification extends Asset {
         public Builder metadata(Map<String, Object> metadata) {
 
             this.metadata = metadata;
-            return this;
-        }
-
-        public Builder notificationsRead(Set<NotificationRead> notificationsRead) {
-
-            this.notificationsRead = notificationsRead;
             return this;
         }
 

@@ -1,9 +1,13 @@
 package me.moirai.discordbot.core.application.usecase.notification.result;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class NotificationResult {
@@ -15,6 +19,7 @@ public final class NotificationResult {
     private final boolean isGlobal;
     private final boolean isInteractable;
     private final Map<String, Object> metadata;
+    private final List<NotificationReadResult> notificationsRead;
 
     private NotificationResult(Builder builder) {
 
@@ -26,6 +31,8 @@ public final class NotificationResult {
         this.isInteractable = builder.isInteractable;
 
         this.metadata = unmodifiableMap(new HashMap<>(builder.metadata == null ? emptyMap() : builder.metadata));
+        this.notificationsRead = unmodifiableList(
+                new ArrayList<>(builder.notificationsRead == null ? emptyList() : builder.notificationsRead));
     }
 
     public static Builder builder() {
@@ -60,6 +67,10 @@ public final class NotificationResult {
         return metadata;
     }
 
+    public List<NotificationReadResult> getNotificationsRead() {
+        return notificationsRead;
+    }
+
     public static final class Builder {
 
         private String message;
@@ -69,6 +80,7 @@ public final class NotificationResult {
         private boolean isGlobal;
         private boolean isInteractable;
         private Map<String, Object> metadata;
+        private List<NotificationReadResult> notificationsRead;
 
         public Builder message(String message) {
             this.message = message;
@@ -102,6 +114,11 @@ public final class NotificationResult {
 
         public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
+            return this;
+        }
+
+        public Builder notificationsRead(List<NotificationReadResult> notificationsRead) {
+            this.notificationsRead = notificationsRead;
             return this;
         }
 

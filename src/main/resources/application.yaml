@@ -73,7 +73,7 @@ spring:
   rsocket:
     server:
       transport: websocket
-      mapping-path: /notifications
+      mapping-path: /rs
       port: 7000
 
 logging:

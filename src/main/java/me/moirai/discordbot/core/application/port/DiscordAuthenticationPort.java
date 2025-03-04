@@ -1,6 +1,6 @@
 package me.moirai.discordbot.core.application.port;
 
-import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
+import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;

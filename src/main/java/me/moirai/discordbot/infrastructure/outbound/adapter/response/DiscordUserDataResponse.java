@@ -3,7 +3,7 @@ package me.moirai.discordbot.infrastructure.outbound.adapter.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordErrorResponse;
+import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordErrorResponse;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DiscordUserDataResponse {

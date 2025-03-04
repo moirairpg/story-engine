@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import me.moirai.discordbot.core.domain.notification.Notification;
+import me.moirai.discordbot.infrastructure.outbound.persistence.PaginationRepository;
 
-public interface NotificationJpaRepository extends JpaRepository<Notification, String> {
+public interface NotificationJpaRepository
+        extends JpaRepository<Notification, String>, PaginationRepository<Notification, String> {
 
     @Query("""
                 SELECT n

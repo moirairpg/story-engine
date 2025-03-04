@@ -1,9 +1,9 @@
 package me.moirai.discordbot.core.domain.notification;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static io.micrometer.common.util.StringUtils.isNotBlank;
 
 import me.moirai.discordbot.common.annotation.DomainService;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.notification.request.SendNotification;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -11,8 +11,10 @@ import reactor.core.publisher.Sinks;
 @DomainService
 public class NotificationServiceImpl implements NotificationService {
 
+    private static final String NOTIFICATION_NOT_FOUND = "Notification to be retrieved was not found";
+
     private final NotificationRepository notificationRepository;
-    private final Sinks.Many<Notification> sink;
+    private final Sinks.Many<String> sink;
 
     public NotificationServiceImpl(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
@@ -32,7 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .type(NotificationType.fromString(createNotification.getType()))
                 .build());
 
-        sink.tryEmitNext(notification);
+        sink.tryEmitNext(notification.getId());
 
         return notification;
     }
@@ -41,12 +43,15 @@ public class NotificationServiceImpl implements NotificationService {
     public Flux<Notification> streamNotificationsForUser(String userId) {
 
         return sink.asFlux()
+                .map(notificationId -> notificationRepository.findById(notificationId)
+                        .orElseThrow(() -> new AssetNotFoundException(NOTIFICATION_NOT_FOUND)))
                 .filter(notification -> belongsToUser(userId, notification))
                 .filter(notification -> !notification.isReadByUserId(userId));
     }
 
     private boolean belongsToUser(String userId, Notification notification) {
 
-        return notification.isGlobal() || defaultIfBlank(notification.getReceiverDiscordId(), EMPTY).equals(userId);
+        return notification.isGlobal() || (isNotBlank(notification.getReceiverDiscordId())
+                && notification.getReceiverDiscordId().equals(userId));
     }
 }

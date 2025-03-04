@@ -1,6 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.world.result;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ public final class SearchWorldsResult {
         this.items = builder.items;
         this.totalItems = builder.totalItems;
         this.totalPages = builder.totalPages;
-        this.results = unmodifiableList(builder.results);
+        this.results = unmodifiableList(new ArrayList<>(isEmpty(builder.results) ? emptyList() : builder.results));
     }
 
     public static Builder builder() {
@@ -52,7 +54,7 @@ public final class SearchWorldsResult {
         private int items;
         private long totalItems;
         private int totalPages;
-        private List<GetWorldResult> results = new ArrayList<>();
+        private List<GetWorldResult> results;
 
         private Builder() {
         }
@@ -78,11 +80,7 @@ public final class SearchWorldsResult {
         }
 
         public Builder results(List<GetWorldResult> results) {
-
-            if (results != null) {
-                this.results = results;
-            }
-
+            this.results = results;
             return this;
         }
 

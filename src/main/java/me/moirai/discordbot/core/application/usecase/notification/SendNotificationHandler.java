@@ -7,14 +7,14 @@ import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.usecase.notification.request.SendNotification;
 import me.moirai.discordbot.core.application.usecase.notification.result.SendNotificationResult;
 import me.moirai.discordbot.core.domain.notification.Notification;
-import me.moirai.discordbot.core.domain.notification.NotificationServiceImpl;
+import me.moirai.discordbot.core.domain.notification.NotificationService;
 
 @UseCaseHandler
 public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotification, SendNotificationResult> {
 
-    private final NotificationServiceImpl notificationService;
+    private final NotificationService notificationService;
 
-    public SendNotificationHandler(NotificationServiceImpl notificationService) {
+    public SendNotificationHandler(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
@@ -31,6 +31,10 @@ public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotifica
 
         if (isBlank(request.getSenderDiscordId())) {
             throw new IllegalArgumentException("Notification sender cannot be null");
+        }
+
+        if (isBlank(request.getReceiverDiscordId()) && !request.isGlobal()) {
+            throw new IllegalArgumentException("The receiver ID cannot be null when a notification is not global");
         }
     }
 

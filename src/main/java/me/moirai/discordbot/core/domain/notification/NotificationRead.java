@@ -13,7 +13,7 @@ import me.moirai.discordbot.common.annotation.NanoId;
 
 @Entity(name = "NotificationRead")
 @Table(name = "notification_read")
-class NotificationRead {
+public class NotificationRead {
 
     @Id
     @NanoId
@@ -52,11 +52,11 @@ class NotificationRead {
         return notification;
     }
 
-    String getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    OffsetDateTime getReadAt() {
+    public OffsetDateTime getReadAt() {
         return readAt;
     }
 

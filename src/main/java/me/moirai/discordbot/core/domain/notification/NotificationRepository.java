@@ -3,6 +3,9 @@ package me.moirai.discordbot.core.domain.notification;
 import java.util.List;
 import java.util.Optional;
 
+import me.moirai.discordbot.core.application.usecase.notification.request.SearchNotifications;
+import me.moirai.discordbot.core.application.usecase.notification.result.SearchNotificationsResult;
+
 public interface NotificationRepository {
 
     Optional<Notification> findById(String id);
@@ -14,4 +17,6 @@ public interface NotificationRepository {
     List<Notification> findUnreadByUserId(String userId);
 
     List<Notification> findReadByUserId(String userId);
+
+    SearchNotificationsResult search(SearchNotifications request);
 }
