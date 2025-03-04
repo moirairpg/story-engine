@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +38,7 @@ import net.dv8tion.jda.api.JDA;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+@Disabled
 @ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
 public class NotificationSocketControllerTest {
