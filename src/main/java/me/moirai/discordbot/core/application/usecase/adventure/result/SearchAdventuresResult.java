@@ -1,6 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.adventure.result;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ public final class SearchAdventuresResult {
         this.totalPages = builder.totalPages;
         this.items = builder.items;
         this.totalItems = builder.totalItems;
-        this.results = unmodifiableList(builder.results);
+        this.results = unmodifiableList(new ArrayList<>(isEmpty(builder.results) ? emptyList() : builder.results));
     }
 
     public static Builder builder() {
@@ -51,7 +53,7 @@ public final class SearchAdventuresResult {
         private int totalPages;
         private int items;
         private long totalItems;
-        private List<GetAdventureResult> results = new ArrayList<>();
+        private List<GetAdventureResult> results;
 
         private Builder() {
         }
@@ -77,11 +79,7 @@ public final class SearchAdventuresResult {
         }
 
         public Builder results(List<GetAdventureResult> results) {
-
-            if (results != null) {
-                this.results = results;
-            }
-
+            this.results = results;
             return this;
         }
 

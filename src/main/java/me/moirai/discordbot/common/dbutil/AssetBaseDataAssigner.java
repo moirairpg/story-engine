@@ -1,6 +1,7 @@
 package me.moirai.discordbot.common.dbutil;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -16,7 +17,11 @@ public class AssetBaseDataAssigner {
 
         MoiraiPrincipal authenticatedUser = SecuritySessionContext.getAuthenticatedUser();
         if (asset.getCreatorDiscordId() == null) {
-            asset.setCreatorDiscordId(authenticatedUser.getDiscordId());
+            String creatorName = Optional.ofNullable(authenticatedUser)
+                    .map(MoiraiPrincipal::getDiscordId)
+                    .orElse("SYSTEM");
+
+            asset.setCreatorDiscordId(creatorName);
         }
 
         OffsetDateTime now = OffsetDateTime.now();

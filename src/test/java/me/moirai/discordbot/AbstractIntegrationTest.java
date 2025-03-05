@@ -1,6 +1,7 @@
 package me.moirai.discordbot;
 
 import org.mockito.Mock;
+import org.springframework.boot.rsocket.context.RSocketServerBootstrap;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
@@ -44,6 +45,9 @@ public abstract class AbstractIntegrationTest {
 
     @MockBean
     private JdaConfig jdaConfig;
+
+    @MockBean
+    private RSocketServerBootstrap rSocketServerBootstrap;
 
     private static final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
 

@@ -10,4 +10,6 @@
   <include file="db/changelog/migrations/1734220624_alter_table_persona_remove_nudge_bump.sql" />
   <include file="db/changelog/migrations/1736283065_create_table_moirai_user.sql" />
   <include file="db/changelog/migrations/1739642293_alter_table_world_lorebook_delete_player_columns.sql" />
+  <include file="db/changelog/migrations/1740331206_create_table_notification.sql" />
+  <include file="db/changelog/migrations/1740331494_create_table_notification_read.sql" />
 </databaseChangeLog>

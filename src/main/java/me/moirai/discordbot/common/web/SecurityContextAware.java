@@ -7,6 +7,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 
 import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public abstract class SecurityContextAware {
@@ -17,7 +18,8 @@ public abstract class SecurityContextAware {
                 .map(function);
     }
 
-    protected <T> Mono<T> flatMapWithAuthenticatedUser(Function<? super MoiraiPrincipal, ? extends Mono<? extends T>> function) {
+    protected <T> Mono<T> flatMapWithAuthenticatedUser(
+            Function<? super MoiraiPrincipal, ? extends Mono<? extends T>> function) {
 
         return mapWithAuthenticatedPrincipal(authentication -> (MoiraiPrincipal) authentication.getPrincipal())
                 .flatMap(function);
@@ -32,5 +34,10 @@ public abstract class SecurityContextAware {
     protected <T> Mono<T> mapWithSecurityContext(Function<SecurityContext, T> function) {
 
         return ReactiveSecurityContextHolder.getContext().map(function);
+    }
+
+    protected <T> Flux<T> fluxMapWithSecurityContext(Function<SecurityContext, T> function) {
+
+        return ReactiveSecurityContextHolder.getContext().flux().map(function);
     }
 }
