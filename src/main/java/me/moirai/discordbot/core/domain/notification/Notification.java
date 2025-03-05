@@ -137,13 +137,16 @@ public class Notification extends Asset {
 
     }
 
-    public void markAsRead(String userId) {
+    public OffsetDateTime markAsRead(String userId) {
 
+        OffsetDateTime readAt = OffsetDateTime.now();
         notificationsRead.add(NotificationRead.builder()
                 .notification(this)
                 .userId(userId)
-                .readAt(OffsetDateTime.now())
+                .readAt(readAt)
                 .build());
+
+        return readAt;
     }
 
     public static final class Builder {

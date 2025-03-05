@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.discordbot.AbstractRestWebTest;
 import me.moirai.discordbot.core.application.usecase.notification.request.GetNotificationById;
+import me.moirai.discordbot.core.application.usecase.notification.request.ReadNotification;
 import me.moirai.discordbot.core.application.usecase.notification.request.SearchNotifications;
 import me.moirai.discordbot.core.application.usecase.notification.result.NotificationReadResult;
 import me.moirai.discordbot.core.application.usecase.notification.result.NotificationResult;
@@ -225,6 +226,38 @@ public class NotificationControllerTest extends AbstractRestWebTest {
 
                     assertThat(result.getResults().get(0).getNotificationsRead().get(0).getReadAt())
                             .isEqualTo(r.getResults().get(0).getNotificationsRead().get(0).getReadAt());
+                });
+    }
+
+    @Test
+    public void http200WhenReadNotification() {
+
+        // Given
+        String userId = "12345";
+        OffsetDateTime readAt = OffsetDateTime.now();
+        NotificationReadResult result = NotificationReadResult.builder()
+                .userId(userId)
+                .readAt(readAt)
+                .build();
+
+        NotificationReadResponse response = NotificationReadResponse.builder()
+                .userId(userId)
+                .readAt(readAt)
+                .build();
+
+        when(useCaseRunner.run(any(ReadNotification.class))).thenReturn(result);
+        when(notificationResponseMapper.toResponse(any(NotificationReadResult.class))).thenReturn(response);
+
+        // Then
+        webTestClient.patch()
+                .uri("/notification/" + userId)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(NotificationReadResponse.class)
+                .value(r -> {
+                    assertThat(r).isNotNull();
+                    assertThat(result.getUserId()).isEqualTo(r.getUserId());
+                    assertThat(result.getReadAt()).isEqualTo(r.getReadAt());
                 });
     }
 }

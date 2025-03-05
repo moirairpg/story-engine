@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
+import me.moirai.discordbot.core.application.usecase.notification.result.NotificationReadResult;
 import me.moirai.discordbot.core.application.usecase.notification.result.NotificationResult;
 import me.moirai.discordbot.core.application.usecase.notification.result.SearchNotificationsResult;
 import me.moirai.discordbot.infrastructure.inbound.rest.response.NotificationReadResponse;
@@ -41,11 +42,16 @@ public class NotificationResponseMapper {
                 .isGlobal(result.isGlobal())
                 .isInteractable(result.isInteractable())
                 .notificationsRead(result.getNotificationsRead().stream()
-                        .map(notificationRead -> NotificationReadResponse.builder()
-                                .userId(notificationRead.getUserId())
-                                .readAt(notificationRead.getReadAt())
-                                .build())
+                        .map(this::toResponse)
                         .toList())
+                .build();
+    }
+
+    public NotificationReadResponse toResponse(NotificationReadResult result) {
+
+        return NotificationReadResponse.builder()
+                .readAt(result.getReadAt())
+                .userId(result.getUserId())
                 .build();
     }
 }

@@ -10,10 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import me.moirai.discordbot.common.annotation.NanoId;
+import me.moirai.discordbot.core.domain.Asset;
 
 @Entity(name = "NotificationRead")
 @Table(name = "notification_read")
-public class NotificationRead {
+public class NotificationRead extends Asset {
 
     @Id
     @NanoId
