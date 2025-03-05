@@ -38,7 +38,7 @@ import net.dv8tion.jda.api.JDA;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-@Disabled
+@Disabled("Disabled until mocking RSocket is possible. This test causes other integration tests to fail, and passes locally but fails the pipeline.")
 @ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
 public class NotificationSocketControllerTest {
