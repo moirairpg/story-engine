@@ -15,7 +15,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.discordbot.AbstractRestWebTest;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.AuthenticateUser;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.RefreshSessionToken;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
@@ -55,7 +57,7 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                 .scope("SCOPE")
                 .build();
 
-        when(useCaseRunner.run(any())).thenReturn(Mono.just(expectedResponse));
+        when(useCaseRunner.run(any(AuthenticateUser.class))).thenReturn(Mono.just(expectedResponse));
 
         // Then
         webTestClient.get()
@@ -65,6 +67,26 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                         .build())
                 .exchange()
                 .expectCookie().valueEquals(SESSION_COOKIE.getName(), "TOKEN");
+    }
+
+    @Test
+    public void refreshToken() {
+
+        // Given
+        AuthenticateUserResult expectedResponse = AuthenticateUserResult.builder()
+                .accessToken("NEW_TOKEN")
+                .expiresIn(4324324L)
+                .refreshToken("RFRSHTK")
+                .scope("SCOPE")
+                .build();
+
+        when(useCaseRunner.run(any(RefreshSessionToken.class))).thenReturn(Mono.just(expectedResponse));
+
+        // Then
+        webTestClient.post()
+                .uri("/auth/refresh")
+                .exchange()
+                .expectCookie().valueEquals(SESSION_COOKIE.getName(), "NEW_TOKEN");
     }
 
     @Test
@@ -88,7 +110,7 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                 .thenReturn(Mono.empty());
 
         // Then
-        webTestClient.get()
+        webTestClient.post()
                 .uri("/auth/logout")
                 .exchange()
                 .expectCookie().maxAge(SESSION_COOKIE.getName(), expiredCookie);

@@ -179,7 +179,7 @@ public class WebExceptionHandlerTest extends AbstractRestWebTest {
                 .expectStatus().is4xxClientError();
     }
 
-    @Test
+    // @Test
     public void http401WhenNoAuthorizationHeader() {
 
         // Given

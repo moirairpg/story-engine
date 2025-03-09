@@ -7,7 +7,6 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 
 import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public abstract class SecurityContextAware {
@@ -27,17 +26,8 @@ public abstract class SecurityContextAware {
 
     protected <T> Mono<T> mapWithAuthenticatedPrincipal(Function<Authentication, T> function) {
 
-        return mapWithSecurityContext(SecurityContext::getAuthentication)
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
                 .map(function);
-    }
-
-    protected <T> Mono<T> mapWithSecurityContext(Function<SecurityContext, T> function) {
-
-        return ReactiveSecurityContextHolder.getContext().map(function);
-    }
-
-    protected <T> Flux<T> fluxMapWithSecurityContext(Function<SecurityContext, T> function) {
-
-        return ReactiveSecurityContextHolder.getContext().flux().map(function);
     }
 }

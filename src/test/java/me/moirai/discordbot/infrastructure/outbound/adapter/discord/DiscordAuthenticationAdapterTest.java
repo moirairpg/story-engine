@@ -18,6 +18,7 @@ import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordAuthResp
 import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordErrorResponse;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
+import me.moirai.discordbot.infrastructure.outbound.adapter.request.RefreshSessionTokenRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.test.StepVerifier;
 
@@ -33,6 +34,34 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         adapter = new DiscordAuthenticationAdapter("http://localhost:" + PORT,
                 "/users", "/token", "/token/revoke",
                 WebClient.builder(), objectMapper);
+    }
+
+    @Test
+    public void refreshToken() throws JsonProcessingException {
+
+        // Given
+        RefreshSessionTokenRequest request = RefreshSessionTokenRequest.builder()
+                .clientId(DUMMY_VALUE)
+                .clientSecret(DUMMY_VALUE)
+                .grantType(DUMMY_VALUE)
+                .build();
+
+        DiscordAuthResponse response = DiscordAuthResponse.builder()
+                .accessToken(DUMMY_VALUE)
+                .expiresIn(424234L)
+                .refreshToken(DUMMY_VALUE)
+                .scope(DUMMY_VALUE)
+                .tokenType(DUMMY_VALUE)
+                .build();
+
+        prepareWebserverFor(response, 200);
+
+        // Then
+        StepVerifier.create(adapter.refreshSessionToken(request))
+                .assertNext(resp -> {
+                    assertThat(resp).isNotNull();
+                })
+                .verifyComplete();
     }
 
     @Test

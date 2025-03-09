@@ -14,6 +14,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,6 +27,7 @@ import me.moirai.discordbot.common.web.SecurityContextAware;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.AuthenticateUser;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.RefreshSessionToken;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
 import me.moirai.discordbot.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
 import me.moirai.discordbot.infrastructure.inbound.rest.response.UserDataResponse;
@@ -92,7 +94,7 @@ public class AuthenticationController extends SecurityContextAware {
                 .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<ServerHttpResponse> logout(ServerWebExchange exchange, Authentication authentication) {
 
@@ -107,6 +109,18 @@ public class AuthenticationController extends SecurityContextAware {
 
             return discordAuthenticationPort.logout(request)
                     .thenReturn(handleSessionTermination(exchange));
+        });
+    }
+
+    @PostMapping("/refresh")
+    @ResponseStatus(code = HttpStatus.OK)
+    public Mono<ServerHttpResponse> refreshSession(ServerWebExchange exchange) {
+
+        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+
+            RefreshSessionToken command = RefreshSessionToken.build(authenticatedUser.getRefreshToken());
+            return useCaseRunner.run(command)
+                    .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
         });
     }
 

@@ -37,7 +37,7 @@ public class MoiraiUserDetailsServiceTest {
     public void authenticateUser_whenUserExists_thenReturnPrincipal() {
 
         // Given
-        String token = "TOKEN";
+        String token = "AUTH_TOKEN / REFRESH_TOKEN";
         String username = "john.doe";
         String nickname = "JohnDoe";
 
@@ -60,8 +60,12 @@ public class MoiraiUserDetailsServiceTest {
         // Then
         StepVerifier.create(service.findByUsername(token))
                 .assertNext(userDetails -> {
-                    assertThat(userDetails).isNotNull();
-                    assertThat(userDetails.getUsername()).isEqualTo(response.getUsername());
+                    MoiraiPrincipal principal = (MoiraiPrincipal) userDetails;
+                    assertThat(principal).isNotNull();
+                    assertThat(principal.getUsername()).isEqualTo(response.getUsername());
+                    assertThat(principal.getEmail()).isEqualTo(response.getEmail());
+                    assertThat(principal.getAuthorizationToken()).isEqualTo("AUTH_TOKEN");
+                    assertThat(principal.getRefreshToken()).isEqualTo("REFRESH_TOKEN");
                 })
                 .verifyComplete();
     }

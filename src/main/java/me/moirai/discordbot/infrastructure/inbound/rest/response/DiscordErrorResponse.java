@@ -36,7 +36,7 @@ public class DiscordErrorResponse {
     public String toString() {
         return "DiscordErrorResponse{" +
                 "error='" + error + "\', " +
-                "errorDescription='" + errorDescription + '\'' +
+                "errorDescription='" + errorDescription +
                 '}';
     }
 
