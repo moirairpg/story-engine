@@ -26,7 +26,6 @@ moirai:
       logout: ${LOGOUT_REDIRECT_URL:/logged-out}
     ignored-paths: >
       /auth/code,
-      /auth/signup,
       /api/swagger/webjars/swagger-ui/index.html,
       /api/swagger/webjars/swagger-ui/index.css,
       /api/swagger/webjars/swagger-ui/swagger-ui.css,

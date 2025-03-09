@@ -1,17 +1,22 @@
 package me.moirai.discordbot.infrastructure.outbound.adapter.discord;
 
+import static java.lang.String.format;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 import java.util.Map;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -28,6 +33,7 @@ import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordAuthResp
 import me.moirai.discordbot.infrastructure.inbound.rest.response.DiscordErrorResponse;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
+import me.moirai.discordbot.infrastructure.outbound.adapter.request.RefreshSessionTokenRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 
@@ -36,15 +42,16 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
 
     private static final Logger LOG = LoggerFactory.getLogger(DiscordAuthenticationAdapter.class);
 
+    private static final String BEARER = "Bearer %s";
     private static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
     private static final String AUTHENTICATION_ERROR = "Error authenticating user on Discord";
     private static final String UNKNOWN_ERROR = "Error on Discord API";
     private static final String BAD_REQUEST_ERROR = "Bad request calling Discord API";
 
-    private static final Predicate<HttpStatusCode> BAD_REQUEST = statusCode -> statusCode
+    private static final Predicate<HttpStatusCode> BAD_REQUEST_PREDICATE = statusCode -> statusCode
             .isSameCodeAs(HttpStatusCode.valueOf(400));
 
-    private static final Predicate<HttpStatusCode> UNAUTHORIZED = statusCode -> statusCode
+    private static final Predicate<HttpStatusCode> UNAUTHORIZED_PREDICATE = statusCode -> statusCode
             .isSameCodeAs(HttpStatusCode.valueOf(401));
 
     private final String usersUri;
@@ -69,7 +76,14 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     @Override
     public Mono<DiscordAuthResponse> authenticate(DiscordAuthRequest request) {
 
-        return discordWebClient(tokenUri, request)
+        return postForAuthentication(tokenUri, request)
+                .bodyToMono(DiscordAuthResponse.class);
+    }
+
+    @Override
+    public Mono<DiscordAuthResponse> refreshSessionToken(RefreshSessionTokenRequest request) {
+
+        return postForAuthentication(tokenUri, request)
                 .bodyToMono(DiscordAuthResponse.class);
     }
 
@@ -77,14 +91,14 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     public Mono<DiscordUserDataResponse> retrieveLoggedUser(String token) {
 
         return webClient.get()
-                .uri(String.format(usersUri, "@me"))
+                .uri(format(usersUri, "@me"))
                 .headers(headers -> {
-                    headers.add(HttpHeaders.AUTHORIZATION, token);
-                    headers.add(HttpHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
+                    headers.add(AUTHORIZATION, format(BEARER, token));
+                    headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
                 })
                 .retrieve()
-                .onStatus(UNAUTHORIZED, this::handleUnauthorized)
-                .onStatus(BAD_REQUEST, this::handleBadRequest)
+                .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
+                .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
                 .onStatus(HttpStatusCode::isError, this::handleUnknownError)
                 .bodyToMono(DiscordUserDataResponse.class);
     }
@@ -92,11 +106,11 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     @Override
     public Mono<Void> logout(DiscordTokenRevocationRequest request) {
 
-        return discordWebClient(tokenRevokeUri, request)
+        return postForAuthentication(tokenRevokeUri, request)
                 .bodyToMono(Void.class);
     }
 
-    private ResponseSpec discordWebClient(String url, Object request) {
+    private ResponseSpec postForAuthentication(String url, Object request) {
 
         final MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<>();
         Map<String, String> fieldMap = objectMapper.convertValue(request, new TypeReference<Map<String, String>>() {
@@ -106,13 +120,13 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
         return webClient.post()
                 .uri(url)
                 .headers(headers -> {
-                    headers.add(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_VALUE);
-                    headers.add(HttpHeaders.ACCEPT, CONTENT_TYPE_VALUE);
+                    headers.add(CONTENT_TYPE, CONTENT_TYPE_VALUE);
+                    headers.add(ACCEPT, CONTENT_TYPE_VALUE);
                 })
                 .body(BodyInserters.fromFormData(valueMap))
                 .retrieve()
-                .onStatus(UNAUTHORIZED, this::handleUnauthorized)
-                .onStatus(BAD_REQUEST, this::handleBadRequest)
+                .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
+                .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
                 .onStatus(HttpStatusCode::isError, this::handleUnknownError);
     }
 
@@ -126,10 +140,10 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
         return clientResponse.bodyToMono(DiscordErrorResponse.class)
                 .map(resp -> {
                     LOG.error(BAD_REQUEST_ERROR + " -> {}", resp);
-                    return new DiscordApiException(HttpStatus.BAD_REQUEST, resp.getError(),
-                        resp.getErrorDescription(),
-                        String.format(BAD_REQUEST_ERROR, resp.getError(), resp.getErrorDescription()));
-                    });
+                    return new DiscordApiException(BAD_REQUEST, resp.getError(),
+                            resp.getErrorDescription(),
+                            format(BAD_REQUEST_ERROR, resp.getError(), resp.getErrorDescription()));
+                });
     }
 
     private Mono<? extends Throwable> handleUnknownError(ClientResponse clientResponse) {
@@ -137,9 +151,9 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
         return clientResponse.bodyToMono(DiscordErrorResponse.class)
                 .map(resp -> {
                     LOG.error(UNKNOWN_ERROR + " -> {}", resp);
-                    return new DiscordApiException(HttpStatus.INTERNAL_SERVER_ERROR, resp.getError(),
+                    return new DiscordApiException(INTERNAL_SERVER_ERROR, resp.getError(),
                             resp.getErrorDescription(),
-                            String.format(UNKNOWN_ERROR, resp.getError(), resp.getErrorDescription()));
+                            format(UNKNOWN_ERROR, resp.getError(), resp.getErrorDescription()));
                 });
     }
 }

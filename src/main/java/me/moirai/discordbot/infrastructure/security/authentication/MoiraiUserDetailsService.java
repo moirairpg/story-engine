@@ -1,7 +1,5 @@
 package me.moirai.discordbot.infrastructure.security.authentication;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -18,8 +16,6 @@ import reactor.core.publisher.Mono;
 @Service
 public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
 
-    private static final String BEARER = "Bearer ";
-
     private final DiscordAuthenticationPort discordAuthenticationPort;
     private final UseCaseRunner useCaseRunner;
 
@@ -32,13 +28,16 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
     }
 
     @Override
-    public Mono<UserDetails> findByUsername(String token) {
+    public Mono<UserDetails> findByUsername(String tokenCluster) {
 
-        return discordAuthenticationPort.retrieveLoggedUser(token)
-                .map(userDetails -> getUserDetails(userDetails, token));
+        String authorizationToken = tokenCluster.split(" / ")[0];
+        String refreshToken = tokenCluster.split(" / ")[1];
+        return discordAuthenticationPort.retrieveLoggedUser(authorizationToken)
+                .map(userDetails -> getUserDetails(userDetails, authorizationToken, refreshToken));
     }
 
-    private MoiraiPrincipal getUserDetails(DiscordUserDataResponse discordUser, String token) {
+    private MoiraiPrincipal getUserDetails(
+            DiscordUserDataResponse discordUser, String authorizationToken, String refreshToken) {
 
         try {
             GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(discordUser.getId());
@@ -48,7 +47,8 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
                     .discordId(moiraiUser.getDiscordId())
                     .username(moiraiUser.getUsername())
                     .email(discordUser.getEmail())
-                    .authorizationToken(token.replace(BEARER, EMPTY))
+                    .authorizationToken(authorizationToken)
+                    .refreshToken(refreshToken)
                     .role(moiraiUser.getRole())
                     .build();
         } catch (AssetNotFoundException e) {

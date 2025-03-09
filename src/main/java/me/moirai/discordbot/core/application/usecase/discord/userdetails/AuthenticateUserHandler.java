@@ -1,7 +1,6 @@
 package me.moirai.discordbot.core.application.usecase.discord.userdetails;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
-import static java.lang.String.format;
 import static me.moirai.discordbot.core.domain.userdetails.Role.PLAYER;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -75,8 +74,7 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
 
     private Mono<DiscordAuthResponse> createUserIfNotExists(DiscordAuthResponse discordAuthResponse) {
 
-        String bearerToken = format("%s %s", discordAuthResponse.getTokenType(), discordAuthResponse.getAccessToken());
-        return discordAuthenticationPort.retrieveLoggedUser(bearerToken)
+        return discordAuthenticationPort.retrieveLoggedUser(discordAuthResponse.getAccessToken())
                 .map(discordUserDetails -> {
                     repository.findByDiscordId(discordUserDetails.getId())
                             .orElseGet(() -> createUser(discordUserDetails));
