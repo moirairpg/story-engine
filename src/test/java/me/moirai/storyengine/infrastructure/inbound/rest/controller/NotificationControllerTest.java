@@ -10,21 +10,15 @@ import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
-import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
-import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResultFixture;
+import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.NotificationResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationReadResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationResponseFixture;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchNotificationsResponse;
+import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResultFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 
 @WebFluxTest(controllers = {
@@ -35,21 +29,12 @@ import me.moirai.storyengine.infrastructure.security.authentication.config.Authe
 })
 public class NotificationControllerTest extends AbstractRestWebTest {
 
-    @MockBean
-    private NotificationResponseMapper notificationResponseMapper;
-
     @Test
     public void http200WhenNotificationById() {
 
         // Given
         String userId = "1234";
         OffsetDateTime readAt = OffsetDateTime.now().minusMonths(1);
-        NotificationResponse response = NotificationResponseFixture.targetedUnreadInfo()
-                .notificationsRead(list(NotificationReadResponse.builder()
-                        .readAt(readAt)
-                        .userId("12345")
-                        .build()))
-                .build();
 
         NotificationResult result = NotificationResultFixture.targetedUnreadInfo()
                 .notificationsRead(list(NotificationReadResult.builder()
@@ -59,14 +44,13 @@ public class NotificationControllerTest extends AbstractRestWebTest {
                 .build();
 
         when(useCaseRunner.run(any(GetNotificationById.class))).thenReturn(result);
-        when(notificationResponseMapper.toResponse(any(NotificationResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()
                 .uri("/notification/" + userId)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(NotificationResponse.class)
+                .expectBody(NotificationResult.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
                     assertThat(result.getMessage()).isEqualTo(r.getMessage());
@@ -87,18 +71,6 @@ public class NotificationControllerTest extends AbstractRestWebTest {
 
         // Given
         OffsetDateTime readAt = OffsetDateTime.now().minusMonths(1);
-        SearchNotificationsResponse response = SearchNotificationsResponse.builder()
-                .page(1)
-                .resultsInPage(10)
-                .totalPages(1)
-                .totalResults(10)
-                .results(list(NotificationResponseFixture.targetedUnreadInfo()
-                        .notificationsRead(list(NotificationReadResponse.builder()
-                                .readAt(readAt)
-                                .userId("12345")
-                                .build()))
-                        .build()))
-                .build();
 
         SearchNotificationsResult result = SearchNotificationsResult.builder()
                 .page(1)
@@ -114,19 +86,18 @@ public class NotificationControllerTest extends AbstractRestWebTest {
                 .build();
 
         when(useCaseRunner.run(any(SearchNotifications.class))).thenReturn(result);
-        when(notificationResponseMapper.toResponse(any(SearchNotificationsResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()
                 .uri("/notification")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(SearchNotificationsResponse.class)
+                .expectBody(SearchNotificationsResult.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
-                    assertThat(result.getItems()).isEqualTo(r.getResultsInPage());
+                    assertThat(result.getItems()).isEqualTo(r.getItems());
                     assertThat(result.getPage()).isEqualTo(r.getPage());
-                    assertThat(result.getTotalItems()).isEqualTo(r.getTotalResults());
+                    assertThat(result.getTotalItems()).isEqualTo(r.getTotalItems());
                     assertThat(result.getTotalPages()).isEqualTo(r.getTotalPages());
 
                     assertThat(result.getResults().get(0).getMessage())
@@ -157,18 +128,6 @@ public class NotificationControllerTest extends AbstractRestWebTest {
 
         // Given
         OffsetDateTime readAt = OffsetDateTime.now().minusMonths(1);
-        SearchNotificationsResponse response = SearchNotificationsResponse.builder()
-                .page(1)
-                .resultsInPage(10)
-                .totalPages(1)
-                .totalResults(10)
-                .results(list(NotificationResponseFixture.targetedUnreadInfo()
-                        .notificationsRead(list(NotificationReadResponse.builder()
-                                .readAt(readAt)
-                                .userId("12345")
-                                .build()))
-                        .build()))
-                .build();
 
         SearchNotificationsResult result = SearchNotificationsResult.builder()
                 .page(1)
@@ -184,7 +143,6 @@ public class NotificationControllerTest extends AbstractRestWebTest {
                 .build();
 
         when(useCaseRunner.run(any(SearchNotifications.class))).thenReturn(result);
-        when(notificationResponseMapper.toResponse(any(SearchNotificationsResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()
@@ -198,12 +156,12 @@ public class NotificationControllerTest extends AbstractRestWebTest {
                         .build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(SearchNotificationsResponse.class)
+                .expectBody(SearchNotificationsResult.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
-                    assertThat(result.getItems()).isEqualTo(r.getResultsInPage());
+                    assertThat(result.getItems()).isEqualTo(r.getItems());
                     assertThat(result.getPage()).isEqualTo(r.getPage());
-                    assertThat(result.getTotalItems()).isEqualTo(r.getTotalResults());
+                    assertThat(result.getTotalItems()).isEqualTo(r.getTotalItems());
                     assertThat(result.getTotalPages()).isEqualTo(r.getTotalPages());
 
                     assertThat(result.getResults().get(0).getMessage())
@@ -240,20 +198,14 @@ public class NotificationControllerTest extends AbstractRestWebTest {
                 .readAt(readAt)
                 .build();
 
-        NotificationReadResponse response = NotificationReadResponse.builder()
-                .userId(userId)
-                .readAt(readAt)
-                .build();
-
         when(useCaseRunner.run(any(ReadNotification.class))).thenReturn(result);
-        when(notificationResponseMapper.toResponse(any(NotificationReadResult.class))).thenReturn(response);
 
         // Then
         webTestClient.patch()
                 .uri("/notification/" + userId)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(NotificationReadResponse.class)
+                .expectBody(NotificationReadResult.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
                     assertThat(result.getUserId()).isEqualTo(r.getUserId());

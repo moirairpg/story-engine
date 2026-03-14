@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.inbound.rest.response;
+package me.moirai.storyengine.infrastructure.outbound.adapter.discord;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

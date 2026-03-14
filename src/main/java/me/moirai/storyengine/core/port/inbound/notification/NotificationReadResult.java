@@ -2,6 +2,10 @@ package me.moirai.storyengine.core.port.inbound.notification;
 
 import java.time.OffsetDateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = NotificationReadResult.Builder.class)
 public final class NotificationReadResult {
 
     private final String userId;
@@ -25,6 +29,7 @@ public final class NotificationReadResult {
         return readAt;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String userId;

@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.model.SearchModels;
 import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.AiModelResponse;
+import me.moirai.storyengine.core.port.inbound.model.SearchModels;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,24 +29,10 @@ public class ModelController extends SecurityContextAware {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<List<AiModelResponse>> getAllAiModels(@RequestParam(required = false) String modelName, @RequestParam(required = false) String tokenLimit) {
+    public Mono<List<AiModelResult>> getAllAiModels(@RequestParam(required = false) String modelName, @RequestParam(required = false) String tokenLimit) {
         return mapWithAuthenticatedUser(authenticatedUser -> {
             SearchModels query = SearchModels.build(modelName, tokenLimit);
-
-            return useCaseRunner.run(query)
-                    .stream()
-                    .map(this::toResponse)
-                    .toList();
+            return useCaseRunner.run(query);
         });
-    }
-
-    private AiModelResponse toResponse(AiModelResult result) {
-
-        return AiModelResponse.builder()
-                .fullModelName(result.getFullModelName())
-                .hardTokenLimit(result.getHardTokenLimit())
-                .internalModelName(result.getInternalModelName())
-                .officialModelName(result.getOfficialModelName())
-                .build();
     }
 }

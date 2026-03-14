@@ -17,15 +17,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.NotificationResponseMapper;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.NotificationSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchNotificationSortingField;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationReadResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchNotificationsResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -34,19 +33,15 @@ import reactor.core.publisher.Mono;
 public class NotificationController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
-    private final NotificationResponseMapper responseMapper;
 
-    public NotificationController(UseCaseRunner useCaseRunner,
-            NotificationResponseMapper responseMapper) {
-
+    public NotificationController(UseCaseRunner useCaseRunner) {
         this.useCaseRunner = useCaseRunner;
-        this.responseMapper = responseMapper;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin()")
-    public Mono<SearchNotificationsResponse> search(NotificationSearchParameters searchParameters) {
+    public Mono<SearchNotificationsResult> search(NotificationSearchParameters searchParameters) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -65,30 +60,30 @@ public class NotificationController extends SecurityContextAware {
                 requestBuilder.isGlobal(Boolean.valueOf(searchParameters.getInteractable()));
             }
 
-            return responseMapper.toResponse(useCaseRunner.run(requestBuilder.build()));
+            return useCaseRunner.run(requestBuilder.build());
         });
     }
 
     @GetMapping("/{notificationId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin()")
-    public Mono<NotificationResponse> getNotificationById(@PathVariable(required = true) String notificationId) {
+    public Mono<NotificationResult> getNotificationById(@PathVariable(required = true) String notificationId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             GetNotificationById request = GetNotificationById.create(notificationId);
-            return responseMapper.toResponse(useCaseRunner.run(request));
+            return useCaseRunner.run(request);
         });
     }
 
     @PatchMapping("/{notificationId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<NotificationReadResponse> readNotification(@PathVariable(required = true) String notificationId) {
+    public Mono<NotificationReadResult> readNotification(@PathVariable(required = true) String notificationId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             ReadNotification request = ReadNotification.create(notificationId, notificationId);
-            return responseMapper.toResponse(useCaseRunner.run(request));
+            return useCaseRunner.run(request);
         });
     }
 

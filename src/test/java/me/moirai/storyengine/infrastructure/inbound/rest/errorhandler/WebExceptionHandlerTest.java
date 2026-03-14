@@ -21,7 +21,6 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.infrastructure.inbound.rest.controller.WorldController;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.ErrorResponse;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie;
@@ -34,9 +33,6 @@ import me.moirai.storyengine.infrastructure.security.authentication.config.Authe
         AuthenticationSecurityConfig.class
 })
 public class WebExceptionHandlerTest extends AbstractRestWebTest {
-
-    @MockBean
-    protected WorldResponseMapper worldResponseMapper;
 
     @MockBean
     protected WorldRequestMapper worldRequestMapper;

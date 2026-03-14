@@ -29,8 +29,7 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetail
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie;
 import reactor.core.publisher.Mono;
 
@@ -53,7 +52,6 @@ public class AuthenticationController extends SecurityContextAware {
     private final String logoutPath;
     private final DiscordAuthenticationPort discordAuthenticationPort;
     private final UseCaseRunner useCaseRunner;
-    private final UserDataResponseMapper responseMapper;
 
     public AuthenticationController(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
@@ -63,8 +61,7 @@ public class AuthenticationController extends SecurityContextAware {
             @Value("${moirai.security.redirect-path.fail}") String failPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
             DiscordAuthenticationPort discordAuthenticationPort,
-            UseCaseRunner useCaseRunner,
-            UserDataResponseMapper responseMapper) {
+            UseCaseRunner useCaseRunner) {
 
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -73,7 +70,6 @@ public class AuthenticationController extends SecurityContextAware {
         this.failPath = failPath;
         this.discordAuthenticationPort = discordAuthenticationPort;
         this.useCaseRunner = useCaseRunner;
-        this.responseMapper = responseMapper;
     }
 
     @GetMapping("/code")
@@ -119,12 +115,12 @@ public class AuthenticationController extends SecurityContextAware {
 
     @GetMapping("/user")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<UserDataResponse> getAuthenticatedUserDetails() {
+    public Mono<UserDetailsResult> getAuthenticatedUserDetails() {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(authenticatedUser.getDiscordId());
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 

@@ -1,10 +1,14 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class CreateAdventureLorebookEntryResult {
 
     private final String id;
 
-    public CreateAdventureLorebookEntryResult(String id) {
+    @JsonCreator
+    public CreateAdventureLorebookEntryResult(@JsonProperty("id") String id) {
         this.id = id;
     }
 

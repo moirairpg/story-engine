@@ -20,21 +20,20 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntryResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldLorebookEntryRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldLorebookEntryResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateLorebookEntryResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.LorebookEntryResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchLorebookEntriesResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdateLorebookEntryResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -44,21 +43,18 @@ public class WorldLorebookController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
     private final WorldLorebookEntryRequestMapper requestMapper;
-    private final WorldLorebookEntryResponseMapper responseMapper;
 
     public WorldLorebookController(UseCaseRunner useCaseRunner,
-            WorldLorebookEntryRequestMapper requestMapper,
-            WorldLorebookEntryResponseMapper responseMapper) {
+            WorldLorebookEntryRequestMapper requestMapper) {
 
         this.useCaseRunner = useCaseRunner;
         this.requestMapper = requestMapper;
-        this.responseMapper = responseMapper;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#worldId, 'World')")
-    public Mono<SearchLorebookEntriesResponse> search(
+    public Mono<SearchWorldLorebookEntriesResult> search(
             @PathVariable(required = true) String worldId,
             LorebookSearchParameters searchParameters) {
 
@@ -74,14 +70,14 @@ public class WorldLorebookController extends SecurityContextAware {
                     .worldId(worldId)
                     .build();
 
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#worldId, 'World')")
-    public Mono<LorebookEntryResponse> getLorebookEntryById(
+    public Mono<GetWorldLorebookEntryResult> getLorebookEntryById(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId) {
 
@@ -93,28 +89,28 @@ public class WorldLorebookController extends SecurityContextAware {
                     .requesterId(authenticatedUser.getDiscordId())
                     .build();
 
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<CreateLorebookEntryResponse> createLorebookEntry(
+    public Mono<CreateWorldLorebookEntryResult> createLorebookEntry(
             @PathVariable(required = true) String worldId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             CreateWorldLorebookEntry command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
-            return responseMapper.toResponse(useCaseRunner.run(command));
+            return useCaseRunner.run(command);
         });
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<UpdateLorebookEntryResponse> updateLorebookEntry(
+    public Mono<UpdateWorldLorebookEntryResult> updateLorebookEntry(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId,
             @Valid @RequestBody UpdateLorebookEntryRequest request) {
@@ -124,7 +120,7 @@ public class WorldLorebookController extends SecurityContextAware {
             UpdateWorldLorebookEntry command = requestMapper.toCommand(request, entryId,
                     worldId, authenticatedUser.getDiscordId());
 
-            return responseMapper.toResponse(useCaseRunner.run(command));
+            return useCaseRunner.run(command);
         });
     }
 

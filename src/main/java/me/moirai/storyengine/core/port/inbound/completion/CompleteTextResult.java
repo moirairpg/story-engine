@@ -1,5 +1,9 @@
 package me.moirai.storyengine.core.port.inbound.completion;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = CompleteTextResult.Builder.class)
 public class CompleteTextResult {
 
     private final String outputText;
@@ -47,6 +51,7 @@ public class CompleteTextResult {
         return tokens;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String outputText;

@@ -5,6 +5,10 @@ import static java.util.Collections.unmodifiableList;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = SearchAdventureLorebookEntriesResult.Builder.class)
 public final class SearchAdventureLorebookEntriesResult {
 
     private final int page;
@@ -46,6 +50,7 @@ public final class SearchAdventureLorebookEntriesResult {
         return results;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private int page;

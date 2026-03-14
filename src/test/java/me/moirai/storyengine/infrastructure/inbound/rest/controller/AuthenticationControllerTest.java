@@ -3,10 +3,10 @@ package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 import static me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie.SESSION_COOKIE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
@@ -20,9 +20,6 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessio
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponseFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 import reactor.core.publisher.Mono;
 
@@ -40,9 +37,6 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
 
     @MockBean
     protected DiscordAuthenticationPort discordAuthenticationPort;
-
-    @MockBean
-    private UserDataResponseMapper responseMapper;
 
     @Test
     public void exchangeCodeForToken() {
@@ -119,26 +113,28 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
     public void getAuthenticatedUser() {
 
         // Given
-        UserDataResponse result = UserDataResponseFixture.create().build();
+        UserDetailsResult result = UserDetailsResult.builder()
+                .discordId("1234")
+                .avatarUrl("someAvatarUrl")
+                .nickname("someNickname")
+                .username("someUsername")
+                .joinDate(OffsetDateTime.now())
+                .build();
 
-        when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class)))
-                .thenReturn(mock(UserDetailsResult.class));
-
-        when(responseMapper.toResponse(any(UserDetailsResult.class))).thenReturn(result);
+        when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(result);
 
         // Then
         webTestClient.get()
                 .uri("/auth/user")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UserDataResponse.class)
+                .expectBody(UserDetailsResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getDiscordId()).isEqualTo(result.getDiscordId());
                     assertThat(response.getNickname()).isEqualTo(result.getNickname());
                     assertThat(response.getUsername()).isEqualTo(result.getUsername());
-                    assertThat(response.getAvatar()).isEqualTo(result.getAvatar());
+                    assertThat(response.getAvatarUrl()).isEqualTo(result.getAvatarUrl());
                 });
-
     }
 }

@@ -7,6 +7,10 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = GetAdventureResult.Builder.class)
 public final class GetAdventureResult {
 
     private final String id;
@@ -186,6 +190,7 @@ public final class GetAdventureResult {
         return bumpFrequency;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String id;

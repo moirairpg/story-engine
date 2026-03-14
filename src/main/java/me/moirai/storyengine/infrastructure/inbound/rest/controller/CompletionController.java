@@ -15,7 +15,6 @@ import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.completion.CompleteText;
 import me.moirai.storyengine.core.port.inbound.completion.CompleteTextResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.TextCompletionRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.TextCompletionResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -32,7 +31,7 @@ public class CompletionController extends SecurityContextAware {
     @PostMapping
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
-    public Mono<TextCompletionResponse> generateText(@Valid @RequestBody TextCompletionRequest request) {
+    public Mono<CompleteTextResult> generateText(@Valid @RequestBody TextCompletionRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -53,8 +52,7 @@ public class CompletionController extends SecurityContextAware {
                     .requesterId(authenticatedUser.getDiscordId())
                     .build();
 
-            return useCaseRunner.run(command)
-                    .map(this::toResponse);
+            return useCaseRunner.run(command);
         });
     }
 
@@ -63,19 +61,6 @@ public class CompletionController extends SecurityContextAware {
         return CompleteText.Message.builder()
                 .isAuthorBot(message.getIsAuthorBot())
                 .messageContent(message.getMessageContent())
-                .build();
-    }
-
-    private TextCompletionResponse toResponse(CompleteTextResult result) {
-
-        return TextCompletionResponse.builder()
-                .outputText(result.getOutputText())
-                .completionTokens(result.getCompletionTokens())
-                .promptTokens(result.getPromptTokens())
-                .totalTokens(result.getTotalTokens())
-                .completionTokens(result.getCompletionTokens())
-                .tokenIds(result.getTokenIds())
-                .tokens(result.getTokens())
                 .build();
     }
 }

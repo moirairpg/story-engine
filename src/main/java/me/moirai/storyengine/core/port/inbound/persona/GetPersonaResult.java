@@ -6,6 +6,10 @@ import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = GetPersonaResult.Builder.class)
 public final class GetPersonaResult {
 
     private final String id;
@@ -71,6 +75,7 @@ public final class GetPersonaResult {
         return lastUpdateDate;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String id;

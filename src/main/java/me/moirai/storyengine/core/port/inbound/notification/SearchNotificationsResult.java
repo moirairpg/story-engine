@@ -7,6 +7,10 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = SearchNotificationsResult.Builder.class)
 public final class SearchNotificationsResult {
 
     private final int page;
@@ -48,6 +52,7 @@ public final class SearchNotificationsResult {
         return results;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private int page;

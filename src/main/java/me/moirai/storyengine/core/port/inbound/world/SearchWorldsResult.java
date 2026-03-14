@@ -7,6 +7,10 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = SearchWorldsResult.Builder.class)
 public final class SearchWorldsResult {
 
     private final int page;
@@ -48,6 +52,7 @@ public final class SearchWorldsResult {
         return results;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private int page;

@@ -1,10 +1,14 @@
 package me.moirai.storyengine.core.port.inbound.world;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class CreateWorldResult {
 
     private final String id;
 
-    public CreateWorldResult(String id) {
+    @JsonCreator
+    public CreateWorldResult(@JsonProperty("id") String id) {
         this.id = id;
     }
 

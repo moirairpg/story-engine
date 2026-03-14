@@ -20,21 +20,20 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntryResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureLorebookEntryRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureLorebookEntryResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateLorebookEntryResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.LorebookEntryResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchLorebookEntriesResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdateLorebookEntryResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -44,21 +43,18 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
     private final AdventureLorebookEntryRequestMapper requestMapper;
-    private final AdventureLorebookEntryResponseMapper responseMapper;
 
     public AdventureLorebookController(UseCaseRunner useCaseRunner,
-            AdventureLorebookEntryRequestMapper requestMapper,
-            AdventureLorebookEntryResponseMapper responseMapper) {
+            AdventureLorebookEntryRequestMapper requestMapper) {
 
         this.useCaseRunner = useCaseRunner;
         this.requestMapper = requestMapper;
-        this.responseMapper = responseMapper;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#adventureId, 'Adventure')")
-    public Mono<SearchLorebookEntriesResponse> search(
+    public Mono<SearchAdventureLorebookEntriesResult> search(
             @PathVariable(required = true) String adventureId,
             LorebookSearchParameters searchParameters) {
 
@@ -74,14 +70,14 @@ public class AdventureLorebookController extends SecurityContextAware {
                     .adventureId(adventureId)
                     .build();
 
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#adventureId, 'Adventure')")
-    public Mono<LorebookEntryResponse> getLorebookEntryById(
+    public Mono<GetAdventureLorebookEntryResult> getLorebookEntryById(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId) {
 
@@ -93,14 +89,14 @@ public class AdventureLorebookController extends SecurityContextAware {
                     .requesterId(authenticatedUser.getDiscordId())
                     .build();
 
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("canModify(#adventureId, 'Adventure')")
-    public Mono<CreateLorebookEntryResponse> createLorebookEntry(
+    public Mono<CreateAdventureLorebookEntryResult> createLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
 
@@ -109,15 +105,14 @@ public class AdventureLorebookController extends SecurityContextAware {
             CreateAdventureLorebookEntry command = requestMapper.toCommand(request,
                     adventureId, authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(command)
-                    .map(responseMapper::toResponse);
+            return useCaseRunner.run(command);
         });
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#adventureId, 'Adventure')")
-    public Mono<UpdateLorebookEntryResponse> updateLorebookEntry(
+    public Mono<UpdateAdventureLorebookEntryResult> updateLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId,
             @Valid @RequestBody UpdateLorebookEntryRequest request) {
@@ -127,8 +122,7 @@ public class AdventureLorebookController extends SecurityContextAware {
             UpdateAdventureLorebookEntry command = requestMapper.toCommand(request, entryId,
                     adventureId, authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(command)
-                    .map(responseMapper::toResponse);
+            return useCaseRunner.run(command);
         });
     }
 

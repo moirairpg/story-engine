@@ -12,11 +12,9 @@ import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurity
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 
 import me.moirai.storyengine.AbstractRestWebTest;
-import me.moirai.storyengine.core.port.inbound.model.SearchModels;
 import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
+import me.moirai.storyengine.core.port.inbound.model.SearchModels;
 import me.moirai.storyengine.core.application.usecase.model.result.AiModelResultFixture;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.AiModelResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.AiModelResponseFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 
 @WebFluxTest(controllers = {
@@ -34,7 +32,7 @@ public class ModelControllerTest extends AbstractRestWebTest {
 
         // Given
         List<AiModelResult> result = list(AiModelResultFixture.gpt35turbo().build());
-        AiModelResponse expectedResponse = AiModelResponseFixture.gpt35turbo().build();
+        AiModelResult expectedResponse = AiModelResultFixture.gpt35turbo().build();
 
         when(useCaseRunner.run(any(SearchModels.class))).thenReturn(result);
 
@@ -43,9 +41,9 @@ public class ModelControllerTest extends AbstractRestWebTest {
                 .uri(MODEL_BASE_URL)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(AiModelResponse.class)
+                .expectBodyList(AiModelResult.class)
                 .value(response -> {
-                    AiModelResponse model = (AiModelResponse) response.get(0);
+                    AiModelResult model = response.get(0);
                     assertThat(model.getFullModelName()).isEqualTo(expectedResponse.getFullModelName());
                     assertThat(model.getInternalModelName()).isEqualTo(expectedResponse.getInternalModelName());
                     assertThat(model.getOfficialModelName()).isEqualTo(expectedResponse.getOfficialModelName());
@@ -58,7 +56,7 @@ public class ModelControllerTest extends AbstractRestWebTest {
 
         // Given
         List<AiModelResult> result = list(AiModelResultFixture.gpt35turbo().build());
-        AiModelResponse expectedResponse = AiModelResponseFixture.gpt35turbo().build();
+        AiModelResult expectedResponse = AiModelResultFixture.gpt35turbo().build();
 
         when(useCaseRunner.run(any(SearchModels.class))).thenReturn(result);
 
@@ -69,9 +67,9 @@ public class ModelControllerTest extends AbstractRestWebTest {
                         .build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(AiModelResponse.class)
+                .expectBodyList(AiModelResult.class)
                 .value(response -> {
-                    AiModelResponse model = (AiModelResponse) response.get(0);
+                    AiModelResult model = response.get(0);
                     assertThat(model.getFullModelName()).isEqualTo(expectedResponse.getFullModelName());
                     assertThat(model.getInternalModelName()).isEqualTo(expectedResponse.getInternalModelName());
                     assertThat(model.getOfficialModelName()).isEqualTo(expectedResponse.getOfficialModelName());
@@ -84,7 +82,7 @@ public class ModelControllerTest extends AbstractRestWebTest {
 
         // Given
         List<AiModelResult> result = list(AiModelResultFixture.gpt35turbo().build());
-        AiModelResponse expectedResponse = AiModelResponseFixture.gpt35turbo().build();
+        AiModelResult expectedResponse = AiModelResultFixture.gpt35turbo().build();
 
         when(useCaseRunner.run(any(SearchModels.class))).thenReturn(result);
 
@@ -95,9 +93,9 @@ public class ModelControllerTest extends AbstractRestWebTest {
                         .build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(AiModelResponse.class)
+                .expectBodyList(AiModelResult.class)
                 .value(response -> {
-                    AiModelResponse model = (AiModelResponse) response.get(0);
+                    AiModelResult model = response.get(0);
                     assertThat(model.getFullModelName()).isEqualTo(expectedResponse.getFullModelName());
                     assertThat(model.getInternalModelName()).isEqualTo(expectedResponse.getInternalModelName());
                     assertThat(model.getOfficialModelName()).isEqualTo(expectedResponse.getOfficialModelName());

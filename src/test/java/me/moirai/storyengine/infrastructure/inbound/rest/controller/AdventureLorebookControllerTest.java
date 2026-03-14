@@ -17,25 +17,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntryResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureLorebookEntryRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureLorebookEntryResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateAdventureResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateLorebookEntryResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.LorebookEntryResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchAdventuresResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchLorebookEntriesResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdateAdventureResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdateLorebookEntryResponse;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 import reactor.core.publisher.Mono;
 
@@ -48,16 +40,13 @@ import reactor.core.publisher.Mono;
 public class AdventureLorebookControllerTest extends AbstractRestWebTest {
 
     @MockBean
-    protected AdventureLorebookEntryResponseMapper adventureLorebookEntryResponseMapper;
-
-    @MockBean
     protected AdventureLorebookEntryRequestMapper adventureLorebookEntryRequestMapper;
 
     @Test
     public void http200WhenSearchLorebookEntries() {
 
         // Given
-        List<LorebookEntryResponse> results = Lists.list(LorebookEntryResponse.builder()
+        List<GetAdventureLorebookEntryResult> results = Lists.list(GetAdventureLorebookEntryResult.builder()
                 .id("ID")
                 .name("NAME")
                 .description("DESC")
@@ -66,31 +55,27 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
                 .lastUpdateDate(OffsetDateTime.now())
                 .build());
 
-        SearchLorebookEntriesResponse expectedResponse = SearchLorebookEntriesResponse.builder()
+        SearchAdventureLorebookEntriesResult expectedResponse = SearchAdventureLorebookEntriesResult.builder()
                 .page(1)
                 .totalPages(2)
-                .totalResults(20)
-                .resultsInPage(10)
+                .totalItems(20)
+                .items(10)
                 .results(results)
                 .build();
 
-        when(useCaseRunner.run(any(SearchAdventureLorebookEntries.class)))
-                .thenReturn(mock(SearchAdventureLorebookEntriesResult.class));
-
-        when(adventureLorebookEntryResponseMapper.toResponse(any(SearchAdventureLorebookEntriesResult.class)))
-                .thenReturn(expectedResponse);
+        when(useCaseRunner.run(any(SearchAdventureLorebookEntries.class))).thenReturn(expectedResponse);
 
         // Then
         webTestClient.get()
                 .uri("/adventure/1234/lorebook")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(SearchAdventuresResponse.class)
+                .expectBody(SearchAdventureLorebookEntriesResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getTotalPages()).isEqualTo(2);
-                    assertThat(response.getTotalResults()).isEqualTo(20);
-                    assertThat(response.getResultsInPage()).isEqualTo(10);
+                    assertThat(response.getTotalItems()).isEqualTo(20);
+                    assertThat(response.getItems()).isEqualTo(10);
                     assertThat(response.getResults()).hasSameSizeAs(results);
                 });
     }
@@ -99,7 +84,7 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchLorebookEntriesWithParameters() {
 
         // Given
-        List<LorebookEntryResponse> results = Lists.list(LorebookEntryResponse.builder()
+        List<GetAdventureLorebookEntryResult> results = Lists.list(GetAdventureLorebookEntryResult.builder()
                 .id("ID")
                 .name("NAME")
                 .description("DESC")
@@ -108,19 +93,15 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
                 .lastUpdateDate(OffsetDateTime.now())
                 .build());
 
-        SearchLorebookEntriesResponse expectedResponse = SearchLorebookEntriesResponse.builder()
+        SearchAdventureLorebookEntriesResult expectedResponse = SearchAdventureLorebookEntriesResult.builder()
                 .page(1)
                 .totalPages(2)
-                .totalResults(20)
-                .resultsInPage(10)
+                .totalItems(20)
+                .items(10)
                 .results(results)
                 .build();
 
-        when(useCaseRunner.run(any(SearchAdventureLorebookEntries.class)))
-                .thenReturn(mock(SearchAdventureLorebookEntriesResult.class));
-
-        when(adventureLorebookEntryResponseMapper.toResponse(any(SearchAdventureLorebookEntriesResult.class)))
-                .thenReturn(expectedResponse);
+        when(useCaseRunner.run(any(SearchAdventureLorebookEntries.class))).thenReturn(expectedResponse);
 
         // Then
         webTestClient.get()
@@ -133,12 +114,12 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
                         .build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(SearchAdventuresResponse.class)
+                .expectBody(SearchAdventureLorebookEntriesResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getTotalPages()).isEqualTo(2);
-                    assertThat(response.getTotalResults()).isEqualTo(20);
-                    assertThat(response.getResultsInPage()).isEqualTo(10);
+                    assertThat(response.getTotalItems()).isEqualTo(20);
+                    assertThat(response.getItems()).isEqualTo(10);
                     assertThat(response.getResults()).hasSameSizeAs(results);
                 });
     }
@@ -147,7 +128,7 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
     public void http200WhenGetLorebookEntryById() {
 
         // Given
-        LorebookEntryResponse expectedResponse = LorebookEntryResponse.builder()
+        GetAdventureLorebookEntryResult expectedResponse = GetAdventureLorebookEntryResult.builder()
                 .id("ID")
                 .name("NAME")
                 .description("DESC")
@@ -156,18 +137,14 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
                 .lastUpdateDate(OffsetDateTime.now())
                 .build();
 
-        when(useCaseRunner.run(any(GetAdventureLorebookEntryById.class)))
-                .thenReturn(mock(GetAdventureLorebookEntryResult.class));
-
-        when(adventureLorebookEntryResponseMapper.toResponse(any(GetAdventureLorebookEntryResult.class)))
-                .thenReturn(expectedResponse);
+        when(useCaseRunner.run(any(GetAdventureLorebookEntryById.class))).thenReturn(expectedResponse);
 
         // Then
         webTestClient.get()
                 .uri("/adventure/1234/lorebook/ID")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(LorebookEntryResponse.class)
+                .expectBody(GetAdventureLorebookEntryResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -188,16 +165,13 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
         request.setDescription("DESC");
         request.setRegex("regex");
 
-        CreateLorebookEntryResponse expectedResponse = CreateLorebookEntryResponse.build("ID");
+        CreateAdventureLorebookEntryResult expectedResponse = CreateAdventureLorebookEntryResult.build("ID");
 
         when(adventureLorebookEntryRequestMapper.toCommand(any(CreateLorebookEntryRequest.class),
                 anyString(), anyString())).thenReturn(mock(CreateAdventureLorebookEntry.class));
 
         when(useCaseRunner.run(any(CreateAdventureLorebookEntry.class)))
-                .thenReturn(Mono.just(mock(CreateAdventureLorebookEntryResult.class)));
-
-        when(adventureLorebookEntryResponseMapper.toResponse(any(CreateAdventureLorebookEntryResult.class)))
-                .thenReturn(expectedResponse);
+                .thenReturn(Mono.just(expectedResponse));
 
         // Then
         webTestClient.post()
@@ -205,7 +179,7 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(CreateAdventureResponse.class)
+                .expectBody(CreateAdventureLorebookEntryResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -221,17 +195,14 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
         request.setDescription("DESC");
         request.setRegex("regex");
 
-        UpdateLorebookEntryResponse expectedResponse = UpdateLorebookEntryResponse
+        UpdateAdventureLorebookEntryResult expectedResponse = UpdateAdventureLorebookEntryResult
                 .build(OffsetDateTime.now());
 
         when(adventureLorebookEntryRequestMapper.toCommand(any(UpdateLorebookEntryRequest.class),
                 anyString(), anyString(), anyString())).thenReturn(mock(UpdateAdventureLorebookEntry.class));
 
         when(useCaseRunner.run(any(UpdateAdventureLorebookEntry.class)))
-                .thenReturn(Mono.just(mock(UpdateAdventureLorebookEntryResult.class)));
-
-        when(adventureLorebookEntryResponseMapper.toResponse(any(UpdateAdventureLorebookEntryResult.class)))
-                .thenReturn(expectedResponse);
+                .thenReturn(Mono.just(expectedResponse));
 
         // Then
         webTestClient.put()
@@ -239,10 +210,10 @@ public class AdventureLorebookControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UpdateAdventureResponse.class)
+                .expectBody(UpdateAdventureLorebookEntryResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getLastUpdateDate()).isEqualTo(expectedResponse.getLastUpdateDate());
+                    assertThat(response.getLastUpdatedDateTime()).isEqualTo(expectedResponse.getLastUpdatedDateTime());
                 });
     }
 

@@ -2,6 +2,10 @@ package me.moirai.storyengine.core.port.inbound.adventure;
 
 import java.time.OffsetDateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = GetAdventureLorebookEntryResult.Builder.class)
 public final class GetAdventureLorebookEntryResult {
 
     private final String id;
@@ -61,6 +65,7 @@ public final class GetAdventureLorebookEntryResult {
         return lastUpdateDate;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String id;

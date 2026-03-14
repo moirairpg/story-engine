@@ -21,13 +21,16 @@ import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AddFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
 import me.moirai.storyengine.core.port.inbound.adventure.RemoveFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
@@ -39,10 +42,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchMod
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.AdventureResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateAdventureResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchAdventuresResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdateAdventureResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -51,21 +50,18 @@ import reactor.core.publisher.Mono;
 public class AdventureController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
-    private final AdventureResponseMapper responseMapper;
     private final AdventureRequestMapper requestMapper;
 
     public AdventureController(UseCaseRunner useCaseRunner,
-            AdventureResponseMapper responseMapper,
             AdventureRequestMapper requestMapper) {
 
         this.useCaseRunner = useCaseRunner;
-        this.responseMapper = responseMapper;
         this.requestMapper = requestMapper;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchAdventuresResponse> search(AdventureSearchParameters searchParameters) {
+    public Mono<SearchAdventuresResult> search(AdventureSearchParameters searchParameters) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -88,47 +84,47 @@ public class AdventureController extends SecurityContextAware {
                     .requesterId(authenticatedUser.getDiscordId())
                     .build();
 
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#adventureId, 'Adventure')")
-    public Mono<AdventureResponse> getAdventureById(
+    public Mono<GetAdventureResult> getAdventureById(
             @PathVariable(required = true) String adventureId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             GetAdventureById query = GetAdventureById.build(adventureId, authenticatedUser.getDiscordId());
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
-    public Mono<CreateAdventureResponse> createAdventure(
+    public Mono<CreateAdventureResult> createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             CreateAdventure command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
-            return responseMapper.toResponse(useCaseRunner.run(command));
+            return useCaseRunner.run(command);
         });
     }
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#adventureId, 'Adventure') && canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
-    public Mono<UpdateAdventureResponse> updateAdventure(
+    public Mono<UpdateAdventureResult> updateAdventure(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             UpdateAdventure command = requestMapper.toCommand(request, adventureId, authenticatedUser.getDiscordId());
-            return responseMapper.toResponse(useCaseRunner.run(command));
+            return useCaseRunner.run(command);
         });
     }
 

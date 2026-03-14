@@ -12,7 +12,6 @@ import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
@@ -21,12 +20,6 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsRe
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.NotificationResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationReadResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponseFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 
 @WebFluxTest(controllers = {
@@ -39,44 +32,33 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
 
     private static final String USER_ID_BASE_URL = "/user/%s";
 
-    @MockBean
-    private UserDataResponseMapper responseMapper;
-
-    @MockBean
-    private NotificationResponseMapper notificationResponseMapper;
-
     @Test
     public void http200WhenUserIsFound() {
 
         // Given
         String userId = "1234";
-        UserDataResponse response = UserDataResponseFixture.create()
-                .discordId(userId)
-                .build();
-
         UserDetailsResult result = UserDetailsResult.builder()
-                .avatarUrl(response.getAvatar())
-                .discordId(response.getDiscordId())
-                .nickname(response.getNickname())
-                .username(response.getUsername())
-                .joinDate(response.getJoinDate())
+                .discordId(userId)
+                .avatarUrl("someAvatarUrl")
+                .nickname("someNickname")
+                .username("someUsername")
+                .joinDate(OffsetDateTime.now())
                 .build();
 
         when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(result);
-        when(responseMapper.toResponse(any(UserDetailsResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()
                 .uri(String.format(USER_ID_BASE_URL, userId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UserDataResponse.class)
+                .expectBody(UserDetailsResult.class)
                 .value(r -> {
-                    assertThat(response).isNotNull();
-                    assertThat(response.getDiscordId()).isEqualTo(r.getDiscordId());
-                    assertThat(response.getNickname()).isEqualTo(r.getNickname());
-                    assertThat(response.getUsername()).isEqualTo(r.getUsername());
-                    assertThat(response.getAvatar()).isEqualTo(r.getAvatar());
+                    assertThat(r).isNotNull();
+                    assertThat(result.getDiscordId()).isEqualTo(r.getDiscordId());
+                    assertThat(result.getNickname()).isEqualTo(r.getNickname());
+                    assertThat(result.getUsername()).isEqualTo(r.getUsername());
+                    assertThat(result.getAvatarUrl()).isEqualTo(r.getAvatarUrl());
                 });
     }
 
@@ -101,19 +83,6 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
         // Given
         String userId = "1234";
         OffsetDateTime readAt = OffsetDateTime.now().minusMonths(1);
-        NotificationResponse response = NotificationResponse.builder()
-                .isGlobal(false)
-                .isInteractable(true)
-                .message("some message")
-                .receiverDiscordId("12345")
-                .senderDiscordId("12345")
-                .type("INFO")
-                .metadata(Maps.newHashMap("someKey", "someValue"))
-                .notificationsRead(list(NotificationReadResponse.builder()
-                        .readAt(readAt)
-                        .userId("12345")
-                        .build()))
-                .build();
 
         List<NotificationResult> result = list(NotificationResult.builder()
                 .isGlobal(false)
@@ -130,14 +99,13 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
                 .build());
 
         when(useCaseRunner.run(any(GetNotificationsByUserId.class))).thenReturn(result);
-        when(notificationResponseMapper.toResponse(any(NotificationResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()
                 .uri(String.format("/user/%s/notifications", userId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(NotificationResponse.class)
+                .expectBodyList(NotificationResult.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
                     assertThat(result.get(0).getMessage()).isEqualTo(r.get(0).getMessage());

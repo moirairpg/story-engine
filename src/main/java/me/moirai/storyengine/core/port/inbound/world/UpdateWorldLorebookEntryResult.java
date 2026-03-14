@@ -2,11 +2,15 @@ package me.moirai.storyengine.core.port.inbound.world;
 
 import java.time.OffsetDateTime;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class UpdateWorldLorebookEntryResult {
 
     private final OffsetDateTime lastUpdatedDateTime;
 
-    public UpdateWorldLorebookEntryResult(OffsetDateTime lastUpdatedDateTime) {
+    @JsonCreator
+    public UpdateWorldLorebookEntryResult(@JsonProperty("lastUpdatedDateTime") OffsetDateTime lastUpdatedDateTime) {
         this.lastUpdatedDateTime = lastUpdatedDateTime;
     }
 

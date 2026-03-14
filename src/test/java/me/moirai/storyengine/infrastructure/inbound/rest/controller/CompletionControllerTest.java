@@ -20,7 +20,6 @@ import me.moirai.storyengine.core.port.inbound.completion.CompleteTextResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.TextCompletionRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.TextCompletionRequestFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.ErrorResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.TextCompletionResponse;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 import reactor.core.publisher.Mono;
 
@@ -56,7 +55,7 @@ public class CompletionControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(TextCompletionResponse.class)
+                .expectBody(CompleteTextResult.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getCompletionTokens()).isEqualTo(expectedResponse.getCompletionTokens());

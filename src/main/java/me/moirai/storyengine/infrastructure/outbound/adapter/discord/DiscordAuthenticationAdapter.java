@@ -34,7 +34,6 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPor
 import me.moirai.storyengine.core.port.outbound.discord.DiscordTokenRevocationRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
 import reactor.core.publisher.Mono;
 

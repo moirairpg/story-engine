@@ -2,6 +2,10 @@ package me.moirai.storyengine.core.port.inbound.discord.userdetails;
 
 import java.time.OffsetDateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = UserDetailsResult.Builder.class)
 public final class UserDetailsResult {
 
     private final String discordId;
@@ -49,6 +53,7 @@ public final class UserDetailsResult {
         return joinDate;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String discordId;

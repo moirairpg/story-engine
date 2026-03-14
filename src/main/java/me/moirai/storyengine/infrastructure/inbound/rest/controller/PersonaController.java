@@ -21,13 +21,16 @@ import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.persona.AddFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
 import me.moirai.storyengine.core.port.inbound.persona.RemoveFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.UpdatePersonaResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.PersonaRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.PersonaResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.PersonaSearchParameters;
@@ -36,10 +39,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDir
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.CreatePersonaResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.PersonaResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchPersonasResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdatePersonaResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -49,20 +48,17 @@ public class PersonaController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
     private final PersonaRequestMapper requestMapper;
-    private final PersonaResponseMapper responseMapper;
 
     public PersonaController(UseCaseRunner useCaseRunner,
-            PersonaRequestMapper requestMapper,
-            PersonaResponseMapper responseMapper) {
+            PersonaRequestMapper requestMapper) {
 
         this.useCaseRunner = useCaseRunner;
         this.requestMapper = requestMapper;
-        this.responseMapper = responseMapper;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchPersonasResponse> search(PersonaSearchParameters searchParameters) {
+    public Mono<SearchPersonasResult> search(PersonaSearchParameters searchParameters) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -79,37 +75,37 @@ public class PersonaController extends SecurityContextAware {
                     .requesterId(authenticatedUser.getDiscordId())
                     .build();
 
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @GetMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#personaId, 'Persona')")
-    public Mono<PersonaResponse> getPersonaById(@PathVariable(required = true) String personaId) {
+    public Mono<GetPersonaResult> getPersonaById(@PathVariable(required = true) String personaId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             GetPersonaById query = GetPersonaById.build(personaId, authenticatedUser.getDiscordId());
-            return responseMapper.toResponse(useCaseRunner.run(query));
+            return useCaseRunner.run(query);
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<CreatePersonaResponse> createPersona(@Valid @RequestBody CreatePersonaRequest request) {
+    public Mono<CreatePersonaResult> createPersona(@Valid @RequestBody CreatePersonaRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             CreatePersona command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
-        }).map(responseMapper::toResponse);
+        });
     }
 
     @PutMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canWrite(#personaId, 'Persona')")
-    public Mono<UpdatePersonaResponse> updatePersona(
+    public Mono<UpdatePersonaResult> updatePersona(
             @PathVariable(required = true) String personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
 
@@ -119,7 +115,7 @@ public class PersonaController extends SecurityContextAware {
                     authenticatedUser.getDiscordId());
 
             return useCaseRunner.run(command);
-        }).map(responseMapper::toResponse);
+        });
     }
 
     @DeleteMapping("/{personaId}")

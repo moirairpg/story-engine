@@ -1,5 +1,9 @@
 package me.moirai.storyengine.core.port.inbound.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = AiModelResult.Builder.class)
 public class AiModelResult {
 
     private final String fullModelName;
@@ -34,6 +38,7 @@ public class AiModelResult {
         return hardTokenLimit;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static final class Builder {
 
         private String fullModelName;

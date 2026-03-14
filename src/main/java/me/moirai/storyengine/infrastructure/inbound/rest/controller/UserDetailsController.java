@@ -16,11 +16,9 @@ import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.NotificationResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationResponse;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -29,26 +27,18 @@ import reactor.core.publisher.Mono;
 public class UserDetailsController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
-    private final UserDataResponseMapper userDataResponseMapper;
-    private final NotificationResponseMapper notificationResponseMapper;
 
-    public UserDetailsController(UseCaseRunner useCaseRunner,
-            UserDataResponseMapper userDataResponseMapper,
-            NotificationResponseMapper notificationResponseMapper) {
-
+    public UserDetailsController(UseCaseRunner useCaseRunner) {
         this.useCaseRunner = useCaseRunner;
-        this.userDataResponseMapper = userDataResponseMapper;
-        this.notificationResponseMapper = notificationResponseMapper;
     }
 
     @GetMapping("/{discordUserId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin()")
-    public Mono<UserDataResponse> getUserByDiscordId(@PathVariable(required = true) String discordUserId) {
+    public Mono<UserDetailsResult> getUserByDiscordId(@PathVariable(required = true) String discordUserId) {
 
         return Mono.just(GetUserDetailsByDiscordId.build(discordUserId))
-                .map(useCaseRunner::run)
-                .map(userDataResponseMapper::toResponse);
+                .map(useCaseRunner::run);
     }
 
     @DeleteMapping("/{discordUserId}")
@@ -63,15 +53,13 @@ public class UserDetailsController extends SecurityContextAware {
     @GetMapping("/{discordUserId}/notifications")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin() || isAuthenticatedUser(#discordUserId)")
-    public Mono<List<NotificationResponse>> getNotificationsByUserId(
+    public Mono<List<NotificationResult>> getNotificationsByUserId(
             @PathVariable(required = true) String discordUserId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             GetNotificationsByUserId request = GetNotificationsByUserId.create(discordUserId);
-            return useCaseRunner.run(request).stream()
-                    .map(notificationResponseMapper::toResponse)
-                    .toList();
+            return useCaseRunner.run(request);
         });
     }
 }
