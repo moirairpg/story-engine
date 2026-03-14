@@ -15,12 +15,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.DeleteUserByDiscordId;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.UserDetailsResult;
-import me.moirai.storyengine.core.application.usecase.notification.request.GetNotificationsByUserId;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationReadResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.NotificationResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationReadResponse;

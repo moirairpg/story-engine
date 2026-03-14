@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.domain.persona;
 
-import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import reactor.core.publisher.Mono;
 
 public interface PersonaService {

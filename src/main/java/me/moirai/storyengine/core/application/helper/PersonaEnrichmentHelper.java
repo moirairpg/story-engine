@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.helper;
 
 import java.util.Map;
 
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
 import reactor.core.publisher.Mono;
 
 public interface PersonaEnrichmentHelper {

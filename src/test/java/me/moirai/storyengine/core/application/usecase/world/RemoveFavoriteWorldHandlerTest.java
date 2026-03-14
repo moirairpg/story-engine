@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.RemoveFavoriteWorld;
+import me.moirai.storyengine.core.port.inbound.world.RemoveFavoriteWorld;
 import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)

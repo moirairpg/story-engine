@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.adventure.request;
 
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 

@@ -3,8 +3,8 @@ package me.moirai.storyengine.core.domain.adventure;
 import java.util.List;
 import java.util.Optional;
 
-import me.moirai.storyengine.core.application.usecase.adventure.request.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.application.usecase.adventure.result.SearchAdventureLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 
 public interface AdventureLorebookEntryRepository {
 

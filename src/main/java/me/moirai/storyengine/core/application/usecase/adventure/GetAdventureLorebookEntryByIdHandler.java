@@ -4,8 +4,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.adventure.request.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureService;
 

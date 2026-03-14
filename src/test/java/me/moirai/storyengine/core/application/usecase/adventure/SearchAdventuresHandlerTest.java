@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.adventure.request.SearchAdventures;
-import me.moirai.storyengine.core.application.usecase.adventure.result.SearchAdventuresResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)

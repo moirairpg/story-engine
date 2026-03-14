@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.core.application.model.request.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.response.ChatMessage;
 import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponse;
 import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponseChoice;

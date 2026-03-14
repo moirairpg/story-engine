@@ -29,12 +29,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
 import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.DiscordTokenRevocationRequest;
+import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordAuthRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -104,7 +104,14 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     }
 
     @Override
-    public Mono<Void> logout(DiscordTokenRevocationRequest request) {
+    public Mono<Void> logout(String clientId, String clientSecret, String token, String tokenTypeHint) {
+
+        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .token(token)
+                .tokenTypeHint(tokenTypeHint)
+                .build();
 
         return postForAuthentication(tokenRevokeUri, request)
                 .bodyToMono(Void.class);

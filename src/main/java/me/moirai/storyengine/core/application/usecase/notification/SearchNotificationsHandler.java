@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.notification;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.notification.request.SearchNotifications;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 
 @UseCaseHandler

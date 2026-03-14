@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.model.result;
 
+import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
+
 public class AiModelResultFixture {
 
     public static AiModelResult.Builder gpt4Omni() {

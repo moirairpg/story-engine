@@ -6,8 +6,8 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.persona.request.GetPersonaById;
-import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
 

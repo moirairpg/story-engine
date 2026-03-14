@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.notification.request;
 
+import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
+
 public class SendNotificationFixture {
 
     public static SendNotification.Builder targetedUnreadInfo() {

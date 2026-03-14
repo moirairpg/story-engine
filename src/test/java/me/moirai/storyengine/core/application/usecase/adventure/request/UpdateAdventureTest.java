@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.adventure.request;
 
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;

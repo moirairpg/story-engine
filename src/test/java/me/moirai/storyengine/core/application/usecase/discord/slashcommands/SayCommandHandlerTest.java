@@ -11,6 +11,7 @@ import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.SayCommand;
 
 public class SayCommandHandlerTest extends AbstractDiscordTest {
 

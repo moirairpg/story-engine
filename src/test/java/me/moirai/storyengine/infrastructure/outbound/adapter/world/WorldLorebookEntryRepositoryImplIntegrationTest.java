@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
-import me.moirai.storyengine.core.application.usecase.world.request.SearchWorldLorebookEntries;
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldLorebookEntryResult;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.domain.world.WorldFixture;

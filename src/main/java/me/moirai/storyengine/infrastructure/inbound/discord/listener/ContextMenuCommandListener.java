@@ -7,8 +7,8 @@ import java.util.Arrays;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.TokenizeInput;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeInput;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;

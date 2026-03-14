@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.persona;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.persona.request.SearchPersonas;
-import me.moirai.storyengine.core.application.usecase.persona.result.SearchPersonasResult;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
 
 @UseCaseHandler

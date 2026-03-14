@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.adventure.request.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureService;

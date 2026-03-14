@@ -12,8 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.model.request.SearchModels;
-import me.moirai.storyengine.core.application.usecase.model.result.AiModelResult;
+import me.moirai.storyengine.core.port.inbound.model.SearchModels;
+import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
 import me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel;
 
 @ExtendWith(MockitoExtension.class)

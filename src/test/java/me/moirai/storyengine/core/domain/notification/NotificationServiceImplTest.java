@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.application.usecase.notification.request.SendNotification;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
 import me.moirai.storyengine.core.application.usecase.notification.request.SendNotificationFixture;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;

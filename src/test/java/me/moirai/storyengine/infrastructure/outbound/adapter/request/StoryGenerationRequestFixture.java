@@ -1,5 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 
+import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
+
 public class StoryGenerationRequestFixture {
 
     public static StoryGenerationRequest.Builder create() {

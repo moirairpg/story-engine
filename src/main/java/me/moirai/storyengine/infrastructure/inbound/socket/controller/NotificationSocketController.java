@@ -6,10 +6,10 @@ import org.springframework.stereotype.Controller;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.application.usecase.notification.request.SendNotification;
-import me.moirai.storyengine.core.application.usecase.notification.request.StreamNotificationsForUser;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.SendNotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
+import me.moirai.storyengine.core.port.inbound.notification.StreamNotificationsForUser;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
 import me.moirai.storyengine.infrastructure.inbound.socket.request.SendNotificationRequest;
 import me.moirai.storyengine.infrastructure.inbound.socket.response.NotificationResponse;
 import me.moirai.storyengine.infrastructure.inbound.socket.response.SendNotificationResponse;

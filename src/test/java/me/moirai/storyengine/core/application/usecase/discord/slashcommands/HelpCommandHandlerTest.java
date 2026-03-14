@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.HelpCommand;
 import me.moirai.storyengine.infrastructure.inbound.discord.slashcommands.DiscordSlashCommand;
 import me.moirai.storyengine.infrastructure.inbound.discord.slashcommands.GoSlashCommand;
 import me.moirai.storyengine.infrastructure.inbound.discord.slashcommands.HelpSlashCommand;

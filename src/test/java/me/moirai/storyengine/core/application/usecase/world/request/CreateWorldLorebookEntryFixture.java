@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.world.request;
 
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
+
 public class CreateWorldLorebookEntryFixture {
 
     public static CreateWorldLorebookEntry.Builder sampleLorebookEntry() {

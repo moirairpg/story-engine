@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
 import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResultFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;

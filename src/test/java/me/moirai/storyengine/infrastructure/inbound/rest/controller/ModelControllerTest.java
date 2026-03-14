@@ -12,8 +12,8 @@ import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurity
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 
 import me.moirai.storyengine.AbstractRestWebTest;
-import me.moirai.storyengine.core.application.usecase.model.request.SearchModels;
-import me.moirai.storyengine.core.application.usecase.model.result.AiModelResult;
+import me.moirai.storyengine.core.port.inbound.model.SearchModels;
+import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
 import me.moirai.storyengine.core.application.usecase.model.result.AiModelResultFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.AiModelResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.AiModelResponseFixture;

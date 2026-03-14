@@ -1,10 +1,9 @@
 package me.moirai.storyengine.core.port;
 
+import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordAuthRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 
 public interface DiscordAuthenticationPort {
@@ -15,5 +14,5 @@ public interface DiscordAuthenticationPort {
 
     Mono<DiscordUserDataResponse> retrieveLoggedUser(String token);
 
-    Mono<Void> logout(DiscordTokenRevocationRequest request);
+    Mono<Void> logout(String clientId, String clientSecret, String token, String tokenTypeHint);
 }

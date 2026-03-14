@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.world.request.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldService;
 

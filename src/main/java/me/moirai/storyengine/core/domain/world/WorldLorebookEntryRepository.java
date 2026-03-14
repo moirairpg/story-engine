@@ -3,8 +3,8 @@ package me.moirai.storyengine.core.domain.world;
 import java.util.List;
 import java.util.Optional;
 
-import me.moirai.storyengine.core.application.usecase.world.request.SearchWorldLorebookEntries;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 
 public interface WorldLorebookEntryRepository {
 

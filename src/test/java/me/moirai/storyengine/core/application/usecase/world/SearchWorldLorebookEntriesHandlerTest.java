@@ -16,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.application.usecase.world.request.SearchWorldLorebookEntries;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;

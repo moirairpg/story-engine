@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.world;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.world.request.SearchWorlds;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
 
 @UseCaseHandler

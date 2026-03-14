@@ -11,8 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.application.usecase.world.CreateWorldHandler;
-import me.moirai.storyengine.core.application.usecase.world.request.CreateWorld;
-import me.moirai.storyengine.core.application.usecase.world.result.CreateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

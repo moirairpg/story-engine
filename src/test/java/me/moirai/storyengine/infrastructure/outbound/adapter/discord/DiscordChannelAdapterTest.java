@@ -27,8 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.DiscordEmbeddedMessageRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequestFixture;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

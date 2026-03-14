@@ -17,14 +17,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureService;
-import me.moirai.storyengine.core.domain.port.TokenizerPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
 
 @SuppressWarnings("unchecked")

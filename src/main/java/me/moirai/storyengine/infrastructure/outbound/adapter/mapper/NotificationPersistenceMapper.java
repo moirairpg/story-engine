@@ -3,8 +3,8 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 
 @Component

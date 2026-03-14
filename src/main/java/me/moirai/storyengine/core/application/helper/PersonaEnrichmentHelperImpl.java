@@ -10,8 +10,8 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
-import me.moirai.storyengine.core.domain.port.TokenizerPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
 import reactor.core.publisher.Mono;
 
 @Helper

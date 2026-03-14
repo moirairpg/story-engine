@@ -11,8 +11,8 @@ import java.util.stream.IntStream;
 import org.apache.commons.collections4.ListUtils;
 
 import me.moirai.storyengine.common.annotation.Helper;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.core.domain.port.TokenizerPort;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
 
 @Helper
 @SuppressWarnings("unchecked")

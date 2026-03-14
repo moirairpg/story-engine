@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.domain.persona;
 
 import java.util.Optional;
 
-import me.moirai.storyengine.core.application.usecase.persona.request.SearchPersonas;
-import me.moirai.storyengine.core.application.usecase.persona.result.SearchPersonasResult;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 
 public interface PersonaRepository {
 

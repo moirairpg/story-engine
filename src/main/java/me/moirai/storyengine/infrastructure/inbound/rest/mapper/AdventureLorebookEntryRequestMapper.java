@@ -2,9 +2,9 @@ package me.moirai.storyengine.infrastructure.inbound.rest.mapper;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.request.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
 

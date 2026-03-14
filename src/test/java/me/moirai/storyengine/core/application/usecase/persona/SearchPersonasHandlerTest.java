@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.persona.request.SearchPersonas;
-import me.moirai.storyengine.core.application.usecase.persona.result.SearchPersonasResult;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
 
 @ExtendWith(MockitoExtension.class)

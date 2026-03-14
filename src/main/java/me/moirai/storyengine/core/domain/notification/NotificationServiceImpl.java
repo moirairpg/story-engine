@@ -4,7 +4,7 @@ import static io.micrometer.common.util.StringUtils.isNotBlank;
 
 import me.moirai.storyengine.common.annotation.DomainService;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.application.usecase.notification.request.SendNotification;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 

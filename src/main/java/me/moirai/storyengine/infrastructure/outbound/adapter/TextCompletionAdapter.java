@@ -14,8 +14,8 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import me.moirai.storyengine.common.exception.OpenAiApiException;
-import me.moirai.storyengine.core.application.model.request.TextGenerationRequest;
-import me.moirai.storyengine.core.application.model.result.TextGenerationResult;
+import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
 import me.moirai.storyengine.core.port.TextCompletionPort;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ChatMessage;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.CompletionRequest;

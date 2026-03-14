@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

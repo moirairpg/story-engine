@@ -4,8 +4,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.notification.request.SendNotification;
-import me.moirai.storyengine.core.application.usecase.notification.result.SendNotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationService;
 

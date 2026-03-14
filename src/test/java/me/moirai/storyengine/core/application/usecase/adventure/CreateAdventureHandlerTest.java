@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureFixture;
-import me.moirai.storyengine.core.application.usecase.adventure.result.CreateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;

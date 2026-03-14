@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersona;
-import me.moirai.storyengine.core.application.usecase.persona.request.UpdatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequestFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdatePersonaRequest;

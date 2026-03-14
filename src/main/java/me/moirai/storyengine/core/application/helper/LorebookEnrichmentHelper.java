@@ -3,8 +3,8 @@ package me.moirai.storyengine.core.application.helper;
 import java.util.List;
 import java.util.Map;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
 
 public interface LorebookEnrichmentHelper {
 

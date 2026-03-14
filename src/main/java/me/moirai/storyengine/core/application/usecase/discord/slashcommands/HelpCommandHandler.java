@@ -10,6 +10,7 @@ import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.HelpCommand;
 import me.moirai.storyengine.infrastructure.inbound.discord.slashcommands.DiscordSlashCommand;
 
 @UseCaseHandler

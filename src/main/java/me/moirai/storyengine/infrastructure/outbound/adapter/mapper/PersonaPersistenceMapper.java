@@ -3,8 +3,8 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResult;
-import me.moirai.storyengine.core.application.usecase.persona.result.SearchPersonasResult;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.domain.persona.Persona;
 
 @Component

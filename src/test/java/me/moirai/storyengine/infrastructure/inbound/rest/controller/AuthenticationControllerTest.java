@@ -14,16 +14,15 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.AuthenticateUser;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.RefreshSessionToken;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponseFixture;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 import reactor.core.publisher.Mono;
 
@@ -106,7 +105,7 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
 
         // Given
         Duration expiredCookie = Duration.ofSeconds(0);
-        when(discordAuthenticationPort.logout(any(DiscordTokenRevocationRequest.class)))
+        when(discordAuthenticationPort.logout(any(), any(), any(), any()))
                 .thenReturn(Mono.empty());
 
         // Then

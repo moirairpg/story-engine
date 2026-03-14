@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.persona.request;
 
+import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Sets.set;
 

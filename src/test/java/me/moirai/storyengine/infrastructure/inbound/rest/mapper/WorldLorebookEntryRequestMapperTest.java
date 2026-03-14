@@ -7,9 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.world.request.DeleteWorldLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
 

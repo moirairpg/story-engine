@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.notification.result;
 
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+
 import static org.assertj.core.util.Maps.newHashMap;
 
 public class NotificationResultFixture {

@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port;
 
 import java.util.Map;
 
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
 
 public interface StorySummarizationPort {

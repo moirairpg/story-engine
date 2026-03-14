@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResultFixture;
-import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

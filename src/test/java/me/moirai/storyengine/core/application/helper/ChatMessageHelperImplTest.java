@@ -15,9 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
-import me.moirai.storyengine.core.domain.port.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)

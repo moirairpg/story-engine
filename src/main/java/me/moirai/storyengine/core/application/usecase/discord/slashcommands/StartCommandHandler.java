@@ -8,17 +8,18 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.AiModelRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.AiModelRequest;
+import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.ModerationConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

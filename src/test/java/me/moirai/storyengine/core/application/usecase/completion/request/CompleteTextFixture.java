@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.completion.request;
 
+import me.moirai.storyengine.core.port.inbound.completion.CompleteText;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 

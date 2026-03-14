@@ -11,9 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.notification.request.SearchNotifications;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 
 @ExtendWith(MockitoExtension.class)

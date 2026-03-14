@@ -5,10 +5,10 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.adventure.result.CreateAdventureLorebookEntryResult;
-import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureLorebookEntryResult;
-import me.moirai.storyengine.core.application.usecase.adventure.result.SearchAdventureLorebookEntriesResult;
-import me.moirai.storyengine.core.application.usecase.adventure.result.UpdateAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntryResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateLorebookEntryResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.LorebookEntryResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchLorebookEntriesResponse;

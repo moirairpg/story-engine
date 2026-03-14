@@ -22,7 +22,7 @@ import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
+import me.moirai.storyengine.core.port.outbound.DiscordEmbeddedMessageRequest;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
 @ExtendWith(MockitoExtension.class)

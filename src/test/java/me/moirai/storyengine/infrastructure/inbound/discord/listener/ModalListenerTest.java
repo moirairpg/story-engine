@@ -16,12 +16,12 @@ import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureAuthorsNoteByChannelId;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureBumpByChannelId;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureNudgeByChannelId;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureRememberByChannelId;
-import me.moirai.storyengine.core.application.usecase.discord.contextmenu.EditMessage;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.SayCommand;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureAuthorsNoteByChannelId;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureBumpByChannelId;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureNudgeByChannelId;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureRememberByChannelId;
+import me.moirai.storyengine.core.port.inbound.discord.contextmenu.EditMessage;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.SayCommand;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;

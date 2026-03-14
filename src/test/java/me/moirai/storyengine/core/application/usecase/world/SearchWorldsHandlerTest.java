@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.SearchWorlds;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)

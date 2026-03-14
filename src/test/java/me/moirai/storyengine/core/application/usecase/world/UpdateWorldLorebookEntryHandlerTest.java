@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.world.result.UpdateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntryResult;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.domain.world.WorldService;

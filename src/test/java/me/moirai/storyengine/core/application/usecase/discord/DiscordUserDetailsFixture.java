@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.discord;
 
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
+
 public class DiscordUserDetailsFixture {
 
     private static final String MENTION_BASE = "<@%s>";

@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.adventure.request.SearchAdventures;
-import me.moirai.storyengine.core.application.usecase.adventure.result.SearchAdventuresResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 
 @UseCaseHandler

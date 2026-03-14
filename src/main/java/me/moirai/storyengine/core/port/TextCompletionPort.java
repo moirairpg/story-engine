@@ -1,7 +1,7 @@
 package me.moirai.storyengine.core.port;
 
-import me.moirai.storyengine.core.application.model.request.TextGenerationRequest;
-import me.moirai.storyengine.core.application.model.result.TextGenerationResult;
+import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
 import reactor.core.publisher.Mono;
 
 public interface TextCompletionPort {

@@ -5,9 +5,9 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationReadResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationReadResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.NotificationResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchNotificationsResponse;

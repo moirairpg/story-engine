@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port;
 
 import java.util.Optional;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 
 public interface DiscordUserDetailsPort {
 

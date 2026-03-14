@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.world.request.DeleteWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldService;
 
 @UseCaseHandler

@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.transaction.Transactional;
 import me.moirai.storyengine.AbstractIntegrationTest;
-import me.moirai.storyengine.core.application.usecase.world.request.SearchWorlds;
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResult;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;

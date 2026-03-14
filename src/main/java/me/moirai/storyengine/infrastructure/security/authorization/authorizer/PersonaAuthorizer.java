@@ -3,8 +3,8 @@ package me.moirai.storyengine.infrastructure.security.authorization.authorizer;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.usecase.persona.request.GetPersonaById;
-import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
 import me.moirai.storyengine.infrastructure.security.authorization.BaseAssetAuthorizer;

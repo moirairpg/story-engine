@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.adventure.request;
 
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
+
 public class UpdateAdventureLorebookEntryFixture {
 
     public static UpdateAdventureLorebookEntry.Builder sampleLorebookEntry() {

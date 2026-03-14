@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.world;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.world.request.CreateWorld;
-import me.moirai.storyengine.core.application.usecase.world.result.CreateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
 import me.moirai.storyengine.core.domain.world.WorldService;
 import reactor.core.publisher.Mono;
 

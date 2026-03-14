@@ -18,7 +18,7 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.application.usecase.world.request.GetWorldById;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.infrastructure.inbound.rest.controller.WorldController;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldResponseMapper;

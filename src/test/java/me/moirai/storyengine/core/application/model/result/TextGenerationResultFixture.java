@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.model.result;
 
+import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
+
 public class TextGenerationResultFixture {
 
     public static TextGenerationResult.Builder create() {

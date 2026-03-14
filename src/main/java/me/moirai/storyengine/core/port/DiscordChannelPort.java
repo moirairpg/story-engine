@@ -3,8 +3,8 @@ package me.moirai.storyengine.core.port;
 import java.util.List;
 import java.util.Optional;
 
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.DiscordEmbeddedMessageRequest;
 
 public interface DiscordChannelPort {
 

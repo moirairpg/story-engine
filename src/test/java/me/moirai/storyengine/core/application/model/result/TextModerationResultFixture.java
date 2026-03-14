@@ -1,6 +1,8 @@
 package me.moirai.storyengine.core.application.model.result;
 
 import java.util.ArrayList;
+
+import me.moirai.storyengine.core.port.outbound.TextModerationResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

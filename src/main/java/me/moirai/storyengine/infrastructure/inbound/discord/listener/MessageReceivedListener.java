@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.core.application.helper.AdventureHelper;
-import me.moirai.storyengine.core.application.usecase.discord.messagereceived.AuthorModeRequest;
-import me.moirai.storyengine.core.application.usecase.discord.messagereceived.ChatModeRequest;
-import me.moirai.storyengine.core.application.usecase.discord.messagereceived.RpgModeRequest;
+import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
+import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
+import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;

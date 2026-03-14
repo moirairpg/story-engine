@@ -2,10 +2,10 @@ package me.moirai.storyengine.core.domain.adventure;
 
 import java.util.List;
 
-import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.request.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.request.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import reactor.core.publisher.Mono;
 
 public interface AdventureService {

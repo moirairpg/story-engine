@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.world.request;
 
+import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 

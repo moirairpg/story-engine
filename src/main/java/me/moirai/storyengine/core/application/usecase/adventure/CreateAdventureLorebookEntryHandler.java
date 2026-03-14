@@ -4,8 +4,8 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.result.CreateAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.domain.adventure.AdventureService;
 import reactor.core.publisher.Mono;
 

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.application.usecase.model.request.SearchModels;
-import me.moirai.storyengine.core.application.usecase.model.result.AiModelResult;
+import me.moirai.storyengine.core.port.inbound.model.SearchModels;
+import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.AiModelResponse;
 import reactor.core.publisher.Mono;
 

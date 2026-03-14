@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.world;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.world.result.CreateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntryResult;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldService;
 import io.micrometer.common.util.StringUtils;

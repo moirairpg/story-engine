@@ -20,12 +20,12 @@ import io.micrometer.common.util.StringUtils;
 import me.moirai.storyengine.common.annotation.Helper;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureService;
-import me.moirai.storyengine.core.domain.port.TokenizerPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
 
 @Helper
 public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {

@@ -20,12 +20,12 @@ import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.usecase.adventure.request.GetAdventureByChannelId;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
 import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureResultFixture;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.GoCommand;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.RetryCommand;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.StartCommand;
-import me.moirai.storyengine.core.application.usecase.discord.slashcommands.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.GoCommand;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;

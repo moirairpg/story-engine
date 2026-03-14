@@ -5,8 +5,8 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersona;
-import me.moirai.storyengine.core.application.usecase.persona.request.UpdatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
+import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdatePersonaRequest;
 

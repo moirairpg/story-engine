@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
@@ -23,7 +24,7 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

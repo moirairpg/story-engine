@@ -5,10 +5,10 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.persona.result.CreatePersonaResult;
-import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResult;
-import me.moirai.storyengine.core.application.usecase.persona.result.SearchPersonasResult;
-import me.moirai.storyengine.core.application.usecase.persona.result.UpdatePersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
+import me.moirai.storyengine.core.port.inbound.persona.UpdatePersonaResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.CreatePersonaResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.PersonaResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchPersonasResponse;

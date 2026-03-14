@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.adventure.result.CreateAdventureResult;
-import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureResult;
-import me.moirai.storyengine.core.application.usecase.adventure.result.SearchAdventuresResult;
-import me.moirai.storyengine.core.application.usecase.adventure.result.UpdateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.AdventureResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateAdventureResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchAdventuresResponse;

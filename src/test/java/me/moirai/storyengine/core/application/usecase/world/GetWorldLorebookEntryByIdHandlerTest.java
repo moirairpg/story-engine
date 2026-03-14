@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.domain.world.WorldService;

@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.persona.request;
 
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
+
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 

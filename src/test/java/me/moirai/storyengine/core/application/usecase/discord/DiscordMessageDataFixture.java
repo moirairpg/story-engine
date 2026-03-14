@@ -1,5 +1,8 @@
 package me.moirai.storyengine.core.application.usecase.discord;
 
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

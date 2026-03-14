@@ -14,8 +14,8 @@ import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripAsN
 import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripChatPrefix;
 import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripTrailingFragment;
 import static me.moirai.storyengine.common.util.DefaultStringProcessors.trimParagraph;
-import static me.moirai.storyengine.core.application.model.request.ChatMessage.Role.ASSISTANT;
-import static me.moirai.storyengine.core.application.model.request.ChatMessage.Role.USER;
+import static me.moirai.storyengine.core.port.outbound.ChatMessage.Role.ASSISTANT;
+import static me.moirai.storyengine.core.port.outbound.ChatMessage.Role.USER;
 import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -28,17 +28,17 @@ import java.util.Map.Entry;
 import me.moirai.storyengine.common.annotation.Helper;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.application.model.request.ChatMessage;
-import me.moirai.storyengine.core.application.model.request.ChatMessage.Role;
-import me.moirai.storyengine.core.application.model.request.TextGenerationRequest;
-import me.moirai.storyengine.core.application.model.result.TextGenerationResult;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.ChatMessage;
+import me.moirai.storyengine.core.port.outbound.ChatMessage.Role;
+import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.core.port.StorySummarizationPort;
 import me.moirai.storyengine.core.port.TextCompletionPort;
 import me.moirai.storyengine.core.port.TextModerationPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.ModerationConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
 
 @Helper

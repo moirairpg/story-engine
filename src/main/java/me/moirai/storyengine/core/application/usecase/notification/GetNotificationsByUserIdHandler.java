@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.notification.request.GetNotificationsByUserId;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationReadResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 

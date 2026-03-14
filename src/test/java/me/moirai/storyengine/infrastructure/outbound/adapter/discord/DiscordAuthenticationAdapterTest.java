@@ -14,12 +14,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import me.moirai.storyengine.AbstractWebMockTest;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
+import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordAuthRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.test.StepVerifier;
 
 public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
@@ -171,37 +170,21 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
     @Test
     public void logoutOnDiscord() {
 
-        // Given
-        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .token(DUMMY_VALUE)
-                .tokenTypeHint(DUMMY_VALUE)
-                .build();
-
         wireMockServer.stubFor(any(anyUrl())
                 .willReturn(aResponse().withHeader(CONTENT_TYPE, APPLICATION_JSON)));
 
         // Then
-        StepVerifier.create(adapter.logout(request))
+        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
                 .verifyComplete();
     }
 
     @Test
     public void unauthorizedWhenLogoutOnDiscord() {
 
-        // Given
-        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .token(DUMMY_VALUE)
-                .tokenTypeHint(DUMMY_VALUE)
-                .build();
-
         prepareWebserverFor(401);
 
         // Then
-        StepVerifier.create(adapter.logout(request))
+        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
                 .expectError(AuthenticationFailedException.class)
                 .verify();
     }
@@ -211,13 +194,6 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
             throws JsonProcessingException {
 
         // Given
-        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .token(DUMMY_VALUE)
-                .tokenTypeHint(DUMMY_VALUE)
-                .build();
-
         DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
                 .errorDescription(DUMMY_VALUE)
                 .error(DUMMY_VALUE)
@@ -226,7 +202,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(errorResponse, 400);
 
         // Then
-        StepVerifier.create(adapter.logout(request))
+        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
                 .verifyError(DiscordApiException.class);
     }
 
@@ -235,13 +211,6 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
             throws JsonProcessingException {
 
         // Given
-        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .token(DUMMY_VALUE)
-                .tokenTypeHint(DUMMY_VALUE)
-                .build();
-
         DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
                 .errorDescription(DUMMY_VALUE)
                 .error(DUMMY_VALUE)
@@ -250,7 +219,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(errorResponse, 500);
 
         // Then
-        StepVerifier.create(adapter.logout(request))
+        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
                 .verifyError(DiscordApiException.class);
     }
 

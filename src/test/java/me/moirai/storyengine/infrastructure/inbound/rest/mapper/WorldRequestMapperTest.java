@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.CreateWorld;
-import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorld;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequestFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateWorldRequest;

@@ -17,8 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.criteria.Predicate;
-import me.moirai.storyengine.core.application.usecase.notification.request.SearchNotifications;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.NotificationPersistenceMapper;

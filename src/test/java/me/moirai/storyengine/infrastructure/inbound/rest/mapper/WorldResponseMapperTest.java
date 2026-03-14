@@ -11,11 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.result.CreateWorldResult;
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
 import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResultFixture;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldsResult;
-import me.moirai.storyengine.core.application.usecase.world.result.UpdateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorldResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.CreateWorldResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.SearchWorldsResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UpdateWorldResponse;

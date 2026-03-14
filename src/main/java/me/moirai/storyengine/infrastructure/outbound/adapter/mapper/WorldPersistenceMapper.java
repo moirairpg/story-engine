@@ -3,8 +3,8 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResult;
-import me.moirai.storyengine.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.world.World;
 
 @Component

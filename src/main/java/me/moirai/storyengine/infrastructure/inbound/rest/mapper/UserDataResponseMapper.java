@@ -2,7 +2,7 @@ package me.moirai.storyengine.infrastructure.inbound.rest.mapper;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
 
 @Component

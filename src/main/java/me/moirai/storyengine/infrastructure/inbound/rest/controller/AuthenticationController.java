@@ -24,14 +24,13 @@ import org.springframework.web.server.ServerWebExchange;
 import io.swagger.v3.oas.annotations.Hidden;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.AuthenticateUser;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.RefreshSessionToken;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie;
 import reactor.core.publisher.Mono;
 
@@ -100,14 +99,8 @@ public class AuthenticationController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                    .clientId(clientId)
-                    .clientSecret(clientSecret)
-                    .token(authenticatedUser.getAuthorizationToken())
-                    .tokenTypeHint(TOKEN_TYPE_HINT)
-                    .build();
-
-            return discordAuthenticationPort.logout(request)
+            return discordAuthenticationPort.logout(clientId, clientSecret,
+                    authenticatedUser.getAuthorizationToken(), TOKEN_TYPE_HINT)
                     .thenReturn(handleSessionTermination(exchange));
         });
     }

@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
-import me.moirai.storyengine.core.application.usecase.notification.request.SearchNotifications;
-import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResult;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
 import me.moirai.storyengine.core.domain.notification.NotificationRepository;

@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.adventure.request.RemoveFavoriteAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.RemoveFavoriteAdventure;
 import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @UseCaseHandler

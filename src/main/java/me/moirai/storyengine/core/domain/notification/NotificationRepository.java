@@ -3,8 +3,8 @@ package me.moirai.storyengine.core.domain.notification;
 import java.util.List;
 import java.util.Optional;
 
-import me.moirai.storyengine.core.application.usecase.notification.request.SearchNotifications;
-import me.moirai.storyengine.core.application.usecase.notification.result.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
+import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 
 public interface NotificationRepository {
 

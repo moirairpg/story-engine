@@ -15,10 +15,10 @@ import me.moirai.storyengine.common.annotation.DomainService;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.request.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.application.usecase.adventure.request.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 

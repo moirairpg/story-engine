@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Value;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.AuthenticateUser;
-import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
 import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordAuthRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

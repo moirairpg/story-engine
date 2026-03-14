@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.world.result;
 
+import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 
