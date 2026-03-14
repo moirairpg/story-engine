@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.port;
+package me.moirai.storyengine.core.port;
 
 import java.util.List;
 import java.util.Optional;

@@ -18,8 +18,8 @@ import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.port.DiscordChannelPort;
 import me.moirai.storyengine.core.application.usecase.discord.slashcommands.TokenizeResult;
+import me.moirai.storyengine.core.port.DiscordChannelPort;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;

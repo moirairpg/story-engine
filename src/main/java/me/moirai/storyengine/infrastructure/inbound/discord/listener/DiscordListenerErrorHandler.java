@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.core.application.port.DiscordChannelPort;
+import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest.Color;
 import net.dv8tion.jda.api.entities.Member;

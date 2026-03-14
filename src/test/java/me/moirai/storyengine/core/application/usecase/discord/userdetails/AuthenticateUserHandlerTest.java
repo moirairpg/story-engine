@@ -14,11 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.AuthenticateUser;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
+import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;

@@ -7,12 +7,12 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.port.DiscordUserDetailsPort;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
+import me.moirai.storyengine.core.port.DiscordUserDetailsPort;
 
 @UseCaseHandler
 public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<GetUserDetailsByDiscordId, UserDetailsResult> {

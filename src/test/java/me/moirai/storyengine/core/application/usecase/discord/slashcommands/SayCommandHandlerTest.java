@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
-import me.moirai.storyengine.core.application.port.DiscordChannelPort;
+import me.moirai.storyengine.core.port.DiscordChannelPort;
 
 public class SayCommandHandlerTest extends AbstractDiscordTest {
 

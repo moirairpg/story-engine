@@ -12,7 +12,6 @@ import me.moirai.storyengine.common.annotation.DomainService;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorld;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldLorebookEntry;
 import me.moirai.storyengine.core.application.usecase.world.request.DeleteWorldLorebookEntry;
@@ -21,6 +20,7 @@ import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorldL
 import me.moirai.storyengine.core.domain.Permissions;
 import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 
 @DomainService

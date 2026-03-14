@@ -21,7 +21,6 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResultFixture;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorld;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldLorebookEntry;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldLorebookEntryFixture;
@@ -31,6 +30,7 @@ import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorldL
 import me.moirai.storyengine.core.domain.Permissions;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.Visibility;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
-import me.moirai.storyengine.core.application.port.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordAuthRequest;

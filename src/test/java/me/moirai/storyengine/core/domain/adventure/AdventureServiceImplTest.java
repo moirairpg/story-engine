@@ -24,7 +24,6 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResult;
 import me.moirai.storyengine.core.application.model.result.TextModerationResultFixture;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
 import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.application.usecase.adventure.request.DeleteAdventureLorebookEntry;
@@ -32,6 +31,7 @@ import me.moirai.storyengine.core.application.usecase.adventure.request.GetAdven
 import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

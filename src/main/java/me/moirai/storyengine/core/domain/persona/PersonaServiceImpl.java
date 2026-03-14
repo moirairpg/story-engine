@@ -10,11 +10,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import me.moirai.storyengine.common.annotation.DomainService;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
 import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersona;
 import me.moirai.storyengine.core.domain.Permissions;
 import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 
 @DomainService

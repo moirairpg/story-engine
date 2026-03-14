@@ -17,12 +17,12 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
 import me.moirai.storyengine.core.application.usecase.persona.request.UpdatePersona;
 import me.moirai.storyengine.core.application.usecase.persona.result.UpdatePersonaResult;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

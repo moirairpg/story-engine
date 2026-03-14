@@ -18,7 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResult;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModerationRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponseError;
 import me.moirai.storyengine.infrastructure.outbound.adapter.response.ModerationResponse;

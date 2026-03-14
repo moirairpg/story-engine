@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.application.usecase.discord.userdetails.request.RefreshSessionToken;
+import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

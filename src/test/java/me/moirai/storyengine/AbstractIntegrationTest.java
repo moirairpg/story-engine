@@ -10,11 +10,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import me.moirai.storyengine.core.application.helper.PersonaEnrichmentHelper;
-import me.moirai.storyengine.core.application.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.application.port.DiscordChannelPort;
-import me.moirai.storyengine.core.application.port.StorySummarizationPort;
-import me.moirai.storyengine.core.application.port.TextCompletionPort;
-import me.moirai.storyengine.core.application.port.TextModerationPort;
+import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.DiscordChannelPort;
+import me.moirai.storyengine.core.port.StorySummarizationPort;
+import me.moirai.storyengine.core.port.TextCompletionPort;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.infrastructure.config.JdaConfig;
 import net.dv8tion.jda.api.JDA;
 

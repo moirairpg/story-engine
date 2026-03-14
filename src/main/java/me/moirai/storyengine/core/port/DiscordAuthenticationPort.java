@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.port;
+package me.moirai.storyengine.core.port;
 
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.DiscordAuthRequest;

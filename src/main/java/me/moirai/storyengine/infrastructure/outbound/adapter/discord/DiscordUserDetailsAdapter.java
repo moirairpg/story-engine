@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.application.port.DiscordUserDetailsPort;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.DiscordUserDetailsPort;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;

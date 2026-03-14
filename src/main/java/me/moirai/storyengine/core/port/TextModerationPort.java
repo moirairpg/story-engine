@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.port;
+package me.moirai.storyengine.core.port;
 
 import me.moirai.storyengine.core.application.model.result.TextModerationResult;
 import reactor.core.publisher.Mono;
