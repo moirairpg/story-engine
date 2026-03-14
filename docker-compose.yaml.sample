@@ -39,7 +39,6 @@ services:
       POSTGRES_DB: moirai
       POSTGRES_USER: moirai
       POSTGRES_PASSWORD: moirai
-      CHATRPG_LOG_LEVEL: INFO
       SUCCESS_REDIRECT_URL: http://localhost/success
       FAIL_REDIRECT_URL: http://localhost/fail
       LOGOUT_REDIRECT_URL: http://localhost/logout

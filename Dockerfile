@@ -23,16 +23,15 @@ ENV POSTGRES_HOST=
 ENV POSTGRES_DB=
 ENV POSTGRES_USER=
 ENV POSTGRES_PASSWORD=
-ENV CHATRPG_LOG_LEVEL=
 ENV SUCCESS_REDIRECT_URL=
 ENV FAIL_REDIRECT_URL=
 ENV LOGOUT_REDIRECT_URL=
 
 WORKDIR /opt/moirai
 
-COPY --from=builder /opt/moirai/target/discordbot-2.1.0-SNAPSHOT.jar discordbot-2.1.0-SNAPSHOT.jar
+COPY --from=builder /opt/moirai/target/storyengine-3.0.0-SNAPSHOT.jar storyengine-3.0.0-SNAPSHOT.jar
 
 EXPOSE 8080
 EXPOSE 8000
 
-CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "-jar", "/opt/moirai/discordbot-2.1.0-SNAPSHOT.jar"]
+CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "-jar", "/opt/moirai/storyengine-3.0.0-SNAPSHOT.jar"]
