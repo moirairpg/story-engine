@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.helper.ChatMessageHelper;
+import me.moirai.storyengine.core.application.helper.ChatMessageAdapter;
 import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
 import me.moirai.storyengine.core.application.model.result.TextGenerationResultFixture;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
@@ -53,7 +53,7 @@ public class ContextSummarizationAdapterTest {
     private TokenizerPort tokenizerPort;
 
     @Mock
-    private ChatMessageHelper chatMessageService;
+    private ChatMessageAdapter chatMessageService;
 
     private StorySummarizationAdapter service;
 

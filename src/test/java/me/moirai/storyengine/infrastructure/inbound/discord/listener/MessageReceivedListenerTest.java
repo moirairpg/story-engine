@@ -17,7 +17,7 @@ import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.helper.AdventureHelper;
+import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
@@ -35,7 +35,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
     private UseCaseRunner useCaseRunner;
 
     @Mock
-    private AdventureHelper adventureHelper;
+    private AdventureRepository adventureRepository;
 
     @Mock
     private DiscordListenerErrorHandler errorHandler;
@@ -81,7 +81,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         when(message.getId()).thenReturn(messageId);
         when(event.getJDA()).thenReturn(jda);
         when(jda.getSelfUser()).thenReturn(selfUser);
-        when(adventureHelper.getGameModeByChannelId(anyString())).thenReturn(gameMode);
+        when(adventureRepository.getGameModeByChannelId(anyString())).thenReturn(gameMode);
         when(channelUnion.sendTyping()).thenReturn(restAction);
 
         Mono<Void> useCaseResult = Mono.just(mock(Void.class));
@@ -132,7 +132,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         when(message.getId()).thenReturn(messageId);
         when(event.getJDA()).thenReturn(jda);
         when(jda.getSelfUser()).thenReturn(selfUser);
-        when(adventureHelper.getGameModeByChannelId(anyString())).thenReturn(gameMode);
+        when(adventureRepository.getGameModeByChannelId(anyString())).thenReturn(gameMode);
         when(channelUnion.sendTyping()).thenReturn(restAction);
 
         Mono<Void> useCaseResult = Mono.just(mock(Void.class));
@@ -174,7 +174,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         when(mentions.getMembers()).thenReturn(Collections.emptyList());
         when(member.getUser()).thenReturn(user);
         when(user.isBot()).thenReturn(true);
-        when(adventureHelper.getGameModeByChannelId(anyString())).thenReturn(gameMode);
+        when(adventureRepository.getGameModeByChannelId(anyString())).thenReturn(gameMode);
 
         // When
         listener.onMessageReceived(event);
@@ -208,7 +208,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         when(mentions.getMembers()).thenReturn(Collections.emptyList());
         when(member.getUser()).thenReturn(user);
         when(user.isBot()).thenReturn(false);
-        when(adventureHelper.getGameModeByChannelId(anyString())).thenReturn(gameMode);
+        when(adventureRepository.getGameModeByChannelId(anyString())).thenReturn(gameMode);
 
         // When
         listener.onMessageReceived(event);
@@ -252,7 +252,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         when(message.getId()).thenReturn(messageId);
         when(event.getJDA()).thenReturn(jda);
         when(jda.getSelfUser()).thenReturn(selfUser);
-        when(adventureHelper.getGameModeByChannelId(anyString())).thenReturn(gameMode);
+        when(adventureRepository.getGameModeByChannelId(anyString())).thenReturn(gameMode);
         when(channelUnion.sendTyping()).thenReturn(restAction);
 
         Mono<Void> useCaseResult = Mono.just(mock(Void.class));
@@ -303,7 +303,7 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         when(message.getId()).thenReturn(messageId);
         when(event.getJDA()).thenReturn(jda);
         when(jda.getSelfUser()).thenReturn(selfUser);
-        when(adventureHelper.getGameModeByChannelId(anyString())).thenReturn(gameMode);
+        when(adventureRepository.getGameModeByChannelId(anyString())).thenReturn(gameMode);
         when(channelUnion.sendTyping()).thenReturn(restAction);
 
         Mono<Void> useCaseResult = Mono.just(mock(Void.class));

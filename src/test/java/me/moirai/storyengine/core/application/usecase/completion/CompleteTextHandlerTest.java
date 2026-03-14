@@ -22,7 +22,7 @@ import me.moirai.storyengine.common.exception.AIModelNotSupportedException;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.core.application.helper.LorebookEnrichmentHelper;
+import me.moirai.storyengine.core.application.port.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
 import me.moirai.storyengine.core.application.model.result.TextGenerationResultFixture;
 import me.moirai.storyengine.core.port.outbound.TextModerationResult;
@@ -58,7 +58,7 @@ public class CompleteTextHandlerTest {
     private WorldRepository worldRepository;
 
     @Mock
-    private LorebookEnrichmentHelper lorebookEnrichmentHelper;
+    private LorebookEnrichmentPort lorebookEnrichmentHelper;
 
     @Mock
     private TextModerationPort textModerationPort;

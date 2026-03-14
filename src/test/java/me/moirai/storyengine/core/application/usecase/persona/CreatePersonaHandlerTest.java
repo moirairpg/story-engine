@@ -3,6 +3,7 @@ package me.moirai.storyengine.core.application.usecase.persona;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -11,11 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersonaFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaService;
+import me.moirai.storyengine.core.domain.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.TextModerationPort;
+import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
+import me.moirai.storyengine.core.port.outbound.TextModerationResult;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -23,7 +26,10 @@ import reactor.test.StepVerifier;
 public class CreatePersonaHandlerTest {
 
     @Mock
-    private PersonaService domainService;
+    private TextModerationPort moderationPort;
+
+    @Mock
+    private PersonaRepository repository;
 
     @InjectMocks
     private CreatePersonaHandler handler;
@@ -46,8 +52,12 @@ public class CreatePersonaHandlerTest {
         Persona persona = PersonaFixture.privatePersona().id(id).build();
         CreatePersona command = CreatePersonaFixture.createPrivatePersona().build();
 
-        when(domainService.createFrom(any(CreatePersona.class)))
-                .thenReturn(Mono.just(persona));
+        TextModerationResult moderationResult = TextModerationResult.builder()
+                .contentFlagged(false)
+                .build();
+
+        when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
+        when(repository.save(any(Persona.class))).thenReturn(persona);
 
         // Then
         StepVerifier.create(handler.handle(command))

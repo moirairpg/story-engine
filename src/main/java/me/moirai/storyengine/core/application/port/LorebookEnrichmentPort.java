@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.helper;
+package me.moirai.storyengine.core.application.port;
 
 import java.util.List;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
 
-public interface LorebookEnrichmentHelper {
+public interface LorebookEnrichmentPort {
 
     Map<String, Object> enrichContextWithLorebookForRpg(List<DiscordMessageData> messagesExtracted, String worldId,
             ModelConfigurationRequest modelConfiguration);

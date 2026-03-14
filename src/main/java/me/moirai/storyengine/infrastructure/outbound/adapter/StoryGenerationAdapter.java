@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.helper;
+package me.moirai.storyengine.infrastructure.outbound.adapter;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
@@ -25,25 +25,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import me.moirai.storyengine.common.annotation.Helper;
+import org.springframework.stereotype.Component;
+
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.port.outbound.ChatMessage;
-import me.moirai.storyengine.core.port.outbound.ChatMessage.Role;
-import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
-import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.application.port.LorebookEnrichmentPort;
+import me.moirai.storyengine.core.application.port.PersonaEnrichmentPort;
+import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.core.port.StorySummarizationPort;
 import me.moirai.storyengine.core.port.TextCompletionPort;
 import me.moirai.storyengine.core.port.TextModerationPort;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.ChatMessage;
+import me.moirai.storyengine.core.port.outbound.ChatMessage.Role;
 import me.moirai.storyengine.core.port.outbound.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
 import reactor.core.publisher.Mono;
 
-@Helper
+@Component
 @SuppressWarnings("unchecked")
-public class StoryGenerationHelperImpl implements StoryGenerationHelper {
+public class StoryGenerationAdapter implements StoryGenerationPort {
 
     private static final String LOREBOOK_ENTRIES = "lorebook";
     private static final String STORY_SUMMARY = "summary";
@@ -55,21 +59,21 @@ public class StoryGenerationHelperImpl implements StoryGenerationHelper {
 
     private final DiscordChannelPort discordChannelPort;
     private final StorySummarizationPort summarizationPort;
-    private final LorebookEnrichmentHelper lorebookEnrichmentHelper;
-    private final PersonaEnrichmentHelper personaEnrichmentPort;
+    private final LorebookEnrichmentPort lorebookEnrichmentPort;
+    private final PersonaEnrichmentPort personaEnrichmentPort;
     private final TextCompletionPort textCompletionPort;
     private final TextModerationPort textModerationPort;
 
-    public StoryGenerationHelperImpl(StorySummarizationPort summarizationPort,
+    public StoryGenerationAdapter(StorySummarizationPort summarizationPort,
             DiscordChannelPort discordChannelPort,
-            LorebookEnrichmentHelper lorebookEnrichmentHelper,
-            PersonaEnrichmentHelper personaEnrichmentPort,
+            LorebookEnrichmentPort lorebookEnrichmentPort,
+            PersonaEnrichmentPort personaEnrichmentPort,
             TextCompletionPort textCompletionPort,
             TextModerationPort textModerationPort) {
 
         this.discordChannelPort = discordChannelPort;
         this.summarizationPort = summarizationPort;
-        this.lorebookEnrichmentHelper = lorebookEnrichmentHelper;
+        this.lorebookEnrichmentPort = lorebookEnrichmentPort;
         this.personaEnrichmentPort = personaEnrichmentPort;
         this.textCompletionPort = textCompletionPort;
         this.textModerationPort = textModerationPort;
@@ -96,11 +100,11 @@ public class StoryGenerationHelperImpl implements StoryGenerationHelper {
             List<DiscordMessageData> messageHistory) {
 
         if (request.getGameMode().equals(RPG)) {
-            return lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(messageHistory,
+            return lorebookEnrichmentPort.enrichContextWithLorebookForRpg(messageHistory,
                     request.getAdventureId(), request.getModelConfiguration());
         }
 
-        return lorebookEnrichmentHelper.enrichContextWithLorebook(messageHistory,
+        return lorebookEnrichmentPort.enrichContextWithLorebook(messageHistory,
                 request.getAdventureId(), request.getModelConfiguration());
     }
 

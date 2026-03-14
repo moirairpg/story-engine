@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.helper.AdventureHelper;
+import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
@@ -26,15 +26,15 @@ public class MessageReceivedListener extends ListenerAdapter {
     private static final String CHAT_MODE = "CHAT";
 
     private final UseCaseRunner useCaseRunner;
-    private final AdventureHelper adventureHelper;
+    private final AdventureRepository adventureRepository;
     private final DiscordListenerErrorHandler errorHandler;
 
     public MessageReceivedListener(UseCaseRunner useCaseRunner,
-            AdventureHelper adventureHelper,
+            AdventureRepository adventureRepository,
             DiscordListenerErrorHandler errorHandler) {
 
         this.useCaseRunner = useCaseRunner;
-        this.adventureHelper = adventureHelper;
+        this.adventureRepository = adventureRepository;
         this.errorHandler = errorHandler;
     }
 
@@ -46,7 +46,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
             String channelId = event.getChannel().getId();
             String messageContent = event.getMessage().getContentRaw();
-            String gameMode = adventureHelper.getGameModeByChannelId(channelId);
+            String gameMode = adventureRepository.getGameModeByChannelId(channelId);
 
             if (StringUtils.isNoneBlank(messageContent, gameMode) && !author.getUser().isBot()) {
                 String botUsername = bot.getUser().getName();

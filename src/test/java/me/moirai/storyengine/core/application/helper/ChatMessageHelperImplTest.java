@@ -27,7 +27,7 @@ public class ChatMessageHelperImplTest {
     private TokenizerPort tokenizerPort;
 
     @InjectMocks
-    private ChatMessageHelperImpl service;
+    private ChatMessageAdapter service;
 
     @Test
     public void addMessagesToContext_whenEnoughTokensAndAssetDefined_thenMessagesAreAdded() {

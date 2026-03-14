@@ -3,6 +3,7 @@ package me.moirai.storyengine.core.application.usecase.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -11,11 +12,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldService;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;
+import me.moirai.storyengine.core.domain.world.WorldRepository;
+import me.moirai.storyengine.core.port.TextModerationPort;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+import me.moirai.storyengine.core.port.outbound.TextModerationResult;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -23,7 +27,13 @@ import reactor.test.StepVerifier;
 public class CreateWorldHandlerTest {
 
     @Mock
-    private WorldService domainService;
+    private TextModerationPort moderationPort;
+
+    @Mock
+    private WorldLorebookEntryRepository lorebookEntryRepository;
+
+    @Mock
+    private WorldRepository repository;
 
     @InjectMocks
     private CreateWorldHandler handler;
@@ -46,8 +56,12 @@ public class CreateWorldHandlerTest {
         World world = WorldFixture.privateWorld().id(id).build();
         CreateWorld command = CreateWorldFixture.createPrivateWorld().build();
 
-        when(domainService.createFrom(any(CreateWorld.class)))
-                .thenReturn(Mono.just(world));
+        TextModerationResult moderationResult = TextModerationResult.builder()
+                .contentFlagged(false)
+                .build();
+
+        when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
+        when(repository.save(any(World.class))).thenReturn(world);
 
         // Then
         StepVerifier.create(handler.handle(command))

@@ -1,10 +1,12 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,14 +14,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.core.domain.PermissionsFixture;
+import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;
+import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
-import me.moirai.storyengine.core.domain.world.WorldService;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteWorldLorebookEntryHandlerTest {
 
     @Mock
-    private WorldService domainService;
+    private WorldLorebookEntryRepository lorebookEntryRepository;
+
+    @Mock
+    private WorldRepository repository;
 
     @InjectMocks
     private DeleteWorldLorebookEntryHandler handler;
@@ -62,12 +73,21 @@ public class DeleteWorldLorebookEntryHandlerTest {
                 .requesterId(requesterId)
                 .build();
 
-        doNothing().when(domainService).deleteLorebookEntry(any(DeleteWorldLorebookEntry.class));
+        World world = WorldFixture.publicWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerId(requesterId)
+                        .build())
+                .build();
+
+        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
 
         // When
         handler.handle(command);
 
         // Then
-        verify(domainService, times(1)).deleteLorebookEntry(any());
+        verify(lorebookEntryRepository, times(1)).deleteById(anyString());
     }
 }

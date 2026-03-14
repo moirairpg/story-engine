@@ -9,7 +9,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import me.moirai.storyengine.core.application.helper.PersonaEnrichmentHelper;
+import me.moirai.storyengine.core.application.port.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.core.port.StorySummarizationPort;
@@ -32,7 +32,7 @@ public abstract class AbstractIntegrationTest {
     private DiscordChannelPort discordChannelOperationsPort;
 
     @MockBean
-    private PersonaEnrichmentHelper inputEnrichmentService;
+    private PersonaEnrichmentPort inputEnrichmentService;
 
     @MockBean
     private StorySummarizationPort contextSummarizationService;

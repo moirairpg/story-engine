@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
+import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -37,7 +37,7 @@ public class ChatModeHandlerTest {
     private DiscordChannelPort discordChannelPort;
 
     @Mock
-    private StoryGenerationHelper storyGenerationPort;
+    private StoryGenerationPort storyGenerationPort;
 
     @InjectMocks
     private ChatModeHandler handler;

@@ -20,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import me.moirai.storyengine.MoiraiApplication;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.application.helper.PersonaEnrichmentHelper;
+import me.moirai.storyengine.core.application.port.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
 import me.moirai.storyengine.core.port.inbound.notification.StreamNotificationsForUser;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
@@ -50,7 +50,7 @@ public class NotificationSocketControllerTest {
     private DiscordChannelPort discordChannelOperationsPort;
 
     @MockBean
-    private PersonaEnrichmentHelper inputEnrichmentService;
+    private PersonaEnrichmentPort inputEnrichmentService;
 
     @MockBean
     private StorySummarizationPort contextSummarizationService;

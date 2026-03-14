@@ -9,25 +9,24 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.collections4.ListUtils;
+import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.annotation.Helper;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.TokenizerPort;
 
-@Helper
+@Component
 @SuppressWarnings("unchecked")
-public class ChatMessageHelperImpl implements ChatMessageHelper {
+public class ChatMessageAdapter {
 
     private static final String MESSAGE_HISTORY = "messageHistory";
     private static final String RETRIEVED_MESSAGES = "retrievedMessages";
 
     private final TokenizerPort tokenizerPort;
 
-    public ChatMessageHelperImpl(TokenizerPort tokenizerPort) {
+    public ChatMessageAdapter(TokenizerPort tokenizerPort) {
         this.tokenizerPort = tokenizerPort;
     }
 
-    @Override
     public Map<String, Object> addMessagesToContext(Map<String, Object> context, int reservedTokens) {
 
         List<DiscordMessageData> retrievedMessages = (List<DiscordMessageData>) context.get(RETRIEVED_MESSAGES);
@@ -53,7 +52,6 @@ public class ChatMessageHelperImpl implements ChatMessageHelper {
         return context;
     }
 
-    @Override
     public Map<String, Object> addMessagesToContext(Map<String, Object> context,
             int reservedTokens, int amountOfMessage) {
 
@@ -82,7 +80,6 @@ public class ChatMessageHelperImpl implements ChatMessageHelper {
         return context;
     }
 
-    @Override
     public Map<String, Object> addMessagesToContext(Map<String, Object> context,
             int reservedTokens, String assetManipulated) {
 

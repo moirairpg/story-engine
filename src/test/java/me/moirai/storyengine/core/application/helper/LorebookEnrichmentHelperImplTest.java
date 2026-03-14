@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +18,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.domain.adventure.AdventureService;
-import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRepository;
+import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.infrastructure.outbound.adapter.LorebookEnrichmentAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
 
 @SuppressWarnings("unchecked")
@@ -37,13 +40,16 @@ public class LorebookEnrichmentHelperImplTest {
     private TokenizerPort tokenizerPort;
 
     @Mock
-    private AdventureService adventureService;
+    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
-    private ChatMessageHelper chatMessageService;
+    private AdventureRepository adventureRepository;
+
+    @Mock
+    private ChatMessageAdapter chatMessageService;
 
     @InjectMocks
-    private LorebookEnrichmentHelperImpl adapter;
+    private LorebookEnrichmentAdapter adapter;
 
     @Test
     void enrichContextWithLorebookForRpg_whenMessagesAreValid_andNormalMode_thenReturnContextWithProcessedPlayerEntries() {
@@ -55,6 +61,7 @@ public class LorebookEnrichmentHelperImplTest {
 
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
+        stubAdventureRepository();
         stubLorebookEntriesByWords();
 
         when(tokenizerPort.getTokenCountFrom(anyString()))
@@ -97,6 +104,7 @@ public class LorebookEnrichmentHelperImplTest {
 
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
+        stubAdventureRepository();
         stubLorebookEntriesByWords();
         stubLorebookEntriesByMention();
         stubLorebookEntriesByAuthor();
@@ -169,6 +177,12 @@ public class LorebookEnrichmentHelperImplTest {
         return list(firstMessage, secondMessage, thirdMessage);
     }
 
+    private void stubAdventureRepository() {
+
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
+        when(adventureRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+    }
+
     private void stubLorebookEntriesByAuthor() {
 
         Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
@@ -192,10 +206,10 @@ public class LorebookEnrichmentHelperImplTest {
                 .adventureId(adventure.getId())
                 .build();
 
-        when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
-                .thenReturn(marcusCharacter)
-                .thenReturn(johnCharacter)
-                .thenReturn(marcusCharacter);
+        when(lorebookEntryRepository.findByPlayerId(anyString(), anyString()))
+                .thenReturn(Optional.of(marcusCharacter))
+                .thenReturn(Optional.of(johnCharacter))
+                .thenReturn(Optional.of(marcusCharacter));
     }
 
     private void stubLorebookEntriesByMention() {
@@ -211,9 +225,8 @@ public class LorebookEnrichmentHelperImplTest {
                 .adventureId(adventure.getId())
                 .build();
 
-        when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
-                .thenReturn(marcusCharacter);
-
+        when(lorebookEntryRepository.findByPlayerId(anyString(), anyString()))
+                .thenReturn(Optional.of(marcusCharacter));
     }
 
     private void stubLorebookEntriesByWords() {
@@ -245,7 +258,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .adventureId(adventure.getId())
                 .build();
 
-        when(adventureService.findAllLorebookEntriesByRegex(anyString(), anyString()))
+        when(lorebookEntryRepository.findAllByRegex(anyString(), anyString()))
                 .thenReturn(list(swordOfFire, gloveOfArmageddon, lordOfDoom));
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.application.helper.ChatMessageHelper;
+import me.moirai.storyengine.core.application.helper.ChatMessageAdapter;
 import me.moirai.storyengine.core.port.outbound.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
@@ -43,13 +43,13 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
     private final String summarizationInstriction;
     private final TextCompletionPort openAiPort;
     private final TokenizerPort tokenizerPort;
-    private final ChatMessageHelper chatMessageService;
+    private final ChatMessageAdapter chatMessageService;
 
     public StorySummarizationAdapter(
             @Value("${moirai.discord.bot.summarization-instruction}") String summarizationInstriction,
             TextCompletionPort openAiPort,
             TokenizerPort tokenizerPort,
-            ChatMessageHelper chatMessageService) {
+            ChatMessageAdapter chatMessageService) {
 
         this.summarizationInstriction = summarizationInstriction;
         this.openAiPort = openAiPort;

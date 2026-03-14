@@ -3,20 +3,32 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRepository;
+import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.domain.adventure.AdventureService;
 
 @UseCaseHandler
 public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<DeleteAdventureLorebookEntry, Void> {
 
     private static final String ENTRY_ID_CANNOT_BE_NULL_OR_EMPTY = "Lorebook entry ID cannot be null or empty";
     private static final String ADVENTURE_ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
+    private static final String ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND = "Adventure to be updated was not found";
+    private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE = "User does not have permission to modify this adventure";
+    private static final String LOREBOOK_ENTRY_TO_BE_DELETED_WAS_NOT_FOUND = "Lorebook entry to be deleted was not found";
 
-    private final AdventureService domainService;
+    private final AdventureLorebookEntryRepository lorebookEntryRepository;
+    private final AdventureRepository repository;
 
-    public DeleteAdventureLorebookEntryHandler(AdventureService domainService) {
-        this.domainService = domainService;
+    public DeleteAdventureLorebookEntryHandler(
+            AdventureLorebookEntryRepository lorebookEntryRepository,
+            AdventureRepository repository) {
+
+        this.lorebookEntryRepository = lorebookEntryRepository;
+        this.repository = repository;
     }
 
     @Override
@@ -34,7 +46,17 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
     @Override
     public Void execute(DeleteAdventureLorebookEntry command) {
 
-        domainService.deleteLorebookEntry(command);
+        Adventure adventure = repository.findById(command.getAdventureId())
+                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
+
+        if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE);
+        }
+
+        lorebookEntryRepository.findById(command.getLorebookEntryId())
+                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_DELETED_WAS_NOT_FOUND));
+
+        lorebookEntryRepository.deleteById(command.getLorebookEntryId());
 
         return null;
     }

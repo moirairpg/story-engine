@@ -1,21 +1,27 @@
-package me.moirai.storyengine.core.application.helper;
+package me.moirai.storyengine.infrastructure.outbound.adapter;
 
 import static java.lang.String.format;
 import static me.moirai.storyengine.common.util.DefaultStringProcessors.replacePersonaNamePlaceholderWith;
 
 import java.util.Map;
 
-import me.moirai.storyengine.common.annotation.Helper;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
+import me.moirai.storyengine.core.application.helper.ChatMessageAdapter;
+import me.moirai.storyengine.core.application.port.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.outbound.TokenizerPort;
 import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.TokenizerPort;
 import reactor.core.publisher.Mono;
 
-@Helper
-public class PersonaEnrichmentHelperImpl implements PersonaEnrichmentHelper {
+@Component
+@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
 
     private static final String PERSONA_DESCRIPTION = "[ DEBUG MODE ON: You are an actor interpreting the role of {name}. {name}'s persona is as follows, and you are to maintain character during this conversation: %s ]";
     private static final String PERSONA = "persona";
@@ -25,12 +31,12 @@ public class PersonaEnrichmentHelperImpl implements PersonaEnrichmentHelper {
 
     private final TokenizerPort tokenizerPort;
     private final PersonaRepository personaRepository;
-    private final ChatMessageHelper chatMessageService;
+    private final ChatMessageAdapter chatMessageService;
 
-    public PersonaEnrichmentHelperImpl(
+    public PersonaEnrichmentAdapter(
             TokenizerPort tokenizerPort,
             PersonaRepository personaRepository,
-            ChatMessageHelper chatMessageService) {
+            ChatMessageAdapter chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;
         this.personaRepository = personaRepository;

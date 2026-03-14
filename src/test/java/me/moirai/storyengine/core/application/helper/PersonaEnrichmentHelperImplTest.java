@@ -23,6 +23,7 @@ import me.moirai.storyengine.core.domain.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.outbound.TokenizerPort;
 import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
+import me.moirai.storyengine.infrastructure.outbound.adapter.PersonaEnrichmentAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
 import reactor.test.StepVerifier;
 
@@ -37,10 +38,10 @@ public class PersonaEnrichmentHelperImplTest {
     private PersonaRepository personaRepository;
 
     @Mock
-    private ChatMessageHelper chatMessageService;
+    private ChatMessageAdapter chatMessageService;
 
     @InjectMocks
-    private PersonaEnrichmentHelperImpl service;
+    private PersonaEnrichmentAdapter service;
 
     @Test
     public void enrichWithPersona_whenSufficientTokens_addPersonaAndMessages() {

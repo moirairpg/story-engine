@@ -11,7 +11,7 @@ import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
+import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -28,11 +28,11 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
 
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
 
-    private final StoryGenerationHelper storyGenerationPort;
+    private final StoryGenerationPort storyGenerationPort;
     private final AdventureRepository adventureRepository;
     private final DiscordChannelPort discordChannelPort;
 
-    public AuthorModeHandler(StoryGenerationHelper storyGenerationPort,
+    public AuthorModeHandler(StoryGenerationPort storyGenerationPort,
             AdventureRepository adventureRepository,
             DiscordChannelPort discordChannelPort) {
 

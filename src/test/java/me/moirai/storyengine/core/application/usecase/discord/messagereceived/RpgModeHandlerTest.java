@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
+import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetailsFixture;
@@ -35,7 +35,7 @@ import reactor.test.StepVerifier;
 public class RpgModeHandlerTest {
 
     @Mock
-    private StoryGenerationHelper storyGenerationPort;
+    private StoryGenerationPort storyGenerationPort;
 
     @Mock
     private AdventureRepository adventureRepository;

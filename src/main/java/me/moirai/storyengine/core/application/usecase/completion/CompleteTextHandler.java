@@ -21,7 +21,7 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.helper.LorebookEnrichmentHelper;
+import me.moirai.storyengine.core.application.port.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
@@ -57,7 +57,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
 
     private final PersonaRepository personaRepository;
     private final WorldRepository worldRepository;
-    private final LorebookEnrichmentHelper lorebookEnrichmentHelper;
+    private final LorebookEnrichmentPort lorebookEnrichmentHelper;
     private final TextModerationPort textModerationPort;
     private final TextCompletionPort textCompletionPort;
     private final DiscordUserDetailsPort discordUserDetailsPort;
@@ -66,7 +66,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     public CompleteTextHandler(
             PersonaRepository personaRepository,
             WorldRepository worldRepository,
-            LorebookEnrichmentHelper lorebookEnrichmentHelper,
+            LorebookEnrichmentPort lorebookEnrichmentHelper,
             TextModerationPort textModerationPort,
             TextCompletionPort textCompletionPort,
             DiscordUserDetailsPort discordUserDetailsPort,

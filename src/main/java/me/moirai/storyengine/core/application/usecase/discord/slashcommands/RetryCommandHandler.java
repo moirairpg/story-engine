@@ -7,7 +7,7 @@ import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
+import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -26,11 +26,11 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
     private static final String COMMAND_ONLY_WHEN_LAST_MESSAGE_BY_BOT = "This command can only be used if the last message in channel was sent by the bot.";
 
     private final DiscordChannelPort discordChannelPort;
-    private final StoryGenerationHelper storyGenerationPort;
+    private final StoryGenerationPort storyGenerationPort;
     private final AdventureRepository adventureRepository;
 
     public RetryCommandHandler(DiscordChannelPort discordChannelPort,
-            StoryGenerationHelper storyGenerationPort,
+            StoryGenerationPort storyGenerationPort,
             AdventureRepository adventureRepository) {
 
         this.discordChannelPort = discordChannelPort;

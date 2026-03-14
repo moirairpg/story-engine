@@ -23,6 +23,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.ModerationException;
+import me.moirai.storyengine.core.application.port.LorebookEnrichmentPort;
+import me.moirai.storyengine.infrastructure.outbound.adapter.StoryGenerationAdapter;
+import me.moirai.storyengine.core.application.port.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
@@ -45,13 +48,13 @@ import reactor.test.StepVerifier;
 public class StoryGenerationHelperImplTest {
 
     @Mock
-    private LorebookEnrichmentHelper lorebookEnrichmentHelper;
+    private LorebookEnrichmentPort lorebookEnrichmentHelper;
 
     @Mock
     private StorySummarizationPort summarizationPort;
 
     @Mock
-    private PersonaEnrichmentHelper personaEnrichmentPort;
+    private PersonaEnrichmentPort personaEnrichmentPort;
 
     @Mock
     private DiscordChannelPort discordChannelOperationsPort;
@@ -66,7 +69,7 @@ public class StoryGenerationHelperImplTest {
     private ArgumentCaptor<TextGenerationRequest> textGenerationRequestCaptor;
 
     @InjectMocks
-    private StoryGenerationHelperImpl adapter;
+    private StoryGenerationAdapter adapter;
 
     @Test
     void givenValidMessage_whenExecute_thenShouldProcessAndSendResponse() {

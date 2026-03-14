@@ -3,19 +3,32 @@ package me.moirai.storyengine.core.application.usecase.world;
 import org.apache.commons.lang3.StringUtils;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;
+import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
-import me.moirai.storyengine.core.domain.world.WorldService;
 
 @UseCaseHandler
 public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetWorldLorebookEntryById, GetWorldLorebookEntryResult> {
 
-    private final WorldService domainService;
+    private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
+    private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD = "User does not have permission to view this world";
+    private static final String LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND = "Lorebook entry to be viewed was not found";
 
-    public GetWorldLorebookEntryByIdHandler(WorldService domainService) {
-        this.domainService = domainService;
+    private final WorldLorebookEntryRepository lorebookEntryRepository;
+    private final WorldRepository repository;
+
+    public GetWorldLorebookEntryByIdHandler(
+            WorldLorebookEntryRepository lorebookEntryRepository,
+            WorldRepository repository) {
+
+        this.lorebookEntryRepository = lorebookEntryRepository;
+        this.repository = repository;
     }
 
     @Override
@@ -33,7 +46,15 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public GetWorldLorebookEntryResult execute(GetWorldLorebookEntryById query) {
 
-        WorldLorebookEntry entry = domainService.findLorebookEntryById(query);
+        World world = repository.findById(query.getWorldId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
+
+        if (!world.canUserRead(query.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD);
+        }
+
+        WorldLorebookEntry entry = lorebookEntryRepository.findById(query.getEntryId())
+                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
 
         return mapResult(entry);
     }

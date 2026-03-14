@@ -1,25 +1,91 @@
 package me.moirai.storyengine.core.application.usecase.persona;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.adventure.Moderation;
+import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.domain.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
-import me.moirai.storyengine.core.domain.persona.PersonaService;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
 public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, Mono<CreatePersonaResult>> {
 
-    private final PersonaService domainService;
+    private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
-    public CreatePersonaHandler(PersonaService domainService) {
-        this.domainService = domainService;
+    private final TextModerationPort moderationPort;
+    private final PersonaRepository repository;
+
+    public CreatePersonaHandler(TextModerationPort moderationPort, PersonaRepository repository) {
+        this.moderationPort = moderationPort;
+        this.repository = repository;
     }
 
     @Override
     public Mono<CreatePersonaResult> execute(CreatePersona command) {
 
-        return domainService.createFrom(command)
+        return moderateContent(command.getPersonality())
+                .flatMap(__ -> moderateContent(command.getName()))
+                .map(__ -> {
+                    Persona.Builder personaBuilder = Persona.builder();
+                    Permissions permissions = Permissions.builder()
+                            .ownerId(command.getRequesterDiscordId())
+                            .usersAllowedToRead(command.getUsersAllowedToRead())
+                            .usersAllowedToWrite(command.getUsersAllowedToWrite())
+                            .build();
+
+                    Persona persona = personaBuilder.name(command.getName())
+                            .personality(command.getPersonality())
+                            .visibility(Visibility.fromString(command.getVisibility()))
+                            .permissions(permissions)
+                            .build();
+
+                    return repository.save(persona);
+                })
                 .map(personaCreated -> CreatePersonaResult.build(personaCreated.getId()));
+    }
+
+    private Mono<List<String>> moderateContent(String personality) {
+
+        if (StringUtils.isBlank(personality)) {
+            return Mono.just(Collections.emptyList());
+        }
+
+        return getTopicsFlaggedByModeration(personality)
+                .map(flaggedTopics -> {
+                    if (CollectionUtils.isNotEmpty(flaggedTopics)) {
+                        throw new ModerationException(PERSONA_FLAGGED_BY_MODERATION, flaggedTopics);
+                    }
+
+                    return flaggedTopics;
+                });
+    }
+
+    private Mono<List<String>> getTopicsFlaggedByModeration(String input) {
+
+        return moderationPort.moderate(input)
+                .map(result -> result.getModerationScores()
+                        .entrySet()
+                        .stream()
+                        .filter(this::isTopicFlagged)
+                        .map(Map.Entry::getKey)
+                        .toList());
+    }
+
+    private boolean isTopicFlagged(Entry<String, Double> entry) {
+        return entry.getValue() > Moderation.PERMISSIVE.getThresholds().get(entry.getKey());
     }
 }

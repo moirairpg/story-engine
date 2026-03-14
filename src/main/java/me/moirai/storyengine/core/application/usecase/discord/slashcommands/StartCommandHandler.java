@@ -7,7 +7,7 @@ import java.util.Collections;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.helper.StoryGenerationHelper;
+import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
@@ -29,10 +29,10 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
 
     private final AdventureRepository adventureRepository;
     private final WorldRepository worldRepository;
-    private final StoryGenerationHelper storyGenerationPort;
+    private final StoryGenerationPort storyGenerationPort;
     private final DiscordChannelPort discordChannelPort;
 
-    public StartCommandHandler(StoryGenerationHelper storyGenerationPort,
+    public StartCommandHandler(StoryGenerationPort storyGenerationPort,
             WorldRepository worldRepository,
             AdventureRepository adventureRepository,
             DiscordChannelPort discordChannelPort) {
