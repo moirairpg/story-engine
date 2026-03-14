@@ -7,8 +7,8 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.application.usecase.adventure.request.AddFavoriteAdventure;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteEntity;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteRepository;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @UseCaseHandler
 public class AddFavoriteAdventureHandler extends AbstractUseCaseHandler<AddFavoriteAdventure, Void> {

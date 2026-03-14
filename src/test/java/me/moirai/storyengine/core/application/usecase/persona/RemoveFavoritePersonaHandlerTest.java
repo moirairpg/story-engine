@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.application.usecase.persona.request.RemoveFavoritePersona;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteRepository;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class RemoveFavoritePersonaHandlerTest {

@@ -21,7 +21,7 @@ import me.moirai.storyengine.core.application.usecase.adventure.request.AddFavor
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteRepository;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AddFavoriteAdventureHandlerTest {

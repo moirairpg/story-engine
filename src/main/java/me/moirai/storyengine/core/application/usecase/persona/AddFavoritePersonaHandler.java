@@ -7,8 +7,8 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.application.usecase.persona.request.AddFavoritePersona;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteEntity;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteRepository;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @UseCaseHandler
 public class AddFavoritePersonaHandler extends AbstractUseCaseHandler<AddFavoritePersona, Void> {

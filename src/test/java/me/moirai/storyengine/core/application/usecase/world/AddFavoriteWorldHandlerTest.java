@@ -21,7 +21,7 @@ import me.moirai.storyengine.core.application.usecase.world.request.AddFavoriteW
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
-import me.moirai.storyengine.infrastructure.outbound.persistence.FavoriteRepository;
+import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AddFavoriteWorldHandlerTest {
