@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.application.usecase.discord.contextmenu;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.core.port.inbound.discord.contextmenu.EditMessage;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 
 @UseCaseHandler
 public class EditMessageHandler extends AbstractUseCaseHandler<EditMessage, Void> {

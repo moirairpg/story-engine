@@ -7,8 +7,8 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaRepository;
 
 @UseCaseHandler
 public class DeletePersonaHandler extends AbstractUseCaseHandler<DeletePersona, Void> {

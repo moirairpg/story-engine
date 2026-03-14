@@ -12,8 +12,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -45,7 +45,7 @@ public class RefreshSessionTokenHandlerTest {
         String token = "TOKEN";
         RefreshSessionToken request = RefreshSessionToken.build(token);
 
-        DiscordAuthResponse authResponse = DiscordAuthResponse.builder()
+        AuthenticateUserResult authResponse = AuthenticateUserResult.builder()
                 .accessToken("token")
                 .expiresIn(1234L)
                 .refreshToken("token")

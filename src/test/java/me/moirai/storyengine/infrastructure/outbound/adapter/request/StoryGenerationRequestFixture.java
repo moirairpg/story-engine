@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 
-import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 
 public class StoryGenerationRequestFixture {
 

@@ -18,10 +18,10 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRepository;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchAdventureLorebookEntriesHandlerTest {

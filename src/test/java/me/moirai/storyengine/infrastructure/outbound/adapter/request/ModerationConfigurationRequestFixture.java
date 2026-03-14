@@ -3,7 +3,7 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.moirai.storyengine.core.port.outbound.ModerationConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 
 public class ModerationConfigurationRequestFixture {
 

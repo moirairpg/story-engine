@@ -10,9 +10,9 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
-import me.moirai.storyengine.core.port.DiscordUserDetailsPort;
 
 @UseCaseHandler
 public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<GetUserDetailsByDiscordId, UserDetailsResult> {
@@ -20,11 +20,11 @@ public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<Get
     private static final String USER_NOT_REGISTERED_IN_MOIRAI = "The User with the requested ID is not registered in MoirAI";
     private static final String DISCORD_USER_DOES_NOT_EXIST = "The Discord User with the requested ID does not exist";
 
-    private final UserDomainRepository repository;
+    private final UserRepository repository;
     private final DiscordUserDetailsPort discordUserDetailsPort;
 
     public GetUserDetailsByDiscordIdHandler(
-            UserDomainRepository repository,
+            UserRepository repository,
             DiscordUserDetailsPort discordUserDetailsPort) {
 
         this.repository = repository;

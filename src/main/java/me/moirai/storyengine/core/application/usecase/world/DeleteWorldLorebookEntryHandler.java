@@ -7,9 +7,9 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
+import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class DeleteWorldLorebookEntryHandler extends AbstractUseCaseHandler<DeleteWorldLorebookEntry, Void> {

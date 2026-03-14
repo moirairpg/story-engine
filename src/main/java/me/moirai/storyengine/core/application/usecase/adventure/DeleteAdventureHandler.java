@@ -7,8 +7,8 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 
 @UseCaseHandler
 public class DeleteAdventureHandler extends AbstractUseCaseHandler<DeleteAdventure, Void> {

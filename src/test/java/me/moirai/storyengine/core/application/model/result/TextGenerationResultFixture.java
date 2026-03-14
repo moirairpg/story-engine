@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.application.model.result;
 
-import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
 
 public class TextGenerationResultFixture {
 

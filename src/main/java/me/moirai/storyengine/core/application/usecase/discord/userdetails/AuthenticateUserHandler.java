@@ -10,11 +10,10 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
-import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
-import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -26,14 +25,14 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
     private final String clientId;
     private final String clientSecret;
     private final String redirectUri;
-    private final UserDomainRepository repository;
+    private final UserRepository repository;
     private final DiscordAuthenticationPort discordAuthenticationPort;
 
     public AuthenticateUserHandler(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
             @Value("${moirai.discord.oauth.client-secret}") String clientSecret,
             @Value("${moirai.discord.oauth.redirect-url}") String redirectUri,
-            UserDomainRepository repository,
+            UserRepository repository,
             DiscordAuthenticationPort discordAuthenticationPort) {
 
         this.clientId = clientId;
@@ -56,8 +55,7 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
 
         DiscordAuthRequest request = createDiscordAuthRequest(useCase.getAuthenticationCode());
         return discordAuthenticationPort.authenticate(request)
-                .flatMap(this::createUserIfNotExists)
-                .map(this::toResult);
+                .flatMap(this::createUserIfNotExists);
     }
 
     private DiscordAuthRequest createDiscordAuthRequest(String code) {
@@ -72,14 +70,14 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
                 .build();
     }
 
-    private Mono<DiscordAuthResponse> createUserIfNotExists(DiscordAuthResponse discordAuthResponse) {
+    private Mono<AuthenticateUserResult> createUserIfNotExists(AuthenticateUserResult authenticateUserResult) {
 
-        return discordAuthenticationPort.retrieveLoggedUser(discordAuthResponse.getAccessToken())
+        return discordAuthenticationPort.retrieveLoggedUser(authenticateUserResult.getAccessToken())
                 .map(discordUserDetails -> {
                     repository.findByDiscordId(discordUserDetails.getId())
                             .orElseGet(() -> createUser(discordUserDetails));
 
-                    return discordAuthResponse;
+                    return authenticateUserResult;
                 });
     }
 
@@ -90,16 +88,5 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
                 .creatorId(discordUserDetails.getId())
                 .role(PLAYER)
                 .build());
-    }
-
-    private AuthenticateUserResult toResult(DiscordAuthResponse discordAuthResponse) {
-
-        return AuthenticateUserResult.builder()
-                .accessToken(discordAuthResponse.getAccessToken())
-                .refreshToken(discordAuthResponse.getRefreshToken())
-                .expiresIn(discordAuthResponse.getExpiresIn())
-                .tokenType(discordAuthResponse.getTokenType())
-                .scope(discordAuthResponse.getScope())
-                .build();
     }
 }

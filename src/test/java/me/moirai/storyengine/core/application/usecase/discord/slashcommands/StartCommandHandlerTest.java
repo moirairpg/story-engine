@@ -14,17 +14,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
-import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
-import me.moirai.storyengine.core.port.DiscordChannelPort;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

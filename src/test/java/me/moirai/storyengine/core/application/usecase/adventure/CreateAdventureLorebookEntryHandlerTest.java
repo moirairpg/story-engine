@@ -19,11 +19,11 @@ import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRepository;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.TextModerationResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

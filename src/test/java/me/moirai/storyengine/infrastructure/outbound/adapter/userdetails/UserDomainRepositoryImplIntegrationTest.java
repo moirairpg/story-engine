@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
-    private UserDomainRepository repository;
+    private UserRepository repository;
 
     @Autowired
     private UserJpaRepository jpaRepository;

@@ -8,9 +8,8 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
-import me.moirai.storyengine.core.port.outbound.RefreshSessionTokenRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -45,8 +44,7 @@ public class RefreshSessionTokenHandler
     public Mono<AuthenticateUserResult> execute(RefreshSessionToken useCase) {
 
         RefreshSessionTokenRequest request = createDiscordAuthRequest(useCase.getRefreshToken());
-        return discordAuthenticationPort.refreshSessionToken(request)
-                .map(this::toResult);
+        return discordAuthenticationPort.refreshSessionToken(request);
     }
 
     private RefreshSessionTokenRequest createDiscordAuthRequest(String refreshToken) {
@@ -56,17 +54,6 @@ public class RefreshSessionTokenHandler
                 .grantType(DISCORD_GRANT_TYPE)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .build();
-    }
-
-    private AuthenticateUserResult toResult(DiscordAuthResponse discordAuthResponse) {
-
-        return AuthenticateUserResult.builder()
-                .accessToken(discordAuthResponse.getAccessToken())
-                .refreshToken(discordAuthResponse.getRefreshToken())
-                .expiresIn(discordAuthResponse.getExpiresIn())
-                .tokenType(discordAuthResponse.getTokenType())
-                .scope(discordAuthResponse.getScope())
                 .build();
     }
 }

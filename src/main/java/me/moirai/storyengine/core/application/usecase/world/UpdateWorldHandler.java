@@ -19,10 +19,10 @@ import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

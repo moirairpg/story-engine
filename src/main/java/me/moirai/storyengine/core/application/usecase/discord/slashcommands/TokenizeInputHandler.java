@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeInput;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
 

@@ -15,10 +15,10 @@ import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

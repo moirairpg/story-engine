@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchAdventuresHandlerTest {

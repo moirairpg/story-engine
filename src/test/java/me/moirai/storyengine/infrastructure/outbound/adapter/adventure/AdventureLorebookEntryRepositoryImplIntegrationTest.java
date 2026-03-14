@@ -14,12 +14,12 @@ import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRepository;
 
 public class AdventureLorebookEntryRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 

@@ -14,9 +14,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponseError;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.ModerationResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.ModerationResult;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.ModerationResponse;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.ModerationResult;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.TextModerationAdapter;
 import reactor.test.StepVerifier;
 
 public class TextModerationAdapterTest extends AbstractWebMockTest {

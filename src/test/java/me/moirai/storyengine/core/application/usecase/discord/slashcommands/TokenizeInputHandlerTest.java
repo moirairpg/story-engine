@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.outbound.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeInput;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
 

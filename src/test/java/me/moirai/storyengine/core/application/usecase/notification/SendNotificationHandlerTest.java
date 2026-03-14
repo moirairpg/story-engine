@@ -13,18 +13,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
 import me.moirai.storyengine.core.application.usecase.notification.request.SendNotificationFixture;
-import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
-import me.moirai.storyengine.core.domain.notification.NotificationService;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
+import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SendNotificationHandlerTest {
 
     @Mock
-    private NotificationService notificationService;
+    private NotificationRepository notificationRepository;
 
     @InjectMocks
     private SendNotificationHandler handler;
@@ -91,7 +91,7 @@ public class SendNotificationHandlerTest {
                 .creationDate(OffsetDateTime.parse("2025-01-02T12:00:00.000000Z"))
                 .build();
 
-        when(notificationService.sendNotification(any())).thenReturn(expectedNotification);
+        when(notificationRepository.save(any())).thenReturn(expectedNotification);
 
         // When
         SendNotificationResult result = handler.handle(request);
@@ -111,7 +111,7 @@ public class SendNotificationHandlerTest {
                 .creationDate(OffsetDateTime.parse("2025-01-02T12:00:00.000000Z"))
                 .build();
 
-        when(notificationService.sendNotification(any())).thenReturn(expectedNotification);
+        when(notificationRepository.save(any())).thenReturn(expectedNotification);
 
         // When
         SendNotificationResult result = handler.handle(request);

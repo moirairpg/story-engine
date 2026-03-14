@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel;
-import me.moirai.storyengine.core.port.outbound.AiModelRequest;
-import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
+import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 
 public class ModelConfigurationRequestFixture {
 

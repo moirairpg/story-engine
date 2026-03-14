@@ -16,11 +16,11 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

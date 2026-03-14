@@ -11,13 +11,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import me.moirai.storyengine.AbstractWebMockTest;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
-import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
-import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
-import me.moirai.storyengine.core.port.outbound.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
 import reactor.test.StepVerifier;
 
@@ -45,13 +47,12 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
                 .grantType(DUMMY_VALUE)
                 .build();
 
-        DiscordAuthResponse response = DiscordAuthResponse.builder()
-                .accessToken(DUMMY_VALUE)
-                .expiresIn(424234L)
-                .refreshToken(DUMMY_VALUE)
-                .scope(DUMMY_VALUE)
-                .tokenType(DUMMY_VALUE)
-                .build();
+        Map<String, Object> response = new HashMap<>();
+        response.put("access_token", DUMMY_VALUE);
+        response.put("expires_in", 424234L);
+        response.put("refresh_token", DUMMY_VALUE);
+        response.put("scope", DUMMY_VALUE);
+        response.put("token_type", DUMMY_VALUE);
 
         prepareWebserverFor(response, 200);
 
@@ -76,13 +77,12 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
                 .scope(DUMMY_VALUE)
                 .build();
 
-        DiscordAuthResponse response = DiscordAuthResponse.builder()
-                .accessToken(DUMMY_VALUE)
-                .expiresIn(424234L)
-                .refreshToken(DUMMY_VALUE)
-                .scope(DUMMY_VALUE)
-                .tokenType(DUMMY_VALUE)
-                .build();
+        Map<String, Object> response = new HashMap<>();
+        response.put("access_token", DUMMY_VALUE);
+        response.put("expires_in", 424234L);
+        response.put("refresh_token", DUMMY_VALUE);
+        response.put("scope", DUMMY_VALUE);
+        response.put("token_type", DUMMY_VALUE);
 
         prepareWebserverFor(response, 200);
 

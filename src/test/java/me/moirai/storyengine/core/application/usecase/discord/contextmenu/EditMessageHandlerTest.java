@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.contextmenu.EditMessage;
-import me.moirai.storyengine.core.port.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 
 public class EditMessageHandlerTest extends AbstractDiscordTest {
 

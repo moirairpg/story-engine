@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetail
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.UserDataResponseMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.UserDataResponseFixture;

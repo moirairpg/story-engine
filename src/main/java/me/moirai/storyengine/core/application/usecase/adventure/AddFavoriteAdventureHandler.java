@@ -5,8 +5,8 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.adventure.AddFavoriteAdventure;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
 import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 

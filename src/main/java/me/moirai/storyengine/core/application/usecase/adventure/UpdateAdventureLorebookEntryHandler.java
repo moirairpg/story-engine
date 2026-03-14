@@ -17,12 +17,12 @@ import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRepository;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

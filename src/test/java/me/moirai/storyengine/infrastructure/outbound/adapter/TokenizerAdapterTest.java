@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.TokenizerAdapter;
 
 public class TokenizerAdapterTest {
 

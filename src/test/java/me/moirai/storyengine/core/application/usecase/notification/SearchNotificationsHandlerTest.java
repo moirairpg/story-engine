@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
-import me.moirai.storyengine.core.domain.notification.NotificationRepository;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchNotificationsHandlerTest {

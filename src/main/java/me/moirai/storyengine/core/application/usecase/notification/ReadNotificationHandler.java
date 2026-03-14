@@ -9,9 +9,9 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
-import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 
 @UseCaseHandler
 public class ReadNotificationHandler

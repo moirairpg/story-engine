@@ -10,8 +10,8 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
-import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 
 @UseCaseHandler
 public class GetNotificationsByUserIdHandler

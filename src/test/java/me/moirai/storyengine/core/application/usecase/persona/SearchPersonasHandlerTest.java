@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
-import me.moirai.storyengine.core.domain.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchPersonasHandlerTest {

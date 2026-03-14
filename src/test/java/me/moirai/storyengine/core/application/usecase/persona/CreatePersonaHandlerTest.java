@@ -15,10 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.application.usecase.persona.request.CreatePersonaFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
-import me.moirai.storyengine.core.port.outbound.TextModerationResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

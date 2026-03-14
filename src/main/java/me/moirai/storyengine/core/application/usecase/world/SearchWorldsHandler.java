@@ -4,7 +4,7 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class SearchWorldsHandler extends AbstractUseCaseHandler<SearchWorlds, SearchWorldsResult> {

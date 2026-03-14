@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
-import me.moirai.storyengine.core.port.DiscordChannelPort;
-import me.moirai.storyengine.core.port.outbound.DiscordEmbeddedMessageRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordEmbeddedMessageRequest;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;

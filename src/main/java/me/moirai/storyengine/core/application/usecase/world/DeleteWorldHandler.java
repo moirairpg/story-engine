@@ -7,8 +7,8 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
 
 @UseCaseHandler
 public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void> {

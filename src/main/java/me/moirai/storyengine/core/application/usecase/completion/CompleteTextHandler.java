@@ -2,9 +2,8 @@ package me.moirai.storyengine.core.application.usecase.completion;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toCollection;
-import static me.moirai.storyengine.core.port.outbound.ChatMessage.Role.ASSISTANT;
-import static me.moirai.storyengine.core.port.outbound.ChatMessage.Role.SYSTEM;
-import static me.moirai.storyengine.core.port.outbound.ChatMessage.Role.USER;
+import static me.moirai.storyengine.common.enums.AiRole.ASSISTANT;
+import static me.moirai.storyengine.common.enums.AiRole.USER;
 import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.fromString;
 import static me.moirai.storyengine.core.domain.adventure.Moderation.DISABLED;
 import static org.apache.commons.collections4.MapUtils.isEmpty;
@@ -17,33 +16,33 @@ import java.util.stream.Collectors;
 
 import io.micrometer.common.util.StringUtils;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.port.LorebookEnrichmentPort;
-import me.moirai.storyengine.core.port.outbound.ChatMessage;
-import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
-import me.moirai.storyengine.core.port.outbound.TextGenerationResult;
+import me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel;
+import me.moirai.storyengine.core.domain.adventure.Moderation;
+import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.completion.CompleteText;
 import me.moirai.storyengine.core.port.inbound.completion.CompleteText.Message;
 import me.moirai.storyengine.core.port.inbound.completion.CompleteTextResult;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
-import me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.outbound.TokenizerPort;
-import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
-import me.moirai.storyengine.core.port.DiscordUserDetailsPort;
-import me.moirai.storyengine.core.port.TextCompletionPort;
-import me.moirai.storyengine.core.port.TextModerationPort;
-import me.moirai.storyengine.core.port.outbound.AiModelRequest;
-import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
-import me.moirai.storyengine.core.port.outbound.ModerationConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
+import me.moirai.storyengine.core.port.outbound.generation.LorebookEnrichmentPort;
+import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
+import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -107,10 +106,10 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
                 .map(this::mapMessage)
                 .collect(toCollection(ArrayList::new));
 
-        ChatMessage personality = ChatMessage.build(SYSTEM, persona.getPersonality());
+        ChatMessage personality = ChatMessage.asSystem(persona.getPersonality());
         ChatMessage lorebook = extractLorebookEntriesFromHistory(useCase, world, author, model);
 
-        if (StringUtils.isNotBlank(lorebook.getContent())) {
+        if (StringUtils.isNotBlank(lorebook.content())) {
             context.addFirst(lorebook);
         }
 
@@ -132,7 +131,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     }
 
     private ChatMessage mapMessage(Message message) {
-        return ChatMessage.build(message.isAuthorBot() ? ASSISTANT : USER, message.getMessageContent());
+        return new ChatMessage(message.isAuthorBot() ? ASSISTANT : USER, message.getMessageContent());
     }
 
     private ChatMessage extractLorebookEntriesFromHistory(CompleteText useCase, World world,
@@ -161,7 +160,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
 
         String lorebook = (String) context.get("lorebook");
 
-        return ChatMessage.build(SYSTEM, lorebook);
+        return ChatMessage.asSystem(lorebook);
     }
 
     private Mono<TextGenerationResult> generateAiOutput(
@@ -199,7 +198,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
             ModerationConfigurationRequest moderation) {
 
         String messageHistory = messages.stream()
-                .map(ChatMessage::getContent)
+                .map(ChatMessage::content)
                 .collect(Collectors.joining("\n"));
 
         return getTopicsFlaggedByModeration(messageHistory, moderation)

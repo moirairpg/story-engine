@@ -16,10 +16,10 @@ import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
 import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 

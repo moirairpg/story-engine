@@ -16,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

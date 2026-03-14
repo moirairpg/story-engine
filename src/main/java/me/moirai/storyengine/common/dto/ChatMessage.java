@@ -1,10 +1,14 @@
 package me.moirai.storyengine.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import me.moirai.storyengine.common.enums.AiRole;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record ChatMessage(
-        AiRole role,
-        String content) {
+        @JsonProperty("role") AiRole role,
+        @JsonProperty("content") String content) {
 
     public static ChatMessage asSystem(String content) {
 

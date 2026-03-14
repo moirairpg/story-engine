@@ -8,16 +8,16 @@ import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.application.port.StoryGenerationPort;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.DiscordChannelPort;
-import me.moirai.storyengine.core.port.outbound.AiModelRequest;
-import me.moirai.storyengine.core.port.outbound.ModelConfigurationRequest;
-import me.moirai.storyengine.core.port.outbound.ModerationConfigurationRequest;
-import me.moirai.storyengine.core.port.outbound.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler

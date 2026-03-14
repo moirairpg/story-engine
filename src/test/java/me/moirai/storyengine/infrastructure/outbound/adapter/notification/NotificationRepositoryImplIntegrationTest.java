@@ -14,9 +14,9 @@ import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
-import me.moirai.storyengine.core.domain.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
 
 @Sql(statements = { "DELETE FROM notification_read", "DELETE FROM notification" })

@@ -4,18 +4,22 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.notification.Notification;
+import me.moirai.storyengine.core.domain.notification.NotificationType;
 import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
 import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
-import me.moirai.storyengine.core.domain.notification.Notification;
-import me.moirai.storyengine.core.domain.notification.NotificationService;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
+import reactor.core.publisher.Sinks;
 
 @UseCaseHandler
 public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotification, SendNotificationResult> {
 
-    private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
+    private final Sinks.Many<String> sink;
 
-    public SendNotificationHandler(NotificationService notificationService) {
-        this.notificationService = notificationService;
+    public SendNotificationHandler(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+        this.sink = Sinks.many().multicast().onBackpressureBuffer();
     }
 
     @Override
@@ -41,7 +45,17 @@ public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotifica
     @Override
     public SendNotificationResult execute(SendNotification request) {
 
-        Notification notification = notificationService.sendNotification(request);
+        Notification notification = notificationRepository.save(Notification.builder()
+                .isGlobal(request.isGlobal())
+                .isInteractable(request.isInteractable())
+                .message(request.getMessage())
+                .metadata(request.getMetadata())
+                .receiverDiscordId(request.getReceiverDiscordId())
+                .senderDiscordId(request.getSenderDiscordId())
+                .type(NotificationType.fromString(request.getType()))
+                .build());
+
+        sink.tryEmitNext(notification.getId());
         return SendNotificationResult.withIdAndCreationDateTime(notification.getId(), notification.getCreationDate());
     }
 }

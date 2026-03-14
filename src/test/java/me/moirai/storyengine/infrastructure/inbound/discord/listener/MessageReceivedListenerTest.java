@@ -17,10 +17,10 @@ import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import net.dv8tion.jda.api.entities.Mentions;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

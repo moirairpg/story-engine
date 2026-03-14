@@ -4,7 +4,7 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
-import me.moirai.storyengine.core.domain.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @UseCaseHandler
 public class SearchPersonasHandler extends AbstractUseCaseHandler<SearchPersonas, SearchPersonasResult> {

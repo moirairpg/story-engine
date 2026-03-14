@@ -1,7 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 
-import me.moirai.storyengine.core.port.outbound.DiscordEmbeddedMessageRequest;
-import me.moirai.storyengine.core.port.outbound.DiscordEmbeddedMessageRequest.Color;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordEmbeddedMessageRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordEmbeddedMessageRequest.Color;
 
 public class DiscordEmbeddedMessageRequestFixture {
 

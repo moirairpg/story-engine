@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @Repository
-public class UserDomainRepositoryImpl implements UserDomainRepository {
+public class UserDomainRepositoryImpl implements UserRepository {
 
     private final UserJpaRepository jpaRepository;
 

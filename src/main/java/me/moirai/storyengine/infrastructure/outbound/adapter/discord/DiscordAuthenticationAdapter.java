@@ -28,11 +28,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.port.outbound.DiscordAuthRequest;
-import me.moirai.storyengine.core.port.outbound.DiscordTokenRevocationRequest;
-import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
-import me.moirai.storyengine.core.port.outbound.RefreshSessionTokenRequest;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordTokenRevocationRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
 import reactor.core.publisher.Mono;
@@ -74,17 +75,30 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     }
 
     @Override
-    public Mono<DiscordAuthResponse> authenticate(DiscordAuthRequest request) {
+    public Mono<AuthenticateUserResult> authenticate(DiscordAuthRequest request) {
 
         return postForAuthentication(tokenUri, request)
-                .bodyToMono(DiscordAuthResponse.class);
+                .bodyToMono(DiscordAuthResponse.class)
+                .map(this::toResult);
     }
 
     @Override
-    public Mono<DiscordAuthResponse> refreshSessionToken(RefreshSessionTokenRequest request) {
+    public Mono<AuthenticateUserResult> refreshSessionToken(RefreshSessionTokenRequest request) {
 
         return postForAuthentication(tokenUri, request)
-                .bodyToMono(DiscordAuthResponse.class);
+                .bodyToMono(DiscordAuthResponse.class)
+                .map(this::toResult);
+    }
+
+    private AuthenticateUserResult toResult(DiscordAuthResponse response) {
+
+        return AuthenticateUserResult.builder()
+                .accessToken(response.getAccessToken())
+                .refreshToken(response.getRefreshToken())
+                .expiresIn(response.getExpiresIn())
+                .tokenType(response.getTokenType())
+                .scope(response.getScope())
+                .build();
     }
 
     @Override

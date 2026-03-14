@@ -15,12 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.DiscordAuthenticationPort;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordAuthResponse;
-import me.moirai.storyengine.core.port.outbound.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -28,7 +28,7 @@ import reactor.test.StepVerifier;
 public class AuthenticateUserHandlerTest {
 
     @Mock
-    private UserDomainRepository repository;
+    private UserRepository repository;
 
     @Mock
     private DiscordAuthenticationPort discordAuthenticationPort;
@@ -74,7 +74,7 @@ public class AuthenticateUserHandlerTest {
                 .username("someUsername")
                 .build();
 
-        DiscordAuthResponse authResponse = DiscordAuthResponse.builder()
+        AuthenticateUserResult authResult = AuthenticateUserResult.builder()
                 .accessToken("token")
                 .expiresIn(1234L)
                 .refreshToken("token")
@@ -82,18 +82,18 @@ public class AuthenticateUserHandlerTest {
                 .scope("scope")
                 .build();
 
-        when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResponse));
+        when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResult));
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(discordUserData));
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
 
         // Then
         StepVerifier.create(handler.handle(query))
                 .assertNext(result -> {
-                    assertThat(result.getAccessToken()).isEqualTo(authResponse.getAccessToken());
-                    assertThat(result.getRefreshToken()).isEqualTo(authResponse.getRefreshToken());
-                    assertThat(result.getExpiresIn()).isEqualTo(authResponse.getExpiresIn());
-                    assertThat(result.getTokenType()).isEqualTo(authResponse.getTokenType());
-                    assertThat(result.getScope()).isEqualTo(authResponse.getScope());
+                    assertThat(result.getAccessToken()).isEqualTo(authResult.getAccessToken());
+                    assertThat(result.getRefreshToken()).isEqualTo(authResult.getRefreshToken());
+                    assertThat(result.getExpiresIn()).isEqualTo(authResult.getExpiresIn());
+                    assertThat(result.getTokenType()).isEqualTo(authResult.getTokenType());
+                    assertThat(result.getScope()).isEqualTo(authResult.getScope());
                 })
                 .verifyComplete();
     }
@@ -116,7 +116,7 @@ public class AuthenticateUserHandlerTest {
                 .username("someUsername")
                 .build();
 
-        DiscordAuthResponse authResponse = DiscordAuthResponse.builder()
+        AuthenticateUserResult authResult = AuthenticateUserResult.builder()
                 .accessToken("token")
                 .expiresIn(1234L)
                 .refreshToken("token")
@@ -124,7 +124,7 @@ public class AuthenticateUserHandlerTest {
                 .scope("scope")
                 .build();
 
-        when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResponse));
+        when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResult));
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(discordUserData));
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.empty());
         when(repository.save(any())).thenReturn(user);
@@ -132,11 +132,11 @@ public class AuthenticateUserHandlerTest {
         // Then
         StepVerifier.create(handler.handle(query))
                 .assertNext(result -> {
-                    assertThat(result.getAccessToken()).isEqualTo(authResponse.getAccessToken());
-                    assertThat(result.getRefreshToken()).isEqualTo(authResponse.getRefreshToken());
-                    assertThat(result.getExpiresIn()).isEqualTo(authResponse.getExpiresIn());
-                    assertThat(result.getTokenType()).isEqualTo(authResponse.getTokenType());
-                    assertThat(result.getScope()).isEqualTo(authResponse.getScope());
+                    assertThat(result.getAccessToken()).isEqualTo(authResult.getAccessToken());
+                    assertThat(result.getRefreshToken()).isEqualTo(authResult.getRefreshToken());
+                    assertThat(result.getExpiresIn()).isEqualTo(authResult.getExpiresIn());
+                    assertThat(result.getTokenType()).isEqualTo(authResult.getTokenType());
+                    assertThat(result.getScope()).isEqualTo(authResult.getScope());
                 })
                 .verifyComplete();
     }

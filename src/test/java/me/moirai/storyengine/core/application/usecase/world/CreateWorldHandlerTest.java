@@ -15,11 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntryRepository;
-import me.moirai.storyengine.core.domain.world.WorldRepository;
-import me.moirai.storyengine.core.port.TextModerationPort;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
-import me.moirai.storyengine.core.port.outbound.TextModerationResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
+import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

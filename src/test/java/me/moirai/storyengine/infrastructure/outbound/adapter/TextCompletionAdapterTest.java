@@ -15,12 +15,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.core.port.outbound.TextGenerationRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.ChatMessage;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponse;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponseChoice;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponseError;
-import me.moirai.storyengine.infrastructure.outbound.adapter.response.CompletionResponseUsage;
+import me.moirai.storyengine.common.dto.ChatMessage;
+import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponse;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseChoice;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseUsage;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.TextCompletionAdapter;
 import reactor.test.StepVerifier;
 
 public class TextCompletionAdapterTest extends AbstractWebMockTest {
@@ -55,9 +56,7 @@ public class TextCompletionAdapterTest extends AbstractWebMockTest {
                         .totalTokens(100)
                         .build())
                 .choices(Collections.singletonList(CompletionResponseChoice.builder()
-                        .message(ChatMessage.builder()
-                                .content("Text output")
-                                .build())
+                        .message(ChatMessage.asAssistant("Text output"))
                         .build()))
                 .build();
 

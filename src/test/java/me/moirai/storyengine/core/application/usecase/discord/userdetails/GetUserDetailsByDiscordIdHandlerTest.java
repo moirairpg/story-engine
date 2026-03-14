@@ -18,15 +18,15 @@ import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetailsFixture;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserDomainRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.DiscordUserDetailsPort;
 
 public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
 
     @Mock
-    private UserDomainRepository repository;
+    private UserRepository repository;
 
     @Mock
     private DiscordUserDetailsPort discordUserDetailsPort;

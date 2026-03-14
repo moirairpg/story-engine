@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
-import me.moirai.storyengine.core.port.DiscordUserDetailsPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;

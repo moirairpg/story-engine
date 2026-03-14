@@ -4,7 +4,7 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
-import me.moirai.storyengine.core.domain.notification.NotificationRepository;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @UseCaseHandler
 public class SearchNotificationsHandler extends AbstractUseCaseHandler<SearchNotifications, SearchNotificationsResult> {
