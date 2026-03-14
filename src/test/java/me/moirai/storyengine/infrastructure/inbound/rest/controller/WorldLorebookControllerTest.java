@@ -17,10 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;

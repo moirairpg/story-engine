@@ -16,15 +16,13 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureLorebookEntryRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
