@@ -12,4 +12,9 @@
   <include file="db/changelog/migrations/1739642293_alter_table_world_lorebook_delete_player_columns.sql" />
   <include file="db/changelog/migrations/1740331206_create_table_notification.sql" />
   <include file="db/changelog/migrations/1740331494_create_table_notification_read.sql" />
+  <include file="db/changelog/migrations/1773453362_alter_table_adventure_rename_discord_columns.sql" />
+  <include file="db/changelog/migrations/1773453363_alter_table_world_rename_discord_columns.sql" />
+  <include file="db/changelog/migrations/1773453364_alter_table_persona_rename_discord_columns.sql" />
+  <include file="db/changelog/migrations/1773453365_alter_table_moirai_user_rename_discord_columns.sql" />
+  <include file="db/changelog/migrations/1773453366_alter_table_notification_rename_discord_columns.sql" />
 </databaseChangeLog>

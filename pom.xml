@@ -13,33 +13,24 @@
     </parent>
 
     <groupId>me.moirai</groupId>
-    <artifactId>discordbot</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
+    <artifactId>storyengine</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
     <name>MoirAI</name>
-    <description>Discord RPG bot</description>
+    <description>MoirAI — AI-powered RPG engine</description>
 
     <properties>
         <github.global.server>github</github.global.server>
         <java.version>21</java.version>
-        <logback.version>1.5.6</logback.version>
-        <logback.json.version>0.1.5</logback.json.version>
-        <pitest.skip>true</pitest.skip>
         <testcontainers.version>1.19.7</testcontainers.version>
         <springdoc.version>2.4.0</springdoc.version>
-        <sonar.organization>chatrpg</sonar.organization>
-        <sonar.projectName>backend</sonar.projectName>
-        <sonar.projectKey>chatrpg-cs_chatrpg-be</sonar.projectKey>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <pitest.version>1.11.7</pitest.version>
-        <tokenizer.version>0.26.0</tokenizer.version>
-        <jna.version>2.0.0</jna.version>
+        <tokenizer.version>1.1.0</tokenizer.version>
+        <uuid-generator.version>4.3.0</uuid-generator.version>
         <apache.commons.lang.version>3.14.0</apache.commons.lang.version>
         <apache.commons.collections.version>4.4</apache.commons.collections.version>
         <jackson.dataformat.version>2.16.1</jackson.dataformat.version>
-        <logback.encoder.version>7.4</logback.encoder.version>
         <wiremock.version>3.9.1</wiremock.version>
         <jda.version>5.1.2</jda.version>
-        <jacoco.version>0.8.11</jacoco.version>
+        <jacoco.version>0.8.13</jacoco.version>
     </properties>
 
     <dependencies>
@@ -105,11 +96,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.pitest</groupId>
-            <artifactId>pitest</artifactId>
-            <version>${pitest.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
@@ -140,8 +126,8 @@
 
         <!-- Application core -->
         <dependency>
-            <groupId>ai.djl.huggingface</groupId>
-            <artifactId>tokenizers</artifactId>
+            <groupId>com.knuddels</groupId>
+            <artifactId>jtokkit</artifactId>
             <version>${tokenizer.version}</version>
         </dependency>
         <dependency>
@@ -152,9 +138,9 @@
 
         <!-- Libraries -->
         <dependency>
-            <groupId>com.aventrix.jnanoid</groupId>
-            <artifactId>jnanoid</artifactId>
-            <version>${jna.version}</version>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>${uuid-generator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -168,29 +154,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>${logback.encoder.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback.contrib</groupId>
-            <artifactId>logback-json-classic</artifactId>
-            <version>${logback.json.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback.contrib</groupId>
-            <artifactId>logback-jackson</artifactId>
-            <version>${logback.json.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -271,6 +234,13 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -Dnet.bytebuddy.experimental=true</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
@@ -293,46 +263,8 @@
                         <exclude>**/exception/*</exclude>
                         <exclude>**/config/**</exclude>
                         <exclude>**/logging/**</exclude>
-                        <exclude>**/DiscordPrincipal.class</exclude>
-                        <exclude>ChatRpgApplication.class</exclude>
                     </excludes>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>${pitest.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.pitest</groupId>
-                        <artifactId>pitest-junit5-plugin</artifactId>
-                        <version>1.1.2</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <timestampedReports>true</timestampedReports>
-                    <targetClasses>
-                        <param>me.moirai.discordbot*</param>
-                    </targetClasses>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <configuration>
-                            <skip>${pitest.skip}</skip>
-                            <threads>4</threads>
-                            <timestampedReports>false</timestampedReports>
-                            <withHistory>false</withHistory>
-                            <excludedClasses>
-                                <param>me.moirai.discordbot.common.logging.*</param>
-                                <param>me.moirai.discordbot.core.config.*</param>
-                            </excludedClasses>
-                        </configuration>
-                        <goals>
-                            <goal>mutationCoverage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

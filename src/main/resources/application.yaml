@@ -1,7 +1,4 @@
 moirai:
-  nano-id:
-    alphabet: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
-    characters-amount: 10
   discord:
     oauth:
       client-id: ${DISCORD_BOT_CLIENT_ID}

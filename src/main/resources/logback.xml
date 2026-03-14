@@ -1,51 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
-
-    <springProfile name="!(json-log-stdout)">
-        <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%d{yyyy-MM-dd' 'HH:mm:ss} [%level] [%thread] [%logger] - %msg%n</pattern>
-            </encoder>
-        </appender>
-        <root>
-            <appender-ref ref="stdout" />
-        </root>
-    </springProfile>
-
-    <springProfile name="json-log-stdout">
-        <appender name="json-stdout" class="ch.qos.logback.core.ConsoleAppender">
-            <layout class="me.moirai.discordbot.common.logging.JsonLoggerFormatter">
-                <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-                    <prettyPrint>true</prettyPrint>
-                </jsonFormatter>
-                <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
-            </layout>
-        </appender>
-        <root>
-            <appender-ref ref="json-stdout" />
-        </root>
-    </springProfile>
-
-    <springProfile name="json-log-file">
-        <appender name="json-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <layout class="me.moirai.discordbot.common.logging.JsonLoggerFormatter">
-                <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-                    <prettyPrint>false</prettyPrint>
-                </jsonFormatter>
-                <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
-            </layout>
-            <File>logs/bot.log</File>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <maxIndex>10</maxIndex>
-                <fileNamePattern>logs/archived/bot-%d{yyyy-MM-dd}.log</fileNamePattern>
-            </rollingPolicy>
-            <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-                <MaxFileSize>250MB</MaxFileSize>
-            </triggeringPolicy>
-        </appender>
-        <root>
-            <appender-ref ref="json-file" />
-        </root>
-    </springProfile>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd' 'HH:mm:ss} [%level] [%thread] [%logger] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="stdout" />
+    </root>
 </configuration>

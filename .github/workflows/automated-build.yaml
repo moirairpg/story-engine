@@ -28,12 +28,6 @@ jobs:
       - name: Unit tests
         if: github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master'
         run: mvn test -e
-      - name: Unit tests & SonarCloud reports
-        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master'
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn verify sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -e
       - name: Test container build image
         if: github.ref != 'refs/heads/develop'
         run: docker build -t ${{ vars.DOCKER_REPO_ADDR }}/${{ vars.DOCKER_REPO }}/${{ vars.DOCKER_IMAGE_NAME }}:bleeding-edge .
