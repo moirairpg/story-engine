@@ -10,8 +10,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.Permissions;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class WorldTest {

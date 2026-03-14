@@ -10,7 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
-import me.moirai.storyengine.core.domain.Asset;
+import me.moirai.storyengine.common.domain.Asset;
 
 @Entity(name = "NotificationRead")
 @Table(name = "notification_read")

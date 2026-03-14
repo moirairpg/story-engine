@@ -24,7 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.dbutil.StringObjectMapConverter;
-import me.moirai.storyengine.core.domain.Asset;
+import me.moirai.storyengine.common.domain.Asset;
 
 @Entity(name = "Notification")
 @Table(name = "notification")

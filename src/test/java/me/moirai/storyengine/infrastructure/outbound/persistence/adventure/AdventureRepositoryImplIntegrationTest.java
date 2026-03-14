@@ -1,8 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.persistence.adventure;
 
 import static java.util.Collections.singleton;
-import static me.moirai.storyengine.core.domain.Visibility.PRIVATE;
-import static me.moirai.storyengine.core.domain.Visibility.PUBLIC;
+import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
 import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.GPT35_TURBO;
 import static me.moirai.storyengine.core.domain.adventure.GameMode.AUTHOR;
 import static me.moirai.storyengine.core.domain.adventure.GameMode.CHAT;
@@ -24,11 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import me.moirai.storyengine.AbstractIntegrationTest;
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.application.usecase.adventure.request.SearchAdventures;
 import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureResult;
 import me.moirai.storyengine.core.application.usecase.adventure.result.SearchAdventuresResult;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;

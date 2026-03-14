@@ -1,11 +1,12 @@
 package me.moirai.storyengine.core.domain;
 
-import static me.moirai.storyengine.core.domain.CompletionRole.SYSTEM;
+import static me.moirai.storyengine.common.domain.CompletionRole.SYSTEM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import me.moirai.storyengine.common.domain.CompletionRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 public class CompletionRoleTest {

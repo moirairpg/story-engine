@@ -2,8 +2,8 @@ package me.moirai.storyengine.core.domain.adventure;
 
 import java.time.OffsetDateTime;
 
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 
 public class AdventureFixture {
 

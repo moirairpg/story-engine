@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
-import me.moirai.storyengine.core.domain.Asset;
+import me.moirai.storyengine.common.domain.Asset;
 
 @Entity(name = "WorldLorebookEntry")
 @Table(name = "world_lorebook")

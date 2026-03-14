@@ -15,13 +15,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventure;
 import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureFixture;
 import me.moirai.storyengine.core.application.usecase.adventure.result.UpdateAdventureResult;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;

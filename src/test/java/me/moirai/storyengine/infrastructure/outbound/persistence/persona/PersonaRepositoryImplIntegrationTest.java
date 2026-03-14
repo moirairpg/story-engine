@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.transaction.Transactional;
 import me.moirai.storyengine.AbstractIntegrationTest;
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.application.usecase.persona.request.SearchPersonas;
 import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResult;
 import me.moirai.storyengine.core.application.usecase.persona.result.SearchPersonasResult;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;

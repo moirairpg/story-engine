@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import me.moirai.storyengine.core.domain.Asset;
+import me.moirai.storyengine.common.domain.Asset;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
 

@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.persistence.world;
 
-import static me.moirai.storyengine.core.domain.Visibility.PUBLIC;
+import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Sets.set;
 

@@ -9,10 +9,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
+import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.ShareableAsset;
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.Permissions;
-import me.moirai.storyengine.core.domain.ShareableAsset;
-import me.moirai.storyengine.core.domain.Visibility;
 
 @Entity(name = "World")
 @Table(name = "world")

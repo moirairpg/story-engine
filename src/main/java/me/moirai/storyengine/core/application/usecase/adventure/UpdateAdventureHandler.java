@@ -1,7 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import static me.moirai.storyengine.core.domain.Visibility.PRIVATE;
-import static me.moirai.storyengine.core.domain.Visibility.PUBLIC;
+import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
 import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.fromString;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.MapUtils.emptyIfNull;

@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.domain;
+package me.moirai.storyengine.common.domain;
 
 import static java.util.Collections.unmodifiableSet;
 

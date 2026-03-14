@@ -3,6 +3,8 @@ package me.moirai.storyengine.core.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import me.moirai.storyengine.common.domain.Permissions;
+
 public class PermissionsFixture {
 
     private static final String OWNER_DISCORD_ID = "586678721356875";

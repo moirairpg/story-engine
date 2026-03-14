@@ -14,12 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResultFixture;
 import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldRepository;
 import me.moirai.storyengine.core.port.TextModerationPort;

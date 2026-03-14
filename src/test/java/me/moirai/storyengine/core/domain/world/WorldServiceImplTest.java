@@ -17,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
@@ -27,9 +29,7 @@ import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldL
 import me.moirai.storyengine.core.application.usecase.world.request.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.application.usecase.world.request.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.application.usecase.world.request.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.domain.Permissions;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 import me.moirai.storyengine.core.port.TextModerationPort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

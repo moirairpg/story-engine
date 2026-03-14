@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.domain.adventure;
 
-import static me.moirai.storyengine.core.domain.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,10 +12,10 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
+import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.Permissions;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.Visibility;
 
 public class AdventureTest {
 
