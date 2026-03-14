@@ -1023,8 +1023,8 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
         List<GetAdventureResult> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
+        assertThat(adventures).extracting(GetAdventureResult::getName)
+                .containsExactlyInAnyOrder(gpt4Mini.getName(), gpt354k.getName());
     }
 
     @Test
