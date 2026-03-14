@@ -18,8 +18,8 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 
 @UseCaseHandler
 public class UpdateAdventureLorebookEntryHandler
-        extends AbstractUseCaseHandler<UpdateAdventureLorebookEntry, Mono<UpdateAdventureLorebookEntryResult>> {
+        extends AbstractUseCaseHandler<UpdateAdventureLorebookEntry, Mono<AdventureLorebookEntryDetails>> {
 
     private static final String ADVENTURE_FLAGGED_BY_MODERATION = "Adventure flagged by moderation";
     private static final String ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND = "Adventure to be updated was not found";
@@ -69,7 +69,7 @@ public class UpdateAdventureLorebookEntryHandler
     }
 
     @Override
-    public Mono<UpdateAdventureLorebookEntryResult> execute(UpdateAdventureLorebookEntry command) {
+    public Mono<AdventureLorebookEntryDetails> execute(UpdateAdventureLorebookEntry command) {
 
         Adventure adventure = repository.findById(command.getAdventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
@@ -107,9 +107,18 @@ public class UpdateAdventureLorebookEntryHandler
                 .map(this::toResult);
     }
 
-    private UpdateAdventureLorebookEntryResult toResult(AdventureLorebookEntry savedEntry) {
+    private AdventureLorebookEntryDetails toResult(AdventureLorebookEntry savedEntry) {
 
-        return UpdateAdventureLorebookEntryResult.build(savedEntry.getLastUpdateDate());
+        return AdventureLorebookEntryDetails.builder()
+                .id(savedEntry.getId())
+                .name(savedEntry.getName())
+                .regex(savedEntry.getRegex())
+                .description(savedEntry.getDescription())
+                .playerId(savedEntry.getPlayerId())
+                .isPlayerCharacter(savedEntry.isPlayerCharacter())
+                .creationDate(savedEntry.getCreationDate())
+                .lastUpdateDate(savedEntry.getLastUpdateDate())
+                .build();
     }
 
     private Mono<List<String>> moderateContent(String content, Moderation moderation) {

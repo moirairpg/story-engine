@@ -17,7 +17,7 @@ public final class SearchWorldsResult {
     private final int items;
     private final long totalItems;
     private final int totalPages;
-    private final List<GetWorldResult> results;
+    private final List<WorldDetails> results;
 
     private SearchWorldsResult(Builder builder) {
 
@@ -48,7 +48,7 @@ public final class SearchWorldsResult {
         return totalPages;
     }
 
-    public List<GetWorldResult> getResults() {
+    public List<WorldDetails> getResults() {
         return results;
     }
 
@@ -59,7 +59,7 @@ public final class SearchWorldsResult {
         private int items;
         private long totalItems;
         private int totalPages;
-        private List<GetWorldResult> results;
+        private List<WorldDetails> results;
 
         private Builder() {
         }
@@ -84,7 +84,7 @@ public final class SearchWorldsResult {
             return this;
         }
 
-        public Builder results(List<GetWorldResult> results) {
+        public Builder results(List<WorldDetails> results) {
             this.results = results;
             return this;
         }

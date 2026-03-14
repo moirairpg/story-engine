@@ -18,15 +18,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.adventure.AddFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.RemoveFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureResultFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
@@ -54,7 +54,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchAdventures() {
 
         // Given
-        List<GetAdventureResult> results = Lists.list(GetAdventureResultFixture.privateMultiplayerAdventure().build(),
+        List<AdventureDetails> results = Lists.list(GetAdventureResultFixture.privateMultiplayerAdventure().build(),
                 GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         SearchAdventuresResult expectedResponse = SearchAdventuresResult.builder()
@@ -86,7 +86,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchAdventuresWithParameters() {
 
         // Given
-        List<GetAdventureResult> results = Lists.list(GetAdventureResultFixture.privateMultiplayerAdventure().build(),
+        List<AdventureDetails> results = Lists.list(GetAdventureResultFixture.privateMultiplayerAdventure().build(),
                 GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         SearchAdventuresResult expectedResponse = SearchAdventuresResult.builder()
@@ -136,7 +136,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
         // Given
         String adventureId = "WRLDID";
 
-        GetAdventureResult expectedResponse = GetAdventureResultFixture.privateMultiplayerAdventure().build();
+        AdventureDetails expectedResponse = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         when(useCaseRunner.run(any(GetAdventureById.class))).thenReturn(expectedResponse);
 
@@ -145,7 +145,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
                 .uri(String.format(ADVENTURE_ID_BASE_URL, adventureId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(GetAdventureResult.class)
+                .expectBody(AdventureDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -168,7 +168,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
 
         // Given
         CreateAdventureRequest request = CreateAdventureRequestFixture.sample();
-        CreateAdventureResult expectedResponse = CreateAdventureResult.build("WRLDID");
+        AdventureDetails expectedResponse = AdventureDetails.builder().id("WRLDID").build();
 
         when(adventureRequestMapper.toCommand(any(CreateAdventureRequest.class), anyString()))
                 .thenReturn(mock(CreateAdventure.class));
@@ -181,7 +181,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(CreateAdventureResult.class)
+                .expectBody(AdventureDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -194,7 +194,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
         // Given
         String adventureId = "WRLDID";
         UpdateAdventureRequest request = UpdateAdventureRequestFixture.sample();
-        UpdateAdventureResult expectedResponse = UpdateAdventureResult.build(OffsetDateTime.now());
+        AdventureDetails expectedResponse = AdventureDetails.builder().lastUpdateDate(OffsetDateTime.now()).build();
 
         when(adventureRequestMapper.toCommand(any(UpdateAdventureRequest.class), anyString(), anyString()))
                 .thenReturn(mock(UpdateAdventure.class));
@@ -207,10 +207,10 @@ public class AdventureControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UpdateAdventureResult.class)
+                .expectBody(AdventureDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getLastUpdatedDateTime()).isEqualTo(expectedResponse.getLastUpdatedDateTime());
+                    assertThat(response.getLastUpdateDate()).isEqualTo(expectedResponse.getLastUpdateDate());
                 });
     }
 

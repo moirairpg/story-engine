@@ -17,14 +17,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldLorebookEntryRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
@@ -45,7 +45,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchLorebookEntries() {
 
         // Given
-        List<GetWorldLorebookEntryResult> results = Lists.list(GetWorldLorebookEntryResult.builder()
+        List<WorldLorebookEntryDetails> results = Lists.list(WorldLorebookEntryDetails.builder()
                 .id("ID")
                 .name("NAME")
                 .description("DESC")
@@ -83,7 +83,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchLorebookEntriesWithParameters() {
 
         // Given
-        List<GetWorldLorebookEntryResult> results = Lists.list(GetWorldLorebookEntryResult.builder()
+        List<WorldLorebookEntryDetails> results = Lists.list(WorldLorebookEntryDetails.builder()
                 .id("ID")
                 .name("NAME")
                 .description("DESC")
@@ -127,7 +127,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
     public void http200WhenGetLorebookEntryById() {
 
         // Given
-        GetWorldLorebookEntryResult expectedResponse = GetWorldLorebookEntryResult.builder()
+        WorldLorebookEntryDetails expectedResponse = WorldLorebookEntryDetails.builder()
                 .id("ID")
                 .name("NAME")
                 .description("DESC")
@@ -143,7 +143,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
                 .uri("/world/1234/lorebook/ID")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(GetWorldLorebookEntryResult.class)
+                .expectBody(WorldLorebookEntryDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -164,7 +164,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
         request.setDescription("DESC");
         request.setRegex("regex");
 
-        CreateWorldLorebookEntryResult expectedResponse = CreateWorldLorebookEntryResult.build("ID");
+        WorldLorebookEntryDetails expectedResponse = WorldLorebookEntryDetails.builder().id("ID").build();
 
         when(worldLorebookEntryRequestMapper.toCommand(any(CreateLorebookEntryRequest.class),
                 anyString(), anyString())).thenReturn(mock(CreateWorldLorebookEntry.class));
@@ -177,7 +177,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(CreateWorldLorebookEntryResult.class)
+                .expectBody(WorldLorebookEntryDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -193,8 +193,8 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
         request.setDescription("DESC");
         request.setRegex("regex");
 
-        UpdateWorldLorebookEntryResult expectedResponse = UpdateWorldLorebookEntryResult
-                .build(OffsetDateTime.now());
+        WorldLorebookEntryDetails expectedResponse = WorldLorebookEntryDetails.builder()
+                .lastUpdateDate(OffsetDateTime.now()).build();
 
         when(worldLorebookEntryRequestMapper.toCommand(any(UpdateLorebookEntryRequest.class),
                 anyString(), anyString(), anyString())).thenReturn(mock(UpdateWorldLorebookEntry.class));
@@ -207,10 +207,10 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UpdateWorldLorebookEntryResult.class)
+                .expectBody(WorldLorebookEntryDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getLastUpdatedDateTime()).isEqualTo(expectedResponse.getLastUpdatedDateTime());
+                    assertThat(response.getLastUpdateDate()).isEqualTo(expectedResponse.getLastUpdateDate());
                 });
     }
 

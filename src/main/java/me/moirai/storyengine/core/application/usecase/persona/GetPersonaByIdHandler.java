@@ -7,12 +7,12 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.persona.Persona;
 
 @UseCaseHandler
-public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById, GetPersonaResult> {
+public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById, PersonaDetails> {
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
@@ -33,7 +33,7 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     }
 
     @Override
-    public GetPersonaResult execute(GetPersonaById query) {
+    public PersonaDetails execute(GetPersonaById query) {
 
         Persona persona = repository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
@@ -45,9 +45,9 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
         return mapResult(persona);
     }
 
-    private GetPersonaResult mapResult(Persona persona) {
+    private PersonaDetails mapResult(Persona persona) {
 
-        return GetPersonaResult.builder()
+        return PersonaDetails.builder()
                 .id(persona.getId())
                 .name(persona.getName())
                 .personality(persona.getName())

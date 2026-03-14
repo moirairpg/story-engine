@@ -6,13 +6,13 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
-import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import reactor.core.publisher.Sinks;
 
 @UseCaseHandler
-public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotification, SendNotificationResult> {
+public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotification, NotificationDetails> {
 
     private final NotificationRepository notificationRepository;
     private final Sinks.Many<String> sink;
@@ -43,7 +43,7 @@ public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotifica
     }
 
     @Override
-    public SendNotificationResult execute(SendNotification request) {
+    public NotificationDetails execute(SendNotification request) {
 
         Notification notification = notificationRepository.save(Notification.builder()
                 .isGlobal(request.isGlobal())
@@ -56,6 +56,22 @@ public class SendNotificationHandler extends AbstractUseCaseHandler<SendNotifica
                 .build());
 
         sink.tryEmitNext(notification.getId());
-        return SendNotificationResult.withIdAndCreationDateTime(notification.getId(), notification.getCreationDate());
+        return mapResult(notification);
+    }
+
+    private NotificationDetails mapResult(Notification notification) {
+
+        return NotificationDetails.builder()
+                .id(notification.getId())
+                .message(notification.getMessage())
+                .senderDiscordId(notification.getSenderDiscordId())
+                .receiverDiscordId(notification.getReceiverDiscordId())
+                .isGlobal(notification.isGlobal())
+                .isInteractable(notification.isInteractable())
+                .type(notification.getType().name())
+                .metadata(notification.getMetadata())
+                .creationDate(notification.getCreationDate())
+                .lastUpdateDate(notification.getLastUpdateDate())
+                .build();
     }
 }

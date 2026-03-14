@@ -12,7 +12,7 @@ import java.util.Set;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
+public final class UpdateAdventure extends UseCase<AdventureDetails> {
 
     private final String id;
     private final String description;

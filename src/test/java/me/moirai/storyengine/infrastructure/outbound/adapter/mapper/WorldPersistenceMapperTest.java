@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
@@ -31,7 +31,7 @@ public class WorldPersistenceMapperTest {
         World world = WorldFixture.privateWorld().build();
 
         // When
-        GetWorldResult result = mapper.mapToResult(world);
+        WorldDetails result = mapper.mapToResult(world);
 
         // Then
         assertThat(result).isNotNull();

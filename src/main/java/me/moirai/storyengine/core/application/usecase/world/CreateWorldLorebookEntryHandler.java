@@ -8,13 +8,13 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class CreateWorldLorebookEntryHandler
-        extends AbstractUseCaseHandler<CreateWorldLorebookEntry, CreateWorldLorebookEntryResult> {
+        extends AbstractUseCaseHandler<CreateWorldLorebookEntry, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_UPDATED_WAS_NOT_FOUND = "World to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD = "User does not have permission to modify this world";
@@ -47,7 +47,7 @@ public class CreateWorldLorebookEntryHandler
     }
 
     @Override
-    public CreateWorldLorebookEntryResult execute(CreateWorldLorebookEntry command) {
+    public WorldLorebookEntryDetails execute(CreateWorldLorebookEntry command) {
 
         World world = repository.findById(command.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
@@ -65,6 +65,18 @@ public class CreateWorldLorebookEntryHandler
                 .build();
 
         WorldLorebookEntry entry = lorebookEntryRepository.save(lorebookEntry);
-        return CreateWorldLorebookEntryResult.build(entry.getId());
+        return mapResult(entry);
+    }
+
+    private WorldLorebookEntryDetails mapResult(WorldLorebookEntry entry) {
+
+        return WorldLorebookEntryDetails.builder()
+                .id(entry.getId())
+                .name(entry.getName())
+                .regex(entry.getRegex())
+                .description(entry.getDescription())
+                .creationDate(entry.getCreationDate())
+                .lastUpdateDate(entry.getLastUpdateDate())
+                .build();
     }
 }

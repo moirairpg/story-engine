@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
@@ -70,7 +70,7 @@ public class GetNotificationByIdHandlerTest {
         when(repository.findById(anyString())).thenReturn(Optional.of(notification));
 
         // When
-        NotificationResult result = handler.handle(request);
+        NotificationDetails result = handler.handle(request);
 
         // Then
         assertThat(result).isNotNull();

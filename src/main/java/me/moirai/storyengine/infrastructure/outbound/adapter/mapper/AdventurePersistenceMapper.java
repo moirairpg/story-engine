@@ -3,16 +3,16 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 
 @Component
 public class AdventurePersistenceMapper {
 
-    public GetAdventureResult mapToResult(Adventure adventure) {
+    public AdventureDetails mapToResult(Adventure adventure) {
 
-        return GetAdventureResult.builder()
+        return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .worldId(adventure.getWorldId())

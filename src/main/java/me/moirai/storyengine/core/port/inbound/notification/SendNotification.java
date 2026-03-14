@@ -8,7 +8,7 @@ import java.util.Map;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class SendNotification extends UseCase<SendNotificationResult> {
+public final class SendNotification extends UseCase<NotificationDetails> {
 
     private final String message;
     private final String senderDiscordId;

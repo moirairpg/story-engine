@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port.inbound.notification;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public class GetNotificationById extends UseCase<NotificationResult>  {
+public class GetNotificationById extends UseCase<NotificationDetails>  {
 
     private final String notificationId;
 

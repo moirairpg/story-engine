@@ -16,13 +16,13 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
-import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, Mono<CreatePersonaResult>> {
+public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, Mono<PersonaDetails>> {
 
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
@@ -35,7 +35,7 @@ public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, 
     }
 
     @Override
-    public Mono<CreatePersonaResult> execute(CreatePersona command) {
+    public Mono<PersonaDetails> execute(CreatePersona command) {
 
         return moderateContent(command.getPersonality())
                 .flatMap(__ -> moderateContent(command.getName()))
@@ -55,7 +55,22 @@ public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, 
 
                     return repository.save(persona);
                 })
-                .map(personaCreated -> CreatePersonaResult.build(personaCreated.getId()));
+                .map(this::mapResult);
+    }
+
+    private PersonaDetails mapResult(Persona persona) {
+
+        return PersonaDetails.builder()
+                .id(persona.getId())
+                .name(persona.getName())
+                .personality(persona.getPersonality())
+                .visibility(persona.getVisibility().name())
+                .creationDate(persona.getCreationDate())
+                .lastUpdateDate(persona.getLastUpdateDate())
+                .ownerId(persona.getOwnerId())
+                .usersAllowedToRead(persona.getUsersAllowedToRead())
+                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
+                .build();
     }
 
     private Mono<List<String>> moderateContent(String personality) {

@@ -3,16 +3,17 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.domain.notification.Notification;
 
 @Component
 public class NotificationPersistenceMapper {
 
-    public NotificationResult mapToResult(Notification notification) {
+    public NotificationDetails mapToResult(Notification notification) {
 
-        return NotificationResult.builder()
+        return NotificationDetails.builder()
+                .id(notification.getId())
                 .message(notification.getMessage())
                 .receiverDiscordId(notification.getReceiverDiscordId())
                 .senderDiscordId(notification.getSenderDiscordId())
@@ -20,6 +21,8 @@ public class NotificationPersistenceMapper {
                 .metadata(notification.getMetadata())
                 .isGlobal(notification.isGlobal())
                 .isInteractable(notification.isInteractable())
+                .creationDate(notification.getCreationDate())
+                .lastUpdateDate(notification.getLastUpdateDate())
                 .build();
     }
 

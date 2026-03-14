@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
 import me.moirai.storyengine.infrastructure.security.authorization.BaseAssetAuthorizer;
@@ -31,7 +31,7 @@ public class PersonaAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetPersonaById request = GetPersonaById.build(assetId, principal.getDiscordId());
-        GetPersonaResult personaDetails = useCaseRunner.run(request);
+        PersonaDetails personaDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = personaDetails.getOwnerId().equals(userId);
@@ -44,7 +44,7 @@ public class PersonaAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetPersonaById request = GetPersonaById.build(assetId, principal.getDiscordId());
-        GetPersonaResult personaDetails = useCaseRunner.run(request);
+        PersonaDetails personaDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = personaDetails.getOwnerId().equals(userId);
@@ -58,7 +58,7 @@ public class PersonaAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetPersonaById request = GetPersonaById.build(assetId, principal.getDiscordId());
-        GetPersonaResult personaDetails = useCaseRunner.run(request);
+        PersonaDetails personaDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = personaDetails.getOwnerId().equals(userId);

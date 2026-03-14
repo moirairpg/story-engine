@@ -3,7 +3,7 @@ package me.moirai.storyengine.core.port.inbound.adventure;
 import me.moirai.storyengine.common.usecases.UseCase;
 import reactor.core.publisher.Mono;
 
-public final class CreateAdventureLorebookEntry extends UseCase<Mono<CreateAdventureLorebookEntryResult>> {
+public final class CreateAdventureLorebookEntry extends UseCase<Mono<AdventureLorebookEntryDetails>> {
 
     private final String adventureId;
     private final String name;

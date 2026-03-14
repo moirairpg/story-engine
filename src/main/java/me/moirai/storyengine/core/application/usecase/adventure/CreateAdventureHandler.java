@@ -10,8 +10,8 @@ import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -27,7 +27,7 @@ import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.world.World;
 
 @UseCaseHandler
-public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventure, CreateAdventureResult> {
+public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventure, AdventureDetails> {
 
     private static final String USER_NO_PERMISSION_IN_WORLD = "User does not have permission to view the world to be linked to this adventure";
     private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to view the persona to be linked to this adventure";
@@ -55,7 +55,7 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
     }
 
     @Override
-    public CreateAdventureResult execute(CreateAdventure command) {
+    public AdventureDetails execute(CreateAdventure command) {
 
         World world = getWorldTobeLinked(command);
         Persona persona = getPersonaToBeLinked(command);
@@ -83,7 +83,41 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
         List<AdventureLorebookEntry> lorebook = buildLorebook(world, adventure);
         lorebook.stream().forEach(lorebookEntryRepository::save);
 
-        return CreateAdventureResult.build(adventure.getId());
+        return mapResult(adventure);
+    }
+
+    private AdventureDetails mapResult(Adventure adventure) {
+
+        return AdventureDetails.builder()
+                .id(adventure.getId())
+                .name(adventure.getName())
+                .worldId(adventure.getWorldId())
+                .personaId(adventure.getPersonaId())
+                .visibility(adventure.getVisibility().name())
+                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
+                .moderation(adventure.getModeration().name())
+                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
+                .temperature(adventure.getModelConfiguration().getTemperature())
+                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
+                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
+                .stopSequences(adventure.getModelConfiguration().getStopSequences())
+                .logitBias(adventure.getModelConfiguration().getLogitBias())
+                .usersAllowedToWrite(adventure.getUsersAllowedToWrite())
+                .usersAllowedToRead(adventure.getUsersAllowedToRead())
+                .ownerId(adventure.getOwnerId())
+                .creationDate(adventure.getCreationDate())
+                .lastUpdateDate(adventure.getLastUpdateDate())
+                .description(adventure.getDescription())
+                .adventureStart(adventure.getAdventureStart())
+                .channelId(adventure.getChannelId())
+                .gameMode(adventure.getGameMode().name())
+                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
+                .nudge(adventure.getContextAttributes().getNudge())
+                .remember(adventure.getContextAttributes().getRemember())
+                .bump(adventure.getContextAttributes().getBump())
+                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
+                .isMultiplayer(adventure.isMultiplayer())
+                .build();
     }
 
     private Persona getPersonaToBeLinked(CreateAdventure command) {

@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 
@@ -10,8 +12,8 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = GetAdventureResult.Builder.class)
-public final class GetAdventureResult {
+@JsonDeserialize(builder = AdventureDetails.Builder.class)
+public final class AdventureDetails {
 
     private final String id;
     private final String name;
@@ -42,7 +44,7 @@ public final class GetAdventureResult {
     private final Set<String> usersAllowedToRead;
     private final Set<String> usersAllowedToWrite;
 
-    private GetAdventureResult(Builder builder) {
+    private AdventureDetails(Builder builder) {
 
         this.id = builder.id;
         this.name = builder.name;
@@ -68,10 +70,10 @@ public final class GetAdventureResult {
         this.authorsNote = builder.authorsNote;
         this.bump = builder.bump;
         this.bumpFrequency = builder.bumpFrequency;
-        this.logitBias = unmodifiableMap(builder.logitBias);
-        this.stopSequences = unmodifiableSet(builder.stopSequences);
-        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
-        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
+        this.logitBias = unmodifiableMap(builder.logitBias == null ? emptyMap() : builder.logitBias);
+        this.stopSequences = unmodifiableSet(builder.stopSequences == null ? emptySet() : builder.stopSequences);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead == null ? emptySet() : builder.usersAllowedToRead);
+        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite == null ? emptySet() : builder.usersAllowedToWrite);
     }
 
     public static Builder builder() {
@@ -369,8 +371,8 @@ public final class GetAdventureResult {
             return this;
         }
 
-        public GetAdventureResult build() {
-            return new GetAdventureResult(this);
+        public AdventureDetails build() {
+            return new AdventureDetails(this);
         }
     }
 }

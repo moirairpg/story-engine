@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetail
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 
 @WebFluxTest(controllers = {
@@ -84,7 +84,7 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
         String userId = "1234";
         OffsetDateTime readAt = OffsetDateTime.now().minusMonths(1);
 
-        List<NotificationResult> result = list(NotificationResult.builder()
+        List<NotificationDetails> result = list(NotificationDetails.builder()
                 .isGlobal(false)
                 .isInteractable(true)
                 .message("some message")
@@ -105,7 +105,7 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
                 .uri(String.format("/user/%s/notifications", userId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(NotificationResult.class)
+                .expectBodyList(NotificationDetails.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
                     assertThat(result.get(0).getMessage()).isEqualTo(r.get(0).getMessage());

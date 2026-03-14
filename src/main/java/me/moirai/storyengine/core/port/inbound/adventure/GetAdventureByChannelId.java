@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port.inbound.adventure;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class GetAdventureByChannelId extends UseCase<GetAdventureResult> {
+public final class GetAdventureByChannelId extends UseCase<AdventureDetails> {
 
     private final String channelId;
     private final String requesterId;

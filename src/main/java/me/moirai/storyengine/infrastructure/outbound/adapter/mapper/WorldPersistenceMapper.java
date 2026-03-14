@@ -3,16 +3,16 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.world.World;
 
 @Component
 public class WorldPersistenceMapper {
 
-    public GetWorldResult mapToResult(World world) {
+    public WorldDetails mapToResult(World world) {
 
-        return GetWorldResult.builder()
+        return WorldDetails.builder()
                 .id(world.getId())
                 .name(world.getName())
                 .description(world.getDescription())

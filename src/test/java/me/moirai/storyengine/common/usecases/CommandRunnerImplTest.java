@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.application.usecase.world.CreateWorldHandler;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -64,7 +64,7 @@ public class CommandRunnerImplTest {
         UseCaseRunnerImpl runner = new UseCaseRunnerImpl();
         CreateWorldHandler handler = mock(CreateWorldHandler.class);
         CreateWorld command = CreateWorld.builder().build();
-        CreateWorldResult expectedResult = CreateWorldResult.build(id);
+        WorldDetails expectedResult = WorldDetails.builder().id(id).build();
 
         when(handler.handle(any(CreateWorld.class))).thenReturn(Mono.just(expectedResult));
 

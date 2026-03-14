@@ -17,14 +17,14 @@ import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono<CreateWorldResult>> {
+public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono<WorldDetails>> {
 
     private static final String WORLD_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
@@ -43,7 +43,7 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
     }
 
     @Override
-    public Mono<CreateWorldResult> execute(CreateWorld command) {
+    public Mono<WorldDetails> execute(CreateWorld command) {
 
         return moderateContent(command.getAdventureStart())
                 .flatMap(__ -> moderateContent(command.getName()))
@@ -75,7 +75,23 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
 
                     return world;
                 })
-                .map(worldCreated -> CreateWorldResult.build(worldCreated.getId()));
+                .map(this::mapResult);
+    }
+
+    private WorldDetails mapResult(World world) {
+
+        return WorldDetails.builder()
+                .id(world.getId())
+                .name(world.getName())
+                .description(world.getDescription())
+                .adventureStart(world.getAdventureStart())
+                .visibility(world.getVisibility().name())
+                .ownerId(world.getOwnerId())
+                .usersAllowedToRead(world.getUsersAllowedToRead())
+                .usersAllowedToWrite(world.getUsersAllowedToWrite())
+                .creationDate(world.getCreationDate())
+                .lastUpdateDate(world.getLastUpdateDate())
+                .build();
     }
 
     private Mono<List<String>> moderateContent(String personality) {

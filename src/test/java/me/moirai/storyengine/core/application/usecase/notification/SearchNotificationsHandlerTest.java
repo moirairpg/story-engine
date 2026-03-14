@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
@@ -42,7 +42,7 @@ public class SearchNotificationsHandlerTest {
                 .totalItems(10)
                 .items(10)
                 .totalPages(1)
-                .results(list(NotificationResult.builder().build()))
+                .results(list(NotificationDetails.builder().build()))
                 .build();
 
         when(repository.search(any())).thenReturn(expectedResult);

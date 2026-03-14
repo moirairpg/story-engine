@@ -6,13 +6,13 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 
 @UseCaseHandler
-public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventureById, GetAdventureResult> {
+public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventureById, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be viewed was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
@@ -33,7 +33,7 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     }
 
     @Override
-    public GetAdventureResult execute(GetAdventureById query) {
+    public AdventureDetails execute(GetAdventureById query) {
 
         Adventure adventure = queryRepository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
@@ -45,9 +45,9 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
         return mapResult(adventure);
     }
 
-    private GetAdventureResult mapResult(Adventure adventure) {
+    private AdventureDetails mapResult(Adventure adventure) {
 
-        return GetAdventureResult.builder()
+        return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .worldId(adventure.getWorldId())

@@ -5,14 +5,14 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
-import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
+import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @UseCaseHandler
-public class GetNotificationByIdHandler extends AbstractUseCaseHandler<GetNotificationById, NotificationResult> {
+public class GetNotificationByIdHandler extends AbstractUseCaseHandler<GetNotificationById, NotificationDetails> {
 
     private final NotificationRepository repository;
 
@@ -29,22 +29,26 @@ public class GetNotificationByIdHandler extends AbstractUseCaseHandler<GetNotifi
     }
 
     @Override
-    public NotificationResult execute(GetNotificationById request) {
+    public NotificationDetails execute(GetNotificationById request) {
 
         return repository.findById(request.getNotificationId())
                 .map(this::toResult)
                 .orElseThrow(() -> new AssetNotFoundException("Notification not found"));
     }
 
-    private NotificationResult toResult(Notification notification) {
+    private NotificationDetails toResult(Notification notification) {
 
-        return NotificationResult.builder()
+        return NotificationDetails.builder()
+                .id(notification.getId())
                 .message(notification.getMessage())
                 .senderDiscordId(notification.getSenderDiscordId())
                 .receiverDiscordId(notification.getReceiverDiscordId())
                 .isGlobal(notification.isGlobal())
                 .isInteractable(notification.isInteractable())
                 .type(notification.getType().name())
+                .metadata(notification.getMetadata())
+                .creationDate(notification.getCreationDate())
+                .lastUpdateDate(notification.getLastUpdateDate())
                 .notificationsRead(notification.getNotificationsRead().stream()
                         .map(notificationRead -> NotificationReadResult.builder()
                                 .userId(notificationRead.getUserId())

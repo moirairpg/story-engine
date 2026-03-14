@@ -15,7 +15,7 @@ public final class SearchWorldLorebookEntriesResult {
     private final int items;
     private final long totalItems;
     private final int totalPages;
-    private final List<GetWorldLorebookEntryResult> results;
+    private final List<WorldLorebookEntryDetails> results;
 
     private SearchWorldLorebookEntriesResult(Builder builder) {
 
@@ -46,7 +46,7 @@ public final class SearchWorldLorebookEntriesResult {
         return totalPages;
     }
 
-    public List<GetWorldLorebookEntryResult> getResults() {
+    public List<WorldLorebookEntryDetails> getResults() {
         return results;
     }
 
@@ -57,7 +57,7 @@ public final class SearchWorldLorebookEntriesResult {
         private int items;
         private long totalItems;
         private int totalPages;
-        private List<GetWorldLorebookEntryResult> results = new ArrayList<>();
+        private List<WorldLorebookEntryDetails> results = new ArrayList<>();
 
         private Builder() {
         }
@@ -82,7 +82,7 @@ public final class SearchWorldLorebookEntriesResult {
             return this;
         }
 
-        public Builder results(List<GetWorldLorebookEntryResult> results) {
+        public Builder results(List<WorldLorebookEntryDetails> results) {
 
             if (results != null) {
                 this.results = results;

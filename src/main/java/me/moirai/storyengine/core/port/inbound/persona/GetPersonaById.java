@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port.inbound.persona;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class GetPersonaById extends UseCase<GetPersonaResult> {
+public final class GetPersonaById extends UseCase<PersonaDetails> {
 
     private final String id;
     private final String requesterId;

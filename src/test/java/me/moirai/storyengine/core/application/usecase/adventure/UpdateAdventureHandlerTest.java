@@ -20,7 +20,7 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureFixture;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -74,11 +74,11 @@ public class UpdateAdventureHandlerTest {
         when(repository.save(any())).thenReturn(expectedUpdatedAdventure);
 
         // When
-        UpdateAdventureResult result = handler.handle(command);
+        AdventureDetails result = handler.handle(command);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getLastUpdatedDateTime()).isEqualTo(expectedUpdatedAdventure.getLastUpdateDate());
+        assertThat(result.getLastUpdateDate()).isEqualTo(expectedUpdatedAdventure.getLastUpdateDate());
     }
 
     @Test

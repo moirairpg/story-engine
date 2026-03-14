@@ -15,7 +15,7 @@ public final class SearchAdventureLorebookEntriesResult {
     private final int items;
     private final long totalItems;
     private final int totalPages;
-    private final List<GetAdventureLorebookEntryResult> results;
+    private final List<AdventureLorebookEntryDetails> results;
 
     private SearchAdventureLorebookEntriesResult(Builder builder) {
 
@@ -46,7 +46,7 @@ public final class SearchAdventureLorebookEntriesResult {
         return totalPages;
     }
 
-    public List<GetAdventureLorebookEntryResult> getResults() {
+    public List<AdventureLorebookEntryDetails> getResults() {
         return results;
     }
 
@@ -57,7 +57,7 @@ public final class SearchAdventureLorebookEntriesResult {
         private int items;
         private long totalItems;
         private int totalPages;
-        private List<GetAdventureLorebookEntryResult> results = new ArrayList<>();
+        private List<AdventureLorebookEntryDetails> results = new ArrayList<>();
 
         private Builder() {
         }
@@ -82,7 +82,7 @@ public final class SearchAdventureLorebookEntriesResult {
             return this;
         }
 
-        public Builder results(List<GetAdventureLorebookEntryResult> results) {
+        public Builder results(List<AdventureLorebookEntryDetails> results) {
 
             if (results != null) {
                 this.results = results;

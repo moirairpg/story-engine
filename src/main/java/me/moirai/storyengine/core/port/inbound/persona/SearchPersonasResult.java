@@ -17,7 +17,7 @@ public final class SearchPersonasResult {
     private final int items;
     private final long totalItems;
     private final int totalPages;
-    private final List<GetPersonaResult> results;
+    private final List<PersonaDetails> results;
 
     private SearchPersonasResult(Builder builder) {
 
@@ -48,7 +48,7 @@ public final class SearchPersonasResult {
         return totalPages;
     }
 
-    public List<GetPersonaResult> getResults() {
+    public List<PersonaDetails> getResults() {
         return results;
     }
 
@@ -59,7 +59,7 @@ public final class SearchPersonasResult {
         private int items;
         private long totalItems;
         private int totalPages;
-        private List<GetPersonaResult> results;
+        private List<PersonaDetails> results;
 
         private Builder() {
         }
@@ -84,7 +84,7 @@ public final class SearchPersonasResult {
             return this;
         }
 
-        public Builder results(List<GetPersonaResult> results) {
+        public Builder results(List<PersonaDetails> results) {
             this.results = results;
             return this;
         }

@@ -19,15 +19,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntryResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureLorebookEntryRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
@@ -77,7 +75,7 @@ public class AdventureLorebookController extends SecurityContextAware {
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#adventureId, 'Adventure')")
-    public Mono<GetAdventureLorebookEntryResult> getLorebookEntryById(
+    public Mono<AdventureLorebookEntryDetails> getLorebookEntryById(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId) {
 
@@ -96,7 +94,7 @@ public class AdventureLorebookController extends SecurityContextAware {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("canModify(#adventureId, 'Adventure')")
-    public Mono<CreateAdventureLorebookEntryResult> createLorebookEntry(
+    public Mono<AdventureLorebookEntryDetails> createLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
 
@@ -112,7 +110,7 @@ public class AdventureLorebookController extends SecurityContextAware {
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#adventureId, 'Adventure')")
-    public Mono<UpdateAdventureLorebookEntryResult> updateLorebookEntry(
+    public Mono<AdventureLorebookEntryDetails> updateLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId,
             @Valid @RequestBody UpdateLorebookEntryRequest request) {

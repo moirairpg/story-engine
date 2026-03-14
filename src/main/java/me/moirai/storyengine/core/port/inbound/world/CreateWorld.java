@@ -11,7 +11,7 @@ import java.util.Set;
 import me.moirai.storyengine.common.usecases.UseCase;
 import reactor.core.publisher.Mono;
 
-public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
+public final class CreateWorld extends UseCase<Mono<WorldDetails>> {
 
     private final String name;
     private final String description;

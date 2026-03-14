@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
@@ -67,7 +67,7 @@ public class NotificationController extends SecurityContextAware {
     @GetMapping("/{notificationId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin()")
-    public Mono<NotificationResult> getNotificationById(@PathVariable(required = true) String notificationId) {
+    public Mono<NotificationDetails> getNotificationById(@PathVariable(required = true) String notificationId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 

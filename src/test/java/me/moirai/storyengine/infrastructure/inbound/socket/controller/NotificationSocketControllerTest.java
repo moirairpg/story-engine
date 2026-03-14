@@ -27,9 +27,8 @@ import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort
 import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
 import me.moirai.storyengine.core.application.usecase.notification.result.NotificationResultFixture;
-import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.infrastructure.config.JdaConfig;
 import me.moirai.storyengine.infrastructure.inbound.socket.request.SendNotificationRequest;
 import me.moirai.storyengine.infrastructure.inbound.socket.response.NotificationResponse;
@@ -91,7 +90,7 @@ public class NotificationSocketControllerTest {
 
         // Given
         String userId = "12345";
-        NotificationResult result = NotificationResultFixture.globalUnreadWarning().build();
+        NotificationDetails result = NotificationResultFixture.globalUnreadWarning().build();
 
         when(useCaseRunner.run(any(StreamNotificationsForUser.class))).thenReturn(Flux.just(result));
 
@@ -116,8 +115,10 @@ public class NotificationSocketControllerTest {
         String notificationId = "12345";
         OffsetDateTime sendDate = OffsetDateTime.now().minusHours(1);
 
-        SendNotificationResult result = SendNotificationResult
-                .withIdAndCreationDateTime(notificationId, sendDate);
+        NotificationDetails result = NotificationDetails.builder()
+                .id(notificationId)
+                .creationDate(sendDate)
+                .build();
 
         SendNotificationRequest request = new SendNotificationRequest();
         request.setMessage("some message");
@@ -131,7 +132,7 @@ public class NotificationSocketControllerTest {
                 .assertNext(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(result.getId());
-                    assertThat(response.getCreationDateTime()).isEqualTo(result.getCreationDateTime());
+                    assertThat(response.getCreationDateTime()).isEqualTo(result.getCreationDate());
                 })
                 .verifyComplete();
     }

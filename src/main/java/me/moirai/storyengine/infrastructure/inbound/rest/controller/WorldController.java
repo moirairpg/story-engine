@@ -21,15 +21,13 @@ import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.AddFavoriteWorld;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
 import me.moirai.storyengine.core.port.inbound.world.RemoveFavoriteWorld;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
@@ -82,7 +80,7 @@ public class WorldController extends SecurityContextAware {
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#worldId, 'World')")
-    public Mono<GetWorldResult> getWorldById(@PathVariable(required = true) String worldId) {
+    public Mono<WorldDetails> getWorldById(@PathVariable(required = true) String worldId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -93,7 +91,7 @@ public class WorldController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<CreateWorldResult> createWorld(@Valid @RequestBody CreateWorldRequest request) {
+    public Mono<WorldDetails> createWorld(@Valid @RequestBody CreateWorldRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -105,7 +103,7 @@ public class WorldController extends SecurityContextAware {
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<UpdateWorldResult> updateWorld(@PathVariable(required = true) String worldId,
+    public Mono<WorldDetails> updateWorld(@PathVariable(required = true) String worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {

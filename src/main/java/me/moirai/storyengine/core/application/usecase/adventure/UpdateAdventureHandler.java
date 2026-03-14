@@ -13,15 +13,15 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.GameMode;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 
 @UseCaseHandler
-public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventure, UpdateAdventureResult> {
+public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventure, AdventureDetails> {
 
     private static final String USER_NO_PERMISSION = "User does not have permission to delete adventure";
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
@@ -42,7 +42,7 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
     }
 
     @Override
-    public UpdateAdventureResult execute(UpdateAdventure command) {
+    public AdventureDetails execute(UpdateAdventure command) {
 
         Adventure adventure = repository.findById(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
@@ -177,8 +177,37 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
                 .forEach(adventure::removeStopSequence);
     }
 
-    private UpdateAdventureResult mapResult(Adventure savedAdventure) {
+    private AdventureDetails mapResult(Adventure savedAdventure) {
 
-        return UpdateAdventureResult.build(savedAdventure.getLastUpdateDate());
+        return AdventureDetails.builder()
+                .id(savedAdventure.getId())
+                .name(savedAdventure.getName())
+                .worldId(savedAdventure.getWorldId())
+                .personaId(savedAdventure.getPersonaId())
+                .visibility(savedAdventure.getVisibility().name())
+                .aiModel(savedAdventure.getModelConfiguration().getAiModel().toString())
+                .moderation(savedAdventure.getModeration().name())
+                .maxTokenLimit(savedAdventure.getModelConfiguration().getMaxTokenLimit())
+                .temperature(savedAdventure.getModelConfiguration().getTemperature())
+                .frequencyPenalty(savedAdventure.getModelConfiguration().getFrequencyPenalty())
+                .presencePenalty(savedAdventure.getModelConfiguration().getPresencePenalty())
+                .stopSequences(savedAdventure.getModelConfiguration().getStopSequences())
+                .logitBias(savedAdventure.getModelConfiguration().getLogitBias())
+                .usersAllowedToWrite(savedAdventure.getUsersAllowedToWrite())
+                .usersAllowedToRead(savedAdventure.getUsersAllowedToRead())
+                .ownerId(savedAdventure.getOwnerId())
+                .creationDate(savedAdventure.getCreationDate())
+                .lastUpdateDate(savedAdventure.getLastUpdateDate())
+                .description(savedAdventure.getDescription())
+                .adventureStart(savedAdventure.getAdventureStart())
+                .channelId(savedAdventure.getChannelId())
+                .gameMode(savedAdventure.getGameMode().name())
+                .authorsNote(savedAdventure.getContextAttributes().getAuthorsNote())
+                .nudge(savedAdventure.getContextAttributes().getNudge())
+                .remember(savedAdventure.getContextAttributes().getRemember())
+                .bump(savedAdventure.getContextAttributes().getBump())
+                .bumpFrequency(savedAdventure.getContextAttributes().getBumpFrequency())
+                .isMultiplayer(savedAdventure.isMultiplayer())
+                .build();
     }
 }

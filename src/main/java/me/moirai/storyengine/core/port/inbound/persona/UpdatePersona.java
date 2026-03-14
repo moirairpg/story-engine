@@ -10,7 +10,7 @@ import java.util.Set;
 import me.moirai.storyengine.common.usecases.UseCase;
 import reactor.core.publisher.Mono;
 
-public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
+public final class UpdatePersona extends UseCase<Mono<PersonaDetails>> {
 
     private final String id;
     private final String name;

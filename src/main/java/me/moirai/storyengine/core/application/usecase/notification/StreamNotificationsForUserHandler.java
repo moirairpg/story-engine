@@ -7,7 +7,7 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.notification.Notification;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.StreamNotificationsForUser;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import reactor.core.publisher.Flux;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Sinks;
 
 @UseCaseHandler
 public class StreamNotificationsForUserHandler
-        extends AbstractUseCaseHandler<StreamNotificationsForUser, Flux<NotificationResult>> {
+        extends AbstractUseCaseHandler<StreamNotificationsForUser, Flux<NotificationDetails>> {
 
     private static final String NOTIFICATION_NOT_FOUND = "Notification to be retrieved was not found";
 
@@ -36,7 +36,7 @@ public class StreamNotificationsForUserHandler
     }
 
     @Override
-    public Flux<NotificationResult> execute(StreamNotificationsForUser request) {
+    public Flux<NotificationDetails> execute(StreamNotificationsForUser request) {
 
         return sink.asFlux()
                 .map(notificationId -> notificationRepository.findById(notificationId)
@@ -52,9 +52,10 @@ public class StreamNotificationsForUserHandler
                 && notification.getReceiverDiscordId().equals(userId));
     }
 
-    private NotificationResult toResult(Notification notification) {
+    private NotificationDetails toResult(Notification notification) {
 
-        return NotificationResult.builder()
+        return NotificationDetails.builder()
+                .id(notification.getId())
                 .isGlobal(notification.isGlobal())
                 .isInteractable(notification.isInteractable())
                 .message(notification.getMessage())
@@ -62,6 +63,8 @@ public class StreamNotificationsForUserHandler
                 .receiverDiscordId(notification.getReceiverDiscordId())
                 .senderDiscordId(notification.getSenderDiscordId())
                 .type(notification.getType().name())
+                .creationDate(notification.getCreationDate())
+                .lastUpdateDate(notification.getLastUpdateDate())
                 .build();
     }
 }

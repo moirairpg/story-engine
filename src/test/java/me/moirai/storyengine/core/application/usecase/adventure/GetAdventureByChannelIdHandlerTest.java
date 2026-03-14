@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -83,7 +83,7 @@ public class GetAdventureByChannelIdHandlerTest {
         when(queryRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
 
         // When
-        GetAdventureResult result = handler.execute(command);
+        AdventureDetails result = handler.execute(command);
 
         // Then
         assertThat(result).isNotNull();

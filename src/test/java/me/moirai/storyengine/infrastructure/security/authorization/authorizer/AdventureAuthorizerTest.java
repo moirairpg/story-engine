@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.application.usecase.adventure.result.GetAdventureResultFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
@@ -48,7 +48,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .ownerId(userId)
                 .build();
 
@@ -70,7 +70,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -90,7 +90,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -110,7 +110,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .ownerId(userId)
                 .build();
 
@@ -132,7 +132,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -152,7 +152,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .usersAllowedToWrite(set(userId))
                 .build();
 
@@ -174,7 +174,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .usersAllowedToRead(set(userId))
                 .build();
 
@@ -196,7 +196,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .ownerId(userId)
                 .build();
 
@@ -218,7 +218,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -238,7 +238,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .usersAllowedToWrite(set(userId))
                 .build();
 
@@ -260,7 +260,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure()
                 .usersAllowedToRead(set(userId))
                 .build();
 
@@ -282,7 +282,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.publicMultiplayerAdventure().build();
+        AdventureDetails adventureDetails = GetAdventureResultFixture.publicMultiplayerAdventure().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -302,7 +302,7 @@ public class AdventureAuthorizerTest {
         // Given
         String adventureId = "12345";
         String userId = "12345";
-        GetAdventureResult adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
+        AdventureDetails adventureDetails = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 

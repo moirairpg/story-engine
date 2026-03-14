@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResultFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
@@ -48,7 +48,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .ownerId(userId)
                 .build();
 
@@ -70,7 +70,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona().build();
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -90,7 +90,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona().build();
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -110,7 +110,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .ownerId(userId)
                 .build();
 
@@ -132,7 +132,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona().build();
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -152,7 +152,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .usersAllowedToWrite(set(userId))
                 .build();
 
@@ -174,7 +174,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .usersAllowedToRead(set(userId))
                 .build();
 
@@ -196,7 +196,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .ownerId(userId)
                 .build();
 
@@ -218,7 +218,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona().build();
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -238,7 +238,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .usersAllowedToWrite(set(userId))
                 .build();
 
@@ -260,7 +260,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona()
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona()
                 .usersAllowedToRead(set(userId))
                 .build();
 
@@ -282,7 +282,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.publicPersona().build();
+        PersonaDetails personaDetails = GetPersonaResultFixture.publicPersona().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -302,7 +302,7 @@ public class PersonaAuthorizerTest {
         // Given
         String personaId = "12345";
         String userId = "12345";
-        GetPersonaResult personaDetails = GetPersonaResultFixture.privatePersona().build();
+        PersonaDetails personaDetails = GetPersonaResultFixture.privatePersona().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 

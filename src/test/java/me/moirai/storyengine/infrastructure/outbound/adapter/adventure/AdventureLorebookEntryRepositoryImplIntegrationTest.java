@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
@@ -171,7 +171,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetAdventureLorebookEntryResult> entries = result.getResults();
+        List<AdventureLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -213,7 +213,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetAdventureLorebookEntryResult> entries = result.getResults();
+        List<AdventureLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -255,7 +255,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetAdventureLorebookEntryResult> entries = result.getResults();
+        List<AdventureLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt4Omni.getName());
@@ -300,7 +300,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetAdventureLorebookEntryResult> entries = result.getResults();
+        List<AdventureLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -344,7 +344,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetAdventureLorebookEntryResult> entries = result.getResults();
+        List<AdventureLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt4Mini.getName());
@@ -387,7 +387,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetAdventureLorebookEntryResult> entries = result.getResults();
+        List<AdventureLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 

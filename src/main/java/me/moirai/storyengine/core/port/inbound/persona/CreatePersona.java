@@ -8,7 +8,7 @@ import java.util.Set;
 import me.moirai.storyengine.common.usecases.UseCase;
 import reactor.core.publisher.Mono;
 
-public final class CreatePersona extends UseCase<Mono<CreatePersonaResult>> {
+public final class CreatePersona extends UseCase<Mono<PersonaDetails>> {
 
     private final String name;
     private final String personality;

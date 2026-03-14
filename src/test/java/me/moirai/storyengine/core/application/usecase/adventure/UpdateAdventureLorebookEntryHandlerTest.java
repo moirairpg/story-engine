@@ -124,7 +124,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getLastUpdatedDateTime()).isNotNull();
+                    assertThat(result.getLastUpdateDate()).isNotNull();
                 })
                 .verifyComplete();
     }

@@ -17,7 +17,7 @@ public final class SearchAdventuresResult {
     private final int totalPages;
     private final int items;
     private final long totalItems;
-    private final List<GetAdventureResult> results;
+    private final List<AdventureDetails> results;
 
     private SearchAdventuresResult(Builder builder) {
         this.page = builder.page;
@@ -47,7 +47,7 @@ public final class SearchAdventuresResult {
         return totalPages;
     }
 
-    public List<GetAdventureResult> getResults() {
+    public List<AdventureDetails> getResults() {
         return results;
     }
 
@@ -58,7 +58,7 @@ public final class SearchAdventuresResult {
         private int totalPages;
         private int items;
         private long totalItems;
-        private List<GetAdventureResult> results;
+        private List<AdventureDetails> results;
 
         private Builder() {
         }
@@ -83,7 +83,7 @@ public final class SearchAdventuresResult {
             return this;
         }
 
-        public Builder results(List<GetAdventureResult> results) {
+        public Builder results(List<AdventureDetails> results) {
             this.results = results;
             return this;
         }

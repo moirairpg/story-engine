@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
@@ -93,7 +93,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
         when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
 
         // When
-        GetWorldLorebookEntryResult result = handler.handle(query);
+        WorldLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

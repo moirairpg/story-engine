@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.port.inbound.world;
+package me.moirai.storyengine.core.port.inbound.persona;
 
 import static java.util.Collections.unmodifiableSet;
 
@@ -9,30 +9,28 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = GetWorldResult.Builder.class)
-public final class GetWorldResult {
+@JsonDeserialize(builder = PersonaDetails.Builder.class)
+public final class PersonaDetails {
 
     private final String id;
     private final String name;
-    private final String description;
-    private final String adventureStart;
+    private final String personality;
     private final String visibility;
     private final String ownerId;
-    private final Set<String> usersAllowedToRead;
     private final Set<String> usersAllowedToWrite;
+    private final Set<String> usersAllowedToRead;
     private final OffsetDateTime creationDate;
     private final OffsetDateTime lastUpdateDate;
 
-    private GetWorldResult(Builder builder) {
+    private PersonaDetails(Builder builder) {
 
         this.id = builder.id;
         this.name = builder.name;
-        this.description = builder.description;
-        this.adventureStart = builder.adventureStart;
+        this.personality = builder.personality;
         this.visibility = builder.visibility;
         this.ownerId = builder.ownerId;
-        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
         this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
         this.creationDate = builder.creationDate;
         this.lastUpdateDate = builder.lastUpdateDate;
     }
@@ -49,12 +47,8 @@ public final class GetWorldResult {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getAdventureStart() {
-        return adventureStart;
+    public String getPersonality() {
+        return personality;
     }
 
     public String getVisibility() {
@@ -65,12 +59,12 @@ public final class GetWorldResult {
         return ownerId;
     }
 
-    public Set<String> getUsersAllowedToRead() {
-        return usersAllowedToRead;
-    }
-
     public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
+    }
+
+    public Set<String> getUsersAllowedToRead() {
+        return usersAllowedToRead;
     }
 
     public OffsetDateTime getCreationDate() {
@@ -86,12 +80,11 @@ public final class GetWorldResult {
 
         private String id;
         private String name;
-        private String description;
-        private String adventureStart;
+        private String personality;
         private String visibility;
         private String ownerId;
-        private Set<String> usersAllowedToRead = new HashSet<>();
         private Set<String> usersAllowedToWrite = new HashSet<>();
+        private Set<String> usersAllowedToRead = new HashSet<>();
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
 
@@ -108,13 +101,8 @@ public final class GetWorldResult {
             return this;
         }
 
-        public Builder description(String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Builder adventureStart(String adventureStart) {
-            this.adventureStart = adventureStart;
+        public Builder personality(String personality) {
+            this.personality = personality;
             return this;
         }
 
@@ -128,19 +116,19 @@ public final class GetWorldResult {
             return this;
         }
 
-        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
-            if (usersAllowedToRead != null) {
-                this.usersAllowedToRead = usersAllowedToRead;
+            if (usersAllowedToWrite != null) {
+                this.usersAllowedToWrite = usersAllowedToWrite;
             }
 
             return this;
         }
 
-        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
-            if (usersAllowedToWrite != null) {
-                this.usersAllowedToWrite = usersAllowedToWrite;
+            if (usersAllowedToRead != null) {
+                this.usersAllowedToRead = usersAllowedToRead;
             }
 
             return this;
@@ -156,8 +144,8 @@ public final class GetWorldResult {
             return this;
         }
 
-        public GetWorldResult build() {
-            return new GetWorldResult(this);
+        public PersonaDetails build() {
+            return new PersonaDetails(this);
         }
     }
 }

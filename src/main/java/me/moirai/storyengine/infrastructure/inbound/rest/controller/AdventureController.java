@@ -20,16 +20,14 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AddFavoriteAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
 import me.moirai.storyengine.core.port.inbound.adventure.RemoveFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
@@ -91,7 +89,7 @@ public class AdventureController extends SecurityContextAware {
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#adventureId, 'Adventure')")
-    public Mono<GetAdventureResult> getAdventureById(
+    public Mono<AdventureDetails> getAdventureById(
             @PathVariable(required = true) String adventureId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
@@ -104,7 +102,7 @@ public class AdventureController extends SecurityContextAware {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
-    public Mono<CreateAdventureResult> createAdventure(
+    public Mono<AdventureDetails> createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
@@ -117,7 +115,7 @@ public class AdventureController extends SecurityContextAware {
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#adventureId, 'Adventure') && canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
-    public Mono<UpdateAdventureResult> updateAdventure(
+    public Mono<AdventureDetails> updateAdventure(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
 

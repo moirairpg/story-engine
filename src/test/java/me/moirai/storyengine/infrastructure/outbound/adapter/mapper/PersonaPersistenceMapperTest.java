@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
@@ -31,7 +31,7 @@ public class PersonaPersistenceMapperTest {
         Persona persona = PersonaFixture.privatePersona().build();
 
         // When
-        GetPersonaResult result = mapper.mapToResult(persona);
+        PersonaDetails result = mapper.mapToResult(persona);
 
         // Then
         assertThat(result).isNotNull();

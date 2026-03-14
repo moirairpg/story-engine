@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.application.usecase.notification.result;
 
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Maps.newHashMap;
@@ -13,7 +13,7 @@ public class NotificationResultTest {
     public void createNotification_whenAllDataProvided_thenInstantiate() {
 
         // Given
-        NotificationResult.Builder builder = NotificationResult.builder()
+        NotificationDetails.Builder builder = NotificationDetails.builder()
                 .type("INFO")
                 .isGlobal(false)
                 .isInteractable(false)
@@ -23,7 +23,7 @@ public class NotificationResultTest {
                 .senderDiscordId("12345");
 
         // When
-        NotificationResult result = builder.build();
+        NotificationDetails result = builder.build();
 
         // Then
         assertThat(result).isNotNull();
@@ -40,7 +40,7 @@ public class NotificationResultTest {
     public void createNotification_whenMetadataNull_thenInstantiateWithEmptyMetadata() {
 
         // Given
-        NotificationResult.Builder builder = NotificationResult.builder()
+        NotificationDetails.Builder builder = NotificationDetails.builder()
                 .type("INFO")
                 .isGlobal(false)
                 .isInteractable(false)
@@ -50,7 +50,7 @@ public class NotificationResultTest {
                 .senderDiscordId("12345");
 
         // When
-        NotificationResult result = builder.build();
+        NotificationDetails result = builder.build();
 
         // Then
         assertThat(result).isNotNull();

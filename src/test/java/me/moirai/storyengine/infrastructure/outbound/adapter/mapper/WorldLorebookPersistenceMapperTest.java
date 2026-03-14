@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
@@ -31,7 +31,7 @@ public class WorldLorebookPersistenceMapperTest {
         WorldLorebookEntry worldLorebookEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
 
         // When
-        GetWorldLorebookEntryResult result = mapper.mapToResult(worldLorebookEntry);
+        WorldLorebookEntryDetails result = mapper.mapToResult(worldLorebookEntry);
 
         // Then
         assertThat(result).isNotNull();

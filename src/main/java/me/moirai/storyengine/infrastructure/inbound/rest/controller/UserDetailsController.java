@@ -18,7 +18,7 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByD
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -53,7 +53,7 @@ public class UserDetailsController extends SecurityContextAware {
     @GetMapping("/{discordUserId}/notifications")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin() || isAuthenticatedUser(#discordUserId)")
-    public Mono<List<NotificationResult>> getNotificationsByUserId(
+    public Mono<List<NotificationDetails>> getNotificationsByUserId(
             @PathVariable(required = true) String discordUserId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {

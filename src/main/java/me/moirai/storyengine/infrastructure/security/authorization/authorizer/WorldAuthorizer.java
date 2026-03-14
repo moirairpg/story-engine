@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
 import me.moirai.storyengine.infrastructure.security.authorization.BaseAssetAuthorizer;
@@ -31,7 +31,7 @@ public class WorldAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetWorldById request = GetWorldById.build(assetId, principal.getDiscordId());
-        GetWorldResult worldDetails = useCaseRunner.run(request);
+        WorldDetails worldDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = worldDetails.getOwnerId().equals(userId);
@@ -44,7 +44,7 @@ public class WorldAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetWorldById request = GetWorldById.build(assetId, principal.getDiscordId());
-        GetWorldResult worldDetails = useCaseRunner.run(request);
+        WorldDetails worldDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = worldDetails.getOwnerId().equals(userId);
@@ -58,7 +58,7 @@ public class WorldAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetWorldById request = GetWorldById.build(assetId, principal.getDiscordId());
-        GetWorldResult worldDetails = useCaseRunner.run(request);
+        WorldDetails worldDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = worldDetails.getOwnerId().equals(userId);

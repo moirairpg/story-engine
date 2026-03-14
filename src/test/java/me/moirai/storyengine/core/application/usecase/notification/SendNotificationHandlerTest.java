@@ -17,7 +17,7 @@ import me.moirai.storyengine.core.application.usecase.notification.request.SendN
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
 import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
-import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -94,12 +94,12 @@ public class SendNotificationHandlerTest {
         when(notificationRepository.save(any())).thenReturn(expectedNotification);
 
         // When
-        SendNotificationResult result = handler.handle(request);
+        NotificationDetails result = handler.handle(request);
 
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(expectedNotification.getId());
-        assertThat(result.getCreationDateTime()).isEqualTo(expectedNotification.getCreationDate());
+        assertThat(result.getCreationDate()).isEqualTo(expectedNotification.getCreationDate());
     }
 
     @Test
@@ -114,11 +114,11 @@ public class SendNotificationHandlerTest {
         when(notificationRepository.save(any())).thenReturn(expectedNotification);
 
         // When
-        SendNotificationResult result = handler.handle(request);
+        NotificationDetails result = handler.handle(request);
 
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(expectedNotification.getId());
-        assertThat(result.getCreationDateTime()).isEqualTo(expectedNotification.getCreationDate());
+        assertThat(result.getCreationDate()).isEqualTo(expectedNotification.getCreationDate());
     }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public class GetNotificationsByUserId extends UseCase<List<NotificationResult>>  {
+public class GetNotificationsByUserId extends UseCase<List<NotificationDetails>>  {
 
     private final String userId;
 

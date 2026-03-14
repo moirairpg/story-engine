@@ -1,30 +1,26 @@
-package me.moirai.storyengine.core.port.inbound.adventure;
+package me.moirai.storyengine.core.port.inbound.world;
 
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = GetAdventureLorebookEntryResult.Builder.class)
-public final class GetAdventureLorebookEntryResult {
+@JsonDeserialize(builder = WorldLorebookEntryDetails.Builder.class)
+public final class WorldLorebookEntryDetails {
 
     private final String id;
     private final String name;
     private final String regex;
     private final String description;
-    private final String playerId;
-    private final boolean isPlayerCharacter;
     private final OffsetDateTime creationDate;
     private final OffsetDateTime lastUpdateDate;
 
-    private GetAdventureLorebookEntryResult(Builder builder) {
+    private WorldLorebookEntryDetails(Builder builder) {
 
         this.id = builder.id;
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
-        this.playerId = builder.playerId;
-        this.isPlayerCharacter = builder.isPlayerCharacter;
         this.creationDate = builder.creationDate;
         this.lastUpdateDate = builder.lastUpdateDate;
     }
@@ -49,14 +45,6 @@ public final class GetAdventureLorebookEntryResult {
         return description;
     }
 
-    public String getPlayerId() {
-        return playerId;
-    }
-
-    public boolean isPlayerCharacter() {
-        return isPlayerCharacter;
-    }
-
     public OffsetDateTime getCreationDate() {
         return creationDate;
     }
@@ -72,8 +60,6 @@ public final class GetAdventureLorebookEntryResult {
         private String name;
         private String regex;
         private String description;
-        private String playerId;
-        private boolean isPlayerCharacter;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
 
@@ -100,16 +86,6 @@ public final class GetAdventureLorebookEntryResult {
             return this;
         }
 
-        public Builder playerId(String playerId) {
-            this.playerId = playerId;
-            return this;
-        }
-
-        public Builder isPlayerCharacter(boolean isPlayerCharacter) {
-            this.isPlayerCharacter = isPlayerCharacter;
-            return this;
-        }
-
         public Builder creationDate(OffsetDateTime creationDate) {
             this.creationDate = creationDate;
             return this;
@@ -120,8 +96,8 @@ public final class GetAdventureLorebookEntryResult {
             return this;
         }
 
-        public GetAdventureLorebookEntryResult build() {
-            return new GetAdventureLorebookEntryResult(this);
+        public WorldLorebookEntryDetails build() {
+            return new WorldLorebookEntryDetails(this);
         }
     }
 }

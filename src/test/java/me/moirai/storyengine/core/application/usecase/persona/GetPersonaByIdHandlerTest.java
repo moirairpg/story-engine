@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
@@ -74,7 +74,7 @@ public class GetPersonaByIdHandlerTest {
         when(repository.findById(anyString())).thenReturn(Optional.of(persona));
 
         // When
-        GetPersonaResult result = handler.handle(query);
+        PersonaDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

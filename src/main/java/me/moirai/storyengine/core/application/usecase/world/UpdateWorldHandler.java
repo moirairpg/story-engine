@@ -18,7 +18,7 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
@@ -26,7 +26,7 @@ import me.moirai.storyengine.core.domain.world.World;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono<UpdateWorldResult>> {
+public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono<WorldDetails>> {
 
     private static final String WORLD_FLAGGED_BY_MODERATION = "World flagged by moderation";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
@@ -52,12 +52,28 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
     }
 
     @Override
-    public Mono<UpdateWorldResult> execute(UpdateWorld command) {
+    public Mono<WorldDetails> execute(UpdateWorld command) {
 
         return moderateContent(command.getAdventureStart())
                 .flatMap(__ -> moderateContent(command.getName()))
                 .map(__ -> updateWorld(command))
-                .map(worldUpdated -> UpdateWorldResult.build(worldUpdated.getLastUpdateDate()));
+                .map(this::mapResult);
+    }
+
+    private WorldDetails mapResult(World world) {
+
+        return WorldDetails.builder()
+                .id(world.getId())
+                .name(world.getName())
+                .description(world.getDescription())
+                .adventureStart(world.getAdventureStart())
+                .visibility(world.getVisibility().name())
+                .ownerId(world.getOwnerId())
+                .usersAllowedToRead(world.getUsersAllowedToRead())
+                .usersAllowedToWrite(world.getUsersAllowedToWrite())
+                .creationDate(world.getCreationDate())
+                .lastUpdateDate(world.getLastUpdateDate())
+                .build();
     }
 
     public World updateWorld(UpdateWorld command) {

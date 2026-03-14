@@ -17,7 +17,7 @@ public final class SearchNotificationsResult {
     private final int items;
     private final long totalItems;
     private final int totalPages;
-    private final List<NotificationResult> results;
+    private final List<NotificationDetails> results;
 
     private SearchNotificationsResult(Builder builder) {
 
@@ -48,7 +48,7 @@ public final class SearchNotificationsResult {
         return totalPages;
     }
 
-    public List<NotificationResult> getResults() {
+    public List<NotificationDetails> getResults() {
         return results;
     }
 
@@ -59,7 +59,7 @@ public final class SearchNotificationsResult {
         private int items;
         private long totalItems;
         private int totalPages;
-        private List<NotificationResult> results;
+        private List<NotificationDetails> results;
 
         private Builder() {
         }
@@ -84,7 +84,7 @@ public final class SearchNotificationsResult {
             return this;
         }
 
-        public Builder results(List<NotificationResult> results) {
+        public Builder results(List<NotificationDetails> results) {
             this.results = results;
             return this;
         }

@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port.inbound.world;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class GetWorldById extends UseCase<GetWorldResult> {
+public final class GetWorldById extends UseCase<WorldDetails> {
 
     private final String id;
     private final String requesterId;

@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
@@ -60,7 +60,7 @@ public class GetWorldByIdHandlerTest {
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
 
         // When
-        GetWorldResult result = handler.handle(query);
+        WorldDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

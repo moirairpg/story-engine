@@ -7,15 +7,15 @@ import java.util.stream.Stream;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
-import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
+import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @UseCaseHandler
 public class GetNotificationsByUserIdHandler
-        extends AbstractUseCaseHandler<GetNotificationsByUserId, List<NotificationResult>> {
+        extends AbstractUseCaseHandler<GetNotificationsByUserId, List<NotificationDetails>> {
 
     private final NotificationRepository repository;
 
@@ -32,7 +32,7 @@ public class GetNotificationsByUserIdHandler
     }
 
     @Override
-    public List<NotificationResult> execute(GetNotificationsByUserId request) {
+    public List<NotificationDetails> execute(GetNotificationsByUserId request) {
 
         return Stream.concat(repository.findReadByUserId(request.getUserId()).stream(),
                 repository.findUnreadByUserId(request.getUserId()).stream())
@@ -40,15 +40,19 @@ public class GetNotificationsByUserIdHandler
                 .toList();
     }
 
-    private NotificationResult toResult(Notification notification, String userId) {
+    private NotificationDetails toResult(Notification notification, String userId) {
 
-        return NotificationResult.builder()
+        return NotificationDetails.builder()
+                .id(notification.getId())
                 .message(notification.getMessage())
                 .senderDiscordId(notification.getSenderDiscordId())
                 .receiverDiscordId(notification.getReceiverDiscordId())
                 .isGlobal(notification.isGlobal())
                 .isInteractable(notification.isInteractable())
                 .type(notification.getType().name())
+                .metadata(notification.getMetadata())
+                .creationDate(notification.getCreationDate())
+                .lastUpdateDate(notification.getLastUpdateDate())
                 .notificationsRead(notification.getNotificationsRead().stream()
                         .map(notificationRead -> NotificationReadResult.builder()
                                 .userId(notificationRead.getUserId())

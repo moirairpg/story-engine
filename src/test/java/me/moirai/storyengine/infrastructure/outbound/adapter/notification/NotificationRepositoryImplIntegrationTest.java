@@ -12,7 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
@@ -193,7 +193,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).getType()).isEqualTo(info.getType().name());
         assertThat(notifications.get(1).getType()).isEqualTo(urgent.getType().name());
         assertThat(notifications.get(2).getType()).isEqualTo(warning.getType().name());
@@ -232,7 +232,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).getType()).isEqualTo(warning.getType().name());
         assertThat(notifications.get(1).getType()).isEqualTo(urgent.getType().name());
         assertThat(notifications.get(2).getType()).isEqualTo(info.getType().name());
@@ -270,7 +270,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).getSenderDiscordId()).isEqualTo(urgent.getSenderDiscordId());
         assertThat(notifications.get(1).getSenderDiscordId()).isEqualTo(info.getSenderDiscordId());
     }
@@ -307,7 +307,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).getReceiverDiscordId()).isEqualTo(urgent.getReceiverDiscordId());
         assertThat(notifications.get(1).getReceiverDiscordId()).isEqualTo(info.getReceiverDiscordId());
     }
@@ -344,7 +344,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).getType()).isEqualTo(info.getType().name());
     }
 
@@ -380,7 +380,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).isGlobal()).isEqualTo(info.isGlobal());
     }
 
@@ -416,7 +416,7 @@ public class NotificationRepositoryImplIntegrationTest extends AbstractIntegrati
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<NotificationResult> notifications = result.getResults();
+        List<NotificationDetails> notifications = result.getResults();
         assertThat(notifications.get(0).isInteractable()).isEqualTo(info.isInteractable());
     }
 }

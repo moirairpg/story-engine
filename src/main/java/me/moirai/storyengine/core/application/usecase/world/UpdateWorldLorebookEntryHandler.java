@@ -8,13 +8,13 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class UpdateWorldLorebookEntryHandler
-        extends AbstractUseCaseHandler<UpdateWorldLorebookEntry, UpdateWorldLorebookEntryResult> {
+        extends AbstractUseCaseHandler<UpdateWorldLorebookEntry, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_UPDATED_WAS_NOT_FOUND = "World to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD = "User does not have permission to modify this world";
@@ -32,7 +32,7 @@ public class UpdateWorldLorebookEntryHandler
     }
 
     @Override
-    public UpdateWorldLorebookEntryResult execute(UpdateWorldLorebookEntry command) {
+    public WorldLorebookEntryDetails execute(UpdateWorldLorebookEntry command) {
 
         World world = repository.findById(command.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
@@ -59,8 +59,15 @@ public class UpdateWorldLorebookEntryHandler
         return mapResult(lorebookEntryRepository.save(lorebookEntry));
     }
 
-    private UpdateWorldLorebookEntryResult mapResult(WorldLorebookEntry savedEntry) {
+    private WorldLorebookEntryDetails mapResult(WorldLorebookEntry savedEntry) {
 
-        return UpdateWorldLorebookEntryResult.build(savedEntry.getLastUpdateDate());
+        return WorldLorebookEntryDetails.builder()
+                .id(savedEntry.getId())
+                .name(savedEntry.getName())
+                .regex(savedEntry.getRegex())
+                .description(savedEntry.getDescription())
+                .creationDate(savedEntry.getCreationDate())
+                .lastUpdateDate(savedEntry.getLastUpdateDate())
+                .build();
     }
 }

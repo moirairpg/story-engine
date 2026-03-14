@@ -14,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationById;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationReadResult;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotificationsResult;
@@ -36,7 +36,7 @@ public class NotificationControllerTest extends AbstractRestWebTest {
         String userId = "1234";
         OffsetDateTime readAt = OffsetDateTime.now().minusMonths(1);
 
-        NotificationResult result = NotificationResultFixture.targetedUnreadInfo()
+        NotificationDetails result = NotificationResultFixture.targetedUnreadInfo()
                 .notificationsRead(list(NotificationReadResult.builder()
                         .readAt(readAt)
                         .userId("12345")
@@ -50,7 +50,7 @@ public class NotificationControllerTest extends AbstractRestWebTest {
                 .uri("/notification/" + userId)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(NotificationResult.class)
+                .expectBody(NotificationDetails.class)
                 .value(r -> {
                     assertThat(r).isNotNull();
                     assertThat(result.getMessage()).isEqualTo(r.getMessage());

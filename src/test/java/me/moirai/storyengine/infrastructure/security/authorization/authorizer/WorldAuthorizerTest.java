@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResultFixture;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
@@ -48,7 +48,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .ownerId(userId)
                 .build();
 
@@ -70,7 +70,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld().build();
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -90,7 +90,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld().build();
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -110,7 +110,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .ownerId(userId)
                 .build();
 
@@ -132,7 +132,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld().build();
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -152,7 +152,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .usersAllowedToWrite(set(userId))
                 .build();
 
@@ -174,7 +174,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .usersAllowedToRead(set(userId))
                 .build();
 
@@ -196,7 +196,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .ownerId(userId)
                 .build();
 
@@ -218,7 +218,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld().build();
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -238,7 +238,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .usersAllowedToWrite(set(userId))
                 .build();
 
@@ -260,7 +260,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld()
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld()
                 .usersAllowedToRead(set(userId))
                 .build();
 
@@ -282,7 +282,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.publicWorld().build();
+        WorldDetails worldDetails = GetWorldResultFixture.publicWorld().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 
@@ -302,7 +302,7 @@ public class WorldAuthorizerTest {
         // Given
         String worldId = "12345";
         String userId = "12345";
-        GetWorldResult worldDetails = GetWorldResultFixture.privateWorld().build();
+        WorldDetails worldDetails = GetWorldResultFixture.privateWorld().build();
 
         SecuritySessionContext.setCurrentUser(principal);
 

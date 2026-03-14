@@ -19,7 +19,7 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureFixture;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -163,7 +163,7 @@ public class CreateAdventureHandlerTest {
                 .thenReturn(list(WorldLorebookEntryFixture.sampleLorebookEntry().build()));
 
         // When
-        CreateAdventureResult result = handler.handle(command);
+        AdventureDetails result = handler.handle(command);
 
         // Then
         assertThat(result).isNotNull();

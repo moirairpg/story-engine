@@ -20,14 +20,12 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldLorebookEntryRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
@@ -77,7 +75,7 @@ public class WorldLorebookController extends SecurityContextAware {
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#worldId, 'World')")
-    public Mono<GetWorldLorebookEntryResult> getLorebookEntryById(
+    public Mono<WorldLorebookEntryDetails> getLorebookEntryById(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId) {
 
@@ -96,7 +94,7 @@ public class WorldLorebookController extends SecurityContextAware {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<CreateWorldLorebookEntryResult> createLorebookEntry(
+    public Mono<WorldLorebookEntryDetails> createLorebookEntry(
             @PathVariable(required = true) String worldId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
 
@@ -110,7 +108,7 @@ public class WorldLorebookController extends SecurityContextAware {
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<UpdateWorldLorebookEntryResult> updateLorebookEntry(
+    public Mono<WorldLorebookEntryDetails> updateLorebookEntry(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId,
             @Valid @RequestBody UpdateLorebookEntryRequest request) {

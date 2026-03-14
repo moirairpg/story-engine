@@ -21,15 +21,13 @@ import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.persona.AddFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
-import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.RemoveFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
-import me.moirai.storyengine.core.port.inbound.persona.UpdatePersonaResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.PersonaRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
@@ -82,7 +80,7 @@ public class PersonaController extends SecurityContextAware {
     @GetMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canRead(#personaId, 'Persona')")
-    public Mono<GetPersonaResult> getPersonaById(@PathVariable(required = true) String personaId) {
+    public Mono<PersonaDetails> getPersonaById(@PathVariable(required = true) String personaId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -93,7 +91,7 @@ public class PersonaController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<CreatePersonaResult> createPersona(@Valid @RequestBody CreatePersonaRequest request) {
+    public Mono<PersonaDetails> createPersona(@Valid @RequestBody CreatePersonaRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
@@ -105,7 +103,7 @@ public class PersonaController extends SecurityContextAware {
     @PutMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("canWrite(#personaId, 'Persona')")
-    public Mono<UpdatePersonaResult> updatePersona(
+    public Mono<PersonaDetails> updatePersona(
             @PathVariable(required = true) String personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
 

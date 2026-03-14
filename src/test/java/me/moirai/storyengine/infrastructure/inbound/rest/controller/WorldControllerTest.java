@@ -18,15 +18,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.world.AddFavoriteWorld;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
-import me.moirai.storyengine.core.port.inbound.world.CreateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.RemoveFavoriteWorld;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.application.usecase.world.result.GetWorldResultFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
@@ -55,7 +55,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchWorlds() {
 
         // Given
-        List<GetWorldResult> results = Lists.list(GetWorldResultFixture.publicWorld().build(),
+        List<WorldDetails> results = Lists.list(GetWorldResultFixture.publicWorld().build(),
                 GetWorldResultFixture.privateWorld().build());
 
         SearchWorldsResult expectedResponse = SearchWorldsResult.builder()
@@ -87,7 +87,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchWorldsWithParameters() {
 
         // Given
-        List<GetWorldResult> results = Lists.list(GetWorldResultFixture.publicWorld().build(),
+        List<WorldDetails> results = Lists.list(GetWorldResultFixture.publicWorld().build(),
                 GetWorldResultFixture.privateWorld().build());
 
         SearchWorldsResult expectedResponse = SearchWorldsResult.builder()
@@ -131,7 +131,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
         // Given
         String worldId = "WRLDID";
 
-        GetWorldResult expectedResponse = GetWorldResultFixture.publicWorld().build();
+        WorldDetails expectedResponse = GetWorldResultFixture.publicWorld().build();
 
         when(useCaseRunner.run(any(GetWorldById.class))).thenReturn(expectedResponse);
 
@@ -140,7 +140,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
                 .uri(String.format(WORLD_ID_BASE_URL, worldId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(GetWorldResult.class)
+                .expectBody(WorldDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -165,7 +165,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
 
         // Given
         CreateWorldRequest request = CreateWorldRequestFixture.createPrivateWorld();
-        CreateWorldResult expectedResponse = CreateWorldResult.build("WRLDID");
+        WorldDetails expectedResponse = WorldDetails.builder().id("WRLDID").build();
 
         when(worldRequestMapper.toCommand(any(CreateWorldRequest.class), anyString()))
                 .thenReturn(mock(CreateWorld.class));
@@ -177,7 +177,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(CreateWorldResult.class)
+                .expectBody(WorldDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -190,7 +190,7 @@ public class WorldControllerTest extends AbstractRestWebTest {
         // Given
         String worldId = "WRLDID";
         UpdateWorldRequest request = UpdateWorldRequestFixture.createPrivateWorld();
-        UpdateWorldResult expectedResponse = UpdateWorldResult.build(OffsetDateTime.now());
+        WorldDetails expectedResponse = WorldDetails.builder().lastUpdateDate(OffsetDateTime.now()).build();
 
         when(worldRequestMapper.toCommand(any(UpdateWorldRequest.class), anyString(), anyString()))
                 .thenReturn(mock(UpdateWorld.class));
@@ -202,10 +202,10 @@ public class WorldControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UpdateWorldResult.class)
+                .expectBody(WorldDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getLastUpdatedDateTime()).isEqualTo(expectedResponse.getLastUpdatedDateTime());
+                    assertThat(response.getLastUpdateDate()).isEqualTo(expectedResponse.getLastUpdateDate());
                 });
     }
 

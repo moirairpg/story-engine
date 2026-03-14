@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.transaction.Transactional;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
@@ -201,7 +201,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -239,7 +239,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(worlds.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -279,7 +279,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(worlds.get(2).getName()).isEqualTo(gpt4Omni.getName());
@@ -325,7 +325,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -368,7 +368,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -410,7 +410,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(2).getName()).isEqualTo(gpt4Mini.getName());
@@ -451,7 +451,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -490,7 +490,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -536,7 +536,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -584,7 +584,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -629,7 +629,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -675,7 +675,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -724,7 +724,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
     }
@@ -772,7 +772,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -816,7 +816,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetWorldResult> worlds = result.getResults();
+        List<WorldDetails> worlds = result.getResults();
         assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 

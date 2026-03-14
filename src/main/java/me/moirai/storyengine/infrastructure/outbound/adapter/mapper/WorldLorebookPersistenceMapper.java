@@ -3,16 +3,16 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 
 @Component
 public class WorldLorebookPersistenceMapper {
 
-    public GetWorldLorebookEntryResult mapToResult(WorldLorebookEntry entry) {
+    public WorldLorebookEntryDetails mapToResult(WorldLorebookEntry entry) {
 
-        return GetWorldLorebookEntryResult.builder()
+        return WorldLorebookEntryDetails.builder()
                 .id(entry.getId())
                 .name(entry.getName())
                 .description(entry.getDescription())

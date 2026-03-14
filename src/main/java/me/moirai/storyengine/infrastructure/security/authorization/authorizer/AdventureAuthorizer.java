@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
 import me.moirai.storyengine.infrastructure.security.authorization.BaseAssetAuthorizer;
@@ -31,7 +31,7 @@ public class AdventureAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetAdventureById request = GetAdventureById.build(assetId, principal.getDiscordId());
-        GetAdventureResult adventureDetails = useCaseRunner.run(request);
+        AdventureDetails adventureDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = adventureDetails.getOwnerId().equals(userId);
@@ -44,7 +44,7 @@ public class AdventureAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetAdventureById request = GetAdventureById.build(assetId, principal.getDiscordId());
-        GetAdventureResult adventureDetails = useCaseRunner.run(request);
+        AdventureDetails adventureDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = adventureDetails.getOwnerId().equals(userId);
@@ -58,7 +58,7 @@ public class AdventureAuthorizer implements BaseAssetAuthorizer {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         GetAdventureById request = GetAdventureById.build(assetId, principal.getDiscordId());
-        GetAdventureResult adventureDetails = useCaseRunner.run(request);
+        AdventureDetails adventureDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = adventureDetails.getOwnerId().equals(userId);

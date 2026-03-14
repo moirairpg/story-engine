@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
@@ -57,7 +57,7 @@ public class GetNotificationsByUserIdHandlerTest {
         when(repository.findUnreadByUserId(anyString())).thenReturn(emptyList());
 
         // When
-        List<NotificationResult> result = handler.handle(request);
+        List<NotificationDetails> result = handler.handle(request);
 
         // Then
         assertThat(result).isNotNull().isNotEmpty().hasSize(1);
@@ -79,7 +79,7 @@ public class GetNotificationsByUserIdHandlerTest {
         when(repository.findUnreadByUserId(anyString())).thenReturn(notifications);
 
         // When
-        List<NotificationResult> result = handler.handle(request);
+        List<NotificationDetails> result = handler.handle(request);
 
         // Then
         assertThat(result).isNotNull().isNotEmpty().hasSize(1);
@@ -103,7 +103,7 @@ public class GetNotificationsByUserIdHandlerTest {
         when(repository.findUnreadByUserId(anyString())).thenReturn(emptyList());
 
         // When
-        List<NotificationResult> result = handler.handle(request);
+        List<NotificationDetails> result = handler.handle(request);
 
         // Then
         assertThat(result).isNotNull().isNotEmpty().hasSize(2);

@@ -79,7 +79,7 @@ public class UpdateWorldHandlerTest {
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getLastUpdatedDateTime()).isEqualTo(expectedUpdatedWorld.getLastUpdateDate());
+                    assertThat(result.getLastUpdateDate()).isEqualTo(expectedUpdatedWorld.getLastUpdateDate());
                 })
                 .verifyComplete();
     }

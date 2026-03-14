@@ -26,7 +26,7 @@ import jakarta.persistence.PersistenceContext;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
@@ -434,7 +434,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -480,7 +480,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -528,7 +528,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(2).getName()).isEqualTo(gpt4Omni.getName());
@@ -577,7 +577,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -627,7 +627,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(2).getName()).isEqualTo(gpt4Mini.getName());
@@ -668,7 +668,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
     }
@@ -708,7 +708,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -759,7 +759,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
         assertThat(adventures.get(2).getName()).isEqualTo(gpt4Omni.getName());
@@ -802,7 +802,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -842,7 +842,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -882,7 +882,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -926,7 +926,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -975,7 +975,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1022,8 +1022,8 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
-        assertThat(adventures).extracting(GetAdventureResult::getName)
+        List<AdventureDetails> adventures = result.getResults();
+        assertThat(adventures).extracting(AdventureDetails::getName)
                 .containsExactlyInAnyOrder(gpt4Mini.getName(), gpt354k.getName());
     }
 
@@ -1176,7 +1176,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -1229,7 +1229,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -1283,7 +1283,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
     }
@@ -1338,7 +1338,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
     }
@@ -1394,7 +1394,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -1440,7 +1440,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1485,7 +1485,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1542,7 +1542,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
     }
@@ -1590,7 +1590,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1643,7 +1643,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt354k.getName());
     }
 
@@ -1696,7 +1696,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1750,7 +1750,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
     }
@@ -1809,7 +1809,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1869,7 +1869,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -1923,7 +1923,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
 
-        List<GetAdventureResult> adventures = result.getResults();
+        List<AdventureDetails> adventures = result.getResults();
         assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 

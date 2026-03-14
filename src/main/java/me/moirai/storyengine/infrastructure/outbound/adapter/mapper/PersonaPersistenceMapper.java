@@ -3,16 +3,16 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.domain.persona.Persona;
 
 @Component
 public class PersonaPersistenceMapper {
 
-    public GetPersonaResult mapToResult(Persona persona) {
+    public PersonaDetails mapToResult(Persona persona) {
 
-        return GetPersonaResult.builder()
+        return PersonaDetails.builder()
                 .id(persona.getId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())

@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
@@ -64,10 +64,10 @@ public class UpdateWorldLorebookEntryHandlerTest {
         when(lorebookEntryRepository.save(any())).thenReturn(expectedUpdatedEntry);
 
         // When
-        UpdateWorldLorebookEntryResult result = handler.handle(command);
+        WorldLorebookEntryDetails result = handler.handle(command);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getLastUpdatedDateTime()).isEqualTo(expectedUpdatedEntry.getLastUpdateDate());
+        assertThat(result.getLastUpdateDate()).isEqualTo(expectedUpdatedEntry.getLastUpdateDate());
     }
 }

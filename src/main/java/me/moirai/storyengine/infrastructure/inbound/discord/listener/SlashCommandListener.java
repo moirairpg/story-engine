@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.GoCommand;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.HelpCommand;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
@@ -155,7 +155,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private void processBumpCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
         GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
-        GetAdventureResult result = useCaseRunner.run(request);
+        AdventureDetails result = useCaseRunner.run(request);
 
         TextInput bumpContent = TextInput.create("bumpContent", CONTENT, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Reminders inserted between messages to keep AI's act on track")
@@ -182,7 +182,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private void processAuthorsNoteCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
         GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
-        GetAdventureResult result = useCaseRunner.run(request);
+        AdventureDetails result = useCaseRunner.run(request);
 
         TextInput authorsNoteContent = TextInput
                 .create("authorsNoteContent", CONTENT, TextInputStyle.PARAGRAPH)
@@ -202,7 +202,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private void processNudgeCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
         GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
-        GetAdventureResult result = useCaseRunner.run(request);
+        AdventureDetails result = useCaseRunner.run(request);
 
         TextInput nudgeContent = TextInput.create("nudgeContent", CONTENT, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("General instructions for the AI to follow")
@@ -221,7 +221,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private void processRememberCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
         GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
-        GetAdventureResult result = useCaseRunner.run(request);
+        AdventureDetails result = useCaseRunner.run(request);
 
         TextInput rememberContent = TextInput
                 .create("rememberContent", CONTENT, TextInputStyle.PARAGRAPH)

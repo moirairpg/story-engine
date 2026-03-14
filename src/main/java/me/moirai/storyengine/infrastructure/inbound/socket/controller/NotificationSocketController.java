@@ -6,10 +6,9 @@ import org.springframework.stereotype.Controller;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.SendNotification;
 import me.moirai.storyengine.core.port.inbound.notification.StreamNotificationsForUser;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationResult;
-import me.moirai.storyengine.core.port.inbound.notification.SendNotificationResult;
 import me.moirai.storyengine.infrastructure.inbound.socket.request.SendNotificationRequest;
 import me.moirai.storyengine.infrastructure.inbound.socket.response.NotificationResponse;
 import me.moirai.storyengine.infrastructure.inbound.socket.response.SendNotificationResponse;
@@ -29,7 +28,7 @@ public class NotificationSocketController extends SecurityContextAware {
     public Flux<NotificationResponse> subscribeToNotifications(@Payload String receiverDiscordId) {
 
         StreamNotificationsForUser query = StreamNotificationsForUser.create(receiverDiscordId);
-        return useCaseRunner.run(query).map(this::toResponse);
+        return useCaseRunner.run(query).map(this::toNotificationResponse);
     }
 
     @MessageMapping("notifications.send")
@@ -46,14 +45,14 @@ public class NotificationSocketController extends SecurityContextAware {
                 .build();
 
         return Mono.just(useCaseRunner.run(command))
-                .map(this::toResponse);
+                .map(this::toSendNotificationResponse);
     }
 
-    private SendNotificationResponse toResponse(SendNotificationResult result) {
-        return SendNotificationResponse.withIdAndCreationDateTime(result.getId(), result.getCreationDateTime());
+    private SendNotificationResponse toSendNotificationResponse(NotificationDetails result) {
+        return SendNotificationResponse.withIdAndCreationDateTime(result.getId(), result.getCreationDate());
     }
 
-    private NotificationResponse toResponse(NotificationResult result) {
+    private NotificationResponse toNotificationResponse(NotificationDetails result) {
 
         return NotificationResponse.builder()
                 .isGlobal(result.isGlobal())

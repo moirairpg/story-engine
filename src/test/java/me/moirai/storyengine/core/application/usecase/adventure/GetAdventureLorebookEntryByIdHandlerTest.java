@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
@@ -93,7 +93,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
         when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
 
         // When
-        GetAdventureLorebookEntryResult result = handler.handle(query);
+        AdventureLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

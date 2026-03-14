@@ -1,16 +1,16 @@
 package me.moirai.storyengine.core.application.usecase.adventure.result;
 
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 
 public class GetAdventureResultFixture {
 
-    public static GetAdventureResult.Builder privateMultiplayerAdventure() {
+    public static AdventureDetails.Builder privateMultiplayerAdventure() {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
-        return GetAdventureResult.builder()
+        return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .personaId(adventure.getPersonaId())
@@ -29,10 +29,10 @@ public class GetAdventureResultFixture {
                 .usersAllowedToRead(adventure.getUsersAllowedToRead())
                 .usersAllowedToWrite(adventure.getUsersAllowedToWrite());
     }
-    public static GetAdventureResult.Builder publicMultiplayerAdventure() {
+    public static AdventureDetails.Builder publicMultiplayerAdventure() {
 
         Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
-        return GetAdventureResult.builder()
+        return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .personaId(adventure.getPersonaId())

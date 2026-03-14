@@ -8,13 +8,13 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
 @UseCaseHandler
-public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetAdventureLorebookEntryById, GetAdventureLorebookEntryResult> {
+public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetAdventureLorebookEntryById, AdventureLorebookEntryDetails> {
 
     private static final String ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND = "Adventure to be viewed was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_ADVENTURE = "User does not have permission to view this adventure";
@@ -44,7 +44,7 @@ public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler
     }
 
     @Override
-    public GetAdventureLorebookEntryResult execute(GetAdventureLorebookEntryById query) {
+    public AdventureLorebookEntryDetails execute(GetAdventureLorebookEntryById query) {
 
         Adventure adventure = repository.findById(query.getAdventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
@@ -59,9 +59,9 @@ public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler
         return mapResult(entry);
     }
 
-    private GetAdventureLorebookEntryResult mapResult(AdventureLorebookEntry entry) {
+    private AdventureLorebookEntryDetails mapResult(AdventureLorebookEntry entry) {
 
-        return GetAdventureLorebookEntryResult.builder()
+        return AdventureLorebookEntryDetails.builder()
                 .id(entry.getId())
                 .name(entry.getName())
                 .regex(entry.getRegex())

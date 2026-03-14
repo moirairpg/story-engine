@@ -3,7 +3,7 @@ package me.moirai.storyengine.core.port.inbound.notification;
 import me.moirai.storyengine.common.usecases.UseCase;
 import reactor.core.publisher.Flux;
 
-public final class StreamNotificationsForUser extends UseCase<Flux<NotificationResult>>  {
+public final class StreamNotificationsForUser extends UseCase<Flux<NotificationDetails>>  {
 
     private final String userId;
 

@@ -18,15 +18,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import me.moirai.storyengine.AbstractRestWebTest;
 import me.moirai.storyengine.core.port.inbound.persona.AddFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
-import me.moirai.storyengine.core.port.inbound.persona.CreatePersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.RemoveFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
-import me.moirai.storyengine.core.port.inbound.persona.UpdatePersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.application.usecase.persona.result.GetPersonaResultFixture;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.PersonaRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
@@ -55,7 +55,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchPersonas() {
 
         // Given
-        List<GetPersonaResult> results = Lists.list(GetPersonaResultFixture.publicPersona().build(),
+        List<PersonaDetails> results = Lists.list(GetPersonaResultFixture.publicPersona().build(),
                 GetPersonaResultFixture.privatePersona().build());
 
         SearchPersonasResult expectedResponse = SearchPersonasResult.builder()
@@ -87,7 +87,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
     public void http200WhenSearchPersonasWithParameters() {
 
         // Given
-        List<GetPersonaResult> results = Lists.list(GetPersonaResultFixture.publicPersona().build(),
+        List<PersonaDetails> results = Lists.list(GetPersonaResultFixture.publicPersona().build(),
                 GetPersonaResultFixture.privatePersona().build());
 
         SearchPersonasResult expectedResponse = SearchPersonasResult.builder()
@@ -131,7 +131,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
         // Given
         String personaId = "WRLDID";
 
-        GetPersonaResult expectedResponse = GetPersonaResultFixture.publicPersona().build();
+        PersonaDetails expectedResponse = GetPersonaResultFixture.publicPersona().build();
 
         when(useCaseRunner.run(any(GetPersonaById.class))).thenReturn(expectedResponse);
 
@@ -140,7 +140,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
                 .uri(String.format(PERSONA_ID_BASE_URL, personaId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(GetPersonaResult.class)
+                .expectBody(PersonaDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -163,7 +163,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
 
         // Given
         CreatePersonaRequest request = CreatePersonaRequestFixture.createPrivatePersona();
-        CreatePersonaResult expectedResponse = CreatePersonaResult.build("WRLDID");
+        PersonaDetails expectedResponse = PersonaDetails.builder().id("WRLDID").build();
 
         when(personaRequestMapper.toCommand(any(CreatePersonaRequest.class), anyString()))
                 .thenReturn(mock(CreatePersona.class));
@@ -176,7 +176,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(CreatePersonaResult.class)
+                .expectBody(PersonaDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
                     assertThat(response.getId()).isEqualTo(expectedResponse.getId());
@@ -189,7 +189,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
         // Given
         String personaId = "WRLDID";
         UpdatePersonaRequest request = UpdatePersonaRequestFixture.privatePersona();
-        UpdatePersonaResult expectedResponse = UpdatePersonaResult.build(OffsetDateTime.now());
+        PersonaDetails expectedResponse = PersonaDetails.builder().lastUpdateDate(OffsetDateTime.now()).build();
 
         when(personaRequestMapper.toCommand(any(UpdatePersonaRequest.class), anyString(), anyString()))
                 .thenReturn(mock(UpdatePersona.class));
@@ -202,10 +202,10 @@ public class PersonaControllerTest extends AbstractRestWebTest {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(UpdatePersonaResult.class)
+                .expectBody(PersonaDetails.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getLastUpdatedDateTime()).isEqualTo(expectedResponse.getLastUpdatedDateTime());
+                    assertThat(response.getLastUpdateDate()).isEqualTo(expectedResponse.getLastUpdateDate());
                 });
     }
 

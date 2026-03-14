@@ -17,8 +17,8 @@ import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
-import me.moirai.storyengine.core.port.inbound.persona.UpdatePersonaResult;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
@@ -26,7 +26,7 @@ import me.moirai.storyengine.core.domain.persona.Persona;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, Mono<UpdatePersonaResult>> {
+public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, Mono<PersonaDetails>> {
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
@@ -52,12 +52,27 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     }
 
     @Override
-    public Mono<UpdatePersonaResult> execute(UpdatePersona request) {
+    public Mono<PersonaDetails> execute(UpdatePersona request) {
 
         return moderateContent(request.getPersonality())
                 .flatMap(__ -> moderateContent(request.getName()))
                 .map(__ -> updatePersona(request))
-                .map(personaUpdated -> UpdatePersonaResult.build(personaUpdated.getLastUpdateDate()));
+                .map(this::mapResult);
+    }
+
+    private PersonaDetails mapResult(Persona persona) {
+
+        return PersonaDetails.builder()
+                .id(persona.getId())
+                .name(persona.getName())
+                .personality(persona.getPersonality())
+                .visibility(persona.getVisibility().name())
+                .creationDate(persona.getCreationDate())
+                .lastUpdateDate(persona.getLastUpdateDate())
+                .ownerId(persona.getOwnerId())
+                .usersAllowedToRead(persona.getUsersAllowedToRead())
+                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
+                .build();
     }
 
     private Persona updatePersona(UpdatePersona command) {

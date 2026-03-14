@@ -4,14 +4,14 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 
 @UseCaseHandler
 public class GetAdventureByChannelIdHandler
-        extends AbstractUseCaseHandler<GetAdventureByChannelId, GetAdventureResult> {
+        extends AbstractUseCaseHandler<GetAdventureByChannelId, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "No adventures exist for this channel";
     private static final String USER_NO_PERMISSION = "User does not have permission to view adventure";
@@ -23,7 +23,7 @@ public class GetAdventureByChannelIdHandler
     }
 
     @Override
-    public GetAdventureResult execute(GetAdventureByChannelId useCase) {
+    public AdventureDetails execute(GetAdventureByChannelId useCase) {
 
         Adventure adventure = queryRepository.findByChannelId(useCase.getChannelId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
@@ -35,9 +35,9 @@ public class GetAdventureByChannelIdHandler
         return toResult(adventure);
     }
 
-    private GetAdventureResult toResult(Adventure adventure) {
+    private AdventureDetails toResult(Adventure adventure) {
 
-        return GetAdventureResult.builder()
+        return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .worldId(adventure.getWorldId())

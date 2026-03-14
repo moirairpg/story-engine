@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureResult;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -91,7 +91,7 @@ public class GetAdventureByIdHandlerTest {
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
 
         // When
-        GetAdventureResult result = handler.handle(query);
+        AdventureDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
@@ -162,7 +162,7 @@ public class GetAdventureByIdHandlerTest {
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
 
         // When
-        GetAdventureResult result = handler.handle(query);
+        AdventureDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

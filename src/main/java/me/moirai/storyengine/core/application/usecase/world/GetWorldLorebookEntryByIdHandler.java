@@ -9,12 +9,12 @@ import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
-public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetWorldLorebookEntryById, GetWorldLorebookEntryResult> {
+public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetWorldLorebookEntryById, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD = "User does not have permission to view this world";
@@ -44,7 +44,7 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
     }
 
     @Override
-    public GetWorldLorebookEntryResult execute(GetWorldLorebookEntryById query) {
+    public WorldLorebookEntryDetails execute(GetWorldLorebookEntryById query) {
 
         World world = repository.findById(query.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
@@ -59,9 +59,9 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
         return mapResult(entry);
     }
 
-    private GetWorldLorebookEntryResult mapResult(WorldLorebookEntry entry) {
+    private WorldLorebookEntryDetails mapResult(WorldLorebookEntry entry) {
 
-        return GetWorldLorebookEntryResult.builder()
+        return WorldLorebookEntryDetails.builder()
                 .id(entry.getId())
                 .name(entry.getName())
                 .regex(entry.getRegex())

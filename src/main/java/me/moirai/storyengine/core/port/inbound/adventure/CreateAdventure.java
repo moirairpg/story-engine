@@ -12,7 +12,7 @@ import org.apache.commons.collections4.MapUtils;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class CreateAdventure extends UseCase<CreateAdventureResult> {
+public final class CreateAdventure extends UseCase<AdventureDetails> {
 
     private final String name;
     private final String description;

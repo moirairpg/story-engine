@@ -1,17 +1,17 @@
 package me.moirai.storyengine.core.application.usecase.world.result;
 
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 public class GetWorldResultFixture {
 
-    public static GetWorldResult.Builder publicWorld() {
+    public static WorldDetails.Builder publicWorld() {
 
         World world = WorldFixture.publicWorld().build();
 
-        return GetWorldResult.builder()
+        return WorldDetails.builder()
                 .id(world.getId())
                 .name(world.getName())
                 .description(world.getDescription())
@@ -23,11 +23,11 @@ public class GetWorldResultFixture {
                 .usersAllowedToWrite(world.getUsersAllowedToWrite());
     }
 
-    public static GetWorldResult.Builder privateWorld() {
+    public static WorldDetails.Builder privateWorld() {
 
         World world = WorldFixture.privateWorld().build();
 
-        return GetWorldResult.builder()
+        return WorldDetails.builder()
                 .id(world.getId())
                 .name(world.getName())
                 .description(world.getDescription())

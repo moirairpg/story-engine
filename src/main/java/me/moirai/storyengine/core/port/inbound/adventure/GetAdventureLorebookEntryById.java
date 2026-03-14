@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.port.inbound.adventure;
 
 import me.moirai.storyengine.common.usecases.UseCase;
 
-public final class GetAdventureLorebookEntryById extends UseCase<GetAdventureLorebookEntryResult> {
+public final class GetAdventureLorebookEntryById extends UseCase<AdventureLorebookEntryDetails> {
 
     private final String entryId;
     private final String adventureId;

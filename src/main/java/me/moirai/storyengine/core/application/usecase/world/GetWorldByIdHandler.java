@@ -6,13 +6,13 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldResult;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
+import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
-public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, GetWorldResult> {
+public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, WorldDetails> {
 
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be deleted was not found";
@@ -33,7 +33,7 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
     }
 
     @Override
-    public GetWorldResult execute(GetWorldById query) {
+    public WorldDetails execute(GetWorldById query) {
 
         World world = repository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
@@ -45,15 +45,17 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
         return mapResult(world);
     }
 
-    private GetWorldResult mapResult(World world) {
+    private WorldDetails mapResult(World world) {
 
-        return GetWorldResult.builder()
+        return WorldDetails.builder()
                 .id(world.getId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())
                 .visibility(world.getVisibility().name())
                 .ownerId(world.getOwnerId())
+                .usersAllowedToRead(world.getUsersAllowedToRead())
+                .usersAllowedToWrite(world.getUsersAllowedToWrite())
                 .creationDate(world.getCreationDate())
                 .lastUpdateDate(world.getLastUpdateDate())
                 .build();

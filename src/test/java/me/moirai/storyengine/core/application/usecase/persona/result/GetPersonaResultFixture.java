@@ -1,16 +1,16 @@
 package me.moirai.storyengine.core.application.usecase.persona.result;
 
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 public class GetPersonaResultFixture {
 
-    public static GetPersonaResult.Builder privatePersona() {
+    public static PersonaDetails.Builder privatePersona() {
 
         Persona persona = PersonaFixture.privatePersona().build();
-        return GetPersonaResult.builder()
+        return PersonaDetails.builder()
                 .id(persona.getId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())
@@ -22,10 +22,10 @@ public class GetPersonaResultFixture {
                 .ownerId(persona.getOwnerId());
     }
 
-    public static GetPersonaResult.Builder publicPersona() {
+    public static PersonaDetails.Builder publicPersona() {
 
         Persona persona = PersonaFixture.publicPersona().build();
-        return GetPersonaResult.builder()
+        return PersonaDetails.builder()
                 .id(persona.getId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())

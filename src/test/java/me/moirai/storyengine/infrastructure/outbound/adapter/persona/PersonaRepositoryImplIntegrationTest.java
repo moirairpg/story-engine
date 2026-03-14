@@ -14,7 +14,7 @@ import jakarta.transaction.Transactional;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
-import me.moirai.storyengine.core.port.inbound.persona.GetPersonaResult;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
@@ -224,7 +224,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -262,7 +262,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(personas.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -304,7 +304,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(personas.get(2).getName()).isEqualTo(gpt4Omni.getName());
@@ -345,7 +345,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -387,7 +387,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(2).getName()).isEqualTo(gpt4Mini.getName());
@@ -428,7 +428,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -471,7 +471,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -519,7 +519,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -564,7 +564,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -612,7 +612,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -659,7 +659,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Omni.getName());
     }
@@ -707,7 +707,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
     }
@@ -751,7 +751,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -797,7 +797,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
@@ -843,7 +843,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetPersonaResult> personas = result.getResults();
+        List<PersonaDetails> personas = result.getResults();
         assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 

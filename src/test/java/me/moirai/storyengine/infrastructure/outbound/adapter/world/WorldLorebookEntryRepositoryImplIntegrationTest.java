@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryResult;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
@@ -149,7 +149,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldLorebookEntryResult> entries = result.getResults();
+        List<WorldLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -190,7 +190,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldLorebookEntryResult> entries = result.getResults();
+        List<WorldLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -232,7 +232,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldLorebookEntryResult> entries = result.getResults();
+        List<WorldLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt4Omni.getName());
@@ -277,7 +277,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldLorebookEntryResult> entries = result.getResults();
+        List<WorldLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Mini.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt354k.getName());
@@ -321,7 +321,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<GetWorldLorebookEntryResult> entries = result.getResults();
+        List<WorldLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt354k.getName());
         assertThat(entries.get(1).getName()).isEqualTo(gpt4Omni.getName());
         assertThat(entries.get(2).getName()).isEqualTo(gpt4Mini.getName());
@@ -364,7 +364,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         assertThat(result).isNotNull();
         assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<GetWorldLorebookEntryResult> entries = result.getResults();
+        List<WorldLorebookEntryDetails> entries = result.getResults();
         assertThat(entries.get(0).getName()).isEqualTo(gpt4Mini.getName());
     }
 
