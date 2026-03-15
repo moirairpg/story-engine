@@ -5,7 +5,12 @@ import static me.moirai.storyengine.core.domain.userdetails.Role.PLAYER;
 
 import java.time.OffsetDateTime;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
 public class UserFixture {
+
+    public static final String PUBLIC_ID = "aabbccdd-1111-0000-0000-000000000000";
+    public static final Long NUMERIC_ID = 1L;
 
     public static User.Builder player() {
 
@@ -27,5 +32,21 @@ public class UserFixture {
                 .creatorId("12341234")
                 .creationDate(OffsetDateTime.now())
                 .lastUpdateDate(OffsetDateTime.now());
+    }
+
+    public static User playerWithId() {
+
+        User user = player().build();
+        ReflectionTestUtils.setField(user, "id", NUMERIC_ID);
+        ReflectionTestUtils.setField(user, "publicId", PUBLIC_ID);
+        return user;
+    }
+
+    public static User adminWithId() {
+
+        User user = admin().build();
+        ReflectionTestUtils.setField(user, "id", NUMERIC_ID);
+        ReflectionTestUtils.setField(user, "publicId", PUBLIC_ID);
+        return user;
     }
 }

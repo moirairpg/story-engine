@@ -63,9 +63,7 @@ public class AuthenticateUserHandlerTest {
         String exchangeCode = "12345";
         AuthenticateUser query = AuthenticateUser.build(exchangeCode);
 
-        User user = UserFixture.player()
-                .id("QWEQWE")
-                .build();
+        User user = UserFixture.player().build();
 
         DiscordUserDataResponse discordUserData = DiscordUserDataResponse.builder()
                 .id(user.getDiscordId())
@@ -105,9 +103,7 @@ public class AuthenticateUserHandlerTest {
         String exchangeCode = "12345";
         AuthenticateUser query = AuthenticateUser.build(exchangeCode);
 
-        User user = UserFixture.player()
-                .id("QWEQWE")
-                .build();
+        User user = UserFixture.player().build();
 
         DiscordUserDataResponse discordUserData = DiscordUserDataResponse.builder()
                 .id(user.getDiscordId())

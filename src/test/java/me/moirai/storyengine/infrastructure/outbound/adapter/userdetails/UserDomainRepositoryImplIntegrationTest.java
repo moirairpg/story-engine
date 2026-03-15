@@ -43,9 +43,7 @@ public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegration
     public void findUserById_whenUserFound_thenReturnUser() {
 
         // Given
-        User user = repository.save(UserFixture.player()
-                .id(null)
-                .build());
+        User user = repository.save(UserFixture.player().build());
 
         // When
         Optional<User> result = repository.findByDiscordId(user.getDiscordId());
@@ -60,9 +58,7 @@ public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegration
     public void createUser() {
 
         // Given
-        User user = UserFixture.player()
-                .id(null)
-                .build();
+        User user = UserFixture.player().build();
 
         // When
         User result = repository.save(user);
@@ -75,9 +71,7 @@ public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegration
     public void deleteUser() {
 
         // Given
-        User user = repository.save(UserFixture.player()
-                .id(null)
-                .build());
+        User user = repository.save(UserFixture.player().build());
 
         // When
         repository.delete(user);

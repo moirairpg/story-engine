@@ -8,7 +8,7 @@ import me.moirai.storyengine.common.dbutil.PaginationRepository;
 import me.moirai.storyengine.core.domain.userdetails.User;
 
 public interface UserJpaRepository
-                extends JpaRepository<User, String>, PaginationRepository<User, String> {
+                extends JpaRepository<User, Long>, PaginationRepository<User, Long> {
 
         Optional<User> findByDiscordId(String discordId);
 

@@ -1,14 +1,17 @@
 package me.moirai.storyengine.core.domain.userdetails;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Asset;
 
 @Entity
@@ -16,8 +19,11 @@ import me.moirai.storyengine.common.domain.Asset;
 public class User extends Asset {
 
     @Id
-    @UuidIdentifier
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    private String publicId;
 
     @Column(name = "discord_id", unique = true, nullable = false)
     private String discordId;
@@ -30,7 +36,6 @@ public class User extends Asset {
 
         super(builder.creatorId, builder.creationDate, builder.lastUpdateDate, builder.version);
 
-        this.id = builder.id;
         this.discordId = builder.discordId;
         this.role = builder.role;
     }
@@ -39,13 +44,24 @@ public class User extends Asset {
         super();
     }
 
+    @PrePersist
+    private void generatePublicId() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID().toString();
+        }
+    }
+
     public static Builder builder() {
 
         return new Builder();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
+    }
+
+    public String getPublicId() {
+        return publicId;
     }
 
     public String getDiscordId() {
@@ -58,7 +74,6 @@ public class User extends Asset {
 
     public static final class Builder {
 
-        private String id;
         private String discordId;
         private Role role;
         private String creatorId;
@@ -67,12 +82,6 @@ public class User extends Asset {
         private int version;
 
         private Builder() {
-        }
-
-        public Builder id(String id) {
-
-            this.id = id;
-            return this;
         }
 
         public Builder discordId(String discordId) {
