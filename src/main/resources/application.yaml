@@ -66,11 +66,6 @@ spring:
             token-uri: https://discord.com/api/oauth2/token
             user-info-uri: https://discord.com/api/users/@me
             user-name-attribute: id
-  rsocket:
-    server:
-      transport: websocket
-      mapping-path: /rs
-      port: 7000
 
 logging:
   level:
