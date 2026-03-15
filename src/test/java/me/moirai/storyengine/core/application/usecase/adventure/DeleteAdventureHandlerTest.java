@@ -47,16 +47,15 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenNoAdventurePermission_thenThrowException() {
 
         // Given
-        String id = "ADVID";
+        String id = AdventureFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeleteAdventure command = DeleteAdventure.build(id, requesterId);
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .name("New name")
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
 
         // Then
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
@@ -66,11 +65,11 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        String id = "ADVID";
+        String id = AdventureFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeleteAdventure command = DeleteAdventure.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
@@ -80,25 +79,24 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenProperPermission_thenAdventureIsDeleted() {
 
         // Given
-        String id = "ADVID";
+        String id = AdventureFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeleteAdventure command = DeleteAdventure.build(id, requesterId);
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .name("New name")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
 
         // When
         handler.handle(command);
 
         // Then
-        verify(repository, times(1)).findById(anyString());
-        verify(repository, times(1)).deleteById(anyString());
+        verify(repository, times(1)).findByPublicId(anyString());
+        verify(repository, times(1)).deleteByPublicId(anyString());
     }
 }

@@ -106,7 +106,7 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
                 .personaId(persona.getPublicId())
-                .adventureId(adventure.getId())
+                .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(adventure.getGameMode().name())
                 .nudge(adventure.getContextAttributes().getNudge())

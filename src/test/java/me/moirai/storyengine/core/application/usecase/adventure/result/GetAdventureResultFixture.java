@@ -13,7 +13,7 @@ public class GetAdventureResultFixture {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return AdventureDetails.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .personaId(PersonaFixture.PUBLIC_ID)
                 .worldId(WorldFixture.PUBLIC_ID)
@@ -35,7 +35,7 @@ public class GetAdventureResultFixture {
 
         Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
         return AdventureDetails.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .personaId(PersonaFixture.PUBLIC_ID)
                 .worldId(WorldFixture.PUBLIC_ID)

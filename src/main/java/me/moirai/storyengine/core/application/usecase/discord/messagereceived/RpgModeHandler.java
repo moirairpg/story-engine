@@ -97,7 +97,7 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
                 .personaId(persona.getPublicId())
-                .adventureId(adventure.getId())
+                .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(RPG.name())
                 .nudge(adventure.getContextAttributes().getNudge())

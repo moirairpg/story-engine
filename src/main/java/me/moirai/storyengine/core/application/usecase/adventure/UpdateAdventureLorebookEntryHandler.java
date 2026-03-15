@@ -65,7 +65,7 @@ public class UpdateAdventureLorebookEntryHandler
     @Override
     public Mono<AdventureLorebookEntryDetails> execute(UpdateAdventureLorebookEntry command) {
 
-        Adventure adventure = repository.findById(command.getAdventureId())
+        Adventure adventure = repository.findByPublicId(command.getAdventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
@@ -91,7 +91,7 @@ public class UpdateAdventureLorebookEntryHandler
     private AdventureLorebookEntryDetails toResult(AdventureLorebookEntry savedEntry) {
 
         return AdventureLorebookEntryDetails.builder()
-                .id(savedEntry.getId())
+                .id(savedEntry.getPublicId())
                 .name(savedEntry.getName())
                 .regex(savedEntry.getRegex())
                 .description(savedEntry.getDescription())

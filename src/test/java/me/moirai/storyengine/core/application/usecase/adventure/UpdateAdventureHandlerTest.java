@@ -81,7 +81,7 @@ public class UpdateAdventureHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(expectedUpdatedAdventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(expectedUpdatedAdventure));
         when(repository.save(any())).thenReturn(expectedUpdatedAdventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
@@ -105,7 +105,7 @@ public class UpdateAdventureHandlerTest {
                 .requesterId(requesterUserId)
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.execute(updateAdventure));
@@ -122,7 +122,7 @@ public class UpdateAdventureHandlerTest {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
 
         // Then
         assertThrows(AssetAccessDeniedException.class, () -> handler.execute(updateAdventure));
@@ -132,7 +132,6 @@ public class UpdateAdventureHandlerTest {
     public void updateAdventure_whenPrivateToBeMadePublic_thenAdventureIsMadePublic() {
 
         // Given
-        String id = "ADVID";
         String requesterId = "RQSTRID";
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .requesterId(requesterId)
@@ -147,13 +146,12 @@ public class UpdateAdventureHandlerTest {
                 .build();
 
         Adventure expectedUpdatedAdventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .visibility(Visibility.PUBLIC)
                 .build();
 
         ArgumentCaptor<Adventure> adventureCaptor = ArgumentCaptor.forClass(Adventure.class);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
@@ -172,7 +170,6 @@ public class UpdateAdventureHandlerTest {
     public void updateAdventure_whenInvalidVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = "ADVID";
         String requesterId = "RQSTRID";
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .requesterId(requesterId)
@@ -187,13 +184,12 @@ public class UpdateAdventureHandlerTest {
                 .build();
 
         Adventure expectedUpdatedAdventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .visibility(Visibility.PRIVATE)
                 .build();
 
         ArgumentCaptor<Adventure> adventureCaptor = ArgumentCaptor.forClass(Adventure.class);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
@@ -253,7 +249,7 @@ public class UpdateAdventureHandlerTest {
 
         ArgumentCaptor<Adventure> adventureCaptor = ArgumentCaptor.forClass(Adventure.class);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(unchangedAdventure);
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
@@ -284,7 +280,7 @@ public class UpdateAdventureHandlerTest {
 
         ArgumentCaptor<Adventure> adventureCaptor = ArgumentCaptor.forClass(Adventure.class);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
@@ -317,7 +313,7 @@ public class UpdateAdventureHandlerTest {
 
         ArgumentCaptor<Adventure> adventureCaptor = ArgumentCaptor.forClass(Adventure.class);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));

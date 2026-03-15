@@ -74,9 +74,15 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     }
 
     @Override
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
 
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByPublicId(String publicId) {
+
+        jpaRepository.deleteByPublicId(publicId);
     }
 
     @Override
@@ -104,9 +110,15 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     }
 
     @Override
-    public Optional<Adventure> findById(String id) {
+    public Optional<Adventure> findById(Long id) {
 
         return jpaRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Adventure> findByPublicId(String publicId) {
+
+        return jpaRepository.findByPublicId(publicId);
     }
 
     @Override

@@ -122,14 +122,14 @@ public class CreateAdventureHandlerTest {
     public void createAdventure_whenValidDate_thenAdventureIsCreated() {
 
         // Given
-        String id = "HAUDHUAHD";
         CreateAdventure command = CreateAdventureFixture.sample().build();
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(command.getRequesterDiscordId())
                         .build())
                 .build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
         World world = WorldFixture.privateWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -153,6 +153,6 @@ public class CreateAdventureHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(AdventureFixture.PUBLIC_ID);
     }
 }

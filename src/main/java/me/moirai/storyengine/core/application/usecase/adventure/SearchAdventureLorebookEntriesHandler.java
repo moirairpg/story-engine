@@ -26,7 +26,7 @@ public class SearchAdventureLorebookEntriesHandler
     @Override
     public SearchAdventureLorebookEntriesResult execute(SearchAdventureLorebookEntries query) {
 
-        Adventure adventure = adventureRepository.findById(query.getAdventureId())
+        Adventure adventure = adventureRepository.findByPublicId(query.getAdventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
         if (adventure.canUserRead(query.getRequesterDiscordId())) {

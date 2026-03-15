@@ -13,7 +13,7 @@ public class AdventureLorebookPersistenceMapper {
     public AdventureLorebookEntryDetails mapToResult(AdventureLorebookEntry entry) {
 
         return AdventureLorebookEntryDetails.builder()
-                .id(entry.getId())
+                .id(entry.getPublicId())
                 .name(entry.getName())
                 .description(entry.getDescription())
                 .regex(entry.getRegex())

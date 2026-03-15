@@ -34,14 +34,14 @@ public class DeleteAdventureHandler extends AbstractUseCaseHandler<DeleteAdventu
     @Override
     public Void execute(DeleteAdventure command) {
 
-        Adventure adventure = repository.findById(command.getId())
+        Adventure adventure = repository.findByPublicId(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
         if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION);
         }
 
-        repository.deleteById(command.getId());
+        repository.deleteByPublicId(command.getId());
 
         return null;
     }

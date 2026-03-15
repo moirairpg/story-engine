@@ -93,7 +93,7 @@ public class GoCommandHandler extends AbstractUseCaseHandler<GoCommand, Mono<Voi
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
                 .personaId(persona.getPublicId())
-                .adventureId(adventure.getId())
+                .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(adventure.getGameMode().name())
                 .nudge(adventure.getContextAttributes().getNudge())

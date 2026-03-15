@@ -54,7 +54,7 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
     @Override
     public AdventureDetails execute(UpdateAdventure command) {
 
-        Adventure adventure = repository.findById(command.getId())
+        Adventure adventure = repository.findByPublicId(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
         if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
@@ -202,7 +202,7 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
     private AdventureDetails mapResult(Adventure savedAdventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
-                .id(savedAdventure.getId())
+                .id(savedAdventure.getPublicId())
                 .name(savedAdventure.getName())
                 .worldId(worldPublicId)
                 .personaId(personaPublicId)

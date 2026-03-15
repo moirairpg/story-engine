@@ -22,7 +22,7 @@ public class UpdateAdventureTest {
         // Given
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         UpdateAdventure.Builder builder = UpdateAdventure.builder()
-                .id(adventure.getId())
+                .id(AdventureFixture.PUBLIC_ID)
                 .name(adventure.getName())
                 .description(adventure.getDescription())
                 .worldId(WorldFixture.PUBLIC_ID)
@@ -58,7 +58,7 @@ public class UpdateAdventureTest {
         UpdateAdventure updateAdventure = builder.build();
 
         // Then
-        assertThat(updateAdventure.getId()).isEqualTo(adventure.getId());
+        assertThat(updateAdventure.getId()).isEqualTo(AdventureFixture.PUBLIC_ID);
         assertThat(updateAdventure.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(updateAdventure.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(updateAdventure.getChannelId()).isEqualTo(adventure.getChannelId());

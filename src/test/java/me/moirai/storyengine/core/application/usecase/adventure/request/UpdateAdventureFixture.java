@@ -16,7 +16,7 @@ public class UpdateAdventureFixture {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return UpdateAdventure.builder()
-                .id(adventure.getId())
+                .id(AdventureFixture.PUBLIC_ID)
                 .name(adventure.getName())
                 .description(adventure.getDescription())
                 .worldId(String.valueOf(adventure.getWorldId()))

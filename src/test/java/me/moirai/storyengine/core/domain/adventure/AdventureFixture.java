@@ -2,17 +2,20 @@ package me.moirai.storyengine.core.domain.adventure;
 
 import java.time.OffsetDateTime;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class AdventureFixture {
 
     private static final String OWNER_DISCORD_ID = "586678721356875";
+    public static final String PUBLIC_ID = "857345aa-2222-0000-0000-000000000000";
+    public static final Long NUMERIC_ID = 2L;
 
     public static Adventure.Builder privateSingleplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -38,7 +41,6 @@ public class AdventureFixture {
     public static Adventure.Builder privateMultiplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -64,7 +66,6 @@ public class AdventureFixture {
     public static Adventure.Builder publicSingleplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -90,7 +91,6 @@ public class AdventureFixture {
     public static Adventure.Builder publicMultiplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -111,5 +111,21 @@ public class AdventureFixture {
         builder.version(1);
 
         return builder;
+    }
+
+    public static Adventure privateMultiplayerAdventureWithId() {
+
+        Adventure adventure = privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", PUBLIC_ID);
+        return adventure;
+    }
+
+    public static Adventure publicMultiplayerAdventureWithId() {
+
+        Adventure adventure = publicMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", PUBLIC_ID);
+        return adventure;
     }
 }

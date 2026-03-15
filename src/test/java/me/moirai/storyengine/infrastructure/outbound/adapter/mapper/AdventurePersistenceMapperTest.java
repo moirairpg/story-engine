@@ -35,7 +35,7 @@ public class AdventurePersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(adventure.getId());
+        assertThat(result.getId()).isEqualTo(adventure.getPublicId());
         assertThat(result.getName()).isEqualTo(adventure.getName());
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
@@ -53,7 +53,6 @@ public class AdventurePersistenceMapperTest {
         // Given
         List<Adventure> adventures = IntStream.range(0, 20)
                 .mapToObj(op -> AdventureFixture.publicSingleplayerAdventure()
-                        .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 

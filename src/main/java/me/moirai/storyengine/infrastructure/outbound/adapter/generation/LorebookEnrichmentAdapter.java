@@ -94,7 +94,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
         Map<String, Object> context = new HashMap<>();
         context.put(RETRIEVED_MESSAGES, new ArrayList<>(rawMessageHistory));
 
-        Adventure adventure = adventureRepository.findById(adventureId)
+        Adventure adventure = adventureRepository.findByPublicId(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
         List<AdventureLorebookEntry> entriesFound = adventure.getLorebookEntriesByRegex(stringifiedStory);
@@ -114,7 +114,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
         Set<String> entryIdsNotDuplicated = new HashSet<>();
         return Stream.of(entriesInHistory, entriesByMention, entriesByAuthor)
                 .flatMap(Collection::stream)
-                .filter(entry -> entryIdsNotDuplicated.add(entry.getId()))
+                .filter(entry -> entry.getPublicId() != null && entryIdsNotDuplicated.add(entry.getPublicId()))
                 .toList();
     }
 
@@ -125,7 +125,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                 .map(DiscordMessageData::getContent)
                 .toList();
 
-        Adventure adventure = adventureRepository.findById(adventureId)
+        Adventure adventure = adventureRepository.findByPublicId(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
         return adventure.getLorebookEntriesByRegex(stringifyList(messageHistory));
@@ -153,7 +153,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(
-                        AdventureLorebookEntry::getId,
+                        AdventureLorebookEntry::getPublicId,
                         entry -> entry,
                         (existing, replacement) -> existing))
                 .values()
@@ -163,7 +163,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
 
     private AdventureLorebookEntry findLorebookEntryByPlayerDiscordId(String playerId, String adventureId) {
 
-        Adventure adventure = adventureRepository.findById(adventureId)
+        Adventure adventure = adventureRepository.findByPublicId(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
         return adventure.getLorebookEntryByPlayerId(playerId)

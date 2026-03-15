@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
@@ -69,14 +70,12 @@ public class GetAdventureByIdHandlerTest {
     public void getAdventure_whenNoAdventurePermission_thenThrowException() {
 
         // Given
-        String adventureId = "123123";
+        String adventureId = AdventureFixture.PUBLIC_ID;
         String requesterId = "123123";
         GetAdventureById command = GetAdventureById.build(adventureId, requesterId);
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(adventureId)
-                .build();
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
-        when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(queryRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
 
         // Then
         assertThatThrownBy(() -> handler.execute(command))
@@ -88,18 +87,18 @@ public class GetAdventureByIdHandlerTest {
     public void getAdventureById() {
 
         // Given
-        String id = "HAUDHUAHD";
         String requesterId = "RQSTRID";
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        GetAdventureById query = GetAdventureById.build(id, requesterId);
+        GetAdventureById query = GetAdventureById.build(AdventureFixture.PUBLIC_ID, requesterId);
 
-        when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(queryRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
@@ -108,7 +107,7 @@ public class GetAdventureByIdHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(AdventureFixture.PUBLIC_ID);
         assertThat(result.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(result.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(result.getChannelId()).isEqualTo(adventure.getChannelId());
@@ -145,11 +144,11 @@ public class GetAdventureByIdHandlerTest {
     public void findAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        String id = "ADVID";
+        String id = AdventureFixture.PUBLIC_ID;
         String requesterId = "123123";
         GetAdventureById query = GetAdventureById.build(id, requesterId);
 
-        when(queryRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(queryRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
@@ -159,19 +158,19 @@ public class GetAdventureByIdHandlerTest {
     public void findAdventure_whenValidId_thenAdventureIsReturned() {
 
         // Given
-        String id = "ADVID";
         String requesterId = "RQSTRID";
-        GetAdventureById query = GetAdventureById.build(id, requesterId);
+        GetAdventureById query = GetAdventureById.build(AdventureFixture.PUBLIC_ID, requesterId);
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
                 .name("New name")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(queryRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
@@ -181,13 +180,11 @@ public class GetAdventureByIdHandlerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo(adventure.getName());
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(AdventureFixture.PUBLIC_ID);
         assertThat(result.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(result.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(result.getChannelId()).isEqualTo(adventure.getChannelId());
         assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
-        assertThat(result.getName()).isEqualTo(adventure.getName());
         assertThat(result.getOwnerId()).isEqualTo(adventure.getOwnerId());
         assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());

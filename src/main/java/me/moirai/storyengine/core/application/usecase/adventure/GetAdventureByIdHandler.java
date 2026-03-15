@@ -45,7 +45,7 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     @Override
     public AdventureDetails execute(GetAdventureById query) {
 
-        Adventure adventure = queryRepository.findById(query.getId())
+        Adventure adventure = queryRepository.findByPublicId(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
         if (!adventure.canUserRead(query.getRequesterDiscordId())) {
@@ -64,7 +64,7 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     private AdventureDetails mapResult(Adventure adventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .worldId(worldPublicId)
                 .personaId(personaPublicId)

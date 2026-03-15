@@ -10,9 +10,13 @@ import me.moirai.storyengine.common.dbutil.PaginationRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 
 public interface AdventureJpaRepository
-        extends JpaRepository<Adventure, String>, PaginationRepository<Adventure, String> {
+        extends JpaRepository<Adventure, Long>, PaginationRepository<Adventure, Long> {
 
     Optional<Adventure> findByChannelId(String channelId);
+
+    Optional<Adventure> findByPublicId(String publicId);
+
+    void deleteByPublicId(String publicId);
 
     @Query("SELECT cc.gameMode FROM Adventure cc WHERE cc.channelId = :channelId")
     String getGameModeByChannelId(String channelId);

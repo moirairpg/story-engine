@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 
+import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 
@@ -13,7 +14,7 @@ public class StoryGenerationRequestFixture {
                 .botNickname("BotNickname")
                 .channelId("CHNLID")
                 .guildId("GLDID")
-                .adventureId("WRLDID")
+                .adventureId(AdventureFixture.PUBLIC_ID)
                 .personaId(PersonaFixture.PUBLIC_ID)
                 .gameMode("CHAT")
                 .authorsNote("Author's note")

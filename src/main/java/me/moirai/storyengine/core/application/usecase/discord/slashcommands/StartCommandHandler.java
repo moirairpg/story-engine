@@ -113,7 +113,7 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
                 .personaId(persona.getPublicId())
-                .adventureId(adventure.getId())
+                .adventureId(adventure.getPublicId())
                 .messageHistory(Collections.singletonList(adventureStartMessage))
                 .gameMode(adventure.getGameMode().name())
                 .nudge(adventure.getContextAttributes().getNudge())

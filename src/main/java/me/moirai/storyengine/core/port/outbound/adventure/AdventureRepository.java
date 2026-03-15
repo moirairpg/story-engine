@@ -12,7 +12,9 @@ public interface AdventureRepository {
 
     Adventure save(Adventure adventure);
 
-    void deleteById(String id);
+    void deleteById(Long id);
+
+    void deleteByPublicId(String publicId);
 
     void updateRememberByChannelId(String remember, String channelId);
 
@@ -22,7 +24,9 @@ public interface AdventureRepository {
 
     void updateBumpByChannelId(String bumpContent, int bumpFrequency, String channelId);
 
-    Optional<Adventure> findById(String id);
+    Optional<Adventure> findById(Long id);
+
+    Optional<Adventure> findByPublicId(String publicId);
 
     SearchAdventuresResult search(SearchAdventures request);
 

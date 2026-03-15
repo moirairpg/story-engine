@@ -54,7 +54,7 @@ public class GetAdventureByChannelIdHandler
     private AdventureDetails toResult(Adventure adventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .worldId(worldPublicId)
                 .personaId(personaPublicId)

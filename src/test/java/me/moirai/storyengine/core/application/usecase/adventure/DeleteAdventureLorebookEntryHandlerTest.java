@@ -79,7 +79,7 @@ public class DeleteAdventureLorebookEntryHandlerTest {
         Adventure adventure = spy(baseAdventure);
         doNothing().when(adventure).removeLorebookEntry(anyString());
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(repository.save(any())).thenReturn(adventure);
 
         // When

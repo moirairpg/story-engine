@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -69,11 +70,12 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
     public void getAdventureLorebookEntryById() {
 
         // Given
-        String id = "HAUDHUAHD";
-        String adventureId = "WRLDID";
+        String adventureId = AdventureFixture.PUBLIC_ID;
         String requesterId = "4314324";
 
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().id(id).build();
+        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
+        ReflectionTestUtils.setField(entry, "id", AdventureLorebookEntryFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(entry, "publicId", AdventureLorebookEntryFixture.PUBLIC_ID);
 
         Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -85,19 +87,19 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
         doReturn(entry).when(adventure).getLorebookEntryById(anyString());
 
         GetAdventureLorebookEntryById query = GetAdventureLorebookEntryById.builder()
-                .entryId(id)
+                .entryId(AdventureLorebookEntryFixture.PUBLIC_ID)
                 .adventureId(adventureId)
                 .requesterId(requesterId)
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
 
         // When
         AdventureLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(entry.getId());
+        assertThat(result.getId()).isEqualTo(entry.getPublicId());
         assertThat(result.getName()).isEqualTo(entry.getName());
         assertThat(result.getRegex()).isEqualTo(entry.getRegex());
         assertThat(result.getDescription()).isEqualTo(entry.getDescription());

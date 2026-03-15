@@ -97,7 +97,7 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
                 .personaId(persona.getPublicId())
-                .adventureId(adventure.getId())
+                .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(AUTHOR.name())
                 .nudge(adventure.getContextAttributes().getNudge())

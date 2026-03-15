@@ -30,6 +30,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
@@ -56,7 +57,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .build();
 
         // When
@@ -98,7 +98,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String adventureId = "WRLDID";
 
         // When
-        Optional<Adventure> retrievedAdventureOptional = repository.findById(adventureId);
+        Optional<Adventure> retrievedAdventureOptional = repository.findByPublicId(adventureId);
 
         // Then
         assertThat(retrievedAdventureOptional).isNotNull().isEmpty();
@@ -109,7 +109,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         Adventure adventure = repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .build());
 
         // When
@@ -124,15 +123,14 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         Adventure originalAdventure = repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .version(0)
                 .build());
 
         Adventure worldToUbeUpdated = AdventureFixture.privateMultiplayerAdventure()
-                .id(originalAdventure.getId())
                 .visibility(Visibility.PUBLIC)
                 .version(originalAdventure.getVersion())
                 .build();
+        ReflectionTestUtils.setField(worldToUbeUpdated, "id", originalAdventure.getId());
 
         // When
         Adventure updatedAdventure = repository.save(worldToUbeUpdated);
@@ -151,7 +149,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .version(0)
                 .channelId(channelId)
                 .build());
@@ -176,7 +173,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .version(0)
                 .channelId(channelId)
                 .build());
@@ -201,7 +197,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .version(0)
                 .channelId(channelId)
                 .build());
@@ -227,7 +222,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .version(0)
                 .channelId(channelId)
                 .build());
@@ -248,20 +242,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
     public void retrieveAdventureById() {
 
         // Given
-        String adventureId = "234234";
+        String channelId = "234234";
         Adventure adventure = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(adventureId)
-                .channelId(adventureId)
+                .channelId(channelId)
                 .build());
 
         // When
-        Optional<Adventure> retrievedAdventureOptional = repository.findById(adventureId);
+        Optional<Adventure> retrievedAdventureOptional = repository.findByPublicId(adventure.getPublicId());
 
         // Then
         assertThat(retrievedAdventureOptional).isNotNull().isNotEmpty();
 
         Adventure retrievedAdventure = retrievedAdventureOptional.get();
-        assertThat(retrievedAdventure.getId()).isEqualTo(adventure.getId());
+        assertThat(retrievedAdventure.getPublicId()).isEqualTo(adventure.getPublicId());
         assertThat(retrievedAdventure.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(retrievedAdventure.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(retrievedAdventure.getChannelId()).isEqualTo(adventure.getChannelId());
@@ -298,7 +291,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String channelId = "234234";
         Adventure adventure = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .channelId(channelId)
                 .build());
 
@@ -360,7 +352,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
@@ -368,7 +359,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .usersAllowedToRead(singleton(ownerId))
@@ -377,7 +367,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .build())
@@ -411,19 +400,16 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
                         .build())
@@ -458,19 +444,16 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
                         .build())
@@ -506,21 +489,18 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
@@ -555,21 +535,18 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
@@ -605,14 +582,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
@@ -645,14 +620,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
@@ -685,7 +658,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -693,7 +665,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .moderation(PERMISSIVE)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
@@ -701,7 +672,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .moderation(PERMISSIVE)
                 .channelId("CHNLID3")
@@ -737,14 +707,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
@@ -778,14 +746,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String ownerId = "586678721356875";
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
@@ -818,14 +784,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
@@ -858,14 +822,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
@@ -902,21 +864,18 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
@@ -951,7 +910,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -959,7 +917,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .moderation(PERMISSIVE)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
@@ -967,7 +924,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .moderation(PERMISSIVE)
                 .channelId("CHNLID3")
@@ -997,7 +953,15 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         String ownerId = "586678721356875";
-        String worldId = "WRLD";
+        Long worldIdValue = 999L;
+        String worldId = "999";
+
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+                .worldId(worldIdValue)
+                .channelId("CHNLID_WRLD_R")
+                .build();
+
+        jpaRepository.save(adventure);
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1019,7 +983,15 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         String ownerId = "586678721356875";
-        String personaId = "strict";
+        Long personaIdValue = 888L;
+        String personaId = "888";
+
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+                .personaId(personaIdValue)
+                .channelId("CHNLID_PSNA_R")
+                .build();
+
+        jpaRepository.save(adventure);
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1043,7 +1015,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
@@ -1051,7 +1022,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1060,7 +1030,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .build())
@@ -1095,7 +1064,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
@@ -1104,7 +1072,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
@@ -1113,7 +1080,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
                         .build())
@@ -1148,7 +1114,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
@@ -1157,7 +1122,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
@@ -1166,7 +1130,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
                         .build())
@@ -1202,7 +1165,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -1212,7 +1174,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1222,7 +1183,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
@@ -1257,7 +1217,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -1267,7 +1226,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1277,7 +1235,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
@@ -1313,14 +1270,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1358,14 +1313,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1403,7 +1356,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -1411,7 +1363,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1422,7 +1373,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -1461,14 +1411,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1508,21 +1456,18 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1561,14 +1506,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1578,7 +1521,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
                         .aiModel(GPT35_TURBO)
@@ -1614,7 +1556,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -1622,7 +1563,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -1633,7 +1573,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1669,7 +1608,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -1678,7 +1616,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -1690,7 +1627,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1727,7 +1663,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721358363";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -1736,7 +1671,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1749,7 +1683,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
@@ -1786,7 +1719,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String ownerId = "586678721358363";
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 1")
                 .moderation(STRICT)
                 .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
@@ -1795,7 +1727,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -1807,7 +1738,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
                 .name("Number 3")
                 .moderation(PERMISSIVE)
                 .channelId("CHNLID3")
@@ -1839,7 +1769,15 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         String ownerId = "586678721356875";
-        String worldId = "WRLD";
+        Long worldIdValue = 999L;
+        String worldId = "999";
+
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+                .worldId(worldIdValue)
+                .channelId("CHNLID_WRLD_W")
+                .build();
+
+        jpaRepository.save(adventure);
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1862,7 +1800,15 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         String ownerId = "586678721356875";
-        String personaId = "strict";
+        Long personaIdValue = 888L;
+        String personaId = "888";
+
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+                .personaId(personaIdValue)
+                .channelId("CHNLID_PSNA_W")
+                .build();
+
+        jpaRepository.save(adventure);
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)

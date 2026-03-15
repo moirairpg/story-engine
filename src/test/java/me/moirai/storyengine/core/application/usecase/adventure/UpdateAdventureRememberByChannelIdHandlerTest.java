@@ -53,7 +53,6 @@ public class UpdateAdventureRememberByChannelIdHandlerTest {
     public void updateRemember_whenNoAdventurePermission_thenThrowException() {
 
         // Given
-        String adventureId = "123123";
         String requesterId = "123123";
         UpdateAdventureRememberByChannelId command = UpdateAdventureRememberByChannelId.builder()
                 .remember("Remember")
@@ -62,7 +61,6 @@ public class UpdateAdventureRememberByChannelIdHandlerTest {
                 .build();
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(adventureId)
                 .build();
 
         when(repository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));

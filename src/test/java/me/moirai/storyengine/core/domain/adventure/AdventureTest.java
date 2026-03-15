@@ -24,7 +24,6 @@ public class AdventureTest {
 
         // Given
         Adventure.Builder adventureBuilder = Adventure.builder();
-        adventureBuilder.id("ID");
         adventureBuilder.name("Name");
         adventureBuilder.worldId(1L);
         adventureBuilder.personaId(1L);
@@ -40,7 +39,6 @@ public class AdventureTest {
 
         // Then
         assertThat(adventure).isNotNull();
-        assertThat(adventure.getId()).isEqualTo("ID");
         assertThat(adventure.getName()).isEqualTo("Name");
         assertThat(adventure.getWorldId()).isEqualTo(1L);
         assertThat(adventure.getPersonaId()).isEqualTo(1L);

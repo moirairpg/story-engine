@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class AdventureLorebookEntryTest {
 
@@ -13,7 +14,6 @@ public class AdventureLorebookEntryTest {
 
         // Given
         AdventureLorebookEntry.Builder builder = AdventureLorebookEntry.builder()
-                .id("857345HAA")
                 .name("White River")
                 .description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.")
                 .regex("[Ww]hite [Rr]iver")
@@ -26,13 +26,15 @@ public class AdventureLorebookEntryTest {
 
         // When
         AdventureLorebookEntry entry = builder.build();
+        ReflectionTestUtils.setField(entry, "id", AdventureLorebookEntryFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(entry, "publicId", AdventureLorebookEntryFixture.PUBLIC_ID);
 
         // Then
         assertThat(entry).isNotNull();
         assertThat(entry.getCreationDate()).isNotNull();
         assertThat(entry.getLastUpdateDate()).isNotNull();
         assertThat(entry.getDescription()).isEqualTo("The White River goes through Falkreath, Whiterun and ends in Eastmarch.");
-        assertThat(entry.getId()).isEqualTo("857345HAA");
+        assertThat(entry.getPublicId()).isEqualTo(AdventureLorebookEntryFixture.PUBLIC_ID);
         assertThat(entry.getName()).isEqualTo("White River");
         assertThat(entry.getPlayerId()).isEqualTo("2423423423423");
         assertThat(entry.getCreatorId()).isEqualTo("CRTID");

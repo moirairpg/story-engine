@@ -14,11 +14,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.domain.Visibility;
@@ -30,8 +32,11 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 public class Adventure extends ShareableAsset {
 
     @Id
-    @UuidIdentifier
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    private String publicId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -77,7 +82,6 @@ public class Adventure extends ShareableAsset {
         super(builder.creatorId, builder.creationDate,
                 builder.lastUpdateDate, builder.permissions, builder.visibility, builder.version);
 
-        this.id = builder.id;
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
@@ -95,8 +99,19 @@ public class Adventure extends ShareableAsset {
         super();
     }
 
-    public String getId() {
+    @PrePersist
+    private void generatePublicId() {
+        if (publicId == null) {
+            publicId = java.util.UUID.randomUUID().toString();
+        }
+    }
+
+    public Long getId() {
         return id;
+    }
+
+    public String getPublicId() {
+        return publicId;
     }
 
     public String getName() {
@@ -334,7 +349,7 @@ public class Adventure extends ShareableAsset {
     public AdventureLorebookEntry getLorebookEntryById(String entryId) {
 
         return lorebook.stream()
-                .filter(e -> e.getId().equals(entryId))
+                .filter(e -> entryId.equals(e.getPublicId()))
                 .findFirst()
                 .orElseThrow(() -> new AssetNotFoundException("Lorebook entry not found"));
     }
@@ -355,7 +370,6 @@ public class Adventure extends ShareableAsset {
 
     public static final class Builder {
 
-        private String id;
         private String name;
         private String description;
         private String adventureStart;
@@ -375,12 +389,6 @@ public class Adventure extends ShareableAsset {
         private int version;
 
         private Builder() {
-        }
-
-        public Builder id(String id) {
-
-            this.id = id;
-            return this;
         }
 
         public Builder name(String name) {

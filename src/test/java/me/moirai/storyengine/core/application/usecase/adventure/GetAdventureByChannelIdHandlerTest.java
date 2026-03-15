@@ -66,7 +66,6 @@ public class GetAdventureByChannelIdHandlerTest {
         String requesterId = "123123";
         GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(adventureId)
                 .build();
 
         when(queryRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
@@ -85,7 +84,6 @@ public class GetAdventureByChannelIdHandlerTest {
         String requesterId = "123123";
         GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(adventureId)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
@@ -100,8 +98,7 @@ public class GetAdventureByChannelIdHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(adventureId);
-        assertThat(result.getId()).isEqualTo(adventure.getId());
+        assertThat(result.getId()).isEqualTo(adventure.getPublicId());
         assertThat(result.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(result.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(result.getChannelId()).isEqualTo(adventure.getChannelId());

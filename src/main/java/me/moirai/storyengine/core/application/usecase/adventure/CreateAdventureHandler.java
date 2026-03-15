@@ -83,7 +83,7 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
     private AdventureDetails mapResult(Adventure adventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .worldId(worldPublicId)
                 .personaId(personaPublicId)

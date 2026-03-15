@@ -44,7 +44,7 @@ public class SearchAdventureLorebookEntriesHandlerTest {
                 .requesterId("1234")
                 .build();
 
-        when(adventureRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -67,7 +67,7 @@ public class SearchAdventureLorebookEntriesHandlerTest {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
-        when(adventureRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -95,7 +95,7 @@ public class SearchAdventureLorebookEntriesHandlerTest {
 
         Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
 
-        when(adventureRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(adventureRepository.searchLorebookEntries(any(SearchAdventureLorebookEntries.class)))
                 .thenReturn(expectedResult);
 

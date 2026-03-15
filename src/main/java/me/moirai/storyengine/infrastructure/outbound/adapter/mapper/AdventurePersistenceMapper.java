@@ -14,7 +14,7 @@ public class AdventurePersistenceMapper {
     public AdventureRawDto mapToResult(Adventure adventure) {
 
         return AdventureRawDto.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .worldId(adventure.getWorldId())
                 .personaId(adventure.getPersonaId())
@@ -61,7 +61,7 @@ public class AdventurePersistenceMapper {
     private AdventureDetails mapToSearchResult(Adventure adventure) {
 
         return AdventureDetails.builder()
-                .id(adventure.getId())
+                .id(adventure.getPublicId())
                 .name(adventure.getName())
                 .worldId(String.valueOf(adventure.getWorldId()))
                 .channelId(adventure.getChannelId())

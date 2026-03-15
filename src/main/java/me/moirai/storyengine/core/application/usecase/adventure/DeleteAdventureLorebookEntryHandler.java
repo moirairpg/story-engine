@@ -40,7 +40,7 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
     @Override
     public Void execute(DeleteAdventureLorebookEntry command) {
 
-        Adventure adventure = repository.findById(command.getAdventureId())
+        Adventure adventure = repository.findByPublicId(command.getAdventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         if (!adventure.canUserWrite(command.getRequesterDiscordId())) {

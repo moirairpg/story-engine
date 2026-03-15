@@ -92,7 +92,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 .contentFlagged(false)
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
         when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
         when(repository.save(any())).thenReturn(adventure);
 

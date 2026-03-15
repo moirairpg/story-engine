@@ -53,7 +53,6 @@ public class UpdateAdventureNudgeByChannelIdHandlerTest {
     public void updateNudge_whenNoAdventurePermission_thenThrowException() {
 
         // Given
-        String adventureId = "123123";
         String requesterId = "123123";
         UpdateAdventureNudgeByChannelId command = UpdateAdventureNudgeByChannelId.builder()
                 .nudge("Nudge")
@@ -62,7 +61,6 @@ public class UpdateAdventureNudgeByChannelIdHandlerTest {
                 .build();
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(adventureId)
                 .build();
 
         when(repository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));

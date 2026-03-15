@@ -4,9 +4,11 @@ import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Asset;
 
 @Entity
@@ -14,8 +16,11 @@ import me.moirai.storyengine.common.domain.Asset;
 public class AdventureLorebookEntry extends Asset {
 
     @Id
-    @UuidIdentifier
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    private String publicId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -33,12 +38,11 @@ public class AdventureLorebookEntry extends Asset {
     private boolean isPlayerCharacter;
 
     @Column(name = "adventure_id", insertable = false, updatable = false)
-    private String adventureId;
+    private Long adventureId;
 
     private AdventureLorebookEntry(Builder builder) {
 
         super(builder.creatorId, builder.creationDate, builder.lastUpdateDate, builder.version);
-        this.id = builder.id;
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
@@ -50,13 +54,24 @@ public class AdventureLorebookEntry extends Asset {
         super();
     }
 
+    @PrePersist
+    private void generatePublicId() {
+        if (publicId == null) {
+            publicId = java.util.UUID.randomUUID().toString();
+        }
+    }
+
     public static Builder builder() {
 
         return new Builder();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
+    }
+
+    public String getPublicId() {
+        return publicId;
     }
 
     public String getName() {
@@ -108,7 +123,6 @@ public class AdventureLorebookEntry extends Asset {
 
     public static final class Builder {
 
-        private String id;
         private String name;
         private String regex;
         private String description;
@@ -120,12 +134,6 @@ public class AdventureLorebookEntry extends Asset {
         private int version;
 
         private Builder() {
-        }
-
-        public Builder id(String id) {
-
-            this.id = id;
-            return this;
         }
 
         public Builder name(String name) {
