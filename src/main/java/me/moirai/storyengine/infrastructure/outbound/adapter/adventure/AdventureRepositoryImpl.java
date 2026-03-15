@@ -19,14 +19,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.AdventurePersistenceMapper;
 
 @Repository
@@ -36,10 +32,6 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     private static final int DEFAULT_ITEMS = 10;
 
     private static final String WRITE = "WRITE";
-    private static final String ID = "id";
-    private static final String ASSET_ID = "assetId";
-    private static final String ASSET_TYPE = "assetType";
-    private static final String ADVENTURE = "adventure";
     private static final String NAME = "name";
     private static final String GAME_MODE = "gameMode";
     private static final String VISIBILITY = "visibility";
@@ -53,16 +45,13 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     private static final String PERMISSIONS = "permissions";
 
     private final AdventureJpaRepository jpaRepository;
-    private final FavoriteRepository favoriteRepository;
     private final AdventurePersistenceMapper mapper;
 
     public AdventureRepositoryImpl(
             AdventureJpaRepository jpaRepository,
-            FavoriteRepository favoriteRepository,
             AdventurePersistenceMapper mapper) {
 
         this.jpaRepository = jpaRepository;
-        this.favoriteRepository = favoriteRepository;
         this.mapper = mapper;
     }
 
@@ -75,7 +64,6 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     @Override
     public void deleteById(String id) {
 
-        favoriteRepository.deleteAllByAssetId(id);
         jpaRepository.deleteById(id);
     }
 
@@ -145,16 +133,6 @@ public class AdventureRepositoryImpl implements AdventureRepository {
                 predicates.add(canUserWrite(cb, root, request.getRequesterDiscordId()));
             } else {
                 predicates.add(canUserRead(cb, root, request.getRequesterDiscordId()));
-            }
-
-            if (request.isFavorites()) {
-                Subquery<String> subquery = cq.subquery(String.class);
-                Root<FavoriteEntity> favoriteRoot = subquery.from(FavoriteEntity.class);
-
-                subquery.select(favoriteRoot.get(ASSET_ID))
-                        .where(cb.equal(favoriteRoot.get(ASSET_TYPE), ADVENTURE));
-
-                predicates.add(root.get(ID).in(subquery));
             }
 
             if (isNotBlank(request.getName())) {

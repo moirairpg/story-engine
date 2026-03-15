@@ -9,7 +9,6 @@ public class WorldSearchParameters {
 
     private String name;
     private String ownerId;
-    private boolean favorites;
     private Integer page;
     private Integer size;
     private SearchSortingField sortingField;
@@ -34,14 +33,6 @@ public class WorldSearchParameters {
 
     public void setOwnerDiscordId(String ownerId) {
         this.ownerId = ownerId;
-    }
-
-    public boolean isFavorites() {
-        return favorites;
-    }
-
-    public void setFavorites(boolean favorites) {
-        this.favorites = favorites;
     }
 
     public Integer getPage() {

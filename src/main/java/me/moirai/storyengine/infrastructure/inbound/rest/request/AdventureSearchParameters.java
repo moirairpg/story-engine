@@ -14,7 +14,6 @@ public class AdventureSearchParameters {
     private String world;
     private String persona;
     private String ownerId;
-    private boolean favorites;
     private boolean isMultiplayer;
     private Integer page;
     private Integer size;
@@ -59,14 +58,6 @@ public class AdventureSearchParameters {
 
     public void setOwnerDiscordId(String ownerId) {
         this.ownerId = ownerId;
-    }
-
-    public boolean isFavorites() {
-        return favorites;
-    }
-
-    public void setFavorites(boolean favorites) {
-        this.favorites = favorites;
     }
 
     public boolean isMultiplayer() {

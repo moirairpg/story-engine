@@ -19,18 +19,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.world.AddFavoriteWorld;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
-import me.moirai.storyengine.core.port.inbound.world.RemoveFavoriteWorld;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.WorldSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
@@ -63,7 +60,6 @@ public class WorldController extends SecurityContextAware {
             SearchWorlds query = SearchWorlds.builder()
                     .name(searchParameters.getName())
                     .ownerId(searchParameters.getOwnerId())
-                    .favorites(searchParameters.isFavorites())
                     .page(searchParameters.getPage())
                     .size(searchParameters.getSize())
                     .sortingField(getSortingField(searchParameters.getSortingField()))
@@ -121,41 +117,6 @@ public class WorldController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             DeleteWorld command = DeleteWorld.build(worldId, authenticatedUser.getDiscordId());
-            useCaseRunner.run(command);
-
-            return Mono.empty();
-        });
-    }
-
-    @PostMapping("/favorite")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @PreAuthorize("canRead(#request.assetId, 'World')")
-    public Mono<Void> addFavoriteWorld(@RequestBody FavoriteRequest request) {
-
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            AddFavoriteWorld command = AddFavoriteWorld.builder()
-                    .assetId(request.getAssetId())
-                    .playerId(authenticatedUser.getDiscordId())
-                    .build();
-
-            useCaseRunner.run(command);
-
-            return Mono.empty();
-        });
-    }
-
-    @DeleteMapping("/favorite/{assetId}")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<Void> removeFavoriteWorld(@PathVariable(required = true) String assetId) {
-
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            RemoveFavoriteWorld command = RemoveFavoriteWorld.builder()
-                    .assetId(assetId)
-                    .playerId(authenticatedUser.getDiscordId())
-                    .build();
-
             useCaseRunner.run(command);
 
             return Mono.empty();

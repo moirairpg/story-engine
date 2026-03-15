@@ -1,7 +1,5 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +15,6 @@ import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
-import me.moirai.storyengine.core.port.inbound.notification.GetNotificationsByUserId;
-import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -50,16 +46,5 @@ public class UserDetailsController extends SecurityContextAware {
         useCaseRunner.run(command);
     }
 
-    @GetMapping("/{discordUserId}/notifications")
-    @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("isAdmin() || isAuthenticatedUser(#discordUserId)")
-    public Mono<List<NotificationDetails>> getNotificationsByUserId(
-            @PathVariable(required = true) String discordUserId) {
-
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-
-            GetNotificationsByUserId request = GetNotificationsByUserId.create(discordUserId);
-            return useCaseRunner.run(request);
-        });
-    }
 }
+

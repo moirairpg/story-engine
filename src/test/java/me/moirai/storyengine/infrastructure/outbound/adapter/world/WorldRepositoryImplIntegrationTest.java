@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.transaction.Transactional;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -20,8 +19,6 @@ import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 
 public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
@@ -30,9 +27,6 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
     @Autowired
     private WorldJpaRepository jpaRepository;
-
-    @Autowired
-    private FavoriteRepository favoriteRepository;
 
     @Autowired
     private WorldLorebookEntryJpaRepository lorebookEntryJpaRepository;
@@ -132,30 +126,6 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         // Then
         assertThat(originalWorld.getVersion()).isZero();
         assertThat(updatedWorld.getVersion()).isOne();
-    }
-
-    @Test
-    @Transactional
-    public void deleteWorld_whenIsFavorite_thenDeleteFavorites() {
-
-        // Given
-        String userId = "1234";
-        World originalWorld = repository.save(WorldFixture.privateWorld()
-                .id(null)
-                .build());
-
-        FavoriteEntity favorite = favoriteRepository.save(FavoriteEntity.builder()
-                .playerId(userId)
-                .assetId(originalWorld.getId())
-                .assetType("persona")
-                .build());
-
-        // When
-        repository.deleteById(originalWorld.getId());
-
-        // Then
-        assertThat(repository.findById(originalWorld.getId())).isNotNull().isEmpty();
-        assertThat(favoriteRepository.existsById(favorite.getId())).isFalse();
     }
 
     @Test
@@ -860,182 +830,4 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result.getResults()).isNotNull().isEmpty();
     }
 
-    @Test
-    public void searcFavoritehWorlds_whenNoFilter_thenReturnAllResults() {
-
-        // Given
-        String ownerId = "586678721356875";
-        World gpt4Omni = jpaRepository.save(WorldFixture.privateWorld()
-                .id(null)
-                .name("Number 1")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(ownerId)
-                        .build())
-                .build());
-
-        World gpt4Mini = jpaRepository.save(WorldFixture.publicWorld()
-                .id(null)
-                .name("Number 2")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .usersAllowedToWrite(set(ownerId))
-                        .build())
-                .build());
-
-        World gpt354k = jpaRepository.save(WorldFixture.publicWorld()
-                .id(null)
-                .name("Number 3")
-                .build());
-
-        FavoriteEntity favorite1 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt4Omni.getId())
-                .build();
-
-        FavoriteEntity favorite2 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt4Mini.getId())
-                .build();
-
-        FavoriteEntity favorite3 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt354k.getId())
-                .build();
-
-        favoriteRepository.saveAll(set(favorite1, favorite2, favorite3));
-
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .favorites(true)
-                .build();
-
-        // When
-        SearchWorldsResult result = repository.search(query);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
-    }
-
-    @Test
-    public void searcFavoritehWorlds_whenByVisibility_thenReturnResults() {
-
-        // Given
-        String ownerId = "586678721356875";
-        World gpt4Omni = jpaRepository.save(WorldFixture.privateWorld()
-                .id(null)
-                .name("Number 1")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(ownerId)
-                        .build())
-                .build());
-
-        World gpt4Mini = jpaRepository.save(WorldFixture.publicWorld()
-                .id(null)
-                .name("Number 2")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .usersAllowedToWrite(set(ownerId))
-                        .build())
-                .build());
-
-        World gpt354k = jpaRepository.save(WorldFixture.publicWorld()
-                .id(null)
-                .name("Number 3")
-                .build());
-
-        FavoriteEntity favorite1 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt4Omni.getId())
-                .build();
-
-        FavoriteEntity favorite2 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt4Mini.getId())
-                .build();
-
-        FavoriteEntity favorite3 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt354k.getId())
-                .build();
-
-        favoriteRepository.saveAll(set(favorite1, favorite2, favorite3));
-
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .visibility("public")
-                .favorites(true)
-                .build();
-
-        // When
-        SearchWorldsResult result = repository.search(query);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
-    }
-
-    @Test
-    public void searcFavoritehWorlds_whenFilterByName_thenReturnResults() {
-
-        // Given
-        String ownerId = "586678721356875";
-        World gpt4Omni = jpaRepository.save(WorldFixture.privateWorld()
-                .id(null)
-                .name("Number 1")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(ownerId)
-                        .build())
-                .build());
-
-        World gpt4Mini = jpaRepository.save(WorldFixture.publicWorld()
-                .id(null)
-                .name("Number 2")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .usersAllowedToWrite(set(ownerId))
-                        .build())
-                .build());
-
-        World gpt354k = jpaRepository.save(WorldFixture.publicWorld()
-                .id(null)
-                .name("Number 3")
-                .build());
-
-        FavoriteEntity favorite1 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt4Omni.getId())
-                .build();
-
-        FavoriteEntity favorite2 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt4Mini.getId())
-                .build();
-
-        FavoriteEntity favorite3 = FavoriteEntity.builder()
-                .playerId(ownerId)
-                .assetType("world")
-                .assetId(gpt354k.getId())
-                .build();
-
-        favoriteRepository.saveAll(set(favorite1, favorite2, favorite3));
-
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .name("Number 3")
-                .favorites(true)
-                .build();
-
-        // When
-        SearchWorldsResult result = repository.search(query);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-    }
 }

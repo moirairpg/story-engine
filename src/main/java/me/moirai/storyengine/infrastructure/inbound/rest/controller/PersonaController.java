@@ -19,18 +19,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.persona.AddFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
-import me.moirai.storyengine.core.port.inbound.persona.RemoveFavoritePersona;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.PersonaRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.PersonaSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdatePersonaRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
@@ -63,7 +60,6 @@ public class PersonaController extends SecurityContextAware {
             SearchPersonas query = SearchPersonas.builder()
                     .name(searchParameters.getName())
                     .ownerId(searchParameters.getOwnerId())
-                    .favorites(searchParameters.isFavorites())
                     .page(searchParameters.getPage())
                     .size(searchParameters.getSize())
                     .sortingField(getSortingField(searchParameters.getSortingField()))
@@ -124,41 +120,6 @@ public class PersonaController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             DeletePersona command = DeletePersona.build(personaId, authenticatedUser.getDiscordId());
-            useCaseRunner.run(command);
-
-            return Mono.empty();
-        });
-    }
-
-    @PostMapping("/favorite")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @PreAuthorize("canRead(#request.assetId, 'Persona')")
-    public Mono<Void> addFavoritePersona(@RequestBody FavoriteRequest request) {
-
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            AddFavoritePersona command = AddFavoritePersona.builder()
-                    .assetId(request.getAssetId())
-                    .playerId(authenticatedUser.getDiscordId())
-                    .build();
-
-            useCaseRunner.run(command);
-
-            return Mono.empty();
-        });
-    }
-
-    @DeleteMapping("/favorite/{assetId}")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<Void> removeFavoritePersona(@PathVariable(required = true) String assetId) {
-
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            RemoveFavoritePersona command = RemoveFavoritePersona.builder()
-                    .assetId(assetId)
-                    .playerId(authenticatedUser.getDiscordId())
-                    .build();
-
             useCaseRunner.run(command);
 
             return Mono.empty();

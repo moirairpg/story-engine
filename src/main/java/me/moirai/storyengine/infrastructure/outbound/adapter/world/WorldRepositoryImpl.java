@@ -19,14 +19,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.WorldPersistenceMapper;
 
 @Repository
@@ -35,28 +31,21 @@ public class WorldRepositoryImpl implements WorldRepository {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_ITEMS = 10;
 
-    private static final String ID = "id";
     private static final String WRITE = "WRITE";
     private static final String NAME = "name";
-    private static final String ASSET_ID = "assetId";
-    private static final String ASSET_TYPE = "assetType";
-    private static final String WORLD = "world";
     private static final String VISIBILITY = "visibility";
     private static final String OWNER_DISCORD_ID = "ownerId";
     private static final String DEFAULT_SORT_BY_FIELD = "name";
     private static final String PERMISSIONS = "permissions";
 
     private final WorldJpaRepository jpaRepository;
-    private final FavoriteRepository favoriteRepository;
     private final WorldPersistenceMapper mapper;
 
     public WorldRepositoryImpl(
             WorldJpaRepository jpaRepository,
-            FavoriteRepository favoriteRepository,
             WorldPersistenceMapper mapper) {
 
         this.jpaRepository = jpaRepository;
-        this.favoriteRepository = favoriteRepository;
         this.mapper = mapper;
     }
 
@@ -74,8 +63,6 @@ public class WorldRepositoryImpl implements WorldRepository {
 
     @Override
     public void deleteById(String id) {
-
-        favoriteRepository.deleteAllByAssetId(id);
 
         jpaRepository.deleteById(id);
     }
@@ -104,16 +91,6 @@ public class WorldRepositoryImpl implements WorldRepository {
                 predicates.add(canUserWrite(cb, root, request.getRequesterDiscordId()));
             } else {
                 predicates.add(canUserRead(cb, root, request.getRequesterDiscordId()));
-            }
-
-            if (request.isFavorites()) {
-                Subquery<String> subquery = cq.subquery(String.class);
-                Root<FavoriteEntity> favoriteRoot = subquery.from(FavoriteEntity.class);
-
-                subquery.select(favoriteRoot.get(ASSET_ID))
-                        .where(cb.equal(favoriteRoot.get(ASSET_TYPE), WORLD));
-
-                predicates.add(root.get(ID).in(subquery));
             }
 
             if (isNotBlank(request.getName())) {

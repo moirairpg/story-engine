@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.transaction.Transactional;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
@@ -19,8 +18,6 @@ import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteEntity;
-import me.moirai.storyengine.infrastructure.outbound.adapter.favorite.FavoriteRepository;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTest {
@@ -30,9 +27,6 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
     @Autowired
     private PersonaJpaRepository jpaRepository;
-
-    @Autowired
-    private FavoriteRepository favoriteRepository;
 
     @BeforeEach
     public void before() {
@@ -142,30 +136,6 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         // Then
         assertThat(originalPersona.getVersion()).isZero();
         assertThat(updatedPersona.getVersion()).isOne();
-    }
-
-    @Test
-    @Transactional
-    public void deletePersona_whenIsFavorite_thenDeleteFavorites() {
-
-        // Given
-        String userId = "1234";
-        Persona originalPersona = repository.save(PersonaFixture.privatePersona()
-                .id(null)
-                .build());
-
-        FavoriteEntity favorite = favoriteRepository.save(FavoriteEntity.builder()
-                .playerId(userId)
-                .assetId(originalPersona.getId())
-                .assetType("persona")
-                .build());
-
-        // When
-        repository.deleteById(originalPersona.getId());
-
-        // Then
-        assertThat(repository.findById(originalPersona.getId())).isNotNull().isEmpty();
-        assertThat(favoriteRepository.existsById(favorite.getId())).isFalse();
     }
 
     @Test
@@ -884,165 +854,5 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result.getResults()).isNotNull().isEmpty();
     }
 
-    @Test
-    public void getFavorites_whenNoFilters_thenReturnAll() {
-
-        // Given
-        String playerId = "63456456";
-        SearchPersonas request = SearchPersonas.builder()
-                .requesterId(playerId)
-                .favorites(true)
-                .build();
-
-        Persona persona1 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 1")
-                .build());
-
-        Persona persona2 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 2")
-                .build());
-
-        Persona persona3 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 3")
-                .build());
-
-        FavoriteEntity favorite1 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona1.getId())
-                .build();
-
-        FavoriteEntity favorite2 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona2.getId())
-                .build();
-
-        FavoriteEntity favorite3 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona3.getId())
-                .build();
-
-        favoriteRepository.saveAll(set(favorite1, favorite2, favorite3));
-
-        // When
-        SearchPersonasResult result = repository.search(request);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().hasSize(3);
-    }
-
-    @Test
-    public void getFavorites_whenFilterByName_thenReturnAll() {
-
-        // Given
-        String nameToSearch = "targetName";
-        String playerId = "63456456";
-        SearchPersonas request = SearchPersonas.builder()
-                .requesterId(playerId)
-                .name(nameToSearch)
-                .favorites(true)
-                .build();
-
-        Persona persona1 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name(nameToSearch)
-                .build());
-
-        Persona persona2 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 2")
-                .build());
-
-        Persona persona3 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 3")
-                .build());
-
-        FavoriteEntity favorite1 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona1.getId())
-                .build();
-
-        FavoriteEntity favorite2 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona2.getId())
-                .build();
-
-        FavoriteEntity favorite3 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona3.getId())
-                .build();
-
-        favoriteRepository.saveAll(set(favorite1, favorite2, favorite3));
-
-        // When
-        SearchPersonasResult result = repository.search(request);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().hasSize(1);
-    }
-
-    @Test
-    public void getFavorites_whenFilterByVisibility_thenReturnAll() {
-
-        // Given
-        String playerId = "63456456";
-        SearchPersonas request = SearchPersonas.builder()
-                .requesterId(playerId)
-                .visibility("public")
-                .favorites(true)
-                .build();
-
-        Persona persona1 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 1")
-                .build());
-
-        Persona persona2 = jpaRepository.save(PersonaFixture.publicPersona()
-                .id(null)
-                .name("Number 2")
-                .build());
-
-        Persona persona3 = jpaRepository.save(PersonaFixture.privatePersona()
-                .id(null)
-                .name("Number 3")
-                .build());
-
-        FavoriteEntity favorite1 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona1.getId())
-                .build();
-
-        FavoriteEntity favorite2 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona2.getId())
-                .build();
-
-        FavoriteEntity favorite3 = FavoriteEntity.builder()
-                .playerId(playerId)
-                .assetType("persona")
-                .assetId(persona3.getId())
-                .build();
-
-        favoriteRepository.saveAll(set(favorite1, favorite2, favorite3));
-
-        // When
-        SearchPersonasResult result = repository.search(request);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().hasSize(2);
-    }
 }
+

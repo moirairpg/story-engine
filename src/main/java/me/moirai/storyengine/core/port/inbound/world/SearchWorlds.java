@@ -6,7 +6,6 @@ public final class SearchWorlds extends UseCase<SearchWorldsResult> {
 
     private final String name;
     private final String ownerId;
-    private final boolean favorites;
     private final Integer page;
     private final Integer size;
     private final String sortingField;
@@ -19,7 +18,6 @@ public final class SearchWorlds extends UseCase<SearchWorldsResult> {
 
         this.name = builder.name;
         this.ownerId = builder.ownerId;
-        this.favorites = builder.favorites;
         this.page = builder.page;
         this.size = builder.size;
         this.sortingField = builder.sortingField;
@@ -39,10 +37,6 @@ public final class SearchWorlds extends UseCase<SearchWorldsResult> {
 
     public String getOwnerId() {
         return ownerId;
-    }
-
-    public boolean isFavorites() {
-        return favorites;
     }
 
     public Integer getPage() {
@@ -77,7 +71,6 @@ public final class SearchWorlds extends UseCase<SearchWorldsResult> {
 
         private String name;
         private String ownerId;
-        private boolean favorites;
         private Integer page;
         private Integer size;
         private String sortingField;
@@ -96,11 +89,6 @@ public final class SearchWorlds extends UseCase<SearchWorldsResult> {
 
         public Builder ownerId(String ownerId) {
             this.ownerId = ownerId;
-            return this;
-        }
-
-        public Builder favorites(boolean favorites) {
-            this.favorites = favorites;
             return this;
         }
 

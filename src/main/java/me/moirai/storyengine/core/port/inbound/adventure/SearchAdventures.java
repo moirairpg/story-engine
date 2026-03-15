@@ -8,7 +8,6 @@ public final class SearchAdventures extends UseCase<SearchAdventuresResult> {
     private final String world;
     private final String persona;
     private final String ownerId;
-    private final boolean favorites;
     private final boolean isMultiplayer;
     private final Integer page;
     private final Integer size;
@@ -27,7 +26,6 @@ public final class SearchAdventures extends UseCase<SearchAdventuresResult> {
         this.world = builder.world;
         this.persona = builder.persona;
         this.ownerId = builder.ownerId;
-        this.favorites = builder.favorites;
         this.isMultiplayer = builder.isMultiplayer;
         this.page = builder.page;
         this.size = builder.size;
@@ -59,10 +57,6 @@ public final class SearchAdventures extends UseCase<SearchAdventuresResult> {
 
     public String getOwnerId() {
         return ownerId;
-    }
-
-    public boolean isFavorites() {
-        return favorites;
     }
 
     public boolean isMultiplayer() {
@@ -115,7 +109,6 @@ public final class SearchAdventures extends UseCase<SearchAdventuresResult> {
         private String world;
         private String persona;
         private String ownerId;
-        private boolean favorites;
         private boolean isMultiplayer;
         private Integer page;
         private Integer size;
@@ -148,11 +141,6 @@ public final class SearchAdventures extends UseCase<SearchAdventuresResult> {
 
         public Builder ownerId(String ownerId) {
             this.ownerId = ownerId;
-            return this;
-        }
-
-        public Builder favorites(boolean favorites) {
-            this.favorites = favorites;
             return this;
         }
 

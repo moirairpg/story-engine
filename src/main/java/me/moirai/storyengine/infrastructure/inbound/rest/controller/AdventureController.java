@@ -19,19 +19,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.adventure.AddFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.RemoveFavoriteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.FavoriteRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchGameMode;
@@ -68,7 +65,6 @@ public class AdventureController extends SecurityContextAware {
                     .world(searchParameters.getWorld())
                     .persona(searchParameters.getPersona())
                     .ownerId(searchParameters.getOwnerId())
-                    .favorites(searchParameters.isFavorites())
                     .multiplayer(searchParameters.isMultiplayer())
                     .page(searchParameters.getPage())
                     .size(searchParameters.getSize())
@@ -135,41 +131,6 @@ public class AdventureController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             DeleteAdventure command = requestMapper.toCommand(adventureId, authenticatedUser.getDiscordId());
-            useCaseRunner.run(command);
-
-            return Mono.empty();
-        });
-    }
-
-    @PostMapping("/favorite")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @PreAuthorize("canRead(#request.assetId, 'Adventure')")
-    public Mono<Void> addFavoriteAdventure(@RequestBody FavoriteRequest request) {
-
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            AddFavoriteAdventure command = AddFavoriteAdventure.builder()
-                    .assetId(request.getAssetId())
-                    .playerId(authenticatedUser.getDiscordId())
-                    .build();
-
-            useCaseRunner.run(command);
-
-            return Mono.empty();
-        });
-    }
-
-    @DeleteMapping("/favorite/{assetId}")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<Void> removeFavoriteAdventure(@PathVariable(required = true) String assetId) {
-
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            RemoveFavoriteAdventure command = RemoveFavoriteAdventure.builder()
-                    .assetId(assetId)
-                    .playerId(authenticatedUser.getDiscordId())
-                    .build();
-
             useCaseRunner.run(command);
 
             return Mono.empty();

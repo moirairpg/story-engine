@@ -26,9 +26,6 @@ public abstract class AbstractIntegrationTest {
     private DiscordAuthenticationPort discordAuthenticationPort;
 
     @MockBean
-    private TextCompletionPort openAiPort;
-
-    @MockBean
     private DiscordChannelPort discordChannelOperationsPort;
 
     @MockBean
@@ -39,6 +36,9 @@ public abstract class AbstractIntegrationTest {
 
     @MockBean
     private JDA jda;
+
+    @MockBean
+    private TextCompletionPort textCompletionPort;
 
     @MockBean
     private TextModerationPort textModerationPort;
