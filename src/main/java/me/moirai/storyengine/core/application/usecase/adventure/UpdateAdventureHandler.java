@@ -13,12 +13,14 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.GameMode;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
+import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @UseCaseHandler
 public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventure, AdventureDetails> {
@@ -26,11 +28,14 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
     private static final String USER_NO_PERMISSION = "User does not have permission to delete adventure";
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
+    private static final String PERSONA_NOT_FOUND = "Persona not found";
 
     private final AdventureRepository repository;
+    private final PersonaRepository personaRepository;
 
-    public UpdateAdventureHandler(AdventureRepository repository) {
+    public UpdateAdventureHandler(AdventureRepository repository, PersonaRepository personaRepository) {
         this.repository = repository;
+        this.personaRepository = personaRepository;
     }
 
     @Override
@@ -60,7 +65,9 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         }
 
         if (isNotBlank(command.getPersonaId())) {
-            adventure.updatePersona(command.getPersonaId());
+            Persona persona = personaRepository.findByPublicId(command.getPersonaId())
+                    .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+            adventure.updatePersona(persona.getId());
         }
 
         if (isNotBlank(command.getAiModel())) {
@@ -130,7 +137,12 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         updateLogitBias(command, adventure);
         updatePermissions(command, adventure);
 
-        return mapResult(repository.save(adventure));
+        Adventure savedAdventure = repository.save(adventure);
+
+        Persona persona = personaRepository.findById(savedAdventure.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+
+        return mapResult(savedAdventure, persona.getPublicId());
     }
 
     private void updatePermissions(UpdateAdventure command, Adventure adventure) {
@@ -177,13 +189,13 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
                 .forEach(adventure::removeStopSequence);
     }
 
-    private AdventureDetails mapResult(Adventure savedAdventure) {
+    private AdventureDetails mapResult(Adventure savedAdventure, String personaPublicId) {
 
         return AdventureDetails.builder()
                 .id(savedAdventure.getId())
                 .name(savedAdventure.getName())
                 .worldId(savedAdventure.getWorldId())
-                .personaId(savedAdventure.getPersonaId())
+                .personaId(personaPublicId)
                 .visibility(savedAdventure.getVisibility().name())
                 .aiModel(savedAdventure.getModelConfiguration().getAiModel().toString())
                 .moderation(savedAdventure.getModeration().name())

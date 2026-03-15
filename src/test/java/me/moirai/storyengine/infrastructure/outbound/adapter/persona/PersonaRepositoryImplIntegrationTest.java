@@ -37,9 +37,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void retrievePersonaById() {
 
         // Given
-        Persona persona = jpaRepository.save(PersonaFixture.privatePersona()
-                .id(null)
-                .build());
+        Persona persona = jpaRepository.save(PersonaFixture.privatePersona().build());
 
         // When
         Optional<Persona> retrievedPersonaOptional = repository.findById(persona.getId());
@@ -55,9 +53,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void createPersona() {
 
         // Given
-        Persona persona = PersonaFixture.privatePersona()
-                .id(null)
-                .build();
+        Persona persona = PersonaFixture.privatePersona().build();
 
         // When
         Persona createdPersona = repository.save(persona);
@@ -95,7 +91,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String personaId = "InvalidId";
 
         // When
-        boolean result = repository.existsById(personaId);
+        boolean result = repository.existsByPublicId(personaId);
 
         // Then
         assertThat(result).isFalse();
@@ -105,9 +101,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void deletePersona() {
 
         // Given
-        Persona persona = repository.save(PersonaFixture.privatePersona()
-                .id(null)
-                .build());
+        Persona persona = repository.save(PersonaFixture.privatePersona().build());
 
         // When
         repository.deleteById(persona.getId());
@@ -120,15 +114,13 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void updatePersona() {
 
         // Given
-        Persona originalPersona = repository.save(PersonaFixture.privatePersona()
-                .id(null)
-                .build());
+        Persona originalPersona = repository.save(PersonaFixture.privatePersona().build());
 
         Persona worldToUbeUpdated = PersonaFixture.privatePersona()
-                .id(originalPersona.getId())
                 .visibility(Visibility.PUBLIC)
                 .version(originalPersona.getVersion())
                 .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(worldToUbeUpdated, "id", originalPersona.getId());
 
         // When
         Persona updatedPersona = repository.save(worldToUbeUpdated);
@@ -145,7 +137,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String personaId = "PRSNDID";
 
         // When
-        Optional<Persona> retrievedPersonaOptional = repository.findById(personaId);
+        Optional<Persona> retrievedPersonaOptional = repository.findByPublicId(personaId);
 
         // Then
         assertThat(retrievedPersonaOptional).isNotNull().isEmpty();
@@ -158,14 +150,14 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .usersAllowedToRead(set(ownerId))
@@ -173,7 +165,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .build())
@@ -206,15 +198,15 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -245,15 +237,15 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -287,17 +279,17 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -328,17 +320,17 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -370,17 +362,17 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -409,17 +401,17 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721356875";
 
         Persona gpt4Omni = PersonaFixture.publicPersona()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         Persona gpt4Mini = PersonaFixture.publicPersona()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         Persona gpt354k = PersonaFixture.publicPersona()
-                .id(null)
+
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -452,14 +444,14 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .usersAllowedToWrite(set(ownerId))
@@ -467,7 +459,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .build())
@@ -501,21 +493,21 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
                         .build())
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -546,21 +538,21 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
                         .build())
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -594,7 +586,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -602,7 +594,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -610,7 +602,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -641,7 +633,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -649,7 +641,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -657,7 +649,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -689,12 +681,12 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -702,7 +694,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -732,7 +724,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.publicPersona()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -740,7 +732,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -748,7 +740,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -778,7 +770,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.publicPersona()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToRead(set(ownerId))
@@ -786,7 +778,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToRead(set(ownerId))
@@ -794,7 +786,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -824,17 +816,17 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         String ownerId = "586678721358363";
 
         Persona gpt4Omni = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         Persona gpt4Mini = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         Persona gpt354k = PersonaFixture.privatePersona()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 

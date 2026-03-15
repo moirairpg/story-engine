@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.discord.slashcommands;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,12 +19,14 @@ import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -35,6 +38,9 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
 
     @Mock
     private WorldRepository worldRepository;
+
+    @Mock
+    private PersonaRepository personaRepository;
 
     @Mock
     private StoryGenerationPort storyGenerationPort;
@@ -75,6 +81,8 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
 
         when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
 
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+
         // When
         Mono<Void> result = handler.execute(useCase);
 
@@ -90,7 +98,7 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
         assertThat(generationRequest.getBotUsername()).isEqualTo(useCase.getBotUsername());
         assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
         assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
-        assertThat(generationRequest.getPersonaId()).isEqualTo(adventure.getPersonaId());
+        assertThat(generationRequest.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
     }
 

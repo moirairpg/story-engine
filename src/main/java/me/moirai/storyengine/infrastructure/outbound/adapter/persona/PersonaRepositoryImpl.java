@@ -56,21 +56,39 @@ public class PersonaRepositoryImpl implements PersonaRepository {
     }
 
     @Override
-    public Optional<Persona> findById(String id) {
+    public Optional<Persona> findById(Long id) {
 
         return jpaRepository.findById(id);
     }
 
     @Override
-    public void deleteById(String id) {
+    public Optional<Persona> findByPublicId(String publicId) {
+
+        return jpaRepository.findByPublicId(publicId);
+    }
+
+    @Override
+    public void deleteById(Long id) {
 
         jpaRepository.deleteById(id);
     }
 
     @Override
-    public boolean existsById(String id) {
+    public void deleteByPublicId(String publicId) {
+
+        jpaRepository.deleteByPublicId(publicId);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
 
         return jpaRepository.existsById(id);
+    }
+
+    @Override
+    public boolean existsByPublicId(String publicId) {
+
+        return jpaRepository.existsByPublicId(publicId);
     }
 
     @Override

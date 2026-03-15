@@ -63,7 +63,7 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     private PersonaDetails mapResult(Persona persona) {
 
         return PersonaDetails.builder()
-                .id(persona.getId())
+                .id(persona.getPublicId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())
                 .visibility(persona.getVisibility().name())
@@ -77,7 +77,7 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
 
     private Persona updatePersona(UpdatePersona command) {
 
-        Persona persona = repository.findById(command.getId())
+        Persona persona = repository.findByPublicId(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         if (!persona.canUserWrite(command.getRequesterDiscordId())) {

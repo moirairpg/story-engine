@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
@@ -50,7 +51,7 @@ public class GetPersonaByIdHandlerTest {
         String requesterId = "RQSTRID";
         GetPersonaById query = GetPersonaById.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
@@ -60,40 +61,40 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenPersonaExists_thenReturnPersonaDetails() {
 
         // Given
-        String id = "HAUDHUAHD";
+        String publicId = "857345aa-0000-0000-0000-000000000000";
         String requesterId = "RQSTRID";
         Persona persona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
+        ReflectionTestUtils.setField(persona, "id", 1L);
+        ReflectionTestUtils.setField(persona, "publicId", publicId);
 
-        GetPersonaById query = GetPersonaById.build(id, requesterId);
+        GetPersonaById query = GetPersonaById.build(publicId, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
 
         // When
         PersonaDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(publicId);
     }
 
     @Test
     public void getPersonaById_whenAccessDenied_thenThrowException() {
 
         // Given
-        String id = "HAUDHUAHD";
+        String publicId = "857345aa-0000-0000-0000-000000000000";
         String requesterId = "RQSTRID";
-        Persona persona = PersonaFixture.privatePersona()
-                .id(id)
-                .build();
+        Persona persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "publicId", publicId);
 
-        GetPersonaById query = GetPersonaById.build(id, requesterId);
+        GetPersonaById query = GetPersonaById.build(publicId, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
 
         // When
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));

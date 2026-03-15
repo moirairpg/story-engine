@@ -11,7 +11,7 @@ public class GetPersonaResultFixture {
 
         Persona persona = PersonaFixture.privatePersona().build();
         return PersonaDetails.builder()
-                .id(persona.getId())
+                .id(persona.getPublicId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())
                 .visibility(persona.getVisibility().name())
@@ -26,7 +26,7 @@ public class GetPersonaResultFixture {
 
         Persona persona = PersonaFixture.publicPersona().build();
         return PersonaDetails.builder()
-                .id(persona.getId())
+                .id(persona.getPublicId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())
                 .visibility(persona.getVisibility().name())

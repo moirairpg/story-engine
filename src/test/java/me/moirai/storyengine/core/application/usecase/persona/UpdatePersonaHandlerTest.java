@@ -56,7 +56,7 @@ public class UpdatePersonaHandlerTest {
                 .usersAllowedToWriteToRemove(set("123456"))
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 
@@ -87,13 +87,12 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("SOMEOTHER")
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 
@@ -124,21 +123,19 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .name("New name")
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -170,21 +167,19 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .name("New name")
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -216,21 +211,19 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .name("New name")
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -262,21 +255,19 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .name("New name")
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -308,21 +299,19 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .name("New name")
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -354,13 +343,12 @@ public class UpdatePersonaHandlerTest {
                 .build();
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
 
         // Then
@@ -389,11 +377,9 @@ public class UpdatePersonaHandlerTest {
                         .build())
                 .build();
 
-        Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
-                .id(id)
-                .build();
+        Persona expectedUpdatedPersona = PersonaFixture.privatePersona().build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
 
         // Then
@@ -441,7 +427,7 @@ public class UpdatePersonaHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(unchangedPersona);
 
         // Then

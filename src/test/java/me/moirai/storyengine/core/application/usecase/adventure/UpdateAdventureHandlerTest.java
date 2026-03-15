@@ -3,6 +3,7 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -22,15 +23,20 @@ import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateAdventureHandlerTest {
 
     @Mock
     private AdventureRepository repository;
+
+    @Mock
+    private PersonaRepository personaRepository;
 
     @InjectMocks
     private UpdateAdventureHandler handler;
@@ -72,6 +78,8 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(expectedUpdatedAdventure));
         when(repository.save(any())).thenReturn(expectedUpdatedAdventure);
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         AdventureDetails result = handler.handle(command);
@@ -140,6 +148,8 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         handler.execute(command);
@@ -176,6 +186,8 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         handler.execute(command);
@@ -232,6 +244,7 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(unchangedAdventure);
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         handler.execute(command);
@@ -261,6 +274,8 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         handler.execute(command);
@@ -290,6 +305,8 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         handler.execute(command);

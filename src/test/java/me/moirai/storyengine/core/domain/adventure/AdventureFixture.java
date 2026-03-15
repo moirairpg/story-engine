@@ -17,7 +17,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId("WRLDID");
-        builder.personaId("PRSNID");
+        builder.personaId(1L);
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
@@ -43,7 +43,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId("WRLDID");
-        builder.personaId("PRSNID");
+        builder.personaId(1L);
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
@@ -69,7 +69,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId("WRLDID");
-        builder.personaId("PRSNID");
+        builder.personaId(1L);
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
@@ -95,7 +95,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId("WRLDID");
-        builder.personaId("PRSNID");
+        builder.personaId(1L);
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));

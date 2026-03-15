@@ -49,7 +49,7 @@ public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
         int reservedTokensForPersona = (int) Math.floor(totalTokens * 0.20);
 
-        return Mono.just(personaRepository.findById(personaId)
+        return Mono.just(personaRepository.findByPublicId(personaId)
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND)))
                 .map(persona -> addPersonaToContext(persona, context, reservedTokensForPersona))
                 .map(ctx -> chatMessageService.addMessagesToContext(ctx, reservedTokensForPersona));

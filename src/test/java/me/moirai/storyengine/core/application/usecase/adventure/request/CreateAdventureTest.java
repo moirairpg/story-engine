@@ -23,7 +23,7 @@ public class CreateAdventureTest {
                 .name(adventure.getName())
                 .description(adventure.getDescription())
                 .worldId(adventure.getWorldId())
-                .personaId(adventure.getPersonaId())
+                .personaId("PRSNID")
                 .channelId(adventure.getChannelId())
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
@@ -54,7 +54,7 @@ public class CreateAdventureTest {
         assertThat(updateAdventure.getChannelId()).isEqualTo(adventure.getChannelId());
         assertThat(updateAdventure.getGameMode()).isEqualToIgnoringCase(adventure.getGameMode().name());
         assertThat(updateAdventure.getName()).isEqualTo(adventure.getName());
-        assertThat(updateAdventure.getPersonaId()).isEqualTo(adventure.getPersonaId());
+        assertThat(updateAdventure.getPersonaId()).isEqualTo("PRSNID");
         assertThat(updateAdventure.getWorldId()).isEqualTo(adventure.getWorldId());
         assertThat(updateAdventure.getVisibility()).isEqualToIgnoringCase(adventure.getVisibility().name());
         assertThat(updateAdventure.getPresencePenalty())

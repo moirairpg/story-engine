@@ -35,14 +35,14 @@ public class DeletePersonaHandler extends AbstractUseCaseHandler<DeletePersona, 
     @Override
     public Void execute(DeletePersona request) {
 
-        Persona persona = repository.findById(request.getId())
+        Persona persona = repository.findByPublicId(request.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         if (!persona.canUserWrite(request.getRequesterDiscordId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        repository.deleteById(request.getId());
+        repository.deleteByPublicId(request.getId());
 
         return null;
     }

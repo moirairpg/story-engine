@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.discord.messagereceived;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,10 +21,12 @@ import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageData
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -32,6 +35,9 @@ public class ChatModeHandlerTest {
 
     @Mock
     private AdventureRepository adventureRepository;
+
+    @Mock
+    private PersonaRepository personaRepository;
 
     @Mock
     private DiscordChannelPort discordChannelPort;
@@ -73,6 +79,8 @@ public class ChatModeHandlerTest {
         when(discordChannelPort.retrieveEntireHistoryBefore(anyString(), anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
 
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+
         // When
         Mono<Void> result = handler.execute(useCase);
 
@@ -87,7 +95,7 @@ public class ChatModeHandlerTest {
         assertThat(generationRequest.getBotUsername()).isEqualTo(useCase.getBotUsername());
         assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
         assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
-        assertThat(generationRequest.getPersonaId()).isEqualTo(adventure.getPersonaId());
+        assertThat(generationRequest.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
     }
 }

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
@@ -49,6 +50,7 @@ public class PersonaEnrichmentAdapterTest {
 
         // Given
         Persona persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         Map<String, Object> context = contextWithSummaryAndMessages(10);
 
@@ -56,14 +58,14 @@ public class PersonaEnrichmentAdapterTest {
                 "[ DEBUG MODE ON: You are an actor interpreting the role of %s. %s's persona is as follows, and you are to maintain character during this conversation: %s ]",
                 persona.getName(), persona.getName(), persona.getPersonality());
 
-        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString())).thenReturn(100);
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt()))
                 .thenReturn(context);
 
         // Then
-        StepVerifier.create(service.enrichContextWithPersona(context, persona.getId(), modelConfiguration))
+        StepVerifier.create(service.enrichContextWithPersona(context, persona.getPublicId(), modelConfiguration))
                 .assertNext(processedContext -> {
                     String personaResult = (String) processedContext.get("persona");
                     List<String> messageHistory = (List<String>) processedContext.get("messageHistory");
@@ -79,6 +81,7 @@ public class PersonaEnrichmentAdapterTest {
 
         // Given
         Persona persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         Map<String, Object> context = contextWithSummaryAndMessages(5);
 
@@ -86,7 +89,7 @@ public class PersonaEnrichmentAdapterTest {
                 "[ DEBUG MODE ON: You are an actor interpreting the role of %s. %s's persona is as follows, and you are to maintain character during this conversation: %s ]",
                 persona.getName(), persona.getName(), persona.getPersonality());
 
-        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(100)
                 .thenReturn(100)
@@ -96,7 +99,7 @@ public class PersonaEnrichmentAdapterTest {
                 .thenReturn(context);
 
         // Then
-        StepVerifier.create(service.enrichContextWithPersona(context, persona.getId(), modelConfiguration))
+        StepVerifier.create(service.enrichContextWithPersona(context, persona.getPublicId(), modelConfiguration))
                 .assertNext(processedContext -> {
                     String personaResult = (String) processedContext.get("persona");
                     List<String> messageHistory = (List<String>) processedContext.get("messageHistory");
@@ -112,16 +115,17 @@ public class PersonaEnrichmentAdapterTest {
 
         // Given
         Persona persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         Map<String, Object> context = contextWithSummaryAndMessages(5);
 
-        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(100000)
                 .thenReturn(100);
 
         // Then
-        StepVerifier.create(service.enrichContextWithPersona(context, persona.getId(), modelConfiguration))
+        StepVerifier.create(service.enrichContextWithPersona(context, persona.getPublicId(), modelConfiguration))
                 .verifyError(IllegalStateException.class);
     }
 

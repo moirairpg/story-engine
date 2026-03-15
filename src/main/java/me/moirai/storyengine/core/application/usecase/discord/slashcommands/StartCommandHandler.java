@@ -7,18 +7,20 @@ import java.util.Collections;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
@@ -29,16 +31,19 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
 
     private final AdventureRepository adventureRepository;
     private final WorldRepository worldRepository;
+    private final PersonaRepository personaRepository;
     private final StoryGenerationPort storyGenerationPort;
     private final DiscordChannelPort discordChannelPort;
 
     public StartCommandHandler(StoryGenerationPort storyGenerationPort,
             WorldRepository worldRepository,
+            PersonaRepository personaRepository,
             AdventureRepository adventureRepository,
             DiscordChannelPort discordChannelPort) {
 
         this.adventureRepository = adventureRepository;
         this.worldRepository = worldRepository;
+        this.personaRepository = personaRepository;
         this.storyGenerationPort = storyGenerationPort;
         this.discordChannelPort = discordChannelPort;
     }
@@ -64,6 +69,9 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
 
         World world = worldRepository.findById(adventure.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException("Adventure has no world linked to it"));
+
+        Persona persona = personaRepository.findById(adventure.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException("Adventure has no persona linked to it"));
 
         ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
                 .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
@@ -104,7 +112,7 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
                 .guildId(useCase.getGuildId())
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
-                .personaId(adventure.getPersonaId())
+                .personaId(persona.getPublicId())
                 .adventureId(adventure.getId())
                 .messageHistory(Collections.singletonList(adventureStartMessage))
                 .gameMode(adventure.getGameMode().name())

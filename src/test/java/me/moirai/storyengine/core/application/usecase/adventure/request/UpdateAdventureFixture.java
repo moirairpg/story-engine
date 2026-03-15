@@ -19,7 +19,7 @@ public class UpdateAdventureFixture {
                 .name(adventure.getName())
                 .description(adventure.getDescription())
                 .worldId(adventure.getWorldId())
-                .personaId(adventure.getPersonaId())
+                .personaId("PRSNID")
                 .channelId(adventure.getChannelId())
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())

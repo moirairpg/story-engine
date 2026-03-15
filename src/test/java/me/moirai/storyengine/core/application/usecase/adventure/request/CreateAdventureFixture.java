@@ -12,7 +12,7 @@ public class CreateAdventureFixture {
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return CreateAdventure.builder()
                 .name(adventure.getName())
-                .personaId(adventure.getPersonaId())
+                .personaId("PRSNID")
                 .worldId(adventure.getWorldId())
                 .channelId(adventure.getChannelId())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())

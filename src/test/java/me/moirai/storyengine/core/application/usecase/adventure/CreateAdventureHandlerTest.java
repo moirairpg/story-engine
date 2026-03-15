@@ -20,7 +20,6 @@ import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAd
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
@@ -90,7 +89,7 @@ public class CreateAdventureHandlerTest {
                 .build();
 
         when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
-        when(personaRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
@@ -111,10 +110,8 @@ public class CreateAdventureHandlerTest {
                         .build())
                 .build();
 
-        Persona persona = PersonaFixture.privatePersona().build();
-
         when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
-        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.privatePersona().build()));
 
         // Then
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
@@ -139,14 +136,13 @@ public class CreateAdventureHandlerTest {
                         .build())
                 .build();
 
-        Persona persona = PersonaFixture.privatePersona()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(command.getRequesterDiscordId())
-                        .build())
-                .build();
-
         when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
-        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(
+                PersonaFixture.privatePersona()
+                        .permissions(PermissionsFixture.samplePermissions()
+                                .ownerId(command.getRequesterDiscordId())
+                                .build())
+                        .build()));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
 
         // When

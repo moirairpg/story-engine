@@ -28,14 +28,14 @@ public class PersonaPersistenceMapperTest {
     public void mapPersonaDomain_whenGetOperation_thenMapToGetResult() {
 
         // Given
-        Persona persona = PersonaFixture.privatePersona().build();
+        Persona persona = PersonaFixture.privatePersonaWithId();
 
         // When
         PersonaDetails result = mapper.mapToResult(persona);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(persona.getId());
+        assertThat(result.getId()).isEqualTo(persona.getPublicId());
         assertThat(result.getName()).isEqualTo(persona.getName());
         assertThat(result.getPersonality()).isEqualTo(persona.getPersonality());
         assertThat(result.getVisibility()).isEqualTo(persona.getVisibility().name());
@@ -51,9 +51,7 @@ public class PersonaPersistenceMapperTest {
 
         // Given
         List<Persona> personas = IntStream.range(0, 20)
-                .mapToObj(op -> PersonaFixture.privatePersona()
-                        .id(String.valueOf(op + 1))
-                        .build())
+                .mapToObj(op -> PersonaFixture.privatePersona().build())
                 .toList();
 
         Pageable pageable = Pageable.ofSize(10);

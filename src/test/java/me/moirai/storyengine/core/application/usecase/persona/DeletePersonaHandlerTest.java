@@ -52,7 +52,7 @@ public class DeletePersonaHandlerTest {
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
@@ -67,11 +67,9 @@ public class DeletePersonaHandlerTest {
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 
-        Persona persona = PersonaFixture.privatePersona()
-                .id(id)
-                .build();
+        Persona persona = PersonaFixture.privatePersona().build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
 
         // Then
         assertThatExceptionOfType(AssetAccessDeniedException.class)
@@ -87,19 +85,18 @@ public class DeletePersonaHandlerTest {
         DeletePersona command = DeletePersona.build(id, requesterId);
 
         Persona persona = PersonaFixture.privatePersona()
-                .id(id)
                 .name("New name")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
 
         // When
         handler.handle(command);
 
         // Then
-        verify(repository, times(1)).deleteById(anyString());
+        verify(repository, times(1)).deleteByPublicId(anyString());
     }
 }

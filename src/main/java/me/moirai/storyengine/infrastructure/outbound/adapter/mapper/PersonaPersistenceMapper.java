@@ -13,7 +13,7 @@ public class PersonaPersistenceMapper {
     public PersonaDetails mapToResult(Persona persona) {
 
         return PersonaDetails.builder()
-                .id(persona.getId())
+                .id(persona.getPublicId())
                 .name(persona.getName())
                 .personality(persona.getPersonality())
                 .visibility(persona.getVisibility().name())

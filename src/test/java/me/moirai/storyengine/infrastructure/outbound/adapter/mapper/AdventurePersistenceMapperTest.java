@@ -13,8 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRawDto;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 
@@ -31,7 +31,7 @@ public class AdventurePersistenceMapperTest {
         Adventure adventure = AdventureFixture.publicSingleplayerAdventure().build();
 
         // When
-        AdventureDetails result = mapper.mapToResult(adventure);
+        AdventureRawDto result = mapper.mapToResult(adventure);
 
         // Then
         assertThat(result).isNotNull();
@@ -44,6 +44,7 @@ public class AdventurePersistenceMapperTest {
         assertThat(result.getLastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
         assertThat(result.getOwnerId()).isEqualTo(adventure.getOwnerId());
         assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
+        assertThat(result.getPersonaId()).isEqualTo(adventure.getPersonaId());
     }
 
     @Test

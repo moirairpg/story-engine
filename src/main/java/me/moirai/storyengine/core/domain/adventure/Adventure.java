@@ -40,7 +40,7 @@ public class Adventure extends ShareableAsset {
     private String worldId;
 
     @Column(name = "persona_id", nullable = false)
-    private String personaId;
+    private Long personaId;
 
     @Column(name = "channel_id", nullable = false)
     private String channelId;
@@ -115,7 +115,7 @@ public class Adventure extends ShareableAsset {
         return worldId;
     }
 
-    public String getPersonaId() {
+    public Long getPersonaId() {
         return personaId;
     }
 
@@ -167,7 +167,7 @@ public class Adventure extends ShareableAsset {
         this.adventureStart = adventureStart;
     }
 
-    public void updatePersona(String personaId) {
+    public void updatePersona(Long personaId) {
 
         this.personaId = personaId;
     }
@@ -360,7 +360,7 @@ public class Adventure extends ShareableAsset {
         private String description;
         private String adventureStart;
         private String worldId;
-        private String personaId;
+        private Long personaId;
         private String channelId;
         private boolean isMultiplayer;
         private GameMode gameMode;
@@ -407,7 +407,7 @@ public class Adventure extends ShareableAsset {
             return this;
         }
 
-        public Builder personaId(String personaId) {
+        public Builder personaId(Long personaId) {
 
             this.personaId = personaId;
             return this;

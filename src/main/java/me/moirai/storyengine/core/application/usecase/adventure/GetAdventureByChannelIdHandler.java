@@ -4,10 +4,12 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @UseCaseHandler
 public class GetAdventureByChannelIdHandler
@@ -15,11 +17,14 @@ public class GetAdventureByChannelIdHandler
 
     private static final String ADVENTURE_NOT_FOUND = "No adventures exist for this channel";
     private static final String USER_NO_PERMISSION = "User does not have permission to view adventure";
+    private static final String PERSONA_NOT_FOUND = "Persona not found";
 
     private final AdventureRepository queryRepository;
+    private final PersonaRepository personaRepository;
 
-    public GetAdventureByChannelIdHandler(AdventureRepository queryRepository) {
+    public GetAdventureByChannelIdHandler(AdventureRepository queryRepository, PersonaRepository personaRepository) {
         this.queryRepository = queryRepository;
+        this.personaRepository = personaRepository;
     }
 
     @Override
@@ -32,16 +37,19 @@ public class GetAdventureByChannelIdHandler
             throw new AssetAccessDeniedException(USER_NO_PERMISSION);
         }
 
-        return toResult(adventure);
+        Persona persona = personaRepository.findById(adventure.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+
+        return toResult(adventure, persona.getPublicId());
     }
 
-    private AdventureDetails toResult(Adventure adventure) {
+    private AdventureDetails toResult(Adventure adventure, String personaPublicId) {
 
         return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .worldId(adventure.getWorldId())
-                .personaId(adventure.getPersonaId())
+                .personaId(personaPublicId)
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .moderation(adventure.getModeration().name())

@@ -3,6 +3,7 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -16,18 +17,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureByIdHandlerTest {
 
     @Mock
     private AdventureRepository queryRepository;
+
+    @Mock
+    private PersonaRepository personaRepository;
 
     @InjectMocks
     private GetAdventureByIdHandler handler;
@@ -89,6 +95,7 @@ public class GetAdventureByIdHandlerTest {
         GetAdventureById query = GetAdventureById.build(id, requesterId);
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         AdventureDetails result = handler.handle(query);
@@ -96,14 +103,13 @@ public class GetAdventureByIdHandlerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(id);
-        assertThat(result.getId()).isEqualTo(adventure.getId());
         assertThat(result.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(result.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(result.getChannelId()).isEqualTo(adventure.getChannelId());
         assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
         assertThat(result.getName()).isEqualTo(adventure.getName());
         assertThat(result.getOwnerId()).isEqualTo(adventure.getOwnerId());
-        assertThat(result.getPersonaId()).isEqualTo(adventure.getPersonaId());
+        assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getModeration()).isEqualTo(adventure.getModeration().name());
         assertThat(result.getWorldId()).isEqualTo(adventure.getWorldId());
@@ -160,6 +166,7 @@ public class GetAdventureByIdHandlerTest {
                 .build();
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
         AdventureDetails result = handler.handle(query);
@@ -169,14 +176,13 @@ public class GetAdventureByIdHandlerTest {
         assertThat(result.getName()).isEqualTo(adventure.getName());
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(id);
-        assertThat(result.getId()).isEqualTo(adventure.getId());
         assertThat(result.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(result.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(result.getChannelId()).isEqualTo(adventure.getChannelId());
         assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
         assertThat(result.getName()).isEqualTo(adventure.getName());
         assertThat(result.getOwnerId()).isEqualTo(adventure.getOwnerId());
-        assertThat(result.getPersonaId()).isEqualTo(adventure.getPersonaId());
+        assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getModeration()).isEqualTo(adventure.getModeration().name());
         assertThat(result.getWorldId()).isEqualTo(adventure.getWorldId());

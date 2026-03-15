@@ -10,11 +10,17 @@ public interface PersonaRepository {
 
     Persona save(Persona persona);
 
-    void deleteById(String id);
+    void deleteById(Long id);
 
-    Optional<Persona> findById(String id);
+    void deleteByPublicId(String publicId);
+
+    Optional<Persona> findById(Long id);
+
+    Optional<Persona> findByPublicId(String publicId);
 
     SearchPersonasResult search(SearchPersonas request);
 
-    boolean existsById(String id);
+    boolean existsById(Long id);
+
+    boolean existsByPublicId(String publicId);
 }

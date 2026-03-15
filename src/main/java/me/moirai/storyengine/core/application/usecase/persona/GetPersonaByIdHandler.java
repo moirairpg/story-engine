@@ -35,7 +35,7 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     @Override
     public PersonaDetails execute(GetPersonaById query) {
 
-        Persona persona = repository.findById(query.getId())
+        Persona persona = repository.findByPublicId(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         if (!persona.canUserRead(query.getRequesterDiscordId())) {
@@ -48,9 +48,9 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     private PersonaDetails mapResult(Persona persona) {
 
         return PersonaDetails.builder()
-                .id(persona.getId())
+                .id(persona.getPublicId())
                 .name(persona.getName())
-                .personality(persona.getName())
+                .personality(persona.getPersonality())
                 .visibility(persona.getVisibility().name())
                 .creationDate(persona.getCreationDate())
                 .lastUpdateDate(persona.getLastUpdateDate())

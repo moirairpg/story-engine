@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
@@ -17,6 +19,7 @@ import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationReq
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -24,17 +27,21 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
 
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
     private static final String COMMAND_ONLY_WHEN_LAST_MESSAGE_BY_BOT = "This command can only be used if the last message in channel was sent by the bot.";
+    private static final String PERSONA_NOT_FOUND = "Adventure has no persona linked to it";
 
     private final DiscordChannelPort discordChannelPort;
     private final StoryGenerationPort storyGenerationPort;
     private final AdventureRepository adventureRepository;
+    private final PersonaRepository personaRepository;
 
     public RetryCommandHandler(DiscordChannelPort discordChannelPort,
             StoryGenerationPort storyGenerationPort,
-            AdventureRepository adventureRepository) {
+            AdventureRepository adventureRepository,
+            PersonaRepository personaRepository) {
 
         this.discordChannelPort = discordChannelPort;
         this.adventureRepository = adventureRepository;
+        this.personaRepository = personaRepository;
         this.storyGenerationPort = storyGenerationPort;
     }
 
@@ -67,6 +74,9 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
     private StoryGenerationRequest buildGenerationRequest(RetryCommand useCase,
             Adventure adventure) {
 
+        Persona persona = personaRepository.findById(adventure.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+
         ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
                 .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
                 .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
@@ -95,7 +105,7 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
                 .guildId(useCase.getGuildId())
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
-                .personaId(adventure.getPersonaId())
+                .personaId(persona.getPublicId())
                 .adventureId(adventure.getId())
                 .messageHistory(messageHistory)
                 .gameMode(adventure.getGameMode().name())

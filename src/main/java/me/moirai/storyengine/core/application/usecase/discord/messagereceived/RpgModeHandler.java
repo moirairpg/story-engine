@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
@@ -18,22 +20,27 @@ import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationReq
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
 public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<Void>> {
 
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
+    private static final String PERSONA_NOT_FOUND = "Adventure has no persona linked to it";
 
     private final StoryGenerationPort storyGenerationPort;
     private final AdventureRepository adventureRepository;
+    private final PersonaRepository personaRepository;
     private final DiscordChannelPort discordChannelPort;
 
     public RpgModeHandler(StoryGenerationPort storyGenerationPort,
             AdventureRepository adventureRepository,
+            PersonaRepository personaRepository,
             DiscordChannelPort discordChannelPort) {
 
         this.adventureRepository = adventureRepository;
+        this.personaRepository = personaRepository;
         this.storyGenerationPort = storyGenerationPort;
         this.discordChannelPort = discordChannelPort;
     }
@@ -56,6 +63,9 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
     }
 
     private StoryGenerationRequest buildGenerationRequest(RpgModeRequest useCase, Adventure adventure) {
+
+        Persona persona = personaRepository.findById(adventure.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         AiModelRequest aiModel = AiModelRequest
                 .build(adventure.getModelConfiguration().getAiModel().toString(),
@@ -86,7 +96,7 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
                 .guildId(useCase.getGuildId())
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
-                .personaId(adventure.getPersonaId())
+                .personaId(persona.getPublicId())
                 .adventureId(adventure.getId())
                 .messageHistory(messageHistory)
                 .gameMode(RPG.name())
