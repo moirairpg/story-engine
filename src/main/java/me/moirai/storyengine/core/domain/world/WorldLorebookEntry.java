@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Asset;
 
-@Entity(name = "WorldLorebookEntry")
+@Entity
 @Table(name = "world_lorebook")
 public class WorldLorebookEntry extends Asset {
 
@@ -26,7 +26,7 @@ public class WorldLorebookEntry extends Asset {
     @Column(name = "regex", nullable = false)
     private String regex;
 
-    @Column(name = "world_id", nullable = false)
+    @Column(name = "world_id", insertable = false, updatable = false)
     private String worldId;
 
     private WorldLorebookEntry(Builder builder) {
@@ -37,7 +37,6 @@ public class WorldLorebookEntry extends Asset {
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
-        this.worldId = builder.worldId;
     }
 
     protected WorldLorebookEntry() {
@@ -65,10 +64,6 @@ public class WorldLorebookEntry extends Asset {
         return description;
     }
 
-    public String getWorldId() {
-        return worldId;
-    }
-
     public void updateName(String name) {
 
         this.name = name;
@@ -91,7 +86,6 @@ public class WorldLorebookEntry extends Asset {
         private String regex;
         private String description;
         private String creatorId;
-        private String worldId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
         private int version;
@@ -120,12 +114,6 @@ public class WorldLorebookEntry extends Asset {
         public Builder regex(String regex) {
 
             this.regex = regex;
-            return this;
-        }
-
-        public Builder worldId(String worldId) {
-
-            this.worldId = worldId;
             return this;
         }
 

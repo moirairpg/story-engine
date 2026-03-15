@@ -8,7 +8,6 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
 @UseCaseHandler
@@ -18,16 +17,11 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
     private static final String ADVENTURE_ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
     private static final String ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND = "Adventure to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE = "User does not have permission to modify this adventure";
-    private static final String LOREBOOK_ENTRY_TO_BE_DELETED_WAS_NOT_FOUND = "Lorebook entry to be deleted was not found";
 
-    private final AdventureLorebookEntryRepository lorebookEntryRepository;
     private final AdventureRepository repository;
 
-    public DeleteAdventureLorebookEntryHandler(
-            AdventureLorebookEntryRepository lorebookEntryRepository,
-            AdventureRepository repository) {
+    public DeleteAdventureLorebookEntryHandler(AdventureRepository repository) {
 
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
     }
 
@@ -53,10 +47,8 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE);
         }
 
-        lorebookEntryRepository.findById(command.getLorebookEntryId())
-                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_DELETED_WAS_NOT_FOUND));
-
-        lorebookEntryRepository.deleteById(command.getLorebookEntryId());
+        adventure.removeLorebookEntry(command.getLorebookEntryId());
+        repository.save(adventure);
 
         return null;
     }

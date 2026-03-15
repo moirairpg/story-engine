@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.list;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -23,7 +25,6 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
@@ -39,9 +40,6 @@ public class LorebookEnrichmentAdapterTest {
 
     @Mock
     private TokenizerPort tokenizerPort;
-
-    @Mock
-    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private AdventureRepository adventureRepository;
@@ -62,8 +60,14 @@ public class LorebookEnrichmentAdapterTest {
 
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
-        stubAdventureRepository();
-        stubLorebookEntriesByWords();
+        Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure().build();
+        Adventure adventure = spy(baseAdventure);
+
+        List<AdventureLorebookEntry> lorebookEntries = buildLorebookEntriesForWords(baseAdventure);
+
+        doReturn(lorebookEntries).when(adventure).getLorebookEntriesByRegex(anyString());
+
+        when(adventureRepository.findById(anyString())).thenReturn(Optional.of(adventure));
 
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(5)
@@ -105,10 +109,20 @@ public class LorebookEnrichmentAdapterTest {
 
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
-        stubAdventureRepository();
-        stubLorebookEntriesByWords();
-        stubLorebookEntriesByMention();
-        stubLorebookEntriesByAuthor();
+        Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure().build();
+        Adventure adventure = spy(baseAdventure);
+
+        AdventureLorebookEntry marcusCharacter = buildMarcusCharacter(baseAdventure);
+        AdventureLorebookEntry johnCharacter = buildJohnCharacter(baseAdventure);
+        List<AdventureLorebookEntry> lorebookEntries = buildLorebookEntriesForWords(baseAdventure);
+
+        doReturn(lorebookEntries).when(adventure).getLorebookEntriesByRegex(anyString());
+        doReturn(Optional.of(marcusCharacter))
+                .doReturn(Optional.of(johnCharacter))
+                .doReturn(Optional.of(marcusCharacter))
+                .when(adventure).getLorebookEntryByPlayerId(anyString());
+
+        when(adventureRepository.findById(anyString())).thenReturn(Optional.of(adventure));
 
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(5)
@@ -178,67 +192,37 @@ public class LorebookEnrichmentAdapterTest {
         return list(firstMessage, secondMessage, thirdMessage);
     }
 
-    private void stubAdventureRepository() {
+    private AdventureLorebookEntry buildMarcusCharacter(Adventure adventure) {
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
-        when(adventureRepository.findById(anyString())).thenReturn(Optional.of(adventure));
-    }
-
-    private void stubLorebookEntriesByAuthor() {
-
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
-        AdventureLorebookEntry marcusCharacter = AdventureLorebookEntry.builder()
+        return AdventureLorebookEntry.builder()
                 .id("1")
                 .name("Pyromancer")
                 .regex("[Pp]iro[Mm]ancer")
                 .description("The Pyromancer is a fire battlemage")
                 .playerId("1")
                 .isPlayerCharacter(true)
-                .adventureId(adventure.getId())
                 .build();
+    }
 
-        AdventureLorebookEntry johnCharacter = AdventureLorebookEntry.builder()
+    private AdventureLorebookEntry buildJohnCharacter(Adventure adventure) {
+
+        return AdventureLorebookEntry.builder()
                 .id("2")
                 .name("Lord of Doom")
                 .regex("[Ll]ord [Oo] [Dd]oom")
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerId("2")
                 .isPlayerCharacter(true)
-                .adventureId(adventure.getId())
                 .build();
-
-        when(lorebookEntryRepository.findByPlayerId(anyString(), anyString()))
-                .thenReturn(Optional.of(marcusCharacter))
-                .thenReturn(Optional.of(johnCharacter))
-                .thenReturn(Optional.of(marcusCharacter));
     }
 
-    private void stubLorebookEntriesByMention() {
+    private List<AdventureLorebookEntry> buildLorebookEntriesForWords(Adventure adventure) {
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
-        AdventureLorebookEntry marcusCharacter = AdventureLorebookEntry.builder()
-                .id("1")
-                .name("Pyromancer")
-                .regex("[Pp]iro[Mm]ancer")
-                .description("The Pyromancer is a fire battlemage")
-                .playerId("1")
-                .isPlayerCharacter(true)
-                .adventureId(adventure.getId())
-                .build();
-
-        when(lorebookEntryRepository.findByPlayerId(anyString(), anyString()))
-                .thenReturn(Optional.of(marcusCharacter));
-    }
-
-    private void stubLorebookEntriesByWords() {
-
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
         AdventureLorebookEntry swordOfFire = AdventureLorebookEntry.builder()
                 .id("3")
                 .name("Sword of Fire")
                 .regex("[Ss]word [Oo]f [Ff]ire")
                 .description("The Sword of Fire is a spectral sword that spits fire")
-                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gloveOfArmageddon = AdventureLorebookEntry.builder()
@@ -246,7 +230,6 @@ public class LorebookEnrichmentAdapterTest {
                 .name("Glove of Armageddon")
                 .regex("[Gg]love [Oo]f [Aa]rmageddon")
                 .description("The Glove of Armageddon is a gauntlet that punches with the strength of three suns")
-                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry lordOfDoom = AdventureLorebookEntry.builder()
@@ -256,10 +239,8 @@ public class LorebookEnrichmentAdapterTest {
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerId("2")
                 .isPlayerCharacter(true)
-                .adventureId(adventure.getId())
                 .build();
 
-        when(lorebookEntryRepository.findAllByRegex(anyString(), anyString()))
-                .thenReturn(list(swordOfFire, gloveOfArmageddon, lordOfDoom));
+        return list(swordOfFire, gloveOfArmageddon, lordOfDoom);
     }
 }

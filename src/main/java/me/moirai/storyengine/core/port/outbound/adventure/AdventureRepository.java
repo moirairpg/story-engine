@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 
 public interface AdventureRepository {
@@ -23,6 +25,8 @@ public interface AdventureRepository {
     Optional<Adventure> findById(String id);
 
     SearchAdventuresResult search(SearchAdventures request);
+
+    SearchAdventureLorebookEntriesResult searchLorebookEntries(SearchAdventureLorebookEntries query);
 
     Optional<Adventure> findByChannelId(String channelId);
 

@@ -41,4 +41,6 @@
   <include file="db/changelog/migrations/1773598456_alter_table_adventure_update_entity_references.sql" />
   <include file="db/changelog/migrations/1773598458_alter_table_adventure_lorebook_update_entity_references.sql" />
   <include file="db/changelog/migrations/1773598459_alter_table_world_lorebook_update_entity_references.sql" />
+  <include file="db/changelog/migrations/1773602205_alter_table_adventure_lorebook_add_fk_and_index.sql" />
+  <include file="db/changelog/migrations/1773602209_alter_table_world_lorebook_add_fk_and_index.sql" />
 </databaseChangeLog>

@@ -1,7 +1,10 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,17 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteAdventureLorebookEntryHandlerTest {
-
-    @Mock
-    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private AdventureRepository repository;
@@ -73,21 +70,22 @@ public class DeleteAdventureLorebookEntryHandlerTest {
                 .requesterId(requesterId)
                 .build();
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+        Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
+        Adventure adventure = spy(baseAdventure);
+        doNothing().when(adventure).removeLorebookEntry(anyString());
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
+        when(repository.save(any())).thenReturn(adventure);
 
         // When
         handler.handle(command);
 
         // Then
-        verify(lorebookEntryRepository, times(1)).deleteById(anyString());
+        verify(repository, times(1)).save(any());
     }
 }

@@ -3,6 +3,8 @@ package me.moirai.storyengine.core.application.usecase.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -20,14 +22,10 @@ import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateWorldLorebookEntryHandlerTest {
-
-    @Mock
-    private WorldLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private WorldRepository repository;
@@ -51,17 +49,19 @@ public class UpdateWorldLorebookEntryHandlerTest {
                 .requesterId(requesterId)
                 .build();
 
-        World world = WorldFixture.publicWorld()
+        WorldLorebookEntry expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+
+        World baseWorld = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        WorldLorebookEntry expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+        World world = spy(baseWorld);
+        doReturn(expectedUpdatedEntry).when(world).updateLorebookEntry(anyString(), anyString(), anyString(), anyString());
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(expectedUpdatedEntry));
-        when(lorebookEntryRepository.save(any())).thenReturn(expectedUpdatedEntry);
+        when(repository.save(any())).thenReturn(world);
 
         // When
         WorldLorebookEntryDetails result = handler.handle(command);

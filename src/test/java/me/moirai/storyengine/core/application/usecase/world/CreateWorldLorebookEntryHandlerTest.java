@@ -18,18 +18,12 @@ import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldL
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateWorldLorebookEntryHandlerTest {
-
-    @Mock
-    private WorldLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private WorldRepository repository;
@@ -87,9 +81,7 @@ public class CreateWorldLorebookEntryHandlerTest {
     public void createWorldLorebookEntry() {
 
         // Given
-        String id = "HAUDHUAHD";
         String requesterId = "OWNER123";
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().id(id).build();
         CreateWorldLorebookEntry command = CreateWorldLorebookEntryFixture.sampleLorebookEntry()
                 .requesterId(requesterId)
                 .build();
@@ -101,13 +93,13 @@ public class CreateWorldLorebookEntryHandlerTest {
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
-        when(lorebookEntryRepository.save(any())).thenReturn(entry);
+        when(repository.save(any())).thenReturn(world);
 
         // When
         WorldLorebookEntryDetails result = handler.handle(command);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getName()).isEqualTo(command.getName());
     }
 }

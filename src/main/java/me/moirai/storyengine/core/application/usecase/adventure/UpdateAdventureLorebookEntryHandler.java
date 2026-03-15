@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
-import static io.micrometer.common.util.StringUtils.isNotBlank;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.MapUtils.isEmpty;
@@ -20,7 +19,6 @@ import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import reactor.core.publisher.Mono;
@@ -32,19 +30,15 @@ public class UpdateAdventureLorebookEntryHandler
     private static final String ADVENTURE_FLAGGED_BY_MODERATION = "Adventure flagged by moderation";
     private static final String ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND = "Adventure to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE = "User does not have permission to modify this adventure";
-    private static final String LOREBOOK_ENTRY_TO_BE_UPDATED_WAS_NOT_FOUND = "Lorebook entry to be updated was not found";
 
     private final TextModerationPort moderationPort;
-    private final AdventureLorebookEntryRepository lorebookEntryRepository;
     private final AdventureRepository repository;
 
     public UpdateAdventureLorebookEntryHandler(
             TextModerationPort moderationPort,
-            AdventureLorebookEntryRepository lorebookEntryRepository,
             AdventureRepository repository) {
 
         this.moderationPort = moderationPort;
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
     }
 
@@ -81,28 +75,15 @@ public class UpdateAdventureLorebookEntryHandler
         return moderateContent(command.getName(), adventure.getModeration())
                 .flatMap(__ -> moderateContent(command.getDescription(), adventure.getModeration()))
                 .map(__ -> {
-                    AdventureLorebookEntry lorebookEntry = lorebookEntryRepository.findById(command.getId())
-                            .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_UPDATED_WAS_NOT_FOUND));
+                    AdventureLorebookEntry lorebookEntry = adventure.updateLorebookEntry(
+                            command.getId(),
+                            command.getName(),
+                            command.getRegex(),
+                            command.getDescription(),
+                            command.getPlayerId());
 
-                    if (isNotBlank(command.getName())) {
-                        lorebookEntry.updateName(command.getName());
-                    }
-
-                    if (isNotBlank(command.getRegex())) {
-                        lorebookEntry.updateRegex(command.getRegex());
-                    }
-
-                    if (isNotBlank(command.getDescription())) {
-                        lorebookEntry.updateDescription(command.getDescription());
-                    }
-
-                    if (command.isPlayerCharacter()) {
-                        lorebookEntry.assignPlayer(command.getPlayerId());
-                    } else {
-                        lorebookEntry.unassignPlayer();
-                    }
-
-                    return lorebookEntryRepository.save(lorebookEntry);
+                    repository.save(adventure);
+                    return lorebookEntry;
                 })
                 .map(this::toResult);
     }

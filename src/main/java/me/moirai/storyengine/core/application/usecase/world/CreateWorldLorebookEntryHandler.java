@@ -9,7 +9,6 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
@@ -19,14 +18,10 @@ public class CreateWorldLorebookEntryHandler
     private static final String WORLD_TO_BE_UPDATED_WAS_NOT_FOUND = "World to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD = "User does not have permission to modify this world";
 
-    private final WorldLorebookEntryRepository lorebookEntryRepository;
     private final WorldRepository repository;
 
-    public CreateWorldLorebookEntryHandler(
-            WorldLorebookEntryRepository lorebookEntryRepository,
-            WorldRepository repository) {
+    public CreateWorldLorebookEntryHandler(WorldRepository repository) {
 
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
     }
 
@@ -56,15 +51,12 @@ public class CreateWorldLorebookEntryHandler
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD);
         }
 
-        WorldLorebookEntry lorebookEntry = WorldLorebookEntry.builder()
-                .name(command.getName())
-                .regex(command.getRegex())
-                .description(command.getDescription())
-                .worldId(world.getId())
-                .creatorId(command.getRequesterDiscordId())
-                .build();
+        WorldLorebookEntry entry = world.addLorebookEntry(
+                command.getName(),
+                command.getRegex(),
+                command.getDescription());
 
-        WorldLorebookEntry entry = lorebookEntryRepository.save(lorebookEntry);
+        repository.save(world);
         return mapResult(entry);
     }
 

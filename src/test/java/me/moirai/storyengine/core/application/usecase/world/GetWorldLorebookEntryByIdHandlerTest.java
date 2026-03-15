@@ -3,6 +3,8 @@ package me.moirai.storyengine.core.application.usecase.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -20,14 +22,10 @@ import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetWorldLorebookEntryByIdHandlerTest {
-
-    @Mock
-    private WorldLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private WorldRepository repository;
@@ -77,11 +75,14 @@ public class GetWorldLorebookEntryByIdHandlerTest {
 
         WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().id(id).build();
 
-        World world = WorldFixture.publicWorld()
+        World baseWorld = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
+
+        World world = spy(baseWorld);
+        doReturn(entry).when(world).getLorebookEntryById(anyString());
 
         GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
                 .entryId(id)
@@ -90,13 +91,12 @@ public class GetWorldLorebookEntryByIdHandlerTest {
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
 
         // When
         WorldLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(entry.getId());
     }
 }

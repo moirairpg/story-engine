@@ -23,10 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import io.micrometer.common.util.StringUtils;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
@@ -43,18 +43,15 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
     private static final String LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND = "Lorebook entry to be viewed was not found";
 
     private final TokenizerPort tokenizerPort;
-    private final AdventureLorebookEntryRepository lorebookEntryRepository;
     private final AdventureRepository adventureRepository;
     private final ChatMessageAdapter chatMessageService;
 
     public LorebookEnrichmentAdapter(
             TokenizerPort tokenizerPort,
-            AdventureLorebookEntryRepository lorebookEntryRepository,
             AdventureRepository adventureRepository,
             ChatMessageAdapter chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.adventureRepository = adventureRepository;
         this.chatMessageService = chatMessageService;
     }
@@ -97,10 +94,10 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
         Map<String, Object> context = new HashMap<>();
         context.put(RETRIEVED_MESSAGES, new ArrayList<>(rawMessageHistory));
 
-        adventureRepository.findById(adventureId)
+        Adventure adventure = adventureRepository.findById(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-        List<AdventureLorebookEntry> entriesFound = lorebookEntryRepository.findAllByRegex(stringifiedStory, adventureId);
+        List<AdventureLorebookEntry> entriesFound = adventure.getLorebookEntriesByRegex(stringifiedStory);
         Map<String, Object> enrichedContext = addEntriesFoundToContext(entriesFound, context,
                 reservedTokensForLorebook);
 
@@ -128,10 +125,10 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                 .map(DiscordMessageData::getContent)
                 .toList();
 
-        adventureRepository.findById(adventureId)
+        Adventure adventure = adventureRepository.findById(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-        return lorebookEntryRepository.findAllByRegex(stringifyList(messageHistory), adventureId);
+        return adventure.getLorebookEntriesByRegex(stringifyList(messageHistory));
     }
 
     private List<AdventureLorebookEntry> findLorebookEntriesByMention(String adventureId,
@@ -166,10 +163,10 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
 
     private AdventureLorebookEntry findLorebookEntryByPlayerDiscordId(String playerId, String adventureId) {
 
-        adventureRepository.findById(adventureId)
+        Adventure adventure = adventureRepository.findById(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-        return lorebookEntryRepository.findByPlayerId(playerId, adventureId)
+        return adventure.getLorebookEntryByPlayerId(playerId)
                 .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
     }
 

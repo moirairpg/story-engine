@@ -15,11 +15,9 @@ import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
@@ -29,16 +27,13 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
     private static final String WORLD_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
     private final TextModerationPort moderationPort;
-    private final WorldLorebookEntryRepository lorebookEntryRepository;
     private final WorldRepository repository;
 
     public CreateWorldHandler(
             TextModerationPort moderationPort,
-            WorldLorebookEntryRepository lorebookEntryRepository,
             WorldRepository repository) {
 
         this.moderationPort = moderationPort;
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
     }
 
@@ -64,14 +59,12 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
                             .creatorId(command.getRequesterDiscordId())
                             .build());
 
-                    command.getLorebookEntries().stream()
-                            .map(entry -> WorldLorebookEntry.builder()
-                                    .name(entry.getName())
-                                    .description(entry.getDescription())
-                                    .regex(entry.getRegex())
-                                    .worldId(world.getId())
-                                    .build())
-                            .forEach(lorebookEntryRepository::save);
+                    command.getLorebookEntries().forEach(entry -> world.addLorebookEntry(
+                            entry.getName(),
+                            entry.getRegex(),
+                            entry.getDescription()));
+
+                    repository.save(world);
 
                     return world;
                 })

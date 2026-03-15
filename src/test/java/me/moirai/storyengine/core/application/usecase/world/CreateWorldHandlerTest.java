@@ -18,7 +18,6 @@ import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -28,9 +27,6 @@ public class CreateWorldHandlerTest {
 
     @Mock
     private TextModerationPort moderationPort;
-
-    @Mock
-    private WorldLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private WorldRepository repository;

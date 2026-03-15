@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Asset;
 
-@Entity(name = "AdventureLorebookEntry")
+@Entity
 @Table(name = "adventure_lorebook")
 public class AdventureLorebookEntry extends Asset {
 
@@ -32,7 +32,7 @@ public class AdventureLorebookEntry extends Asset {
     @Column(name = "is_player_character", nullable = false)
     private boolean isPlayerCharacter;
 
-    @Column(name = "adventure_id", nullable = false)
+    @Column(name = "adventure_id", insertable = false, updatable = false)
     private String adventureId;
 
     private AdventureLorebookEntry(Builder builder) {
@@ -44,7 +44,6 @@ public class AdventureLorebookEntry extends Asset {
         this.description = builder.description;
         this.playerId = builder.playerId;
         this.isPlayerCharacter = builder.isPlayerCharacter;
-        this.adventureId = builder.adventureId;
     }
 
     protected AdventureLorebookEntry() {
@@ -78,10 +77,6 @@ public class AdventureLorebookEntry extends Asset {
 
     public boolean isPlayerCharacter() {
         return isPlayerCharacter;
-    }
-
-    public String getAdventureId() {
-        return adventureId;
     }
 
     public void updateName(String name) {
@@ -119,7 +114,6 @@ public class AdventureLorebookEntry extends Asset {
         private String description;
         private String playerId;
         private String creatorId;
-        private String adventureId;
         private boolean isPlayerCharacter;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
@@ -161,12 +155,6 @@ public class AdventureLorebookEntry extends Asset {
         public Builder isPlayerCharacter(boolean isPlayerCharacter) {
 
             this.isPlayerCharacter = isPlayerCharacter;
-            return this;
-        }
-
-        public Builder adventureId(String adventureId) {
-
-            this.adventureId = adventureId;
             return this;
         }
 

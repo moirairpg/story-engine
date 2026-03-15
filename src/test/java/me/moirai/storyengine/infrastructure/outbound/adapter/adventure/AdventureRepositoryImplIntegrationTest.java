@@ -1,13 +1,10 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import static java.util.Collections.singleton;
-import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
-import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
 import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.GPT35_TURBO;
 import static me.moirai.storyengine.core.domain.adventure.GameMode.AUTHOR;
 import static me.moirai.storyengine.core.domain.adventure.GameMode.CHAT;
 import static me.moirai.storyengine.core.domain.adventure.GameMode.RPG;
-import static me.moirai.storyengine.core.domain.adventure.Moderation.DISABLED;
 import static me.moirai.storyengine.core.domain.adventure.Moderation.PERMISSIVE;
 import static me.moirai.storyengine.core.domain.adventure.Moderation.STRICT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,17 +22,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.common.domain.Visibility;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.GameMode;
 import me.moirai.storyengine.core.domain.adventure.ModelConfigurationFixture;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
-
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
 public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
@@ -1004,21 +998,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String ownerId = "586678721356875";
         String worldId = "WRLD";
-        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
-                .channelId("CHNLID1")
-                .worldId(worldId)
-                .build());
-
-        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
-                .channelId("CHNLID2")
-                .worldId("AAAA")
-                .build());
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1041,21 +1020,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String ownerId = "586678721356875";
         String personaId = "strict";
-        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
-                .channelId("CHNLID1")
-                .personaId(personaId)
-                .build());
-
-        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
-                .channelId("CHNLID2")
-                .personaId("AAAA")
-                .build());
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1876,21 +1840,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String ownerId = "586678721356875";
         String worldId = "WRLD";
-        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
-                .channelId("CHNLID1")
-                .worldId(worldId)
-                .build());
-
-        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
-                .channelId("CHNLID2")
-                .worldId("AAAA")
-                .build());
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1914,21 +1863,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         // Given
         String ownerId = "586678721356875";
         String personaId = "strict";
-        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
-                .channelId("CHNLID1")
-                .personaId(personaId)
-                .build());
-
-        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
-                .id(null)
-                .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
-                .channelId("CHNLID2")
-                .personaId("AAAA")
-                .build());
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterId(ownerId)
@@ -1945,7 +1879,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.getTotalItems()).isOne();
         assertThat(result.getTotalPages()).isOne();
     }
-
 
     @Test
     public void adventure_whenChannelIdIsProvided_thenReturnGameMode() {

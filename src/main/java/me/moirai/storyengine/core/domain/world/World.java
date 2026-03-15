@@ -1,20 +1,27 @@
 package me.moirai.storyengine.core.domain.world;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
-@Entity(name = "World")
+@Entity
 @Table(name = "world")
 public class World extends ShareableAsset {
 
@@ -30,6 +37,10 @@ public class World extends ShareableAsset {
 
     @Column(name = "adventure_start", nullable = false)
     private String adventureStart;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "world_id", nullable = false)
+    private List<WorldLorebookEntry> lorebook = new ArrayList<>();
 
     private World(Builder builder) {
 
@@ -67,6 +78,10 @@ public class World extends ShareableAsset {
         return adventureStart;
     }
 
+    public List<WorldLorebookEntry> getLorebook() {
+        return Collections.unmodifiableList(lorebook);
+    }
+
     public void updateName(String name) {
 
         this.name = name;
@@ -80,6 +95,49 @@ public class World extends ShareableAsset {
     public void updateAdventureStart(String adventureStart) {
 
         this.adventureStart = adventureStart;
+    }
+
+    public WorldLorebookEntry addLorebookEntry(String name, String regex, String description) {
+
+        WorldLorebookEntry entry = WorldLorebookEntry.builder()
+                .name(name)
+                .regex(regex)
+                .description(description)
+                .build();
+
+        lorebook.add(entry);
+        return entry;
+    }
+
+    public WorldLorebookEntry updateLorebookEntry(String entryId, String name, String regex, String description) {
+
+        WorldLorebookEntry entry = getLorebookEntryById(entryId);
+        entry.updateName(name);
+        entry.updateRegex(regex);
+        entry.updateDescription(description);
+
+        return entry;
+    }
+
+    public void removeLorebookEntry(String entryId) {
+
+        WorldLorebookEntry entry = getLorebookEntryById(entryId);
+        lorebook.remove(entry);
+    }
+
+    public WorldLorebookEntry getLorebookEntryById(String entryId) {
+
+        return lorebook.stream()
+                .filter(e -> e.getId().equals(entryId))
+                .findFirst()
+                .orElseThrow(() -> new AssetNotFoundException("Lorebook entry not found"));
+    }
+
+    public List<WorldLorebookEntry> getLorebookEntriesByRegex(String value) {
+
+        return lorebook.stream()
+                .filter(e -> value.matches(e.getRegex()))
+                .toList();
     }
 
     public static final class Builder {

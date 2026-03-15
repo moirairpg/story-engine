@@ -2,29 +2,24 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 
 import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.fromString;
 
-import java.util.List;
-
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributes;
 import me.moirai.storyengine.core.domain.adventure.GameMode;
 import me.moirai.storyengine.core.domain.adventure.ModelConfiguration;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventure, AdventureDetails> {
@@ -34,24 +29,18 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
     private static final String WORLD_DOES_NOT_EXIST = "The world to be linked to this adventure does not exist";
     private static final String PERSONA_DOES_NOT_EXIST = "The persona to be linked to this adventure does not exist";
 
-    private final WorldLorebookEntryRepository worldLorebookEntryRepository;
     private final WorldRepository worldRepository;
     private final PersonaRepository personaRepository;
     private final AdventureRepository repository;
-    private final AdventureLorebookEntryRepository lorebookEntryRepository;
 
     public CreateAdventureHandler(
-            WorldLorebookEntryRepository worldLorebookEntryRepository,
             WorldRepository worldRepository,
             PersonaRepository personaRepository,
-            AdventureRepository repository,
-            AdventureLorebookEntryRepository lorebookEntryRepository) {
+            AdventureRepository repository) {
 
-        this.worldLorebookEntryRepository = worldLorebookEntryRepository;
         this.worldRepository = worldRepository;
         this.personaRepository = personaRepository;
         this.repository = repository;
-        this.lorebookEntryRepository = lorebookEntryRepository;
     }
 
     @Override
@@ -80,8 +69,13 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
                 .description(command.getDescription())
                 .build());
 
-        List<AdventureLorebookEntry> lorebook = buildLorebook(world, adventure);
-        lorebook.stream().forEach(lorebookEntryRepository::save);
+        world.getLorebook().forEach(worldEntry -> adventure.addLorebookEntry(
+                worldEntry.getName(),
+                worldEntry.getRegex(),
+                worldEntry.getDescription(),
+                null));
+
+        repository.save(adventure);
 
         return mapResult(adventure);
     }
@@ -142,18 +136,6 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
         }
 
         return world;
-    }
-
-    private List<AdventureLorebookEntry> buildLorebook(World world, Adventure adventure) {
-
-        return worldLorebookEntryRepository.findAllByWorldId(world.getId()).stream()
-                .map(worldEntry -> AdventureLorebookEntry.builder()
-                        .name(worldEntry.getName())
-                        .regex(worldEntry.getRegex())
-                        .description(worldEntry.getDescription())
-                        .adventureId(adventure.getId())
-                        .build())
-                .toList();
     }
 
     private ContextAttributes buildContextAttributes(CreateAdventure command) {

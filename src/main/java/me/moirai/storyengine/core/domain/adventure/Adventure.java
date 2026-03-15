@@ -3,21 +3,29 @@ package me.moirai.storyengine.core.domain.adventure;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
-@Entity(name = "Adventure")
+@Entity
 @Table(name = "adventure")
 public class Adventure extends ShareableAsset {
 
@@ -59,6 +67,10 @@ public class Adventure extends ShareableAsset {
 
     @Embedded
     private ModelConfiguration modelConfiguration;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "adventure_id", nullable = false)
+    private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
 
     private Adventure(Builder builder) {
 
@@ -129,6 +141,10 @@ public class Adventure extends ShareableAsset {
 
     public boolean isMultiplayer() {
         return isMultiplayer;
+    }
+
+    public List<AdventureLorebookEntry> getLorebook() {
+        return Collections.unmodifiableList(lorebook);
     }
 
     public static Builder builder() {
@@ -266,6 +282,75 @@ public class Adventure extends ShareableAsset {
 
         ContextAttributes newContextAttributes = this.contextAttributes.updateRemember(remember);
         this.contextAttributes = newContextAttributes;
+    }
+
+    public AdventureLorebookEntry addLorebookEntry(String name, String regex, String description, String playerId) {
+
+        AdventureLorebookEntry.Builder entryBuilder = AdventureLorebookEntry.builder()
+                .name(name)
+                .regex(regex)
+                .description(description);
+
+        if (isBlank(playerId)) {
+            entryBuilder.isPlayerCharacter(false);
+        } else {
+            entryBuilder.playerId(playerId)
+                    .isPlayerCharacter(true);
+        }
+
+        AdventureLorebookEntry entry = entryBuilder.build();
+        lorebook.add(entry);
+        return entry;
+    }
+
+    public AdventureLorebookEntry updateLorebookEntry(
+            String entryId,
+            String name,
+            String regex,
+            String description,
+            String playerId) {
+
+        AdventureLorebookEntry entry = getLorebookEntryById(entryId);
+
+        entry.updateName(name);
+        entry.updateRegex(regex);
+        entry.updateDescription(description);
+
+        if (isBlank(playerId)) {
+            entry.unassignPlayer();
+        } else {
+            entry.assignPlayer(playerId);
+        }
+
+        return entry;
+    }
+
+    public void removeLorebookEntry(String entryId) {
+
+        AdventureLorebookEntry entry = getLorebookEntryById(entryId);
+        lorebook.remove(entry);
+    }
+
+    public AdventureLorebookEntry getLorebookEntryById(String entryId) {
+
+        return lorebook.stream()
+                .filter(e -> e.getId().equals(entryId))
+                .findFirst()
+                .orElseThrow(() -> new AssetNotFoundException("Lorebook entry not found"));
+    }
+
+    public List<AdventureLorebookEntry> getLorebookEntriesByRegex(String value) {
+
+        return lorebook.stream()
+                .filter(e -> value.matches(e.getRegex()))
+                .toList();
+    }
+
+    public Optional<AdventureLorebookEntry> getLorebookEntryByPlayerId(String playerId) {
+
+        return lorebook.stream()
+                .filter(e -> playerId.equals(e.getPlayerId()))
+                .findFirst();
     }
 
     public static final class Builder {

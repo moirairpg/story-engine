@@ -3,6 +3,8 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -20,14 +22,10 @@ import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureLorebookEntryByIdHandlerTest {
-
-    @Mock
-    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private AdventureRepository repository;
@@ -77,11 +75,14 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
 
         AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().id(id).build();
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+        Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
+
+        Adventure adventure = spy(baseAdventure);
+        doReturn(entry).when(adventure).getLorebookEntryById(anyString());
 
         GetAdventureLorebookEntryById query = GetAdventureLorebookEntryById.builder()
                 .entryId(id)
@@ -90,7 +91,6 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
 
         // When
         AdventureLorebookEntryDetails result = handler.handle(query);

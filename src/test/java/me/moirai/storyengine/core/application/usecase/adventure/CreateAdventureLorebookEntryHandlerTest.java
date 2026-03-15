@@ -18,9 +18,7 @@ import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAd
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
@@ -32,9 +30,6 @@ public class CreateAdventureLorebookEntryHandlerTest {
 
     @Mock
     private TextModerationPort moderationPort;
-
-    @Mock
-    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private AdventureRepository repository;
@@ -82,7 +77,6 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenTriggered_thenCallService() {
 
         // Given
-        String id = "LBID";
         String requesterId = "1234";
         CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry()
                 .requesterId(requesterId)
@@ -94,23 +88,19 @@ public class CreateAdventureLorebookEntryHandlerTest {
                         .build())
                 .build();
 
-        AdventureLorebookEntry createdEntry = AdventureLorebookEntry.builder()
-                .id(id)
-                .build();
-
         TextModerationResult moderationResult = TextModerationResult.builder()
                 .contentFlagged(false)
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
         when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
-        when(lorebookEntryRepository.save(any())).thenReturn(createdEntry);
+        when(repository.save(any())).thenReturn(adventure);
 
         // Then
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getId()).isEqualTo(id);
+                    assertThat(result.getName()).isEqualTo(command.getName());
                 })
                 .verifyComplete();
     }

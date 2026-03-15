@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Lists.list;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -17,14 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.application.usecase.adventure.request.CreateAdventureFixture;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -32,13 +24,14 @@ import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateAdventureHandlerTest {
-
-    @Mock
-    private WorldLorebookEntryRepository worldLorebookEntryRepository;
 
     @Mock
     private WorldRepository worldRepository;
@@ -48,9 +41,6 @@ public class CreateAdventureHandlerTest {
 
     @Mock
     private AdventureRepository repository;
-
-    @Mock
-    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @InjectMocks
     private CreateAdventureHandler handler;
@@ -155,12 +145,9 @@ public class CreateAdventureHandlerTest {
                         .build())
                 .build();
 
-
         when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
-        when(worldLorebookEntryRepository.findAllByWorldId(anyString()))
-                .thenReturn(list(WorldLorebookEntryFixture.sampleLorebookEntry().build()));
 
         // When
         AdventureDetails result = handler.handle(command);

@@ -10,7 +10,6 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
@@ -18,16 +17,11 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
 
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD = "User does not have permission to view this world";
-    private static final String LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND = "Lorebook entry to be viewed was not found";
 
-    private final WorldLorebookEntryRepository lorebookEntryRepository;
     private final WorldRepository repository;
 
-    public GetWorldLorebookEntryByIdHandler(
-            WorldLorebookEntryRepository lorebookEntryRepository,
-            WorldRepository repository) {
+    public GetWorldLorebookEntryByIdHandler(WorldRepository repository) {
 
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
     }
 
@@ -53,8 +47,7 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD);
         }
 
-        WorldLorebookEntry entry = lorebookEntryRepository.findById(query.getEntryId())
-                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
+        WorldLorebookEntry entry = world.getLorebookEntryById(query.getEntryId());
 
         return mapResult(entry);
     }

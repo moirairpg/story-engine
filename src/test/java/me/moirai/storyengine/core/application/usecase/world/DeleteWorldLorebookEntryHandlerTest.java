@@ -1,7 +1,10 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,17 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteWorldLorebookEntryHandlerTest {
-
-    @Mock
-    private WorldLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private WorldRepository repository;
@@ -73,21 +70,22 @@ public class DeleteWorldLorebookEntryHandlerTest {
                 .requesterId(requesterId)
                 .build();
 
-        World world = WorldFixture.publicWorld()
+        World baseWorld = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+        World world = spy(baseWorld);
+        doNothing().when(world).removeLorebookEntry(anyString());
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(entry));
+        when(repository.save(any())).thenReturn(world);
 
         // When
         handler.handle(command);
 
         // Then
-        verify(lorebookEntryRepository, times(1)).deleteById(anyString());
+        verify(repository, times(1)).save(any());
     }
 }

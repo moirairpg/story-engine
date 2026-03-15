@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
-import static io.micrometer.common.util.StringUtils.isEmpty;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.MapUtils.isEmpty;
@@ -20,7 +19,6 @@ import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import reactor.core.publisher.Mono;
@@ -34,16 +32,13 @@ public class CreateAdventureLorebookEntryHandler
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE = "User does not have permission to modify this adventure";
 
     private final TextModerationPort moderationPort;
-    private final AdventureLorebookEntryRepository lorebookEntryRepository;
     private final AdventureRepository repository;
 
     public CreateAdventureLorebookEntryHandler(
             TextModerationPort moderationPort,
-            AdventureLorebookEntryRepository lorebookEntryRepository,
             AdventureRepository repository) {
 
         this.moderationPort = moderationPort;
-        this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
     }
 
@@ -76,17 +71,14 @@ public class CreateAdventureLorebookEntryHandler
         return moderateContent(command.getName(), adventure.getModeration())
                 .flatMap(__ -> moderateContent(command.getDescription(), adventure.getModeration()))
                 .map(__ -> {
-                    AdventureLorebookEntry lorebookEntry = AdventureLorebookEntry.builder()
-                            .name(command.getName())
-                            .regex(command.getRegex())
-                            .description(command.getDescription())
-                            .playerId(command.getPlayerId())
-                            .isPlayerCharacter(isEmpty(command.getPlayerId()))
-                            .adventureId(adventure.getId())
-                            .creatorId(command.getRequesterDiscordId())
-                            .build();
+                    AdventureLorebookEntry lorebookEntry = adventure.addLorebookEntry(
+                            command.getName(),
+                            command.getRegex(),
+                            command.getDescription(),
+                            command.getPlayerId());
 
-                    return lorebookEntryRepository.save(lorebookEntry);
+                    repository.save(adventure);
+                    return lorebookEntry;
                 })
                 .map(this::mapResult);
     }

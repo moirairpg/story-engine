@@ -6,7 +6,6 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 
@@ -18,13 +17,10 @@ public class SearchAdventureLorebookEntriesHandler
     private static final String ADVENTURE_NOT_FOUND = "The adventure where the entries are being search doesn't exist";
 
     private final AdventureRepository adventureRepository;
-    private final AdventureLorebookEntryRepository repository;
 
-    public SearchAdventureLorebookEntriesHandler(AdventureRepository adventureRepository,
-            AdventureLorebookEntryRepository repository) {
+    public SearchAdventureLorebookEntriesHandler(AdventureRepository adventureRepository) {
 
         this.adventureRepository = adventureRepository;
-        this.repository = repository;
     }
 
     @Override
@@ -34,7 +30,7 @@ public class SearchAdventureLorebookEntriesHandler
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
         if (adventure.canUserRead(query.getRequesterDiscordId())) {
-            return repository.search(query);
+            return adventureRepository.searchLorebookEntries(query);
         }
 
         throw new AssetAccessDeniedException(USER_DOES_NO_PERMISSION);

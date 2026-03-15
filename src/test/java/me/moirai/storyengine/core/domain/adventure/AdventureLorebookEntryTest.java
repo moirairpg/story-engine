@@ -12,14 +12,12 @@ public class AdventureLorebookEntryTest {
     public void createLorebookEntry_whenValidData_thenInstanceIsCreated() {
 
         // Given
-        Adventure adventure = AdventureFixture.publicSingleplayerAdventure().build();
         AdventureLorebookEntry.Builder builder = AdventureLorebookEntry.builder()
                 .id("857345HAA")
                 .name("White River")
                 .description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.")
                 .regex("[Ww]hite [Rr]iver")
                 .creatorId("CRTID")
-                .adventureId(adventure.getId())
                 .creationDate(OffsetDateTime.now())
                 .lastUpdateDate(OffsetDateTime.now())
                 .isPlayerCharacter(true)
@@ -40,7 +38,6 @@ public class AdventureLorebookEntryTest {
         assertThat(entry.getCreatorId()).isEqualTo("CRTID");
         assertThat(entry.getRegex()).isEqualTo("[Ww]hite [Rr]iver");
         assertThat(entry.getVersion()).isEqualTo(1);
-        assertThat(entry.getAdventureId()).isEqualTo(adventure.getId());
         assertThat(entry.isPlayerCharacter()).isTrue();
     }
 

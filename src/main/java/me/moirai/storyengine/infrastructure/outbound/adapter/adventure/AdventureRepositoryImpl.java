@@ -20,10 +20,14 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.criteria.Predicate;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.AdventurePersistenceMapper;
+import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.AdventureLorebookPersistenceMapper;
 
 @Repository
 public class AdventureRepositoryImpl implements AdventureRepository {
@@ -43,16 +47,24 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     private static final String DEFAULT_SORT_BY_FIELD = "creationDate";
     private static final String AI_MODEL = "aiModel";
     private static final String PERMISSIONS = "permissions";
+    private static final String ADVENTURE_ID = "adventureId";
+    private static final String DEFAULT_LOREBOOK_SORT_BY_FIELD = NAME;
 
     private final AdventureJpaRepository jpaRepository;
     private final AdventurePersistenceMapper mapper;
+    private final AdventureLorebookEntryJpaRepository lorebookJpaRepository;
+    private final AdventureLorebookPersistenceMapper lorebookMapper;
 
     public AdventureRepositoryImpl(
             AdventureJpaRepository jpaRepository,
-            AdventurePersistenceMapper mapper) {
+            AdventurePersistenceMapper mapper,
+            AdventureLorebookEntryJpaRepository lorebookJpaRepository,
+            AdventureLorebookPersistenceMapper lorebookMapper) {
 
         this.jpaRepository = jpaRepository;
         this.mapper = mapper;
+        this.lorebookJpaRepository = lorebookJpaRepository;
+        this.lorebookMapper = lorebookMapper;
     }
 
     @Override
@@ -119,6 +131,21 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     }
 
     @Override
+    public SearchAdventureLorebookEntriesResult searchLorebookEntries(SearchAdventureLorebookEntries request) {
+
+        int page = extractPageNumber(request.getPage());
+        int size = extractPageSize(request.getSize());
+        String sortByField = extractLorebookSortByField(request.getSortingField());
+        Direction direction = extractDirection(request.getDirection());
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
+        Specification<AdventureLorebookEntry> query = buildLorebookSearchQuery(request);
+        Page<AdventureLorebookEntry> pagedResult = lorebookJpaRepository.findAll(query, pageRequest);
+
+        return lorebookMapper.mapToResult(pagedResult);
+    }
+
+    @Override
     public String getGameModeByChannelId(String channelId) {
 
         return jpaRepository.getGameModeByChannelId(channelId);
@@ -173,12 +200,31 @@ public class AdventureRepositoryImpl implements AdventureRepository {
         };
     }
 
+    private Specification<AdventureLorebookEntry> buildLorebookSearchQuery(SearchAdventureLorebookEntries query) {
+
+        return (root, cq, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.equal(root.get(ADVENTURE_ID), query.getAdventureId()));
+
+            if (isNotBlank(query.getName())) {
+                predicates.add(contains(cb, root, NAME, query.getName()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
     private Direction extractDirection(String direction) {
         return isBlank(direction) ? ASC : Direction.fromString(direction);
     }
 
     private String extractSortByField(String sortByField) {
         return isBlank(sortByField) ? DEFAULT_SORT_BY_FIELD : sortByField;
+    }
+
+    private String extractLorebookSortByField(String sortByField) {
+        return isBlank(sortByField) ? DEFAULT_LOREBOOK_SORT_BY_FIELD : sortByField;
     }
 
     private int extractPageSize(Integer pageSize) {

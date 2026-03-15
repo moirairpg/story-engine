@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Asset;
 
-@Entity(name = "User")
+@Entity
 @Table(name = "moirai_user")
 public class User extends Asset {
 

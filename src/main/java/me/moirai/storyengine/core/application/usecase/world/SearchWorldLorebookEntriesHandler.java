@@ -6,7 +6,6 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
-import me.moirai.storyengine.core.port.outbound.world.WorldLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.world.World;
 
@@ -18,14 +17,10 @@ public class SearchWorldLorebookEntriesHandler
     private static final String WORLD_NOT_FOUND = "The world where the entries are being search doesn't exist";
 
     private final WorldRepository worldRepository;
-    private final WorldLorebookEntryRepository repository;
 
-    public SearchWorldLorebookEntriesHandler(
-            WorldRepository worldRepository,
-            WorldLorebookEntryRepository repository) {
+    public SearchWorldLorebookEntriesHandler(WorldRepository worldRepository) {
 
         this.worldRepository = worldRepository;
-        this.repository = repository;
     }
 
     @Override
@@ -35,7 +30,7 @@ public class SearchWorldLorebookEntriesHandler
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
         if (world.canUserRead(query.getRequesterDiscordId())) {
-            return repository.search(query);
+            return worldRepository.searchLorebookEntries(query);
         }
 
         throw new AssetAccessDeniedException(USER_DOES_NO_PERMISSION);

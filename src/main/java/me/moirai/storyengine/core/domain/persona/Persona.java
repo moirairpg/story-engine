@@ -13,7 +13,7 @@ import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.domain.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
-@Entity(name = "Persona")
+@Entity
 @Table(name = "persona")
 public class Persona extends ShareableAsset {
 

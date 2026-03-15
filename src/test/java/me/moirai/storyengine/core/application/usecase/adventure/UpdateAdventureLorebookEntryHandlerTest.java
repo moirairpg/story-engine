@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -21,7 +23,6 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookEntryRepository;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
@@ -33,9 +34,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
 
     @Mock
     private TextModerationPort moderationPort;
-
-    @Mock
-    private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
     private AdventureRepository repository;
@@ -95,21 +93,23 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenTriggered_thenCallService() {
 
         // Given
-        String id = "LBID";
         String requesterId = "1234";
         UpdateAdventureLorebookEntry command = UpdateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry()
                 .requesterId(requesterId)
                 .build();
 
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+        AdventureLorebookEntry existingEntry = AdventureLorebookEntryFixture.sampleLorebookEntry()
+                .id(command.getId())
+                .build();
+
+        Adventure baseAdventure = AdventureFixture.privateMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        AdventureLorebookEntry createdEntry = AdventureLorebookEntryFixture.sampleLorebookEntry()
-                .id(id)
-                .build();
+        Adventure adventure = spy(baseAdventure);
+        doReturn(existingEntry).when(adventure).updateLorebookEntry(anyString(), anyString(), anyString(), anyString(), anyString());
 
         TextModerationResult moderationResult = TextModerationResult.builder()
                 .contentFlagged(false)
@@ -117,8 +117,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
         when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(createdEntry));
-        when(lorebookEntryRepository.save(any())).thenReturn(createdEntry);
+        when(repository.save(any())).thenReturn(adventure);
 
         // Then
         StepVerifier.create(handler.handle(command))
