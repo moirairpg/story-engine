@@ -40,7 +40,7 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public WorldLorebookEntryDetails execute(GetWorldLorebookEntryById query) {
 
-        World world = repository.findById(query.getWorldId())
+        World world = repository.findByPublicId(query.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
 
         if (!world.canUserRead(query.getRequesterDiscordId())) {
@@ -55,7 +55,7 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
     private WorldLorebookEntryDetails mapResult(WorldLorebookEntry entry) {
 
         return WorldLorebookEntryDetails.builder()
-                .id(entry.getId())
+                .id(entry.getPublicId())
                 .name(entry.getName())
                 .regex(entry.getRegex())
                 .description(entry.getDescription())

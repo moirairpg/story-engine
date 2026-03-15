@@ -44,7 +44,7 @@ public class CreateWorldLorebookEntryHandler
     @Override
     public WorldLorebookEntryDetails execute(CreateWorldLorebookEntry command) {
 
-        World world = repository.findById(command.getWorldId())
+        World world = repository.findByPublicId(command.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         if (!world.canUserWrite(command.getRequesterDiscordId())) {
@@ -63,7 +63,7 @@ public class CreateWorldLorebookEntryHandler
     private WorldLorebookEntryDetails mapResult(WorldLorebookEntry entry) {
 
         return WorldLorebookEntryDetails.builder()
-                .id(entry.getId())
+                .id(entry.getPublicId())
                 .name(entry.getName())
                 .regex(entry.getRegex())
                 .description(entry.getDescription())

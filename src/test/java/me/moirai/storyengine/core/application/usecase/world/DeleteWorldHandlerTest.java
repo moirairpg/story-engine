@@ -61,25 +61,25 @@ public class DeleteWorldHandlerTest {
 
         DeleteWorld command = DeleteWorld.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
-        doNothing().when(repository).deleteById(anyString());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        doNothing().when(repository).deleteByPublicId(anyString());
 
         // When
         handler.handle(command);
 
         // Then
-        verify(repository, times(1)).deleteById(anyString());
+        verify(repository, times(1)).deleteByPublicId(anyString());
     }
 
     @Test
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
-        String id = "WRLDID";
+        String id = WorldFixture.PUBLIC_ID;
         String requesterId = "84REAC";
         DeleteWorld command = DeleteWorld.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
@@ -90,15 +90,14 @@ public class DeleteWorldHandlerTest {
     public void deleteWorld_whenAccessDenied_thenThrowException() {
 
         // Given
-        String id = "PRSNID";
+        String id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeleteWorld command = DeleteWorld.build(id, requesterId);
 
         World world = WorldFixture.privateWorld()
-                .id(id)
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
 
         // Then
         assertThatExceptionOfType(AssetAccessDeniedException.class)

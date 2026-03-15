@@ -2,11 +2,14 @@ package me.moirai.storyengine.core.domain.world;
 
 import java.time.OffsetDateTime;
 
+import com.fasterxml.uuid.Generators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Asset;
 
 @Entity
@@ -14,8 +17,11 @@ import me.moirai.storyengine.common.domain.Asset;
 public class WorldLorebookEntry extends Asset {
 
     @Id
-    @UuidIdentifier
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    private String publicId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -26,14 +32,10 @@ public class WorldLorebookEntry extends Asset {
     @Column(name = "regex", nullable = false)
     private String regex;
 
-    @Column(name = "world_id", insertable = false, updatable = false)
-    private String worldId;
-
     private WorldLorebookEntry(Builder builder) {
 
         super(builder.creatorId, builder.creationDate, builder.lastUpdateDate, builder.version);
 
-        this.id = builder.id;
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
@@ -43,13 +45,24 @@ public class WorldLorebookEntry extends Asset {
         super();
     }
 
+    @PrePersist
+    private void generatePublicId() {
+        if (publicId == null) {
+            publicId = Generators.timeBasedEpochGenerator().generate().toString();
+        }
+    }
+
     public static Builder builder() {
 
         return new Builder();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
+    }
+
+    public String getPublicId() {
+        return publicId;
     }
 
     public String getName() {
@@ -81,7 +94,6 @@ public class WorldLorebookEntry extends Asset {
 
     public static final class Builder {
 
-        private String id;
         private String name;
         private String regex;
         private String description;
@@ -91,12 +103,6 @@ public class WorldLorebookEntry extends Asset {
         private int version;
 
         private Builder() {
-        }
-
-        public Builder id(String id) {
-
-            this.id = id;
-            return this;
         }
 
         public Builder name(String name) {

@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -42,7 +44,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         // Given
         World world = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         // When
@@ -65,7 +67,6 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         // Given
         World world = repository.save(WorldFixture.privateWorld()
-                .id(null)
                 .build());
 
         // When
@@ -82,10 +83,10 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
     public void emptyResultWhenAssetDoesntExist() {
 
         // Given
-        String worldId = "WRLDID";
+        String worldId = WorldFixture.PUBLIC_ID;
 
         // When
-        Optional<World> retrievedWorldOptional = repository.findById(worldId);
+        Optional<World> retrievedWorldOptional = repository.findByPublicId(worldId);
 
         // Then
         assertThat(retrievedWorldOptional).isNotNull().isEmpty();
@@ -96,7 +97,6 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         // Given
         World world = repository.save(WorldFixture.privateWorld()
-                .id(null)
                 .build());
 
         // When
@@ -111,14 +111,13 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         // Given
         World originalWorld = repository.save(WorldFixture.privateWorld()
-                .id(null)
                 .build());
 
         World worldToUbeUpdated = WorldFixture.privateWorld()
-                .id(originalWorld.getId())
                 .visibility(PUBLIC)
                 .version(originalWorld.getVersion())
                 .build();
+        ReflectionTestUtils.setField(worldToUbeUpdated, "id", originalWorld.getId());
 
         // When
         World updatedWorld = repository.save(worldToUbeUpdated);
@@ -135,14 +134,14 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .usersAllowedToRead(set(ownerId))
@@ -150,7 +149,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .build())
@@ -183,15 +182,15 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -222,15 +221,15 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -262,17 +261,17 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -308,17 +307,17 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -351,17 +350,17 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -393,17 +392,17 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -432,17 +431,17 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
         String visibilityToSearch = "public";
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt4Mini = WorldFixture.publicWorld()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         World gpt354k = WorldFixture.publicWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -471,12 +470,12 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721356875";
         String visibilityToSearch = "public";
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt4Mini = WorldFixture.publicWorld()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -484,7 +483,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt354k = WorldFixture.publicWorld()
-                .id(null)
+
                 .name("Number 3")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -517,14 +516,14 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .usersAllowedToWrite(set(ownerId))
@@ -532,7 +531,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId("580485734")
                         .build())
@@ -566,21 +565,21 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
                         .build())
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -611,21 +610,21 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
                         .build())
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -657,7 +656,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -665,7 +664,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -673,7 +672,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -706,7 +705,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -714,7 +713,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -722,7 +721,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -754,12 +753,12 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -767,7 +766,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 
@@ -797,7 +796,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         String ownerId = "586678721358363";
 
         World gpt4Omni = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 1")
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(set(ownerId))
@@ -805,12 +804,12 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
                 .build();
 
         World gpt4Mini = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 2")
                 .build();
 
         World gpt354k = WorldFixture.privateWorld()
-                .id(null)
+
                 .name("Number 3")
                 .build();
 

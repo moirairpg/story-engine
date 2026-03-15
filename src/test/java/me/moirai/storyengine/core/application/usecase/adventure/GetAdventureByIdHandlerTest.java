@@ -25,6 +25,8 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureByIdHandlerTest {
@@ -34,6 +36,9 @@ public class GetAdventureByIdHandlerTest {
 
     @Mock
     private PersonaRepository personaRepository;
+
+    @Mock
+    private WorldRepository worldRepository;
 
     @InjectMocks
     private GetAdventureByIdHandler handler;
@@ -96,6 +101,7 @@ public class GetAdventureByIdHandlerTest {
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         AdventureDetails result = handler.handle(query);
@@ -112,7 +118,7 @@ public class GetAdventureByIdHandlerTest {
         assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getModeration()).isEqualTo(adventure.getModeration().name());
-        assertThat(result.getWorldId()).isEqualTo(adventure.getWorldId());
+        assertThat(result.getWorldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(result.isMultiplayer()).isEqualTo(adventure.isMultiplayer());
         assertThat(result.getCreationDate()).isNotNull();
         assertThat(result.getLastUpdateDate()).isNotNull();
@@ -167,6 +173,7 @@ public class GetAdventureByIdHandlerTest {
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         AdventureDetails result = handler.handle(query);
@@ -185,7 +192,7 @@ public class GetAdventureByIdHandlerTest {
         assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getModeration()).isEqualTo(adventure.getModeration().name());
-        assertThat(result.getWorldId()).isEqualTo(adventure.getWorldId());
+        assertThat(result.getWorldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(result.isMultiplayer()).isEqualTo(adventure.isMultiplayer());
         assertThat(result.getCreationDate()).isNotNull();
         assertThat(result.getLastUpdateDate()).isNotNull();

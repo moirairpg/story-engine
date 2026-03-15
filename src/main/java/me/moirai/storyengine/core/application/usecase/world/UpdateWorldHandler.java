@@ -63,7 +63,7 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
     private WorldDetails mapResult(World world) {
 
         return WorldDetails.builder()
-                .id(world.getId())
+                .id(world.getPublicId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())
@@ -78,7 +78,7 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
 
     public World updateWorld(UpdateWorld command) {
 
-        World world = repository.findById(command.getId())
+        World world = repository.findByPublicId(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
         if (!world.canUserWrite(command.getRequesterDiscordId())) {

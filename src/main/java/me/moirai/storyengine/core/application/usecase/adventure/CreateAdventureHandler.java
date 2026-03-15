@@ -77,15 +77,15 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
 
         repository.save(adventure);
 
-        return mapResult(adventure, persona.getPublicId());
+        return mapResult(adventure, persona.getPublicId(), world.getPublicId());
     }
 
-    private AdventureDetails mapResult(Adventure adventure, String personaPublicId) {
+    private AdventureDetails mapResult(Adventure adventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
-                .worldId(adventure.getWorldId())
+                .worldId(worldPublicId)
                 .personaId(personaPublicId)
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
@@ -128,7 +128,7 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
 
     private World getWorldTobeLinked(CreateAdventure command) {
 
-        World world = worldRepository.findById(command.getWorldId())
+        World world = worldRepository.findByPublicId(command.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_DOES_NOT_EXIST));
 
         if (!world.canUserRead(command.getRequesterDiscordId())) {

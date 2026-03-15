@@ -4,6 +4,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 public class CreateAdventureFixture {
 
@@ -12,8 +13,8 @@ public class CreateAdventureFixture {
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return CreateAdventure.builder()
                 .name(adventure.getName())
-                .personaId("PRSNID")
-                .worldId(adventure.getWorldId())
+                .personaId(PersonaFixture.PUBLIC_ID)
+                .worldId(String.valueOf(adventure.getWorldId()))
                 .channelId(adventure.getChannelId())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .logitBias(adventure.getModelConfiguration().getLogitBias())

@@ -51,7 +51,6 @@ public class WorldPersistenceMapperTest {
         // Given
         List<World> worlds = IntStream.range(0, 20)
                 .mapToObj(op -> WorldFixture.privateWorld()
-                        .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 

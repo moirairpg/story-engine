@@ -35,7 +35,7 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Wo
     @Override
     public WorldDetails execute(GetWorldById query) {
 
-        World world = repository.findById(query.getId())
+        World world = repository.findByPublicId(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
         if (!world.canUserRead(query.getRequesterDiscordId())) {
@@ -48,7 +48,7 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Wo
     private WorldDetails mapResult(World world) {
 
         return WorldDetails.builder()
-                .id(world.getId())
+                .id(world.getPublicId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())

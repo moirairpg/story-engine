@@ -26,7 +26,7 @@ public class SearchWorldLorebookEntriesHandler
     @Override
     public SearchWorldLorebookEntriesResult execute(SearchWorldLorebookEntries query) {
 
-        World world = worldRepository.findById(query.getWorldId())
+        World world = worldRepository.findByPublicId(query.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
         if (world.canUserRead(query.getRequesterDiscordId())) {

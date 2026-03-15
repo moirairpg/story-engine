@@ -63,7 +63,7 @@ public class AdventurePersistenceMapper {
         return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
-                .worldId(adventure.getWorldId())
+                .worldId(String.valueOf(adventure.getWorldId()))
                 .channelId(adventure.getChannelId())
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())

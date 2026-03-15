@@ -13,7 +13,7 @@ public class WorldPersistenceMapper {
     public WorldDetails mapToResult(World world) {
 
         return WorldDetails.builder()
-                .id(world.getId())
+                .id(world.getPublicId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())

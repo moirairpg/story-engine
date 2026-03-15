@@ -92,7 +92,7 @@ public class CreateWorldLorebookEntryHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
         // When

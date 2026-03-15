@@ -24,7 +24,9 @@ import me.moirai.storyengine.core.application.usecase.adventure.request.UpdateAd
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
@@ -37,6 +39,9 @@ public class UpdateAdventureHandlerTest {
 
     @Mock
     private PersonaRepository personaRepository;
+
+    @Mock
+    private WorldRepository worldRepository;
 
     @InjectMocks
     private UpdateAdventureHandler handler;
@@ -63,8 +68,8 @@ public class UpdateAdventureHandlerTest {
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .id(id)
                 .name("Name")
-                .worldId("WRLDID")
-                .personaId("PRSNID")
+                .worldId(WorldFixture.PUBLIC_ID)
+                .personaId(PersonaFixture.PUBLIC_ID)
                 .moderation("STRICT")
                 .visibility("PRIVATE")
                 .requesterId(requesterId)
@@ -80,6 +85,8 @@ public class UpdateAdventureHandlerTest {
         when(repository.save(any())).thenReturn(expectedUpdatedAdventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         AdventureDetails result = handler.handle(command);
@@ -150,6 +157,8 @@ public class UpdateAdventureHandlerTest {
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         handler.execute(command);
@@ -188,6 +197,8 @@ public class UpdateAdventureHandlerTest {
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         handler.execute(command);
@@ -245,6 +256,7 @@ public class UpdateAdventureHandlerTest {
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(unchangedAdventure);
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         handler.execute(command);
@@ -276,6 +288,8 @@ public class UpdateAdventureHandlerTest {
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         handler.execute(command);
@@ -307,6 +321,8 @@ public class UpdateAdventureHandlerTest {
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         handler.execute(command);

@@ -134,7 +134,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void emptyResultWhenAssetDoesntExist() {
 
         // Given
-        String personaId = "PRSNDID";
+        String personaId = PersonaFixture.PUBLIC_ID;
 
         // When
         Optional<Persona> retrievedPersonaOptional = repository.findByPublicId(personaId);

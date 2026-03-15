@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
@@ -69,11 +70,13 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void getWorldLorebookEntryById() {
 
         // Given
-        String id = "HAUDHUAHD";
-        String worldId = "WRLDID";
+        String publicId = WorldLorebookEntryFixture.PUBLIC_ID;
+        String worldId = WorldFixture.PUBLIC_ID;
         String requesterId = "4314324";
 
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().id(id).build();
+        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+        ReflectionTestUtils.setField(entry, "id", WorldLorebookEntryFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(entry, "publicId", publicId);
 
         World baseWorld = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -85,18 +88,18 @@ public class GetWorldLorebookEntryByIdHandlerTest {
         doReturn(entry).when(world).getLorebookEntryById(anyString());
 
         GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
-                .entryId(id)
+                .entryId(publicId)
                 .worldId(worldId)
                 .requesterId(requesterId)
                 .build();
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
 
         // When
         WorldLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(entry.getId());
+        assertThat(result.getId()).isEqualTo(entry.getPublicId());
     }
 }

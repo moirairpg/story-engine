@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 public class UpdateAdventureTest {
 
@@ -23,8 +25,8 @@ public class UpdateAdventureTest {
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .description(adventure.getDescription())
-                .worldId(adventure.getWorldId())
-                .personaId("PRSNID")
+                .worldId(WorldFixture.PUBLIC_ID)
+                .personaId(PersonaFixture.PUBLIC_ID)
                 .channelId(adventure.getChannelId())
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
@@ -62,8 +64,8 @@ public class UpdateAdventureTest {
         assertThat(updateAdventure.getChannelId()).isEqualTo(adventure.getChannelId());
         assertThat(updateAdventure.getGameMode()).isEqualToIgnoringCase(adventure.getGameMode().name());
         assertThat(updateAdventure.getName()).isEqualTo(adventure.getName());
-        assertThat(updateAdventure.getPersonaId()).isEqualTo("PRSNID");
-        assertThat(updateAdventure.getWorldId()).isEqualTo(adventure.getWorldId());
+        assertThat(updateAdventure.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(updateAdventure.getWorldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(updateAdventure.getVisibility()).isEqualToIgnoringCase(adventure.getVisibility().name());
         assertThat(updateAdventure.getPresencePenalty())
                 .isEqualTo(adventure.getModelConfiguration().getPresencePenalty());

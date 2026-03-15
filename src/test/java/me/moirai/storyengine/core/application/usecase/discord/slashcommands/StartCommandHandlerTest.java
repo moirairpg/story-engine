@@ -79,7 +79,7 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
         when(discordChannelPort.retrieveEntireHistoryFrom(anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(world));
 
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
@@ -152,7 +152,7 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
         when(discordChannelPort.retrieveEntireHistoryFrom(anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // When
         Mono<Void> result = handler.execute(useCase);

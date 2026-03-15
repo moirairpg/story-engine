@@ -44,7 +44,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenPersonaNotFound_thenThrowException() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
                 .name("MoirAI")
@@ -72,7 +72,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNotAuthorized_thenThrowException() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -108,7 +108,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenValidData_thenPersonaIsUpdated() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -152,7 +152,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoWriterUsersAreAdded_thenPersonaIsUpdated() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -196,7 +196,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoReaderUsersAreAdded_thenPersonaIsUpdated() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -240,7 +240,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoReaderUsersAreRemoved_thenPersonaIsUpdated() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -284,7 +284,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoWriterUsersAreRemoved_thenPersonaIsUpdated() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -328,7 +328,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenPublicToMakePrivate_thenPersonaIsMadePrivate() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -363,7 +363,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenInvalidVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -394,7 +394,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenContentIsFlagged_thenThrowException() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
                 .name("MoirAI")
@@ -414,7 +414,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenUpdateFieldsAreEmpty_thenPersonaIsNotChanged() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)

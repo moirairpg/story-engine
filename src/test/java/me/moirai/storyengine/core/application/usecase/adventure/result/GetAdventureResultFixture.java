@@ -4,6 +4,8 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 public class GetAdventureResultFixture {
 
@@ -13,8 +15,8 @@ public class GetAdventureResultFixture {
         return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
-                .personaId("PRSNID")
-                .worldId(adventure.getWorldId())
+                .personaId(PersonaFixture.PUBLIC_ID)
+                .worldId(WorldFixture.PUBLIC_ID)
                 .channelId(adventure.getChannelId())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .logitBias(adventure.getModelConfiguration().getLogitBias())
@@ -35,8 +37,8 @@ public class GetAdventureResultFixture {
         return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
-                .personaId("PRSNID")
-                .worldId(adventure.getWorldId())
+                .personaId(PersonaFixture.PUBLIC_ID)
+                .worldId(WorldFixture.PUBLIC_ID)
                 .channelId(adventure.getChannelId())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .logitBias(adventure.getModelConfiguration().getLogitBias())

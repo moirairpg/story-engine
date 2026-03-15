@@ -40,11 +40,11 @@ public class SearchWorldLorebookEntriesHandlerTest {
                 .page(1)
                 .size(2)
                 .sortingField("name")
-                .worldId("1234")
-                .requesterId("1234")
+                .worldId(WorldFixture.PUBLIC_ID)
+                .requesterId(WorldFixture.PUBLIC_ID)
                 .build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -61,13 +61,13 @@ public class SearchWorldLorebookEntriesHandlerTest {
                 .page(1)
                 .size(2)
                 .sortingField("name")
-                .worldId("1234")
-                .requesterId("1234")
+                .worldId(WorldFixture.PUBLIC_ID)
+                .requesterId(WorldFixture.PUBLIC_ID)
                 .build();
 
         World world = WorldFixture.privateWorld().build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -84,8 +84,8 @@ public class SearchWorldLorebookEntriesHandlerTest {
                 .page(1)
                 .size(2)
                 .sortingField("name")
-                .worldId("1234")
-                .requesterId("1234")
+                .worldId(WorldFixture.PUBLIC_ID)
+                .requesterId(WorldFixture.PUBLIC_ID)
                 .build();
 
         SearchWorldLorebookEntriesResult expectedResult = SearchWorldLorebookEntriesResult.builder()
@@ -95,7 +95,7 @@ public class SearchWorldLorebookEntriesHandlerTest {
 
         World world = WorldFixture.publicWorld().build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
         when(worldRepository.searchLorebookEntries(any(SearchWorldLorebookEntries.class)))
                 .thenReturn(expectedResult);
 

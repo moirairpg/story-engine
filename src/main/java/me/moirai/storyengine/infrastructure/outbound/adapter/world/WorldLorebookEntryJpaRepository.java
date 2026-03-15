@@ -6,6 +6,6 @@ import me.moirai.storyengine.common.dbutil.PaginationRepository;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 
 public interface WorldLorebookEntryJpaRepository
-        extends JpaRepository<WorldLorebookEntry, String>,
-        PaginationRepository<WorldLorebookEntry, String> {
+        extends JpaRepository<WorldLorebookEntry, Long>,
+        PaginationRepository<WorldLorebookEntry, Long> {
 }

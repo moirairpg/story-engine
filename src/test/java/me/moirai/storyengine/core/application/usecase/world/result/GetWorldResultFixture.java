@@ -12,7 +12,7 @@ public class GetWorldResultFixture {
         World world = WorldFixture.publicWorld().build();
 
         return WorldDetails.builder()
-                .id(world.getId())
+                .id(world.getPublicId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())
@@ -28,7 +28,7 @@ public class GetWorldResultFixture {
         World world = WorldFixture.privateWorld().build();
 
         return WorldDetails.builder()
-                .id(world.getId())
+                .id(world.getPublicId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())

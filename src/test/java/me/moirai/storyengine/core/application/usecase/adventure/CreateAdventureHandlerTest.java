@@ -25,6 +25,7 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
@@ -50,7 +51,7 @@ public class CreateAdventureHandlerTest {
         // Given
         CreateAdventure command = CreateAdventureFixture.sample().build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
@@ -67,7 +68,7 @@ public class CreateAdventureHandlerTest {
 
         World world = WorldFixture.privateWorld().build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
 
         // Then
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
@@ -88,7 +89,7 @@ public class CreateAdventureHandlerTest {
                         .build())
                 .build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
@@ -110,7 +111,7 @@ public class CreateAdventureHandlerTest {
                         .build())
                 .build();
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(PersonaFixture.privatePersona().build()));
 
         // Then
@@ -135,8 +136,10 @@ public class CreateAdventureHandlerTest {
                         .ownerId(command.getRequesterDiscordId())
                         .build())
                 .build();
+        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
 
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(
                 PersonaFixture.privatePersona()
                         .permissions(PermissionsFixture.samplePermissions()

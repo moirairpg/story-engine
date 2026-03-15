@@ -15,7 +15,7 @@ public final class AdventureRawDto {
     private final String name;
     private final String description;
     private final String adventureStart;
-    private final String worldId;
+    private final Long worldId;
     private final Long personaId;
     private final String channelId;
     private final String visibility;
@@ -84,7 +84,7 @@ public final class AdventureRawDto {
         return name;
     }
 
-    public String getWorldId() {
+    public Long getWorldId() {
         return worldId;
     }
 
@@ -194,7 +194,7 @@ public final class AdventureRawDto {
         private String name;
         private String description;
         private String adventureStart;
-        private String worldId;
+        private Long worldId;
         private Long personaId;
         private String channelId;
         private String visibility;
@@ -242,7 +242,7 @@ public final class AdventureRawDto {
             return this;
         }
 
-        public Builder worldId(String worldId) {
+        public Builder worldId(Long worldId) {
             this.worldId = worldId;
             return this;
         }

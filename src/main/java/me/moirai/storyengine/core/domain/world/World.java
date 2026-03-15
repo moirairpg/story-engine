@@ -7,14 +7,17 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.uuid.Generators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.UuidIdentifier;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.domain.Visibility;
@@ -26,8 +29,11 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 public class World extends ShareableAsset {
 
     @Id
-    @UuidIdentifier
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    private String publicId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -47,7 +53,6 @@ public class World extends ShareableAsset {
         super(builder.creatorId, builder.creationDate,
                 builder.lastUpdateDate, builder.permissions, builder.visibility, builder.version);
 
-        this.id = builder.id;
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
@@ -57,13 +62,24 @@ public class World extends ShareableAsset {
         super();
     }
 
+    @PrePersist
+    private void generatePublicId() {
+        if (publicId == null) {
+            publicId = Generators.timeBasedEpochGenerator().generate().toString();
+        }
+    }
+
     public static Builder builder() {
 
         return new Builder();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
+    }
+
+    public String getPublicId() {
+        return publicId;
     }
 
     public String getName() {
@@ -128,7 +144,7 @@ public class World extends ShareableAsset {
     public WorldLorebookEntry getLorebookEntryById(String entryId) {
 
         return lorebook.stream()
-                .filter(e -> e.getId().equals(entryId))
+                .filter(e -> e.getPublicId().equals(entryId))
                 .findFirst()
                 .orElseThrow(() -> new AssetNotFoundException("Lorebook entry not found"));
     }
@@ -142,7 +158,6 @@ public class World extends ShareableAsset {
 
     public static final class Builder {
 
-        private String id;
         private String name;
         private String description;
         private String adventureStart;
@@ -154,12 +169,6 @@ public class World extends ShareableAsset {
         private int version;
 
         private Builder() {
-        }
-
-        public Builder id(String id) {
-
-            this.id = id;
-            return this;
         }
 
         public Builder name(String name) {

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldFixture;
 import me.moirai.storyengine.core.domain.world.World;
@@ -48,8 +49,10 @@ public class CreateWorldHandlerTest {
     public void createWorld() {
 
         // Given
-        String id = "HAUDHUAHD";
-        World world = WorldFixture.privateWorld().id(id).build();
+        String publicId = WorldFixture.PUBLIC_ID;
+        World world = WorldFixture.privateWorld().build();
+        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(world, "publicId", publicId);
         CreateWorld command = CreateWorldFixture.createPrivateWorld().build();
 
         TextModerationResult moderationResult = TextModerationResult.builder()
@@ -63,7 +66,7 @@ public class CreateWorldHandlerTest {
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getId()).isEqualTo(id);
+                    assertThat(result.getId()).isEqualTo(publicId);
                 })
                 .verifyComplete();
     }

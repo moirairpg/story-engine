@@ -8,10 +8,12 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventureById, AdventureDetails> {
@@ -20,13 +22,16 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
     private static final String USER_NO_PERMISSION = "User does not have permission to view adventure";
     private static final String PERSONA_NOT_FOUND = "Persona not found";
+    private static final String WORLD_NOT_FOUND = "World not found";
 
     private final AdventureRepository queryRepository;
     private final PersonaRepository personaRepository;
+    private final WorldRepository worldRepository;
 
-    public GetAdventureByIdHandler(AdventureRepository queryRepository, PersonaRepository personaRepository) {
+    public GetAdventureByIdHandler(AdventureRepository queryRepository, PersonaRepository personaRepository, WorldRepository worldRepository) {
         this.queryRepository = queryRepository;
         this.personaRepository = personaRepository;
+        this.worldRepository = worldRepository;
     }
 
     @Override
@@ -50,15 +55,18 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
         Persona persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        return mapResult(adventure, persona.getPublicId());
+        World world = worldRepository.findById(adventure.getWorldId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+
+        return mapResult(adventure, persona.getPublicId(), world.getPublicId());
     }
 
-    private AdventureDetails mapResult(Adventure adventure, String personaPublicId) {
+    private AdventureDetails mapResult(Adventure adventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
                 .id(adventure.getId())
                 .name(adventure.getName())
-                .worldId(adventure.getWorldId())
+                .worldId(worldPublicId)
                 .personaId(personaPublicId)
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())

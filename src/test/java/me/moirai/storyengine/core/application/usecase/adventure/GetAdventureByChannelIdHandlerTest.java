@@ -23,7 +23,9 @@ import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureByChannelIdHandlerTest {
@@ -33,6 +35,9 @@ public class GetAdventureByChannelIdHandlerTest {
 
     @Mock
     private PersonaRepository personaRepository;
+
+    @Mock
+    private WorldRepository worldRepository;
 
     @InjectMocks
     private GetAdventureByChannelIdHandler handler;
@@ -88,6 +93,7 @@ public class GetAdventureByChannelIdHandlerTest {
 
         when(queryRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
         // When
         AdventureDetails result = handler.execute(command);
@@ -105,7 +111,7 @@ public class GetAdventureByChannelIdHandlerTest {
         assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getModeration()).isEqualTo(adventure.getModeration().name());
-        assertThat(result.getWorldId()).isEqualTo(adventure.getWorldId());
+        assertThat(result.getWorldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(result.isMultiplayer()).isEqualTo(adventure.isMultiplayer());
         assertThat(result.getCreationDate()).isNotNull();
         assertThat(result.getLastUpdateDate()).isNotNull();

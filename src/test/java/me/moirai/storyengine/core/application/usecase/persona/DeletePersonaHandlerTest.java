@@ -48,7 +48,7 @@ public class DeletePersonaHandlerTest {
     public void deletePersona_whenPersonaNotFound_thenThrowException() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 
@@ -63,7 +63,7 @@ public class DeletePersonaHandlerTest {
     public void deletePersona_whenAccessDenied_thenThrowException() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 
@@ -80,7 +80,7 @@ public class DeletePersonaHandlerTest {
     public void deletePersona_whenProperIdAndPermission_thenPersonaIsDeleted() {
 
         // Given
-        String id = "PRSNID";
+        String id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 

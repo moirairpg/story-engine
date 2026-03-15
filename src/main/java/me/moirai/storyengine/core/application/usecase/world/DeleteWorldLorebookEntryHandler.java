@@ -40,7 +40,7 @@ public class DeleteWorldLorebookEntryHandler extends AbstractUseCaseHandler<Dele
     @Override
     public Void execute(DeleteWorldLorebookEntry command) {
 
-        World world = repository.findById(command.getWorldId())
+        World world = repository.findByPublicId(command.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         if (!world.canUserWrite(command.getRequesterDiscordId())) {

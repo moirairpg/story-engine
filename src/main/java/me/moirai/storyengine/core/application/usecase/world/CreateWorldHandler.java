@@ -74,7 +74,7 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
     private WorldDetails mapResult(World world) {
 
         return WorldDetails.builder()
-                .id(world.getId())
+                .id(world.getPublicId())
                 .name(world.getName())
                 .description(world.getDescription())
                 .adventureStart(world.getAdventureStart())

@@ -68,15 +68,27 @@ public class WorldRepositoryImpl implements WorldRepository {
     }
 
     @Override
-    public Optional<World> findById(String id) {
+    public Optional<World> findById(Long id) {
 
         return jpaRepository.findById(id);
     }
 
     @Override
-    public void deleteById(String id) {
+    public Optional<World> findByPublicId(String publicId) {
+
+        return jpaRepository.findByPublicId(publicId);
+    }
+
+    @Override
+    public void deleteById(Long id) {
 
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByPublicId(String publicId) {
+
+        jpaRepository.deleteByPublicId(publicId);
     }
 
     @Override

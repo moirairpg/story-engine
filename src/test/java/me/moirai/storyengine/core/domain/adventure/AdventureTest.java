@@ -26,7 +26,7 @@ public class AdventureTest {
         Adventure.Builder adventureBuilder = Adventure.builder();
         adventureBuilder.id("ID");
         adventureBuilder.name("Name");
-        adventureBuilder.worldId("WRLDID");
+        adventureBuilder.worldId(1L);
         adventureBuilder.personaId(1L);
         adventureBuilder.channelId("CHNLID");
         adventureBuilder.moderation(Moderation.STRICT);
@@ -42,7 +42,7 @@ public class AdventureTest {
         assertThat(adventure).isNotNull();
         assertThat(adventure.getId()).isEqualTo("ID");
         assertThat(adventure.getName()).isEqualTo("Name");
-        assertThat(adventure.getWorldId()).isEqualTo("WRLDID");
+        assertThat(adventure.getWorldId()).isEqualTo(1L);
         assertThat(adventure.getPersonaId()).isEqualTo(1L);
         assertThat(adventure.getModeration()).isEqualTo(Moderation.STRICT);
         assertThat(adventure.getVisibility()).isEqualTo(PRIVATE);
@@ -606,7 +606,7 @@ public class AdventureTest {
     public void adventure_whenUpdateWorldId_thenWorldIdIsUpdated() {
 
         // Given
-        String newWorldId = "12345";
+        Long newWorldId = 12345L;
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
         // When

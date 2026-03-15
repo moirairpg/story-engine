@@ -8,6 +8,7 @@ import org.assertj.core.util.Maps;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 public class UpdateAdventureFixture {
 
@@ -18,8 +19,8 @@ public class UpdateAdventureFixture {
                 .id(adventure.getId())
                 .name(adventure.getName())
                 .description(adventure.getDescription())
-                .worldId(adventure.getWorldId())
-                .personaId("PRSNID")
+                .worldId(String.valueOf(adventure.getWorldId()))
+                .personaId(PersonaFixture.PUBLIC_ID)
                 .channelId(adventure.getChannelId())
                 .visibility(adventure.getVisibility().name())
                 .aiModel(adventure.getModelConfiguration().getAiModel().toString())

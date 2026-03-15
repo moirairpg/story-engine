@@ -17,10 +17,12 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.GameMode;
 import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @UseCaseHandler
 public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventure, AdventureDetails> {
@@ -29,13 +31,16 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
     private static final String PERSONA_NOT_FOUND = "Persona not found";
+    private static final String WORLD_NOT_FOUND = "World not found";
 
     private final AdventureRepository repository;
     private final PersonaRepository personaRepository;
+    private final WorldRepository worldRepository;
 
-    public UpdateAdventureHandler(AdventureRepository repository, PersonaRepository personaRepository) {
+    public UpdateAdventureHandler(AdventureRepository repository, PersonaRepository personaRepository, WorldRepository worldRepository) {
         this.repository = repository;
         this.personaRepository = personaRepository;
+        this.worldRepository = worldRepository;
     }
 
     @Override
@@ -61,7 +66,9 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         }
 
         if (isNotBlank(command.getWorldId())) {
-            adventure.updateWorld(command.getWorldId());
+            World world = worldRepository.findByPublicId(command.getWorldId())
+                    .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+            adventure.updateWorld(world.getId());
         }
 
         if (isNotBlank(command.getPersonaId())) {
@@ -142,7 +149,10 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         Persona persona = personaRepository.findById(savedAdventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        return mapResult(savedAdventure, persona.getPublicId());
+        World world = worldRepository.findById(savedAdventure.getWorldId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+
+        return mapResult(savedAdventure, persona.getPublicId(), world.getPublicId());
     }
 
     private void updatePermissions(UpdateAdventure command, Adventure adventure) {
@@ -189,12 +199,12 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
                 .forEach(adventure::removeStopSequence);
     }
 
-    private AdventureDetails mapResult(Adventure savedAdventure, String personaPublicId) {
+    private AdventureDetails mapResult(Adventure savedAdventure, String personaPublicId, String worldPublicId) {
 
         return AdventureDetails.builder()
                 .id(savedAdventure.getId())
                 .name(savedAdventure.getName())
-                .worldId(savedAdventure.getWorldId())
+                .worldId(worldPublicId)
                 .personaId(personaPublicId)
                 .visibility(savedAdventure.getVisibility().name())
                 .aiModel(savedAdventure.getModelConfiguration().getAiModel().toString())

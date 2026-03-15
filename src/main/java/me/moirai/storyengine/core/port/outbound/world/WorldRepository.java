@@ -12,9 +12,13 @@ public interface WorldRepository {
 
     World save(World world);
 
-    Optional<World> findById(String id);
+    Optional<World> findById(Long id);
 
-    void deleteById(String id);
+    Optional<World> findByPublicId(String publicId);
+
+    void deleteById(Long id);
+
+    void deleteByPublicId(String publicId);
 
     SearchWorldsResult search(SearchWorlds request);
 

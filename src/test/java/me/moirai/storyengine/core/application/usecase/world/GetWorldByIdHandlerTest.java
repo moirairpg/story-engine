@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
@@ -46,25 +47,26 @@ public class GetWorldByIdHandlerTest {
     public void getWorldById() {
 
         // Given
-        String id = "HAUDHUAHD";
+        String publicId = WorldFixture.PUBLIC_ID;
         String requesterId = "84REAC";
         World world = WorldFixture.privateWorld()
-                .id(id)
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
+        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(world, "publicId", publicId);
 
-        GetWorldById query = GetWorldById.build(id, requesterId);
+        GetWorldById query = GetWorldById.build(publicId, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
 
         // When
         WorldDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(publicId);
     }
 
     @Test
@@ -84,11 +86,11 @@ public class GetWorldByIdHandlerTest {
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
-        String id = "WRLDID";
+        String id = WorldFixture.PUBLIC_ID;
         String requesterId = "84REAC";
         GetWorldById command = GetWorldById.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
@@ -102,12 +104,11 @@ public class GetWorldByIdHandlerTest {
         String id = "HAUDHUAHD";
         String requesterId = "RQSTRID";
         World world = WorldFixture.privateWorld()
-                .id(id)
                 .build();
 
         GetWorldById query = GetWorldById.build(id, requesterId);
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
 
         // When
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));

@@ -13,7 +13,7 @@ public class WorldLorebookPersistenceMapper {
     public WorldLorebookEntryDetails mapToResult(WorldLorebookEntry entry) {
 
         return WorldLorebookEntryDetails.builder()
-                .id(entry.getId())
+                .id(entry.getPublicId())
                 .name(entry.getName())
                 .description(entry.getDescription())
                 .regex(entry.getRegex())

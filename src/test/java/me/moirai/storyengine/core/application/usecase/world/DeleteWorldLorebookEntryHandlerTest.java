@@ -61,7 +61,7 @@ public class DeleteWorldLorebookEntryHandlerTest {
 
         // Given
         String id = "WRDID";
-        String worldId = "WRLDID";
+        String worldId = WorldFixture.PUBLIC_ID;
         String requesterId = "4234324";
 
         DeleteWorldLorebookEntry command = DeleteWorldLorebookEntry.builder()
@@ -79,7 +79,7 @@ public class DeleteWorldLorebookEntryHandlerTest {
         World world = spy(baseWorld);
         doNothing().when(world).removeLorebookEntry(anyString());
 
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
         // When

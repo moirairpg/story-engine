@@ -34,14 +34,14 @@ public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void
     @Override
     public Void execute(DeleteWorld command) {
 
-        World world = repository.findById(command.getId())
+        World world = repository.findByPublicId(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
 
         if (!world.canUserWrite(command.getRequesterDiscordId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        repository.deleteById(command.getId());
+        repository.deleteByPublicId(command.getId());
 
         return null;
     }

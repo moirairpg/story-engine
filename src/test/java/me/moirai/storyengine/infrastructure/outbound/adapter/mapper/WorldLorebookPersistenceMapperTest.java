@@ -46,7 +46,6 @@ public class WorldLorebookPersistenceMapperTest {
         // Given
         List<WorldLorebookEntry> worldLorebookEntries = IntStream.range(0, 20)
                 .mapToObj(op -> WorldLorebookEntryFixture.sampleLorebookEntry()
-                        .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 
