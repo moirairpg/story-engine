@@ -1,5 +1,5 @@
 package me.moirai.storyengine.common.cqs.query;
 
-public abstract class Query<T> {
+public interface Query<T> {
 
 }
