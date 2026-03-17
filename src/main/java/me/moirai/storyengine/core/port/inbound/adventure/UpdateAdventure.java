@@ -5,6 +5,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
+import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
+import me.moirai.storyengine.common.enums.GameMode;
+import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.Visibility;
 
 public record UpdateAdventure(
         UUID adventureId,
@@ -14,11 +18,11 @@ public record UpdateAdventure(
         UUID worldId,
         UUID personaId,
         String channelId,
-        String visibility,
-        String aiModel,
-        String moderation,
+        Visibility visibility,
+        ArtificialIntelligenceModel aiModel,
+        Moderation moderation,
         String requesterId,
-        String gameMode,
+        GameMode gameMode,
         String nudge,
         String remember,
         String authorsNote,

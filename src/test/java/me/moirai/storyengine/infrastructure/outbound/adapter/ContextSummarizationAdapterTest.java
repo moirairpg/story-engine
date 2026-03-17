@@ -24,14 +24,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.model.result.TextGenerationResultFixture;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
+import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResultFixture;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.ChatMessageAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.StorySummarizationAdapter;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import me.moirai.storyengine.common.usecases.UseCaseRunner;
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
 import me.moirai.storyengine.core.port.inbound.model.SearchModels;
@@ -21,18 +21,21 @@ import reactor.core.publisher.Mono;
 @Tag(name = "AI Models", description = "Endpoints for managing MoirAI AI Models")
 public class ModelController extends SecurityContextAware {
 
-    private final UseCaseRunner useCaseRunner;
+    private final QueryRunner queryRunner;
 
-    public ModelController(UseCaseRunner useCaseRunner) {
-        this.useCaseRunner = useCaseRunner;
+    public ModelController(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<List<AiModelResult>> getAllAiModels(@RequestParam(required = false) String modelName, @RequestParam(required = false) String tokenLimit) {
+    public Mono<List<AiModelResult>> getAllAiModels(
+            @RequestParam(required = false) String modelName,
+            @RequestParam(required = false) String tokenLimit) {
+
         return mapWithAuthenticatedUser(authenticatedUser -> {
-            SearchModels query = SearchModels.build(modelName, tokenLimit);
-            return useCaseRunner.run(query);
+            var query = new SearchModels(modelName, tokenLimit);
+            return queryRunner.run(query);
         });
     }
 }
