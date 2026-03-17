@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -91,13 +90,12 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
 
     private AuthenticateUserResult toResult(DiscordAuthResponse response) {
 
-        return AuthenticateUserResult.builder()
-                .accessToken(response.getAccessToken())
-                .refreshToken(response.getRefreshToken())
-                .expiresIn(response.getExpiresIn())
-                .tokenType(response.getTokenType())
-                .scope(response.getScope())
-                .build();
+        return new AuthenticateUserResult(
+                response.accessToken(),
+                response.expiresIn(),
+                response.refreshToken(),
+                response.scope(),
+                response.tokenType());
     }
 
     @Override
@@ -119,12 +117,11 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     @Override
     public Mono<Void> logout(String clientId, String clientSecret, String token, String tokenTypeHint) {
 
-        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .token(token)
-                .tokenTypeHint(tokenTypeHint)
-                .build();
+        var request = new DiscordTokenRevocationRequest(
+                clientId,
+                clientSecret,
+                token,
+                tokenTypeHint);
 
         return postForAuthentication(tokenRevokeUri, request)
                 .bodyToMono(Void.class);
@@ -132,8 +129,8 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
 
     private ResponseSpec postForAuthentication(String url, Object request) {
 
-        final MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<>();
-        Map<String, String> fieldMap = objectMapper.convertValue(request, new TypeReference<Map<String, String>>() {
+        var valueMap = new LinkedMultiValueMap<String, String>();
+        var fieldMap = objectMapper.convertValue(request, new TypeReference<Map<String, String>>() {
         });
 
         valueMap.setAll(fieldMap);

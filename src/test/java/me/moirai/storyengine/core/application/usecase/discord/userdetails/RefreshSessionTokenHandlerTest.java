@@ -31,7 +31,7 @@ public class RefreshSessionTokenHandlerTest {
 
         // Given
         String token = null;
-        RefreshSessionToken request = RefreshSessionToken.build(token);
+        var request = new RefreshSessionToken(token);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -42,16 +42,15 @@ public class RefreshSessionTokenHandlerTest {
     public void refreshToken_whenValidRequest_thenRefreshToken() {
 
         // Given
-        String token = "TOKEN";
-        RefreshSessionToken request = RefreshSessionToken.build(token);
+        var token = "TOKEN";
+        var request = new RefreshSessionToken(token);
 
-        AuthenticateUserResult authResponse = AuthenticateUserResult.builder()
-                .accessToken("token")
-                .expiresIn(1234L)
-                .refreshToken("token")
-                .tokenType("type")
-                .scope("scope")
-                .build();
+        var authResponse = new AuthenticateUserResult(
+                "token",
+                1234L,
+                "token",
+                "type",
+                "scope");
 
         when(discordAuthenticationPort.refreshSessionToken(any())).thenReturn(Mono.just(authResponse));
 
@@ -59,11 +58,11 @@ public class RefreshSessionTokenHandlerTest {
         StepVerifier.create(handler.handle(request))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getAccessToken()).isNotNull().isNotEmpty();
-                    assertThat(result.getExpiresIn()).isNotNull();
-                    assertThat(result.getRefreshToken()).isNotNull().isNotEmpty();
-                    assertThat(result.getScope()).isNotNull().isNotEmpty();
-                    assertThat(result.getTokenType()).isNotNull().isNotEmpty();
+                    assertThat(result.accessToken()).isNotNull().isNotEmpty();
+                    assertThat(result.expiresIn()).isNotNull();
+                    assertThat(result.refreshToken()).isNotNull().isNotEmpty();
+                    assertThat(result.scope()).isNotNull().isNotEmpty();
+                    assertThat(result.tokenType()).isNotNull().isNotEmpty();
                 })
                 .verifyComplete();
     }

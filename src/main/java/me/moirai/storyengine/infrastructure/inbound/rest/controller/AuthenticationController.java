@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
 import io.swagger.v3.oas.annotations.Hidden;
-import me.moirai.storyengine.common.usecases.UseCaseRunner;
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie;
 import reactor.core.publisher.Mono;
 
@@ -51,7 +51,7 @@ public class AuthenticationController extends SecurityContextAware {
     private final String failPath;
     private final String logoutPath;
     private final DiscordAuthenticationPort discordAuthenticationPort;
-    private final UseCaseRunner useCaseRunner;
+    private final QueryRunner queryRunner;
 
     public AuthenticationController(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
@@ -61,7 +61,7 @@ public class AuthenticationController extends SecurityContextAware {
             @Value("${moirai.security.redirect-path.fail}") String failPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
             DiscordAuthenticationPort discordAuthenticationPort,
-            UseCaseRunner useCaseRunner) {
+            QueryRunner queryRunner) {
 
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -69,7 +69,7 @@ public class AuthenticationController extends SecurityContextAware {
         this.logoutPath = logoutPath;
         this.failPath = failPath;
         this.discordAuthenticationPort = discordAuthenticationPort;
-        this.useCaseRunner = useCaseRunner;
+        this.queryRunner = queryRunner;
     }
 
     @GetMapping("/code")
@@ -84,8 +84,8 @@ public class AuthenticationController extends SecurityContextAware {
             return Mono.just(exchange.getResponse());
         }
 
-        AuthenticateUser command = AuthenticateUser.build(code);
-        return useCaseRunner.run(command)
+        var query = new AuthenticateUser(code);
+        return queryRunner.run(query)
                 .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
     }
 
@@ -96,7 +96,7 @@ public class AuthenticationController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             return discordAuthenticationPort.logout(clientId, clientSecret,
-                    authenticatedUser.getAuthorizationToken(), TOKEN_TYPE_HINT)
+                    authenticatedUser.authorizationToken(), TOKEN_TYPE_HINT)
                     .thenReturn(handleSessionTermination(exchange));
         });
     }
@@ -107,8 +107,8 @@ public class AuthenticationController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            RefreshSessionToken command = RefreshSessionToken.build(authenticatedUser.getRefreshToken());
-            return useCaseRunner.run(command)
+            var query = new RefreshSessionToken(authenticatedUser.refreshToken());
+            return queryRunner.run(query)
                     .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
         });
     }
@@ -119,17 +119,17 @@ public class AuthenticationController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(authenticatedUser.getDiscordId());
-            return useCaseRunner.run(query);
+            var query = new GetUserDetailsByDiscordId(authenticatedUser.discordId());
+            return queryRunner.run(query);
         });
     }
 
     private ServerHttpResponse handleSessionAuthentication(
             ServerWebExchange exchange, AuthenticateUserResult authResult) {
 
-        ResponseCookie sessionCookie = createCookie(SESSION_COOKIE, authResult.getAccessToken());
-        ResponseCookie refreshCookie = createCookie(REFRESH_COOKIE, authResult.getRefreshToken());
-        ResponseCookie expiryCookie = createCookie(EXPIRY_COOKIE, String.valueOf(authResult.getExpiresIn()));
+        var sessionCookie = createCookie(SESSION_COOKIE, authResult.accessToken());
+        var refreshCookie = createCookie(REFRESH_COOKIE, authResult.refreshToken());
+        var expiryCookie = createCookie(EXPIRY_COOKIE, String.valueOf(authResult.expiresIn()));
 
         exchange.getResponse().setStatusCode(REDIRECT);
         exchange.getResponse().getHeaders().setLocation(URI.create(successPath));
@@ -142,9 +142,9 @@ public class AuthenticationController extends SecurityContextAware {
 
     private ServerHttpResponse handleSessionTermination(ServerWebExchange exchange) {
 
-        ResponseCookie sessionCookie = expireCookie(SESSION_COOKIE);
-        ResponseCookie refreshCookie = expireCookie(REFRESH_COOKIE);
-        ResponseCookie expiryCookie = expireCookie(EXPIRY_COOKIE);
+        var sessionCookie = expireCookie(SESSION_COOKIE);
+        var refreshCookie = expireCookie(REFRESH_COOKIE);
+        var expiryCookie = expireCookie(EXPIRY_COOKIE);
 
         exchange.getResponse().setStatusCode(REDIRECT);
         exchange.getResponse().getHeaders().setLocation(URI.create(logoutPath));

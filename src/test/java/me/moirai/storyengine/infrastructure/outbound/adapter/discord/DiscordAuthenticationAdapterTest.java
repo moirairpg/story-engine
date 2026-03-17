@@ -229,11 +229,13 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         // Given
         String token = "TOKEN";
 
-        DiscordUserDataResponse response = DiscordUserDataResponse.builder()
-                .globalNickname("displayName")
-                .username("username")
-                .email("email@email.com")
-                .build();
+        DiscordUserDataResponse response = new DiscordUserDataResponse(
+                null,
+                "username",
+                "displayName",
+                null,
+                "email@email.com",
+                null);
 
         prepareWebserverFor(response, 200);
 

@@ -3,19 +3,20 @@ package me.moirai.storyengine.core.application.usecase.discord.userdetails;
 import static io.micrometer.common.util.StringUtils.isBlank;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import java.util.Optional;
+
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
-import me.moirai.storyengine.core.domain.userdetails.User;
 
-@UseCaseHandler
-public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<GetUserDetailsByDiscordId, UserDetailsResult> {
+@QueryHandler
+public class GetUserDetailsByDiscordIdHandler
+        extends AbstractQueryHandler<GetUserDetailsByDiscordId, UserDetailsResult> {
 
     private static final String USER_NOT_REGISTERED_IN_MOIRAI = "The User with the requested ID is not registered in MoirAI";
     private static final String DISCORD_USER_DOES_NOT_EXIST = "The Discord User with the requested ID does not exist";
@@ -34,7 +35,7 @@ public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public void validate(GetUserDetailsByDiscordId useCase) {
 
-        if (isBlank(useCase.getDiscordUserId())) {
+        if (isBlank(useCase.discordUserId())) {
             throw new IllegalArgumentException("Discord ID cannot be null");
         }
     }
@@ -42,22 +43,21 @@ public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public UserDetailsResult execute(GetUserDetailsByDiscordId useCase) {
 
-        DiscordUserDetails discordDetails = discordUserDetailsPort.getUserById(useCase.getDiscordUserId())
+        var discordDetails = discordUserDetailsPort.getUserById(useCase.discordUserId())
                 .orElseThrow(() -> new DiscordApiException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
 
-        User moiraiUser = repository.findByDiscordId(useCase.getDiscordUserId())
+        var moiraiUser = repository.findByDiscordId(useCase.discordUserId())
                 .orElseThrow(() -> new AssetNotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
-        String nickname = isBlank(discordDetails.getNickname()) ? discordDetails.getUsername()
-                : discordDetails.getNickname();
+        var nickname = Optional.ofNullable(discordDetails.getNickname())
+                .orElse(discordDetails.getUsername());
 
-        return UserDetailsResult.builder()
-                .discordId(moiraiUser.getDiscordId())
-                .nickname(nickname)
-                .username(discordDetails.getUsername())
-                .avatarUrl(discordDetails.getAvatarUrl())
-                .role(moiraiUser.getRole().name())
-                .joinDate(moiraiUser.getCreationDate())
-                .build();
+        return new UserDetailsResult(
+                moiraiUser.getDiscordId(),
+                discordDetails.getUsername(),
+                nickname,
+                discordDetails.getAvatarUrl(),
+                moiraiUser.getRole(),
+                moiraiUser.getCreationDate());
     }
 }

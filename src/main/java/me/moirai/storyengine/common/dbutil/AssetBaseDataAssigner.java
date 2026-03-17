@@ -18,7 +18,7 @@ public class AssetBaseDataAssigner {
         MoiraiPrincipal authenticatedUser = SecuritySessionContext.getAuthenticatedUser();
         if (asset.getCreatorId() == null) {
             String creatorName = Optional.ofNullable(authenticatedUser)
-                    .map(MoiraiPrincipal::getDiscordId)
+                    .map(MoiraiPrincipal::discordId)
                     .orElse("SYSTEM");
 
             asset.setCreatorId(creatorName);

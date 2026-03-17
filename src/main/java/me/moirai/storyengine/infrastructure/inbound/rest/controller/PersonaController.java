@@ -68,7 +68,7 @@ public class PersonaController extends SecurityContextAware {
                     getDirection(searchParameters.getDirection()),
                     searchParameters.getVisibility(),
                     getOperation(searchParameters.getOperation()),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -80,7 +80,7 @@ public class PersonaController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            var query = new GetPersonaById(personaId, authenticatedUser.getDiscordId());
+            var query = new GetPersonaById(personaId, authenticatedUser.discordId());
             return queryRunner.run(query);
         });
     }
@@ -95,7 +95,7 @@ public class PersonaController extends SecurityContextAware {
                     request.name(),
                     request.personality(),
                     request.visibility(),
-                    authenticatedUser.getDiscordId(),
+                    authenticatedUser.discordId(),
                     request.usersAllowedToRead(),
                     request.usersAllowedToWrite());
 
@@ -116,7 +116,7 @@ public class PersonaController extends SecurityContextAware {
                     request.name(),
                     request.personality(),
                     request.visibility(),
-                    authenticatedUser.getDiscordId(),
+                    authenticatedUser.discordId(),
                     request.usersAllowedToWriteToAdd(),
                     request.usersAllowedToReadToAdd(),
                     request.usersAllowedToWriteToRemove(),
@@ -132,7 +132,7 @@ public class PersonaController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            var command = new DeletePersona(personaId, authenticatedUser.getDiscordId());
+            var command = new DeletePersona(personaId, authenticatedUser.discordId());
             commandRunner.run(command);
 
             return Mono.empty();

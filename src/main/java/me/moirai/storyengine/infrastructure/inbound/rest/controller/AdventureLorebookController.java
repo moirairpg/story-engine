@@ -50,6 +50,7 @@ public class AdventureLorebookController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
+    // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchAdventureLorebookEntriesResult> search(
@@ -58,14 +59,14 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchAdventureLorebookEntries query = new SearchAdventureLorebookEntries(
+            var query = new SearchAdventureLorebookEntries(
                     adventureId,
                     searchParameters.getName(),
                     searchParameters.getPage(),
                     searchParameters.getSize(),
                     getSortingField(searchParameters.getSortingField()),
                     getDirection(searchParameters.getDirection()),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -79,10 +80,10 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetAdventureLorebookEntryById query = new GetAdventureLorebookEntryById(
+            var query = new GetAdventureLorebookEntryById(
                     entryId,
                     adventureId,
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -96,13 +97,13 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+            var command = new CreateAdventureLorebookEntry(
                     adventureId,
                     request.name(),
                     request.regex(),
                     request.description(),
                     request.playerId(),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return commandRunner.run(command);
         });
@@ -117,14 +118,14 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateAdventureLorebookEntry command = new UpdateAdventureLorebookEntry(
+            var command = new UpdateAdventureLorebookEntry(
                     entryId,
                     adventureId,
                     request.name(),
                     request.regex(),
                     request.description(),
                     request.playerId(),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return commandRunner.run(command);
         });
@@ -138,10 +139,10 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteAdventureLorebookEntry command = new DeleteAdventureLorebookEntry(
+            var command = new DeleteAdventureLorebookEntry(
                     entryId,
                     adventureId,
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             commandRunner.run(command);
 
@@ -149,6 +150,7 @@ public class AdventureLorebookController extends SecurityContextAware {
         });
     }
 
+    // TODO remove all of this
     private String getSortingField(SearchSortingField searchSortingField) {
 
         if (searchSortingField != null) {

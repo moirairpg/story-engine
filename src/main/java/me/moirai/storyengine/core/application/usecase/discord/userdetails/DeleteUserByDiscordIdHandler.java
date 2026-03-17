@@ -2,15 +2,14 @@ package me.moirai.storyengine.core.application.usecase.discord.userdetails;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
-import me.moirai.storyengine.core.domain.userdetails.User;
 
-@UseCaseHandler
-public class DeleteUserByDiscordIdHandler extends AbstractUseCaseHandler<DeleteUserByDiscordId, Void> {
+@CommandHandler
+public class DeleteUserByDiscordIdHandler extends AbstractCommandHandler<DeleteUserByDiscordId, Void> {
 
     private static final String USER_NOT_REGISTERED_IN_MOIRAI = "The User with the requested ID is not registered in MoirAI";
 
@@ -24,7 +23,7 @@ public class DeleteUserByDiscordIdHandler extends AbstractUseCaseHandler<DeleteU
     @Override
     public void validate(DeleteUserByDiscordId useCase) {
 
-        if (isBlank(useCase.getDiscordUserId())) {
+        if (isBlank(useCase.discordUserId())) {
             throw new IllegalArgumentException("Discord ID cannot be null");
         }
     }
@@ -32,7 +31,7 @@ public class DeleteUserByDiscordIdHandler extends AbstractUseCaseHandler<DeleteU
     @Override
     public Void execute(DeleteUserByDiscordId useCase) {
 
-        User discordUser = repository.findByDiscordId(useCase.getDiscordUserId())
+        var discordUser = repository.findByDiscordId(useCase.discordUserId())
                 .orElseThrow(() -> new AssetNotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
         repository.delete(discordUser);

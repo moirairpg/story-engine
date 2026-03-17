@@ -54,13 +54,14 @@ public class WorldController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
+    // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchWorldsResult> search(WorldSearchParameters searchParameters) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchWorlds query = new SearchWorlds(
+            var query = new SearchWorlds(
                     searchParameters.getName(),
                     searchParameters.getOwnerId(),
                     searchParameters.getPage(),
@@ -69,7 +70,7 @@ public class WorldController extends SecurityContextAware {
                     getDirection(searchParameters.getDirection()),
                     getVisibility(searchParameters.getVisibility()),
                     getOperation(searchParameters.getOperation()),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -81,7 +82,7 @@ public class WorldController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldById query = new GetWorldById(worldId, authenticatedUser.getDiscordId());
+            var query = new GetWorldById(worldId, authenticatedUser.discordId());
             return queryRunner.run(query);
         });
     }
@@ -92,7 +93,7 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorld command = new CreateWorld(
+            var command = new CreateWorld(
                     request.name(),
                     request.description(),
                     request.adventureStart(),
@@ -105,7 +106,7 @@ public class WorldController extends SecurityContextAware {
                             .toList(),
                     request.usersAllowedToWrite(),
                     request.usersAllowedToRead(),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return commandRunner.run(command);
         });
@@ -118,13 +119,13 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateWorld command = new UpdateWorld(
+            var command = new UpdateWorld(
                     worldId,
                     request.name(),
                     request.description(),
                     request.adventureStart(),
                     request.visibility(),
-                    authenticatedUser.getDiscordId(),
+                    authenticatedUser.discordId(),
                     request.usersAllowedToWriteToAdd(),
                     request.usersAllowedToWriteToRemove(),
                     request.usersAllowedToReadToAdd(),
@@ -140,7 +141,7 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorld command = new DeleteWorld(worldId, authenticatedUser.getDiscordId());
+            var command = new DeleteWorld(worldId, authenticatedUser.discordId());
             commandRunner.run(command);
 
             return Mono.empty();

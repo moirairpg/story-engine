@@ -1,23 +1,23 @@
 package me.moirai.storyengine.core.application.usecase.discord.userdetails;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
-import static me.moirai.storyengine.core.domain.userdetails.Role.PLAYER;
+import static me.moirai.storyengine.common.enums.Role.PLAYER;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
+import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
-public class AuthenticateUserHandler extends AbstractUseCaseHandler<AuthenticateUser, Mono<AuthenticateUserResult>> {
+@QueryHandler
+public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUser, Mono<AuthenticateUserResult>> {
 
     private static final String DISCORD_SCOPE = "identify";
     private static final String DISCORD_GRANT_TYPE = "authorization_code";
@@ -45,7 +45,7 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
     @Override
     public void validate(AuthenticateUser useCase) {
 
-        if (isBlank(useCase.getAuthenticationCode())) {
+        if (isBlank(useCase.authenticationCode())) {
             throw new IllegalArgumentException("Authentication code cannot be null");
         }
     }
@@ -53,7 +53,7 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
     @Override
     public Mono<AuthenticateUserResult> execute(AuthenticateUser useCase) {
 
-        DiscordAuthRequest request = createDiscordAuthRequest(useCase.getAuthenticationCode());
+        var request = createDiscordAuthRequest(useCase.authenticationCode());
         return discordAuthenticationPort.authenticate(request)
                 .flatMap(this::createUserIfNotExists);
     }
@@ -72,9 +72,9 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
 
     private Mono<AuthenticateUserResult> createUserIfNotExists(AuthenticateUserResult authenticateUserResult) {
 
-        return discordAuthenticationPort.retrieveLoggedUser(authenticateUserResult.getAccessToken())
+        return discordAuthenticationPort.retrieveLoggedUser(authenticateUserResult.accessToken())
                 .map(discordUserDetails -> {
-                    repository.findByDiscordId(discordUserDetails.getId())
+                    repository.findByDiscordId(discordUserDetails.id())
                             .orElseGet(() -> createUser(discordUserDetails));
 
                     return authenticateUserResult;
@@ -84,8 +84,8 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
     private User createUser(DiscordUserDataResponse discordUserDetails) {
 
         return repository.save(User.builder()
-                .discordId(discordUserDetails.getId())
-                .creatorId(discordUserDetails.getId())
+                .discordId(discordUserDetails.id())
+                .creatorId(discordUserDetails.id())
                 .role(PLAYER)
                 .build());
     }

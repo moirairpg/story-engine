@@ -56,13 +56,14 @@ public class AdventureController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
+    // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchAdventuresResult> search(AdventureSearchParameters searchParameters) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchAdventures query = new SearchAdventures(
+            var query = new SearchAdventures(
                     searchParameters.getName(),
                     searchParameters.getWorld(),
                     searchParameters.getPersona(),
@@ -77,7 +78,7 @@ public class AdventureController extends SecurityContextAware {
                     getDirection(searchParameters.getDirection()),
                     getVisibility(searchParameters.getVisibility()),
                     getOperation(searchParameters.getOperation()),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -90,9 +91,9 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetAdventureById query = new GetAdventureById(
+            var query = new GetAdventureById(
                     adventureId,
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -105,7 +106,7 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateAdventure command = new CreateAdventure(
+            var command = new CreateAdventure(
                     request.name(),
                     null,
                     request.worldId(),
@@ -114,7 +115,7 @@ public class AdventureController extends SecurityContextAware {
                     request.visibility(),
                     request.aiModel(),
                     request.moderation(),
-                    authenticatedUser.getDiscordId(),
+                    authenticatedUser.discordId(),
                     request.gameMode(),
                     request.nudge(),
                     request.remember(),
@@ -143,7 +144,7 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateAdventure command = new UpdateAdventure(
+            var command = new UpdateAdventure(
                     adventureId,
                     null,
                     request.adventureStart(),
@@ -154,7 +155,7 @@ public class AdventureController extends SecurityContextAware {
                     request.visibility(),
                     request.aiModel(),
                     request.moderation(),
-                    authenticatedUser.getDiscordId(),
+                    authenticatedUser.discordId(),
                     request.gameMode(),
                     request.nudge(),
                     request.remember(),
@@ -186,9 +187,9 @@ public class AdventureController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteAdventure command = new DeleteAdventure(
+            var command = new DeleteAdventure(
                     adventureId,
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             commandRunner.run(command);
 
@@ -196,6 +197,7 @@ public class AdventureController extends SecurityContextAware {
         });
     }
 
+    // TODO remove all of this
     private String getModel(SearchModel searchModel) {
 
         if (searchModel != null) {

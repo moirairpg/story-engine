@@ -14,10 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.domain.userdetails.User;
-import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
@@ -46,9 +45,9 @@ public class AuthenticateUserHandlerTest {
     public void authenticateUser_whenExchangeCodeIsNull_thenThrowException() {
 
         // Given
-        String expectedMessage = "Authentication code cannot be null";
         String exchangeCode = null;
-        AuthenticateUser query = AuthenticateUser.build(exchangeCode);
+        var expectedMessage = "Authentication code cannot be null";
+        var query = new AuthenticateUser(exchangeCode);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -60,25 +59,25 @@ public class AuthenticateUserHandlerTest {
     public void authenticateUser_whenDataIsValid_thenUserIsAuthenticated() {
 
         // Given
-        String exchangeCode = "12345";
-        AuthenticateUser query = AuthenticateUser.build(exchangeCode);
+        var exchangeCode = "12345";
+        var query = new AuthenticateUser(exchangeCode);
 
-        User user = UserFixture.player().build();
+        var user = UserFixture.player().build();
 
-        DiscordUserDataResponse discordUserData = DiscordUserDataResponse.builder()
-                .id(user.getDiscordId())
-                .email("some@email.com")
-                .globalNickname("someNickname")
-                .username("someUsername")
-                .build();
+        var discordUserData = new DiscordUserDataResponse(
+                user.getDiscordId(),
+                "someUsername",
+                "someNickname",
+                null,
+                "some@email.com",
+                null);
 
-        AuthenticateUserResult authResult = AuthenticateUserResult.builder()
-                .accessToken("token")
-                .expiresIn(1234L)
-                .refreshToken("token")
-                .tokenType("type")
-                .scope("scope")
-                .build();
+        var authResult = new AuthenticateUserResult(
+                "token",
+                1234L,
+                "token",
+                "scope",
+                "type");
 
         when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResult));
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(discordUserData));
@@ -87,11 +86,11 @@ public class AuthenticateUserHandlerTest {
         // Then
         StepVerifier.create(handler.handle(query))
                 .assertNext(result -> {
-                    assertThat(result.getAccessToken()).isEqualTo(authResult.getAccessToken());
-                    assertThat(result.getRefreshToken()).isEqualTo(authResult.getRefreshToken());
-                    assertThat(result.getExpiresIn()).isEqualTo(authResult.getExpiresIn());
-                    assertThat(result.getTokenType()).isEqualTo(authResult.getTokenType());
-                    assertThat(result.getScope()).isEqualTo(authResult.getScope());
+                    assertThat(result.accessToken()).isEqualTo(authResult.accessToken());
+                    assertThat(result.refreshToken()).isEqualTo(authResult.refreshToken());
+                    assertThat(result.expiresIn()).isEqualTo(authResult.expiresIn());
+                    assertThat(result.tokenType()).isEqualTo(authResult.tokenType());
+                    assertThat(result.scope()).isEqualTo(authResult.scope());
                 })
                 .verifyComplete();
     }
@@ -100,25 +99,25 @@ public class AuthenticateUserHandlerTest {
     public void authenticateUser_whenUserNotExists_thenUserIsCreated_andThenUserIsAuthenticated() {
 
         // Given
-        String exchangeCode = "12345";
-        AuthenticateUser query = AuthenticateUser.build(exchangeCode);
+        var exchangeCode = "12345";
+        var query = new AuthenticateUser(exchangeCode);
 
-        User user = UserFixture.player().build();
+        var user = UserFixture.player().build();
 
-        DiscordUserDataResponse discordUserData = DiscordUserDataResponse.builder()
-                .id(user.getDiscordId())
-                .email("some@email.com")
-                .globalNickname("someNickname")
-                .username("someUsername")
-                .build();
+        var discordUserData = new DiscordUserDataResponse(
+                user.getDiscordId(),
+                "someUsername",
+                "someNickname",
+                null,
+                "some@email.com",
+                null);
 
-        AuthenticateUserResult authResult = AuthenticateUserResult.builder()
-                .accessToken("token")
-                .expiresIn(1234L)
-                .refreshToken("token")
-                .tokenType("type")
-                .scope("scope")
-                .build();
+        var authResult = new AuthenticateUserResult(
+                "token",
+                1234L,
+                "token",
+                "scope",
+                "type");
 
         when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResult));
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(discordUserData));
@@ -128,11 +127,11 @@ public class AuthenticateUserHandlerTest {
         // Then
         StepVerifier.create(handler.handle(query))
                 .assertNext(result -> {
-                    assertThat(result.getAccessToken()).isEqualTo(authResult.getAccessToken());
-                    assertThat(result.getRefreshToken()).isEqualTo(authResult.getRefreshToken());
-                    assertThat(result.getExpiresIn()).isEqualTo(authResult.getExpiresIn());
-                    assertThat(result.getTokenType()).isEqualTo(authResult.getTokenType());
-                    assertThat(result.getScope()).isEqualTo(authResult.getScope());
+                    assertThat(result.accessToken()).isEqualTo(authResult.accessToken());
+                    assertThat(result.refreshToken()).isEqualTo(authResult.refreshToken());
+                    assertThat(result.expiresIn()).isEqualTo(authResult.expiresIn());
+                    assertThat(result.tokenType()).isEqualTo(authResult.tokenType());
+                    assertThat(result.scope()).isEqualTo(authResult.scope());
                 })
                 .verifyComplete();
     }

@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.usecases.UseCaseRunner;
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
@@ -28,7 +28,7 @@ public class MoiraiUserDetailsServiceTest {
     private DiscordAuthenticationPort discordAuthenticationPort;
 
     @Mock
-    private UseCaseRunner useCaseRunner;
+    private QueryRunner queryRunner;
 
     @InjectMocks
     private MoiraiUserDetailsService service;
@@ -37,23 +37,25 @@ public class MoiraiUserDetailsServiceTest {
     public void authenticateUser_whenUserExists_thenReturnPrincipal() {
 
         // Given
-        String token = "AUTH_TOKEN / REFRESH_TOKEN";
-        String username = "john.doe";
-        String nickname = "JohnDoe";
+        var token = "AUTH_TOKEN / REFRESH_TOKEN";
+        var username = "john.doe";
+        var nickname = "JohnDoe";
 
-        DiscordUserDataResponse response = DiscordUserDataResponse.builder()
-                .globalNickname(nickname)
-                .username(username)
-                .email("email@email.com")
-                .build();
+        var response = new DiscordUserDataResponse(
+                null,
+                username,
+                nickname,
+                null,
+                "email@email.com",
+                null);
 
-        when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(UserDetailsResult.builder()
-                .avatarUrl("http://someurl.com/somepic.jpg")
-                .discordId("12345")
-                .nickname(nickname)
-                .username(username)
-                .joinDate(OffsetDateTime.parse("2024-12-01T14:00:00Z"))
-                .build());
+        when(queryRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(new UserDetailsResult(
+                "12345",
+                username,
+                nickname,
+                "http://someurl.com/somepic.jpg",
+                null,
+                OffsetDateTime.parse("2024-12-01T14:00:00Z")));
 
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(response));
 
@@ -62,10 +64,10 @@ public class MoiraiUserDetailsServiceTest {
                 .assertNext(userDetails -> {
                     MoiraiPrincipal principal = (MoiraiPrincipal) userDetails;
                     assertThat(principal).isNotNull();
-                    assertThat(principal.getUsername()).isEqualTo(response.getUsername());
-                    assertThat(principal.getEmail()).isEqualTo(response.getEmail());
-                    assertThat(principal.getAuthorizationToken()).isEqualTo("AUTH_TOKEN");
-                    assertThat(principal.getRefreshToken()).isEqualTo("REFRESH_TOKEN");
+                    assertThat(principal.getUsername()).isEqualTo(response.username());
+                    assertThat(principal.email()).isEqualTo(response.email());
+                    assertThat(principal.authorizationToken()).isEqualTo("AUTH_TOKEN");
+                    assertThat(principal.refreshToken()).isEqualTo("REFRESH_TOKEN");
                 })
                 .verifyComplete();
     }

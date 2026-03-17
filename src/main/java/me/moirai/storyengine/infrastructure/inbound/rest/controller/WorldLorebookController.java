@@ -50,6 +50,7 @@ public class WorldLorebookController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
+    // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchWorldLorebookEntriesResult> search(
@@ -58,14 +59,14 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchWorldLorebookEntries query = new SearchWorldLorebookEntries(
+            var query = new SearchWorldLorebookEntries(
                     searchParameters.getName(),
                     worldId,
                     searchParameters.getPage(),
                     searchParameters.getSize(),
                     getSortingField(searchParameters.getSortingField()),
                     getDirection(searchParameters.getDirection()),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -79,10 +80,10 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
+            var query = new GetWorldLorebookEntryById(
                     entryId,
                     worldId,
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return queryRunner.run(query);
         });
@@ -96,12 +97,12 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+            var command = new CreateWorldLorebookEntry(
                     worldId,
                     request.name(),
                     request.description(),
                     request.regex(),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return commandRunner.run(command);
         });
@@ -116,13 +117,13 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateWorldLorebookEntry command = new UpdateWorldLorebookEntry(
+            var command = new UpdateWorldLorebookEntry(
                     entryId,
                     worldId,
                     request.name(),
                     request.description(),
                     request.regex(),
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             return commandRunner.run(command);
         });
@@ -136,10 +137,10 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+            var command = new DeleteWorldLorebookEntry(
                     entryId,
                     worldId,
-                    authenticatedUser.getDiscordId());
+                    authenticatedUser.discordId());
 
             commandRunner.run(command);
 

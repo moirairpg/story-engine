@@ -34,7 +34,7 @@ public class DeleteUserByDiscordIdHandlerTest {
 
         // Given
         String userId = null;
-        DeleteUserByDiscordId command = DeleteUserByDiscordId.build(userId);
+        DeleteUserByDiscordId command = new DeleteUserByDiscordId(userId);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -46,7 +46,7 @@ public class DeleteUserByDiscordIdHandlerTest {
 
         // Given
         String userId = "123123";
-        DeleteUserByDiscordId command = DeleteUserByDiscordId.build(userId);
+        DeleteUserByDiscordId command = new DeleteUserByDiscordId(userId);
 
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.empty());
 
@@ -60,7 +60,7 @@ public class DeleteUserByDiscordIdHandlerTest {
 
         // Given
         String userId = "123123";
-        DeleteUserByDiscordId command = DeleteUserByDiscordId.build(userId);
+        DeleteUserByDiscordId command = new DeleteUserByDiscordId(userId);
         User user = UserFixture.player().build();
 
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));

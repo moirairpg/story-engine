@@ -1,7 +1,7 @@
 package me.moirai.storyengine.core.domain.userdetails;
 
-import static me.moirai.storyengine.core.domain.userdetails.Role.ADMIN;
-import static me.moirai.storyengine.core.domain.userdetails.Role.PLAYER;
+import static me.moirai.storyengine.common.enums.Role.ADMIN;
+import static me.moirai.storyengine.common.enums.Role.PLAYER;
 
 import java.time.OffsetDateTime;
 
@@ -17,7 +17,6 @@ public class UserFixture {
         return User.builder()
                 .discordId("12345")
                 .role(PLAYER)
-                .version(1)
                 .creatorId("12341234")
                 .creationDate(OffsetDateTime.now())
                 .lastUpdateDate(OffsetDateTime.now());
@@ -28,7 +27,6 @@ public class UserFixture {
         return User.builder()
                 .discordId("12345")
                 .role(ADMIN)
-                .version(1)
                 .creatorId("12341234")
                 .creationDate(OffsetDateTime.now())
                 .lastUpdateDate(OffsetDateTime.now());
@@ -36,7 +34,7 @@ public class UserFixture {
 
     public static User playerWithId() {
 
-        User user = player().build();
+        var user = player().build();
         ReflectionTestUtils.setField(user, "id", NUMERIC_ID);
         ReflectionTestUtils.setField(user, "publicId", PUBLIC_ID);
         return user;
@@ -44,7 +42,7 @@ public class UserFixture {
 
     public static User adminWithId() {
 
-        User user = admin().build();
+        var user = admin().build();
         ReflectionTestUtils.setField(user, "id", NUMERIC_ID);
         ReflectionTestUtils.setField(user, "publicId", PUBLIC_ID);
         return user;

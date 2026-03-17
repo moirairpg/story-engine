@@ -10,9 +10,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
+import me.moirai.storyengine.common.enums.Role;
 
 @Entity
 @Table(name = "moirai_user")
@@ -22,19 +23,20 @@ public class User extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
+    @RandomUuid
+    @Column(name = "public_id")
+    private UUID publicId;
 
-    @Column(name = "discord_id", unique = true, nullable = false)
+    @Column(name = "discord_id")
     private String discordId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(name = "role")
     private Role role;
 
     public User(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate, builder.version);
+        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);
 
         this.discordId = builder.discordId;
         this.role = builder.role;
@@ -42,13 +44,6 @@ public class User extends Asset {
 
     protected User() {
         super();
-    }
-
-    @PrePersist
-    private void generatePublicId() {
-        if (publicId == null) {
-            publicId = UUID.randomUUID().toString();
-        }
     }
 
     public static Builder builder() {
@@ -60,7 +55,7 @@ public class User extends Asset {
         return id;
     }
 
-    public String getPublicId() {
+    public UUID getPublicId() {
         return publicId;
     }
 
@@ -79,7 +74,6 @@ public class User extends Asset {
         private String creatorId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
-        private int version;
 
         private Builder() {
         }
@@ -111,12 +105,6 @@ public class User extends Asset {
         public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
 
             this.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public Builder version(int version) {
-
-            this.version = version;
             return this;
         }
 

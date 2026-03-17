@@ -4,17 +4,17 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
+@QueryHandler
 public class RefreshSessionTokenHandler
-        extends AbstractUseCaseHandler<RefreshSessionToken, Mono<AuthenticateUserResult>> {
+        extends AbstractQueryHandler<RefreshSessionToken, Mono<AuthenticateUserResult>> {
 
     private static final String DISCORD_GRANT_TYPE = "refresh_token";
 
@@ -35,7 +35,7 @@ public class RefreshSessionTokenHandler
     @Override
     public void validate(RefreshSessionToken useCase) {
 
-        if (isBlank(useCase.getRefreshToken())) {
+        if (isBlank(useCase.refreshToken())) {
             throw new IllegalArgumentException("Refresh token cannot be null");
         }
     }
@@ -43,7 +43,7 @@ public class RefreshSessionTokenHandler
     @Override
     public Mono<AuthenticateUserResult> execute(RefreshSessionToken useCase) {
 
-        RefreshSessionTokenRequest request = createDiscordAuthRequest(useCase.getRefreshToken());
+        var request = createDiscordAuthRequest(useCase.refreshToken());
         return discordAuthenticationPort.refreshSessionToken(request);
     }
 
