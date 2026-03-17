@@ -1,11 +1,11 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.UUID;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.world.World;
@@ -15,8 +15,8 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
-public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventureById, AdventureDetails> {
+@QueryHandler
+public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureById, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be viewed was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
@@ -37,7 +37,7 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     @Override
     public void validate(GetAdventureById command) {
 
-        if (StringUtils.isBlank(command.getId())) {
+        if (command.adventureId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -45,10 +45,10 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     @Override
     public AdventureDetails execute(GetAdventureById query) {
 
-        Adventure adventure = queryRepository.findByPublicId(query.getId())
+        Adventure adventure = queryRepository.findByPublicId(query.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
-        if (!adventure.canUserRead(query.getRequesterDiscordId())) {
+        if (!adventure.canUserRead(query.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION);
         }
 
@@ -61,37 +61,36 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
         return mapResult(adventure, persona.getPublicId(), world.getPublicId());
     }
 
-    private AdventureDetails mapResult(Adventure adventure, String personaPublicId, String worldPublicId) {
+    private AdventureDetails mapResult(Adventure adventure, UUID personaPublicId, UUID worldPublicId) {
 
-        return AdventureDetails.builder()
-                .id(adventure.getPublicId())
-                .name(adventure.getName())
-                .worldId(worldPublicId)
-                .personaId(personaPublicId)
-                .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .moderation(adventure.getModeration().name())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .temperature(adventure.getModelConfiguration().getTemperature())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .usersAllowedToWrite(adventure.getUsersAllowedToWrite())
-                .usersAllowedToRead(adventure.getUsersAllowedToRead())
-                .ownerId(adventure.getOwnerId())
-                .creationDate(adventure.getCreationDate())
-                .lastUpdateDate(adventure.getLastUpdateDate())
-                .description(adventure.getDescription())
-                .adventureStart(adventure.getAdventureStart())
-                .channelId(adventure.getChannelId())
-                .gameMode(adventure.getGameMode().name())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .remember(adventure.getContextAttributes().getRemember())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .isMultiplayer(adventure.isMultiplayer())
-                .build();
+        return new AdventureDetails(
+                adventure.getPublicId(),
+                adventure.getName(),
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                worldPublicId,
+                personaPublicId,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                adventure.getGameMode().name(),
+                adventure.getOwnerId(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.isMultiplayer(),
+                adventure.getCreationDate(),
+                adventure.getLastUpdateDate(),
+                adventure.getModelConfiguration().logitBias(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getUsersAllowedToRead(),
+                adventure.getUsersAllowedToWrite());
     }
 }

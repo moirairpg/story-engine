@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.application.usecase.discord.slashcommands;
 
-import static me.moirai.storyengine.core.domain.adventure.Moderation.DISABLED;
+import static me.moirai.storyengine.common.enums.Moderation.DISABLED;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,16 +78,16 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .temperature(adventure.getModelConfiguration().getTemperature())
+                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
+                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
+                .logitBias(adventure.getModelConfiguration().logitBias())
+                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
+                .stopSequences(adventure.getModelConfiguration().stopSequences())
+                .temperature(adventure.getModelConfiguration().temperature())
                 .aiModel(AiModelRequest
-                        .build(adventure.getModelConfiguration().getAiModel().toString(),
-                                adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
-                                adventure.getModelConfiguration().getAiModel().getHardTokenLimit()))
+                        .build(adventure.getModelConfiguration().aiModel().toString(),
+                                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                                adventure.getModelConfiguration().aiModel().getHardTokenLimit()))
                 .build();
 
         boolean isModerationEnabled = !adventure.getModeration().equals(DISABLED);
@@ -109,11 +109,11 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
                 .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(adventure.getGameMode().name())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .remember(adventure.getContextAttributes().getRemember())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
+                .nudge(adventure.getContextAttributes().nudge())
+                .authorsNote(adventure.getContextAttributes().authorsNote())
+                .remember(adventure.getContextAttributes().remember())
+                .bump(adventure.getContextAttributes().bump())
+                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
                 .build();
     }
 

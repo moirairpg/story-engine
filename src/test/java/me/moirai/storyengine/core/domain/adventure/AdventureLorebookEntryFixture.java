@@ -1,12 +1,13 @@
 package me.moirai.storyengine.core.domain.adventure;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class AdventureLorebookEntryFixture {
 
-    public static final String PUBLIC_ID = "857345aa-3333-0000-0000-000000000000";
+    public static final UUID PUBLIC_ID = UUID.fromString("857345aa-3333-0000-0000-000000000000");
     public static final Long NUMERIC_ID = 3L;
 
     public static AdventureLorebookEntry.Builder sampleLorebookEntry() {
@@ -19,7 +20,6 @@ public class AdventureLorebookEntryFixture {
         builder.creationDate(OffsetDateTime.now());
         builder.lastUpdateDate(OffsetDateTime.now());
         builder.isPlayerCharacter(false);
-        builder.version(1);
 
         return builder;
     }
@@ -35,7 +35,6 @@ public class AdventureLorebookEntryFixture {
         builder.creationDate(OffsetDateTime.now());
         builder.lastUpdateDate(OffsetDateTime.now());
         builder.isPlayerCharacter(true);
-        builder.version(1);
 
         return builder;
     }

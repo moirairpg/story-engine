@@ -2,54 +2,14 @@ package me.moirai.storyengine.infrastructure.inbound.rest.request;
 
 import java.util.Set;
 
-public class CreatePersonaRequest {
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import me.moirai.storyengine.common.enums.Visibility;
 
-    private String name;
-    private String personality;
-    private String visibility;
-    private Set<String> usersAllowedToWrite;
-    private Set<String> usersAllowedToRead;
-
-    public CreatePersonaRequest() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPersonality() {
-        return personality;
-    }
-
-    public String getVisibility() {
-        return visibility;
-    }
-
-    public Set<String> getUsersAllowedToWrite() {
-        return usersAllowedToWrite;
-    }
-
-    public Set<String> getUsersAllowedToRead() {
-        return usersAllowedToRead;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPersonality(String personality) {
-        this.personality = personality;
-    }
-
-    public void setVisibility(String visibility) {
-        this.visibility = visibility;
-    }
-
-    public void setUsersAllowedToWrite(Set<String> usersAllowedToWrite) {
-        this.usersAllowedToWrite = usersAllowedToWrite;
-    }
-
-    public void setUsersAllowedToRead(Set<String> usersAllowedToRead) {
-        this.usersAllowedToRead = usersAllowedToRead;
-    }
+public record CreatePersonaRequest(
+        @NotEmpty(message = "cannot be empty") String name,
+        @NotEmpty(message = "cannot be empty") String personality,
+        @NotNull(message = "cannot be null") Visibility visibility,
+        Set<String> usersAllowedToWrite,
+        Set<String> usersAllowedToRead) {
 }

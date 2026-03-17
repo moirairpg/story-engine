@@ -15,15 +15,25 @@ public abstract class Asset {
     @Column(name = "creator_id")
     protected String creatorId;
 
-    @Column(name = "creation_date", nullable = false)
+    @Column(name = "creation_date")
     protected OffsetDateTime creationDate;
 
-    @Column(name = "last_update_date", nullable = false)
+    @Column(name = "last_update_date")
     protected OffsetDateTime lastUpdateDate;
 
     @Version
     private int version;
 
+    protected Asset(String creatorId,
+            OffsetDateTime creationDate,
+            OffsetDateTime lastUpdateDate) {
+
+        this.creatorId = creatorId;
+        this.creationDate = creationDate;
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    // TODO remove this ctor
     protected Asset(String creatorId,
             OffsetDateTime creationDate,
             OffsetDateTime lastUpdateDate,

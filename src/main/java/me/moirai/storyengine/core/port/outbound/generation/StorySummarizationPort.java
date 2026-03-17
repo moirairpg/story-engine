@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface StorySummarizationPort {
 
-    Mono<Map<String, Object>> summarizeContextWith(Map<String, Object> context,
+    Mono<Map<String, Object>> summarizeContextWith(
+            Map<String, Object> context,
             StoryGenerationRequest storyGenerationRequest);
 }

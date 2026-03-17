@@ -1,19 +1,19 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
 import io.micrometer.common.util.StringUtils;
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
+@CommandHandler
 public class CreateWorldLorebookEntryHandler
-        extends AbstractUseCaseHandler<CreateWorldLorebookEntry, WorldLorebookEntryDetails> {
+        extends AbstractCommandHandler<CreateWorldLorebookEntry, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_UPDATED_WAS_NOT_FOUND = "World to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD = "User does not have permission to modify this world";
@@ -28,15 +28,15 @@ public class CreateWorldLorebookEntryHandler
     @Override
     public void validate(CreateWorldLorebookEntry command) {
 
-        if (StringUtils.isBlank(command.getWorldId())) {
+        if (command.worldId() == null) {
             throw new IllegalArgumentException("World ID cannot be null");
         }
 
-        if (StringUtils.isBlank(command.getName())) {
+        if (StringUtils.isBlank(command.name())) {
             throw new IllegalArgumentException("Name cannot be null");
         }
 
-        if (StringUtils.isBlank(command.getDescription())) {
+        if (StringUtils.isBlank(command.description())) {
             throw new IllegalArgumentException("Description cannot be null");
         }
     }
@@ -44,31 +44,32 @@ public class CreateWorldLorebookEntryHandler
     @Override
     public WorldLorebookEntryDetails execute(CreateWorldLorebookEntry command) {
 
-        World world = repository.findByPublicId(command.getWorldId())
+        World world = repository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD);
         }
 
         WorldLorebookEntry entry = world.addLorebookEntry(
-                command.getName(),
-                command.getRegex(),
-                command.getDescription());
+                command.name(),
+                command.regex(),
+                command.description());
 
         repository.save(world);
-        return mapResult(entry);
+        return mapResult(world, entry);
     }
 
-    private WorldLorebookEntryDetails mapResult(WorldLorebookEntry entry) {
+    private WorldLorebookEntryDetails mapResult(World world, WorldLorebookEntry entry) {
 
-        return WorldLorebookEntryDetails.builder()
-                .id(entry.getPublicId())
-                .name(entry.getName())
-                .regex(entry.getRegex())
-                .description(entry.getDescription())
-                .creationDate(entry.getCreationDate())
-                .lastUpdateDate(entry.getLastUpdateDate())
-                .build();
+        return new WorldLorebookEntryDetails(
+                entry.getPublicId(),
+                world.getPublicId(),
+                entry.getName(),
+                entry.getRegex(),
+                entry.getDescription(),
+                entry.getCreationDate(),
+                entry.getLastUpdateDate());
     }
 }

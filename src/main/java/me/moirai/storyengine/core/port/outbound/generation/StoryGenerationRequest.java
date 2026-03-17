@@ -3,6 +3,7 @@ package me.moirai.storyengine.core.port.outbound.generation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -15,8 +16,8 @@ public class StoryGenerationRequest {
     private final String botNickname;
     private final String channelId;
     private final String guildId;
-    private final String adventureId;
-    private final String personaId;
+    private final UUID adventureId;
+    private final UUID personaId;
     private final String gameMode;
     private final String nudge;
     private final String authorsNote;
@@ -71,11 +72,11 @@ public class StoryGenerationRequest {
         return guildId;
     }
 
-    public String getAdventureId() {
+    public UUID getAdventureId() {
         return adventureId;
     }
 
-    public String getPersonaId() {
+    public UUID getPersonaId() {
         return personaId;
     }
 
@@ -122,8 +123,8 @@ public class StoryGenerationRequest {
         private String botNickname;
         private String channelId;
         private String guildId;
-        private String adventureId;
-        private String personaId;
+        private UUID adventureId;
+        private UUID personaId;
         private String gameMode;
         private String nudge;
         private String authorsNote;
@@ -157,12 +158,12 @@ public class StoryGenerationRequest {
             return this;
         }
 
-        public Builder adventureId(String adventureId) {
+        public Builder adventureId(UUID adventureId) {
             this.adventureId = adventureId;
             return this;
         }
 
-        public Builder personaId(String personaId) {
+        public Builder personaId(UUID personaId) {
             this.personaId = personaId;
             return this;
         }

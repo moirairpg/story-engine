@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
+@CommandHandler
 public class UpdateAdventureLorebookEntryHandler
-        extends AbstractUseCaseHandler<UpdateAdventureLorebookEntry, Mono<AdventureLorebookEntryDetails>> {
+        extends AbstractCommandHandler<UpdateAdventureLorebookEntry, Mono<AdventureLorebookEntryDetails>> {
 
     private static final String ADVENTURE_FLAGGED_BY_MODERATION = "Adventure flagged by moderation";
     private static final String ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND = "Adventure to be updated was not found";
@@ -45,19 +45,19 @@ public class UpdateAdventureLorebookEntryHandler
     @Override
     public void validate(UpdateAdventureLorebookEntry command) {
 
-        if (isBlank(command.getId())) {
+        if (command.entryId() == null) {
             throw new IllegalArgumentException("Lorebook Entry ID cannot be null");
         }
 
-        if (isBlank(command.getAdventureId())) {
+        if (command.adventureId() == null) {
             throw new IllegalArgumentException("Adventure ID cannot be null");
         }
 
-        if (isBlank(command.getName())) {
+        if (isBlank(command.name())) {
             throw new IllegalArgumentException("Adventure name cannot be null");
         }
 
-        if (isBlank(command.getDescription())) {
+        if (isBlank(command.description())) {
             throw new IllegalArgumentException("Adventure description cannot be null");
         }
     }
@@ -65,22 +65,23 @@ public class UpdateAdventureLorebookEntryHandler
     @Override
     public Mono<AdventureLorebookEntryDetails> execute(UpdateAdventureLorebookEntry command) {
 
-        Adventure adventure = repository.findByPublicId(command.getAdventureId())
+        Adventure adventure = repository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
 
-        if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!adventure.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE);
         }
 
-        return moderateContent(command.getName(), adventure.getModeration())
-                .flatMap(__ -> moderateContent(command.getDescription(), adventure.getModeration()))
+        return moderateContent(command.name(), adventure.getModeration())
+                .flatMap(__ -> moderateContent(command.description(), adventure.getModeration()))
                 .map(__ -> {
                     AdventureLorebookEntry lorebookEntry = adventure.updateLorebookEntry(
-                            command.getId(),
-                            command.getName(),
-                            command.getRegex(),
-                            command.getDescription(),
-                            command.getPlayerId());
+                            command.entryId(),
+                            command.name(),
+                            command.regex(),
+                            command.description(),
+                            command.playerId());
 
                     repository.save(adventure);
                     return lorebookEntry;
@@ -90,16 +91,16 @@ public class UpdateAdventureLorebookEntryHandler
 
     private AdventureLorebookEntryDetails toResult(AdventureLorebookEntry savedEntry) {
 
-        return AdventureLorebookEntryDetails.builder()
-                .id(savedEntry.getPublicId())
-                .name(savedEntry.getName())
-                .regex(savedEntry.getRegex())
-                .description(savedEntry.getDescription())
-                .playerId(savedEntry.getPlayerId())
-                .isPlayerCharacter(savedEntry.isPlayerCharacter())
-                .creationDate(savedEntry.getCreationDate())
-                .lastUpdateDate(savedEntry.getLastUpdateDate())
-                .build();
+        return new AdventureLorebookEntryDetails(
+                savedEntry.getPublicId(),
+                null,
+                savedEntry.getName(),
+                savedEntry.getRegex(),
+                savedEntry.getDescription(),
+                savedEntry.getPlayerId(),
+                savedEntry.isPlayerCharacter(),
+                savedEntry.getCreationDate(),
+                savedEntry.getLastUpdateDate());
     }
 
     private Mono<List<String>> moderateContent(String content, Moderation moderation) {

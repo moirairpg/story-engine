@@ -1,32 +1,29 @@
 package me.moirai.storyengine.core.application.usecase.persona;
 
-import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
-import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
-import me.moirai.storyengine.core.domain.persona.Persona;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
-public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, Mono<PersonaDetails>> {
+@CommandHandler
+public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, Mono<PersonaDetails>> {
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
@@ -36,7 +33,8 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     private final PersonaRepository repository;
     private final TextModerationPort moderationPort;
 
-    public UpdatePersonaHandler(PersonaRepository repository,
+    public UpdatePersonaHandler(
+            PersonaRepository repository,
             TextModerationPort moderationPort) {
 
         this.repository = repository;
@@ -46,7 +44,7 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     @Override
     public void validate(UpdatePersona request) {
 
-        if (isBlank(request.getId())) {
+        if (request.personaId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -54,67 +52,63 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     @Override
     public Mono<PersonaDetails> execute(UpdatePersona request) {
 
-        return moderateContent(request.getPersonality())
-                .flatMap(__ -> moderateContent(request.getName()))
+        return moderateContent(request.personality())
+                .flatMap(__ -> moderateContent(request.name()))
                 .map(__ -> updatePersona(request))
                 .map(this::mapResult);
     }
 
     private PersonaDetails mapResult(Persona persona) {
 
-        return PersonaDetails.builder()
-                .id(persona.getPublicId())
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().name())
-                .creationDate(persona.getCreationDate())
-                .lastUpdateDate(persona.getLastUpdateDate())
-                .ownerId(persona.getOwnerId())
-                .usersAllowedToRead(persona.getUsersAllowedToRead())
-                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
-                .build();
+        return new PersonaDetails(
+                persona.getPublicId(),
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToRead(),
+                persona.getUsersAllowedToWrite(),
+                persona.getCreationDate(),
+                persona.getLastUpdateDate());
     }
 
     private Persona updatePersona(UpdatePersona command) {
 
-        Persona persona = repository.findByPublicId(command.getId())
+        var persona = repository.findByPublicId(command.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        if (!persona.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO move this to authorizer
+        if (!persona.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        if (isNotBlank(command.getName())) {
-            persona.updateName(command.getName());
-        }
+        persona.updateName(command.name());
+        persona.updatePersonality(command.personality());
 
-        if (isNotBlank(command.getPersonality())) {
-            persona.updatePersonality(command.getPersonality());
-        }
-
-        if (isNotBlank(command.getVisibility())) {
-            if (command.getVisibility().equalsIgnoreCase(PUBLIC.name())) {
-                persona.makePublic();
-            } else if (command.getVisibility().equalsIgnoreCase(PRIVATE.name())) {
-                persona.makePrivate();
+        if (command.visibility() != null) {
+            switch (command.visibility()) {
+                case PUBLIC -> persona.makePublic();
+                case PRIVATE -> persona.makePrivate();
+                default -> persona.makePrivate();
             }
         }
 
-        emptyIfNull(command.getUsersAllowedToReadToAdd())
+        emptyIfNull(command.usersAllowedToReadToAdd())
                 .forEach(persona::addReaderUser);
 
-        emptyIfNull(command.getUsersAllowedToWriteToAdd())
+        emptyIfNull(command.usersAllowedToWriteToAdd())
                 .forEach(persona::addWriterUser);
 
-        emptyIfNull(command.getUsersAllowedToReadToRemove())
+        emptyIfNull(command.usersAllowedToReadToRemove())
                 .forEach(persona::removeReaderUser);
 
-        emptyIfNull(command.getUsersAllowedToWriteToRemove())
+        emptyIfNull(command.usersAllowedToWriteToRemove())
                 .forEach(persona::removeWriterUser);
 
         return repository.save(persona);
     }
 
+    // TODO pass this to validation
     private Mono<List<String>> moderateContent(String personality) {
 
         if (isBlank(personality)) {

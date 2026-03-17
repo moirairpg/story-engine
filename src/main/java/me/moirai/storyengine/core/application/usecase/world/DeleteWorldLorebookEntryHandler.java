@@ -1,17 +1,15 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import org.apache.commons.lang3.StringUtils;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
-public class DeleteWorldLorebookEntryHandler extends AbstractUseCaseHandler<DeleteWorldLorebookEntry, Void> {
+@CommandHandler
+public class DeleteWorldLorebookEntryHandler extends AbstractCommandHandler<DeleteWorldLorebookEntry, Void> {
 
     private static final String ENTRY_ID_CANNOT_BE_NULL_OR_EMPTY = "Lorebook entry ID cannot be null or empty";
     private static final String WORLD_ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
@@ -28,11 +26,11 @@ public class DeleteWorldLorebookEntryHandler extends AbstractUseCaseHandler<Dele
     @Override
     public void validate(DeleteWorldLorebookEntry command) {
 
-        if (StringUtils.isBlank(command.getLorebookEntryId())) {
+        if (command.entryId() == null) {
             throw new IllegalArgumentException(ENTRY_ID_CANNOT_BE_NULL_OR_EMPTY);
         }
 
-        if (StringUtils.isBlank(command.getWorldId())) {
+        if (command.worldId() == null) {
             throw new IllegalArgumentException(WORLD_ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -40,14 +38,15 @@ public class DeleteWorldLorebookEntryHandler extends AbstractUseCaseHandler<Dele
     @Override
     public Void execute(DeleteWorldLorebookEntry command) {
 
-        World world = repository.findByPublicId(command.getWorldId())
+        World world = repository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD);
         }
 
-        world.removeLorebookEntry(command.getLorebookEntryId());
+        world.removeLorebookEntry(command.entryId());
         repository.save(world);
 
         return null;

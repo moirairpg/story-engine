@@ -49,11 +49,10 @@ public class CreateWorldHandlerTest {
     public void createWorld() {
 
         // Given
-        String publicId = WorldFixture.PUBLIC_ID;
         World world = WorldFixture.privateWorld().build();
         ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(world, "publicId", publicId);
-        CreateWorld command = CreateWorldFixture.createPrivateWorld().build();
+        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
+        CreateWorld command = CreateWorldFixture.createPrivateWorld();
 
         TextModerationResult moderationResult = TextModerationResult.builder()
                 .contentFlagged(false)
@@ -66,7 +65,7 @@ public class CreateWorldHandlerTest {
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getId()).isEqualTo(publicId);
+                    assertThat(result.id()).isEqualTo(WorldFixture.PUBLIC_ID);
                 })
                 .verifyComplete();
     }

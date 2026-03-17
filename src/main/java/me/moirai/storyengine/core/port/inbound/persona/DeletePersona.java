@@ -1,28 +1,10 @@
 package me.moirai.storyengine.core.port.inbound.persona;
 
-import me.moirai.storyengine.common.usecases.UseCase;
+import java.util.UUID;
 
-public final class DeletePersona extends UseCase<Void> {
+import me.moirai.storyengine.common.cqs.command.Command;
 
-    private final String id;
-    private final String requesterId;
-
-    private DeletePersona(String id, String requesterId) {
-
-        this.id = id;
-        this.requesterId = requesterId;
-    }
-
-    public static DeletePersona build(String id, String requesterId) {
-
-        return new DeletePersona(id, requesterId);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterId;
-    }
+public record DeletePersona(
+        UUID personaId,
+        String requesterId) implements Command<Void> {
 }

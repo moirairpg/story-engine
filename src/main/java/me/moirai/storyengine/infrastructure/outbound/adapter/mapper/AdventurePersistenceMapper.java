@@ -13,81 +13,79 @@ public class AdventurePersistenceMapper {
 
     public AdventureRawDto mapToResult(Adventure adventure) {
 
-        return AdventureRawDto.builder()
-                .id(adventure.getPublicId())
-                .name(adventure.getName())
-                .worldId(adventure.getWorldId())
-                .personaId(adventure.getPersonaId())
-                .channelId(adventure.getChannelId())
-                .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .moderation(adventure.getModeration().name())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .temperature(adventure.getModelConfiguration().getTemperature())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .usersAllowedToWrite(adventure.getUsersAllowedToWrite())
-                .usersAllowedToRead(adventure.getUsersAllowedToRead())
-                .ownerId(adventure.getOwnerId())
-                .creationDate(adventure.getCreationDate())
-                .lastUpdateDate(adventure.getLastUpdateDate())
-                .gameMode(adventure.getGameMode().name())
-                .isMultiplayer(adventure.isMultiplayer())
-                .description(adventure.getDescription())
-                .adventureStart(adventure.getAdventureStart())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .remember(adventure.getContextAttributes().getRemember())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .build();
+        return new AdventureRawDto(
+                adventure.getPublicId(),
+                adventure.getName(),
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                adventure.getWorldId(),
+                adventure.getPersonaId(),
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                adventure.getGameMode().name(),
+                adventure.getOwnerId(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.isMultiplayer(),
+                adventure.getCreationDate(),
+                adventure.getLastUpdateDate(),
+                adventure.getModelConfiguration().logitBias(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getUsersAllowedToRead(),
+                adventure.getUsersAllowedToWrite());
     }
 
     public SearchAdventuresResult mapToResult(Page<Adventure> pagedResult) {
-        return SearchAdventuresResult.builder()
-                .results(pagedResult.getContent()
+        return new SearchAdventuresResult(
+                pagedResult.getNumber() + 1,
+                pagedResult.getTotalPages(),
+                pagedResult.getNumberOfElements(),
+                pagedResult.getTotalElements(),
+                pagedResult.getContent()
                         .stream()
                         .map(this::mapToSearchResult)
-                        .toList())
-                .page(pagedResult.getNumber() + 1)
-                .items(pagedResult.getNumberOfElements())
-                .totalItems(pagedResult.getTotalElements())
-                .totalPages(pagedResult.getTotalPages())
-                .build();
+                        .toList());
     }
 
     private AdventureDetails mapToSearchResult(Adventure adventure) {
 
-        return AdventureDetails.builder()
-                .id(adventure.getPublicId())
-                .name(adventure.getName())
-                .worldId(String.valueOf(adventure.getWorldId()))
-                .channelId(adventure.getChannelId())
-                .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .moderation(adventure.getModeration().name())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .temperature(adventure.getModelConfiguration().getTemperature())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .usersAllowedToWrite(adventure.getUsersAllowedToWrite())
-                .usersAllowedToRead(adventure.getUsersAllowedToRead())
-                .ownerId(adventure.getOwnerId())
-                .creationDate(adventure.getCreationDate())
-                .lastUpdateDate(adventure.getLastUpdateDate())
-                .gameMode(adventure.getGameMode().name())
-                .isMultiplayer(adventure.isMultiplayer())
-                .description(adventure.getDescription())
-                .adventureStart(adventure.getAdventureStart())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .remember(adventure.getContextAttributes().getRemember())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .build();
+        return new AdventureDetails(
+                adventure.getPublicId(),
+                adventure.getName(),
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                null,
+                null,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                adventure.getGameMode().name(),
+                adventure.getOwnerId(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.isMultiplayer(),
+                adventure.getCreationDate(),
+                adventure.getLastUpdateDate(),
+                adventure.getModelConfiguration().logitBias(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getUsersAllowedToRead(),
+                adventure.getUsersAllowedToWrite());
     }
 }

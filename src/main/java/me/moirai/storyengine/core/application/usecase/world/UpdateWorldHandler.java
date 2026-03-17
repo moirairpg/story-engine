@@ -1,32 +1,29 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
-import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
-import me.moirai.storyengine.core.domain.world.World;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
-public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono<WorldDetails>> {
+@CommandHandler
+public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Mono<WorldDetails>> {
 
     private static final String WORLD_FLAGGED_BY_MODERATION = "World flagged by moderation";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
@@ -46,7 +43,7 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
     @Override
     public void validate(UpdateWorld command) {
 
-        if (isBlank(command.getId())) {
+        if (command.worldId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -54,67 +51,59 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
     @Override
     public Mono<WorldDetails> execute(UpdateWorld command) {
 
-        return moderateContent(command.getAdventureStart())
-                .flatMap(__ -> moderateContent(command.getName()))
+        return moderateContent(command.adventureStart())
+                .flatMap(__ -> moderateContent(command.name()))
                 .map(__ -> updateWorld(command))
                 .map(this::mapResult);
     }
 
     private WorldDetails mapResult(World world) {
 
-        return WorldDetails.builder()
-                .id(world.getPublicId())
-                .name(world.getName())
-                .description(world.getDescription())
-                .adventureStart(world.getAdventureStart())
-                .visibility(world.getVisibility().name())
-                .ownerId(world.getOwnerId())
-                .usersAllowedToRead(world.getUsersAllowedToRead())
-                .usersAllowedToWrite(world.getUsersAllowedToWrite())
-                .creationDate(world.getCreationDate())
-                .lastUpdateDate(world.getLastUpdateDate())
-                .build();
+        return new WorldDetails(
+                world.getPublicId(),
+                world.getName(),
+                world.getDescription(),
+                world.getAdventureStart(),
+                world.getVisibility().name(),
+                world.getOwnerId(),
+                world.getUsersAllowedToRead(),
+                world.getUsersAllowedToWrite(),
+                world.getCreationDate(),
+                world.getLastUpdateDate());
     }
 
     public World updateWorld(UpdateWorld command) {
 
-        World world = repository.findByPublicId(command.getId())
+        World world = repository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        if (isNotBlank(command.getName())) {
-            world.updateName(command.getName());
-        }
+        world.updateName(command.name());
+        world.updateDescription(command.description());
+        world.updateAdventureStart(command.adventureStart());
 
-        if (isNotBlank(command.getDescription())) {
-            world.updateDescription(command.getDescription());
-        }
-
-        if (isNotBlank(command.getAdventureStart())) {
-            world.updateAdventureStart(command.getAdventureStart());
-        }
-
-        if (isNotBlank(command.getVisibility())) {
-            if (command.getVisibility().equalsIgnoreCase(PUBLIC.name())) {
-                world.makePublic();
-            } else if (command.getVisibility().equalsIgnoreCase(PRIVATE.name())) {
-                world.makePrivate();
+        if (command.visibility() != null) {
+            switch (command.visibility()) {
+                case PUBLIC -> world.makePublic();
+                case PRIVATE -> world.makePrivate();
+                default -> world.makePrivate();
             }
         }
 
-        emptyIfNull(command.getUsersAllowedToReadToAdd())
+        emptyIfNull(command.usersAllowedToReadToAdd())
                 .forEach(world::addReaderUser);
 
-        emptyIfNull(command.getUsersAllowedToWriteToAdd())
+        emptyIfNull(command.usersAllowedToWriteToAdd())
                 .forEach(world::addWriterUser);
 
-        emptyIfNull(command.getUsersAllowedToReadToRemove())
+        emptyIfNull(command.usersAllowedToReadToRemove())
                 .forEach(world::removeReaderUser);
 
-        emptyIfNull(command.getUsersAllowedToWriteToRemove())
+        emptyIfNull(command.usersAllowedToWriteToRemove())
                 .forEach(world::removeWriterUser);
 
         return repository.save(world);

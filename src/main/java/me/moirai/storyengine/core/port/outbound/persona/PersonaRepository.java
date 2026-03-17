@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.port.outbound.persona;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
@@ -12,15 +13,15 @@ public interface PersonaRepository {
 
     void deleteById(Long id);
 
-    void deleteByPublicId(String publicId);
+    void deleteByPublicId(UUID publicId);
 
     Optional<Persona> findById(Long id);
 
-    Optional<Persona> findByPublicId(String publicId);
+    Optional<Persona> findByPublicId(UUID publicId);
 
     SearchPersonasResult search(SearchPersonas request);
 
     boolean existsById(Long id);
 
-    boolean existsByPublicId(String publicId);
+    boolean existsByPublicId(UUID publicId);
 }

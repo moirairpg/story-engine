@@ -1,9 +1,9 @@
 package me.moirai.storyengine.core.application.usecase.discord.messagereceived;
 
 import static java.util.Objects.nonNull;
+import static me.moirai.storyengine.common.enums.GameMode.AUTHOR;
+import static me.moirai.storyengine.common.enums.Moderation.DISABLED;
 import static me.moirai.storyengine.common.util.DefaultStringProcessors.formatAuthorDirective;
-import static me.moirai.storyengine.core.domain.adventure.GameMode.AUTHOR;
-import static me.moirai.storyengine.core.domain.adventure.Moderation.DISABLED;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
@@ -66,17 +66,17 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().getAiModel().toString(),
-                        adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
-                        adventure.getModelConfiguration().getAiModel().getHardTokenLimit());
+                .build(adventure.getModelConfiguration().aiModel().toString(),
+                        adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                        adventure.getModelConfiguration().aiModel().getHardTokenLimit());
 
         ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .temperature(adventure.getModelConfiguration().getTemperature())
+                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
+                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
+                .logitBias(adventure.getModelConfiguration().logitBias())
+                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
+                .stopSequences(adventure.getModelConfiguration().stopSequences())
+                .temperature(adventure.getModelConfiguration().temperature())
                 .aiModel(aiModel)
                 .build();
 
@@ -100,11 +100,11 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
                 .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(AUTHOR.name())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .remember(adventure.getContextAttributes().getRemember())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
+                .nudge(adventure.getContextAttributes().nudge())
+                .authorsNote(adventure.getContextAttributes().authorsNote())
+                .remember(adventure.getContextAttributes().remember())
+                .bump(adventure.getContextAttributes().bump())
+                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
                 .build();
     }
 

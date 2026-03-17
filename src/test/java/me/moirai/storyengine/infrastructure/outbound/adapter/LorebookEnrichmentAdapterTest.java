@@ -2,6 +2,7 @@ package me.moirai.storyengine.infrastructure.outbound.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.list;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +57,7 @@ public class LorebookEnrichmentAdapterTest {
     void enrichContextWithLorebookForRpg_whenMessagesAreValid_andNormalMode_thenReturnContextWithProcessedPlayerEntries() {
 
         // Given
-        String worldId = AdventureFixture.PUBLIC_ID;
+        UUID worldId = AdventureFixture.PUBLIC_ID;
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         List<DiscordMessageData> messageList = getMessageListForTesting();
 
@@ -68,7 +70,7 @@ public class LorebookEnrichmentAdapterTest {
 
         doReturn(lorebookEntries).when(adventure).getLorebookEntriesByRegex(anyString());
 
-        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
 
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(5)
@@ -104,7 +106,7 @@ public class LorebookEnrichmentAdapterTest {
     void enrichContextWithLorebookForRpg_whenMessagesAreValid_andRpgMode_thenReturnContextWithProcessedPlayerEntries() {
 
         // Given
-        String worldId = AdventureFixture.PUBLIC_ID;
+        UUID worldId = AdventureFixture.PUBLIC_ID;
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         List<DiscordMessageData> messageList = getMessageListForTesting();
 
@@ -123,7 +125,7 @@ public class LorebookEnrichmentAdapterTest {
                 .doReturn(Optional.of(marcusCharacter))
                 .when(adventure).getLorebookEntryByPlayerId(anyString());
 
-        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
 
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(5)
@@ -203,42 +205,15 @@ public class LorebookEnrichmentAdapterTest {
                 .isPlayerCharacter(true)
                 .build();
 
-        ReflectionTestUtils.setField(entry, "publicId", "pyromancer-0000-0000-0000-000000000001");
+        ReflectionTestUtils.setField(entry, "publicId", UUID.fromString("e01b12a5-578e-4eb6-951f-0cc81cafd4fb"));
+        ReflectionTestUtils.setField(entry, "id", 4L);
+
         return entry;
     }
 
     private AdventureLorebookEntry buildJohnCharacter(Adventure adventure) {
 
-        AdventureLorebookEntry entry = AdventureLorebookEntry.builder()
-                .name("Lord of Doom")
-                .regex("[Ll]ord [Oo] [Dd]oom")
-                .description("The Lord of Doom is a very powerful ogre")
-                .playerId("2")
-                .isPlayerCharacter(true)
-                .build();
-
-        ReflectionTestUtils.setField(entry, "publicId", "lorddoom-0000-0000-0000-000000000002");
-        return entry;
-    }
-
-    private List<AdventureLorebookEntry> buildLorebookEntriesForWords(Adventure adventure) {
-
-        AdventureLorebookEntry swordOfFire = AdventureLorebookEntry.builder()
-                .name("Sword of Fire")
-                .regex("[Ss]word [Oo]f [Ff]ire")
-                .description("The Sword of Fire is a spectral sword that spits fire")
-                .build();
-
-        ReflectionTestUtils.setField(swordOfFire, "publicId", "swordfire-0000-0000-0000-000000000003");
-
-        AdventureLorebookEntry gloveOfArmageddon = AdventureLorebookEntry.builder()
-                .name("Glove of Armageddon")
-                .regex("[Gg]love [Oo]f [Aa]rmageddon")
-                .description("The Glove of Armageddon is a gauntlet that punches with the strength of three suns")
-                .build();
-
-        ReflectionTestUtils.setField(gloveOfArmageddon, "publicId", "glovearm-0000-0000-0000-000000000004");
-
+        var lordOfDoomId = UUID.fromString("9af8053c-b65d-468d-a1ad-5348d9b64105");
         AdventureLorebookEntry lordOfDoom = AdventureLorebookEntry.builder()
                 .name("Lord of Doom")
                 .regex("[Ll]ord [Oo] [Dd]oom")
@@ -247,7 +222,45 @@ public class LorebookEnrichmentAdapterTest {
                 .isPlayerCharacter(true)
                 .build();
 
-        ReflectionTestUtils.setField(lordOfDoom, "publicId", "lorddoom-0000-0000-0000-000000000002");
+        ReflectionTestUtils.setField(lordOfDoom, "id", 3L);
+        ReflectionTestUtils.setField(lordOfDoom, "publicId", lordOfDoomId);
+
+        return lordOfDoom;
+    }
+
+    private List<AdventureLorebookEntry> buildLorebookEntriesForWords(Adventure adventure) {
+
+        var swordOfFireId = UUID.fromString("a78d57ee-ec5e-4f54-ace7-e4d7959d01e9");
+        AdventureLorebookEntry swordOfFire = AdventureLorebookEntry.builder()
+                .name("Sword of Fire")
+                .regex("[Ss]word [Oo]f [Ff]ire")
+                .description("The Sword of Fire is a spectral sword that spits fire`")
+                .build();
+
+        ReflectionTestUtils.setField(swordOfFire, "id", 1L);
+        ReflectionTestUtils.setField(swordOfFire, "publicId", swordOfFireId);
+
+        var gloveOfArmageddonId = UUID.fromString("a7628cc2-a98e-486f-ac29-9bfbe4ce36fc");
+        AdventureLorebookEntry gloveOfArmageddon = AdventureLorebookEntry.builder()
+                .name("Glove of Armageddon")
+                .regex("[Gg]love [Oo]f [Aa]rmageddon")
+                .description("The Glove of Armageddon is a gauntlet that punches with the strength of three suns")
+                .build();
+
+        ReflectionTestUtils.setField(gloveOfArmageddon, "id", 2L);
+        ReflectionTestUtils.setField(gloveOfArmageddon, "publicId", gloveOfArmageddonId);
+
+        var lordOfDoomId = UUID.fromString("9af8053c-b65d-468d-a1ad-5348d9b64105");
+        AdventureLorebookEntry lordOfDoom = AdventureLorebookEntry.builder()
+                .name("Lord of Doom")
+                .regex("[Ll]ord [Oo] [Dd]oom")
+                .description("The Lord of Doom is a very powerful ogre")
+                .playerId("2")
+                .isPlayerCharacter(true)
+                .build();
+
+        ReflectionTestUtils.setField(lordOfDoom, "id", 3L);
+        ReflectionTestUtils.setField(lordOfDoom, "publicId", lordOfDoomId);
 
         return list(swordOfFire, gloveOfArmageddon, lordOfDoom);
     }

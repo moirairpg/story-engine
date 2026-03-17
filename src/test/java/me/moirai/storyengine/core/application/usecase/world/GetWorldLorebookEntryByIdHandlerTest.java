@@ -2,12 +2,13 @@ package me.moirai.storyengine.core.application.usecase.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +49,10 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void errorWhenEntryIdIsNull() {
 
         // Given
-        GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder().build();
+        GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
+                null,
+                WorldFixture.PUBLIC_ID,
+                null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -58,9 +62,10 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void errorWhenWorldIdIsNull() {
 
         // Given
-        GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
-                .entryId("ENTRID")
-                .build();
+        GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
+                WorldLorebookEntryFixture.PUBLIC_ID,
+                null,
+                null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -70,8 +75,8 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void getWorldLorebookEntryById() {
 
         // Given
-        String publicId = WorldLorebookEntryFixture.PUBLIC_ID;
-        String worldId = WorldFixture.PUBLIC_ID;
+        UUID publicId = WorldLorebookEntryFixture.PUBLIC_ID;
+        UUID worldId = WorldFixture.PUBLIC_ID;
         String requesterId = "4314324";
 
         WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
@@ -85,21 +90,20 @@ public class GetWorldLorebookEntryByIdHandlerTest {
                 .build();
 
         World world = spy(baseWorld);
-        doReturn(entry).when(world).getLorebookEntryById(anyString());
+        doReturn(entry).when(world).getLorebookEntryById(any(UUID.class));
 
-        GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
-                .entryId(publicId)
-                .worldId(worldId)
-                .requesterId(requesterId)
-                .build();
+        GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
+                publicId,
+                worldId,
+                requesterId);
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
 
         // When
         WorldLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(entry.getPublicId());
+        assertThat(result.id()).isEqualTo(entry.getPublicId());
     }
 }

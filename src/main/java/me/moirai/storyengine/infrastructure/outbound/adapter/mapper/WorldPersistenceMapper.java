@@ -12,31 +12,29 @@ public class WorldPersistenceMapper {
 
     public WorldDetails mapToResult(World world) {
 
-        return WorldDetails.builder()
-                .id(world.getPublicId())
-                .name(world.getName())
-                .description(world.getDescription())
-                .adventureStart(world.getAdventureStart())
-                .usersAllowedToRead(world.getUsersAllowedToRead())
-                .usersAllowedToWrite(world.getUsersAllowedToWrite())
-                .visibility(world.getVisibility().name())
-                .ownerId(world.getOwnerId())
-                .creationDate(world.getCreationDate())
-                .lastUpdateDate(world.getLastUpdateDate())
-                .build();
+        return new WorldDetails(
+                world.getPublicId(),
+                world.getName(),
+                world.getDescription(),
+                world.getAdventureStart(),
+                world.getVisibility().name(),
+                world.getOwnerId(),
+                world.getUsersAllowedToRead(),
+                world.getUsersAllowedToWrite(),
+                world.getCreationDate(),
+                world.getLastUpdateDate());
     }
 
     public SearchWorldsResult mapToResult(Page<World> pagedResult) {
 
-        return SearchWorldsResult.builder()
-                .results(pagedResult.getContent()
+        return new SearchWorldsResult(
+                pagedResult.getNumber() + 1,
+                pagedResult.getNumberOfElements(),
+                pagedResult.getTotalElements(),
+                pagedResult.getTotalPages(),
+                pagedResult.getContent()
                         .stream()
                         .map(this::mapToResult)
-                        .toList())
-                .page(pagedResult.getNumber() + 1)
-                .items(pagedResult.getNumberOfElements())
-                .totalItems(pagedResult.getTotalElements())
-                .totalPages(pagedResult.getTotalPages())
-                .build();
+                        .toList());
     }
 }

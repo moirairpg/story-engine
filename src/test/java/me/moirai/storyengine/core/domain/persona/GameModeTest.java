@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.Test;
 
+import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.adventure.GameMode;
 
 public class GameModeTest {
 

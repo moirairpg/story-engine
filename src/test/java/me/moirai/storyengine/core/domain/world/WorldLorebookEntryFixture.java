@@ -1,12 +1,13 @@
 package me.moirai.storyengine.core.domain.world;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class WorldLorebookEntryFixture {
 
-    public static final String PUBLIC_ID = "857345aa-0000-0000-0000-000000000000";
+    public static final UUID PUBLIC_ID = UUID.fromString("857345aa-0000-0000-0000-000000000000");
     public static final Long NUMERIC_ID = 1L;
 
     public static WorldLorebookEntry.Builder sampleLorebookEntry() {

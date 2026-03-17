@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.ModerationException;
+import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
@@ -65,8 +68,8 @@ public class StoryGenerationAdapterTest {
         String botUsername = "TestBot";
         String botNickname = "Bot";
         String channelId = "channel-1";
-        String adventureId = "adventure-1";
-        String personaId = "persona-1";
+        UUID adventureId = AdventureFixture.PUBLIC_ID;
+        UUID personaId = PersonaFixture.PUBLIC_ID;
         String generatedText = "Once upon a time.";
 
         DiscordMessageData message = DiscordMessageData.builder()
@@ -135,8 +138,8 @@ public class StoryGenerationAdapterTest {
         String botUsername = "TestBot";
         String botNickname = "Bot";
         String channelId = "channel-1";
-        String adventureId = "adventure-rpg";
-        String personaId = "persona-1";
+        UUID adventureId = AdventureFixture.PUBLIC_ID;
+        UUID personaId = PersonaFixture.PUBLIC_ID;
         String generatedText = "You enter the dungeon.";
 
         ModelConfigurationRequest modelConfig = ModelConfigurationRequest.builder()
@@ -198,8 +201,8 @@ public class StoryGenerationAdapterTest {
         String botUsername = "TestBot";
         String botNickname = "Bot";
         String channelId = "channel-1";
-        String adventureId = "adventure-1";
-        String personaId = "persona-1";
+        UUID adventureId = AdventureFixture.PUBLIC_ID;
+        UUID personaId = PersonaFixture.PUBLIC_ID;
 
         ModelConfigurationRequest modelConfig = ModelConfigurationRequest.builder()
                 .aiModel(AiModelRequest.build("gpt4", "gpt-4", 8192))

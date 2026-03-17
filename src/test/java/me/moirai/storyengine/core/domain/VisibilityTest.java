@@ -1,12 +1,12 @@
 package me.moirai.storyengine.core.domain;
 
-import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 public class VisibilityTest {

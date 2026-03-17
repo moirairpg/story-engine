@@ -1,28 +1,10 @@
 package me.moirai.storyengine.core.port.inbound.persona;
 
-import me.moirai.storyengine.common.usecases.UseCase;
+import java.util.UUID;
 
-public final class GetPersonaById extends UseCase<PersonaDetails> {
+import me.moirai.storyengine.common.cqs.query.Query;
 
-    private final String id;
-    private final String requesterId;
-
-    private GetPersonaById(String id, String requesterId) {
-
-        this.id = id;
-        this.requesterId = requesterId;
-    }
-
-    public static GetPersonaById build(String id, String requesterId) {
-
-        return new GetPersonaById(id, requesterId);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterId;
-    }
+public record GetPersonaById(
+        UUID personaId,
+        String requesterId) implements Query<PersonaDetails> {
 }

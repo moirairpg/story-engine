@@ -1,4 +1,4 @@
-package me.moirai.storyengine.common.domain;
+package me.moirai.storyengine.common.enums;
 
 import java.util.Arrays;
 

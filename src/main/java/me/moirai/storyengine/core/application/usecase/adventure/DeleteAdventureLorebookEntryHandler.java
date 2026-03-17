@@ -1,17 +1,15 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
-@UseCaseHandler
-public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<DeleteAdventureLorebookEntry, Void> {
+@CommandHandler
+public class DeleteAdventureLorebookEntryHandler extends AbstractCommandHandler<DeleteAdventureLorebookEntry, Void> {
 
     private static final String ENTRY_ID_CANNOT_BE_NULL_OR_EMPTY = "Lorebook entry ID cannot be null or empty";
     private static final String ADVENTURE_ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
@@ -28,11 +26,11 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
     @Override
     public void validate(DeleteAdventureLorebookEntry command) {
 
-        if (isBlank(command.getLorebookEntryId())) {
+        if (command.entryId() == null) {
             throw new IllegalArgumentException(ENTRY_ID_CANNOT_BE_NULL_OR_EMPTY);
         }
 
-        if (isBlank(command.getAdventureId())) {
+        if (command.adventureId() == null) {
             throw new IllegalArgumentException(ADVENTURE_ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -40,14 +38,15 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
     @Override
     public Void execute(DeleteAdventureLorebookEntry command) {
 
-        Adventure adventure = repository.findByPublicId(command.getAdventureId())
+        Adventure adventure = repository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
 
-        if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!adventure.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_ADVENTURE);
         }
 
-        adventure.removeLorebookEntry(command.getLorebookEntryId());
+        adventure.removeLorebookEntry(command.entryId());
         repository.save(adventure);
 
         return null;

@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.port.outbound.adventure;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
@@ -14,7 +15,7 @@ public interface AdventureRepository {
 
     void deleteById(Long id);
 
-    void deleteByPublicId(String publicId);
+    void deleteByPublicId(UUID publicId);
 
     void updateRememberByChannelId(String remember, String channelId);
 
@@ -26,7 +27,7 @@ public interface AdventureRepository {
 
     Optional<Adventure> findById(Long id);
 
-    Optional<Adventure> findByPublicId(String publicId);
+    Optional<Adventure> findByPublicId(UUID publicId);
 
     SearchAdventuresResult search(SearchAdventures request);
 

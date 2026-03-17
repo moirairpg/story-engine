@@ -10,22 +10,26 @@ public class ContextAttributesTest {
     public void contextAttributes_whenUseBuilder_thenNewInstanceIsCreated() {
 
         // Given
-        ContextAttributes.Builder builder = ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .bump("Bump")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bumpFrequency(1);
+        String nudge = "Nudge";
+        String authorsNote = "Author's note";
+        String remember = "Remember";
+        String bump = "Bump";
+        int bumpFrequency = 1;
 
         // When
-        ContextAttributes contextAttributes = builder.build();
+        ContextAttributes contextAttributes = new ContextAttributes(
+                nudge,
+                authorsNote,
+                remember,
+                bump,
+                bumpFrequency);
 
         // Then
         assertThat(contextAttributes).isNotNull();
-        assertThat(contextAttributes.getAuthorsNote()).isEqualTo("Author's note");
-        assertThat(contextAttributes.getBump()).isEqualTo("Bump");
-        assertThat(contextAttributes.getNudge()).isEqualTo("Nudge");
-        assertThat(contextAttributes.getRemember()).isEqualTo("Remember");
+        assertThat(contextAttributes.authorsNote()).isEqualTo("Author's note");
+        assertThat(contextAttributes.bump()).isEqualTo("Bump");
+        assertThat(contextAttributes.nudge()).isEqualTo("Nudge");
+        assertThat(contextAttributes.remember()).isEqualTo("Remember");
     }
 
     @Test
@@ -33,24 +37,23 @@ public class ContextAttributesTest {
 
         // Given
         String newAuthorsNote = "New value";
-        ContextAttributes contextAttributes = ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .bump("Bump")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bumpFrequency(1)
-                .build();
+        ContextAttributes contextAttributes = new ContextAttributes(
+                "Nudge",
+                "Author's note",
+                "Remember",
+                "Bump",
+                1);
 
         // When
         ContextAttributes updatedContextAttributes = contextAttributes.updateAuthorsNote(newAuthorsNote);
 
         // Then
         assertThat(updatedContextAttributes).isNotNull().isNotEqualTo(contextAttributes);
-        assertThat(updatedContextAttributes.getAuthorsNote()).isEqualTo(newAuthorsNote);
-        assertThat(updatedContextAttributes.getBumpFrequency()).isEqualTo(1);
-        assertThat(updatedContextAttributes.getBump()).isEqualTo("Bump");
-        assertThat(updatedContextAttributes.getNudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.getRemember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.authorsNote()).isEqualTo(newAuthorsNote);
+        assertThat(updatedContextAttributes.bumpFrequency()).isEqualTo(1);
+        assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
+        assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
+        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
     }
 
     @Test
@@ -58,24 +61,23 @@ public class ContextAttributesTest {
 
         // Given
         String newBump = "New value";
-        ContextAttributes contextAttributes = ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .bump("Bump")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bumpFrequency(1)
-                .build();
+        ContextAttributes contextAttributes = new ContextAttributes(
+                "Nudge",
+                "Author's note",
+                "Remember",
+                "Bump",
+                1);
 
         // When
         ContextAttributes updatedContextAttributes = contextAttributes.updateBump(newBump);
 
         // Then
         assertThat(updatedContextAttributes).isNotNull().isNotEqualTo(contextAttributes);
-        assertThat(updatedContextAttributes.getBumpFrequency()).isEqualTo(1);
-        assertThat(updatedContextAttributes.getAuthorsNote()).isEqualTo("Author's note");
-        assertThat(updatedContextAttributes.getBump()).isEqualTo(newBump);
-        assertThat(updatedContextAttributes.getNudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.getRemember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.bumpFrequency()).isEqualTo(1);
+        assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
+        assertThat(updatedContextAttributes.bump()).isEqualTo(newBump);
+        assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
+        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
     }
 
     @Test
@@ -83,24 +85,23 @@ public class ContextAttributesTest {
 
         // Given
         int newBumpFrequency = 3;
-        ContextAttributes contextAttributes = ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bump("Bump")
-                .bumpFrequency(1)
-                .build();
+        ContextAttributes contextAttributes = new ContextAttributes(
+                "Nudge",
+                "Author's note",
+                "Remember",
+                "Bump",
+                1);
 
         // When
         ContextAttributes updatedContextAttributes = contextAttributes.updateBumpFrequency(newBumpFrequency);
 
         // Then
         assertThat(updatedContextAttributes).isNotNull().isNotEqualTo(contextAttributes);
-        assertThat(updatedContextAttributes.getBumpFrequency()).isEqualTo(newBumpFrequency);
-        assertThat(updatedContextAttributes.getAuthorsNote()).isEqualTo("Author's note");
-        assertThat(updatedContextAttributes.getBump()).isEqualTo("Bump");
-        assertThat(updatedContextAttributes.getNudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.getRemember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.bumpFrequency()).isEqualTo(newBumpFrequency);
+        assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
+        assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
+        assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
+        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
     }
 
     @Test
@@ -108,24 +109,23 @@ public class ContextAttributesTest {
 
         // Given
         String newNudge = "New value";
-        ContextAttributes contextAttributes = ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .bump("Bump")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bumpFrequency(1)
-                .build();
+        ContextAttributes contextAttributes = new ContextAttributes(
+                "Nudge",
+                "Author's note",
+                "Remember",
+                "Bump",
+                1);
 
         // When
         ContextAttributes updatedContextAttributes = contextAttributes.updateNudge(newNudge);
 
         // Then
         assertThat(updatedContextAttributes).isNotNull().isNotEqualTo(contextAttributes);
-        assertThat(updatedContextAttributes.getBumpFrequency()).isEqualTo(1);
-        assertThat(updatedContextAttributes.getAuthorsNote()).isEqualTo("Author's note");
-        assertThat(updatedContextAttributes.getBump()).isEqualTo("Bump");
-        assertThat(updatedContextAttributes.getNudge()).isEqualTo(newNudge);
-        assertThat(updatedContextAttributes.getRemember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.bumpFrequency()).isEqualTo(1);
+        assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
+        assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
+        assertThat(updatedContextAttributes.nudge()).isEqualTo(newNudge);
+        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
     }
 
     @Test
@@ -133,23 +133,22 @@ public class ContextAttributesTest {
 
         // Given
         String newRemember = "New value";
-        ContextAttributes contextAttributes = ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .bump("Bump")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bumpFrequency(1)
-                .build();
+        ContextAttributes contextAttributes = new ContextAttributes(
+                "Nudge",
+                "Author's note",
+                "Remember",
+                "Bump",
+                1);
 
         // When
         ContextAttributes updatedContextAttributes = contextAttributes.updateRemember(newRemember);
 
         // Then
         assertThat(updatedContextAttributes).isNotNull().isNotEqualTo(contextAttributes);
-        assertThat(updatedContextAttributes.getBumpFrequency()).isEqualTo(1);
-        assertThat(updatedContextAttributes.getAuthorsNote()).isEqualTo("Author's note");
-        assertThat(updatedContextAttributes.getBump()).isEqualTo("Bump");
-        assertThat(updatedContextAttributes.getNudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.getRemember()).isEqualTo(newRemember);
+        assertThat(updatedContextAttributes.bumpFrequency()).isEqualTo(1);
+        assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
+        assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
+        assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
+        assertThat(updatedContextAttributes.remember()).isEqualTo(newRemember);
     }
 }

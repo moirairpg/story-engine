@@ -1,26 +1,11 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
-import me.moirai.storyengine.common.usecases.UseCase;
+import java.util.UUID;
 
-public final class GetAdventureById extends UseCase<AdventureDetails> {
+import me.moirai.storyengine.common.cqs.query.Query;
 
-    private final String id;
-    private final String requesterId;
-
-    private GetAdventureById(String id, String requesterId) {
-        this.id = id;
-        this.requesterId = requesterId;
-    }
-
-    public static GetAdventureById build(String id, String requesterId) {
-        return new GetAdventureById(id, requesterId);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterId;
-    }
+public record GetAdventureById(
+        UUID adventureId,
+        String requesterId)
+        implements Query<AdventureDetails> {
 }

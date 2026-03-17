@@ -7,33 +7,33 @@ import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 public class GetPersonaResultFixture {
 
-    public static PersonaDetails.Builder privatePersona() {
+    public static PersonaDetails privatePersona() {
 
         Persona persona = PersonaFixture.privatePersona().build();
-        return PersonaDetails.builder()
-                .id(persona.getPublicId())
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().name())
-                .usersAllowedToRead(persona.getUsersAllowedToRead())
-                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
-                .creationDate(persona.getCreationDate())
-                .lastUpdateDate(persona.getLastUpdateDate())
-                .ownerId(persona.getOwnerId());
+        return new PersonaDetails(
+                persona.getPublicId(),
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToWrite(),
+                persona.getUsersAllowedToRead(),
+                persona.getCreationDate(),
+                persona.getLastUpdateDate());
     }
 
-    public static PersonaDetails.Builder publicPersona() {
+    public static PersonaDetails publicPersona() {
 
         Persona persona = PersonaFixture.publicPersona().build();
-        return PersonaDetails.builder()
-                .id(persona.getPublicId())
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().name())
-                .usersAllowedToRead(persona.getUsersAllowedToRead())
-                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
-                .creationDate(persona.getCreationDate())
-                .lastUpdateDate(persona.getLastUpdateDate())
-                .ownerId(persona.getOwnerId());
+        return new PersonaDetails(
+                persona.getPublicId(),
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToWrite(),
+                persona.getUsersAllowedToRead(),
+                persona.getCreationDate(),
+                persona.getLastUpdateDate());
     }
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,17 +38,15 @@ public class UpdateWorldLorebookEntryHandlerTest {
     public void updateWorld() {
 
         // Given
-        String id = "WRDID";
         String requesterId = "OWNER123";
 
-        UpdateWorldLorebookEntry command = UpdateWorldLorebookEntry.builder()
-                .id(id)
-                .name("MoirAI")
-                .regex("MoirAI")
-                .description("This is an RPG world")
-                .worldId(WorldFixture.PUBLIC_ID)
-                .requesterId(requesterId)
-                .build();
+        UpdateWorldLorebookEntry command = new UpdateWorldLorebookEntry(
+                WorldLorebookEntryFixture.PUBLIC_ID,
+                WorldFixture.PUBLIC_ID,
+                "MoirAI",
+                "MoirAI",
+                "This is an RPG world",
+                requesterId);
 
         WorldLorebookEntry expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
 
@@ -58,9 +57,10 @@ public class UpdateWorldLorebookEntryHandlerTest {
                 .build();
 
         World world = spy(baseWorld);
-        doReturn(expectedUpdatedEntry).when(world).updateLorebookEntry(anyString(), anyString(), anyString(), anyString());
+        doReturn(expectedUpdatedEntry).when(world)
+                .updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString());
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
         // When
@@ -68,6 +68,6 @@ public class UpdateWorldLorebookEntryHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getLastUpdateDate()).isEqualTo(expectedUpdatedEntry.getLastUpdateDate());
+        assertThat(result.lastUpdateDate()).isEqualTo(expectedUpdatedEntry.getLastUpdateDate());
     }
 }

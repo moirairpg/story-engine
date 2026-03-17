@@ -1,50 +1,225 @@
 package me.moirai.storyengine.core.application.usecase.adventure.request;
 
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.assertj.core.util.Maps;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 
 public class UpdateAdventureFixture {
 
-    public static UpdateAdventure.Builder sample() {
+    public static UpdateAdventure sample() {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
-        return UpdateAdventure.builder()
-                .id(AdventureFixture.PUBLIC_ID)
-                .name(adventure.getName())
-                .description(adventure.getDescription())
-                .worldId(String.valueOf(adventure.getWorldId()))
-                .personaId(PersonaFixture.PUBLIC_ID)
-                .channelId(adventure.getChannelId())
-                .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .moderation(adventure.getModeration().name())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .temperature(adventure.getModelConfiguration().getTemperature())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .stopSequencesToAdd(adventure.getModelConfiguration().getStopSequences())
-                .stopSequencesToRemove(adventure.getModelConfiguration().getStopSequences())
-                .logitBiasToAdd(Maps.newHashMap("TKNID", 99D))
-                .logitBiasToRemove(Collections.singleton("TKN"))
-                .usersAllowedToWriteToAdd(Collections.singleton("USRID"))
-                .usersAllowedToWriteToRemove(Collections.singleton("USRID"))
-                .usersAllowedToReadToAdd(Collections.singleton("USRID"))
-                .usersAllowedToReadToRemove(Collections.singleton("USRID"))
-                .gameMode(adventure.getGameMode().name())
-                .requesterId(adventure.getOwnerId())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .remember(adventure.getContextAttributes().getRemember())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .isMultiplayer(adventure.isMultiplayer())
-                .adventureStart(adventure.getAdventureStart());
+        return new UpdateAdventure(
+                AdventureFixture.PUBLIC_ID,
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                adventure.getName(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                adventure.getOwnerId(),
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                Maps.newHashMap("TKNID", 99D),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().stopSequences(),
+                Collections.singleton("TKN"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                adventure.isMultiplayer());
+    }
+
+    public static UpdateAdventure sampleWithRequesterId(String requesterId) {
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        return new UpdateAdventure(
+                AdventureFixture.PUBLIC_ID,
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                adventure.getName(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                requesterId,
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                Maps.newHashMap("TKNID", 99D),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().stopSequences(),
+                Collections.singleton("TKN"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                adventure.isMultiplayer());
+    }
+
+    public static UpdateAdventure sampleWithVisibility(String requesterId, String visibility) {
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        return new UpdateAdventure(
+                AdventureFixture.PUBLIC_ID,
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                adventure.getName(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                visibility,
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                requesterId,
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                Maps.newHashMap("TKNID", 99D),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().stopSequences(),
+                Collections.singleton("TKN"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                adventure.isMultiplayer());
+    }
+
+    public static UpdateAdventure sampleWithMultiplayer(String requesterId, boolean isMultiplayer) {
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        return new UpdateAdventure(
+                AdventureFixture.PUBLIC_ID,
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                adventure.getName(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                requesterId,
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                Maps.newHashMap("TKNID", 99D),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().stopSequences(),
+                Collections.singleton("TKN"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                isMultiplayer);
+    }
+
+    public static UpdateAdventure sampleWithNullFields(
+            UUID adventureId,
+            String requesterId,
+            String name,
+            UUID worldId,
+            UUID personaId,
+            String channelId,
+            String visibility,
+            String aiModel,
+            String moderation,
+            String gameMode,
+            Integer maxTokenLimit,
+            Double temperature,
+            Double frequencyPenalty,
+            Double presencePenalty,
+            Map<String, Double> logitBiasToAdd,
+            Set<String> logitBiasToRemove,
+            Set<String> stopSequencesToAdd,
+            Set<String> stopSequencesToRemove,
+            Set<String> usersAllowedToWriteToAdd,
+            Set<String> usersAllowedToWriteToRemove,
+            Set<String> usersAllowedToReadToAdd,
+            Set<String> usersAllowedToReadToRemove,
+            String adventureStart,
+            String description,
+            String gameModeFull,
+            String authorsNote,
+            String nudge,
+            String remember,
+            String bump) {
+
+        return new UpdateAdventure(
+                adventureId,
+                description,
+                adventureStart,
+                name,
+                worldId,
+                personaId,
+                channelId,
+                visibility,
+                aiModel,
+                moderation,
+                requesterId,
+                gameMode,
+                nudge,
+                remember,
+                authorsNote,
+                bump,
+                null,
+                maxTokenLimit,
+                temperature,
+                frequencyPenalty,
+                presencePenalty,
+                logitBiasToAdd,
+                stopSequencesToAdd,
+                stopSequencesToRemove,
+                logitBiasToRemove,
+                usersAllowedToWriteToAdd,
+                usersAllowedToWriteToRemove,
+                usersAllowedToReadToAdd,
+                usersAllowedToReadToRemove,
+                false);
     }
 }

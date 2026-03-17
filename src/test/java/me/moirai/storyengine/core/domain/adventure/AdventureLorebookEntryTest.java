@@ -21,8 +21,7 @@ public class AdventureLorebookEntryTest {
                 .creationDate(OffsetDateTime.now())
                 .lastUpdateDate(OffsetDateTime.now())
                 .isPlayerCharacter(true)
-                .playerId("2423423423423")
-                .version(1);
+                .playerId("2423423423423");
 
         // When
         AdventureLorebookEntry entry = builder.build();
@@ -39,7 +38,6 @@ public class AdventureLorebookEntryTest {
         assertThat(entry.getPlayerId()).isEqualTo("2423423423423");
         assertThat(entry.getCreatorId()).isEqualTo("CRTID");
         assertThat(entry.getRegex()).isEqualTo("[Ww]hite [Rr]iver");
-        assertThat(entry.getVersion()).isEqualTo(1);
         assertThat(entry.isPlayerCharacter()).isTrue();
     }
 

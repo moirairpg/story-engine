@@ -35,15 +35,15 @@ public class PersonaPersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(persona.getPublicId());
-        assertThat(result.getName()).isEqualTo(persona.getName());
-        assertThat(result.getPersonality()).isEqualTo(persona.getPersonality());
-        assertThat(result.getVisibility()).isEqualTo(persona.getVisibility().name());
-        assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
-        assertThat(result.getUsersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
-        assertThat(result.getCreationDate()).isEqualTo(persona.getCreationDate());
-        assertThat(result.getLastUpdateDate()).isEqualTo(persona.getLastUpdateDate());
-        assertThat(result.getOwnerId()).isEqualTo(persona.getOwnerId());
+        assertThat(result.id()).isEqualTo(persona.getPublicId());
+        assertThat(result.name()).isEqualTo(persona.getName());
+        assertThat(result.personality()).isEqualTo(persona.getPersonality());
+        assertThat(result.visibility()).isEqualTo(persona.getVisibility());
+        assertThat(result.usersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
+        assertThat(result.usersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
+        assertThat(result.creationDate()).isEqualTo(persona.getCreationDate());
+        assertThat(result.lastUpdateDate()).isEqualTo(persona.getLastUpdateDate());
+        assertThat(result.ownerId()).isEqualTo(persona.getOwnerId());
     }
 
     @Test
@@ -62,8 +62,8 @@ public class PersonaPersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getPage()).isEqualTo(1);
-        assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getItems()).isEqualTo(20);
+        assertThat(result.page()).isEqualTo(1);
+        assertThat(result.totalPages()).isEqualTo(2);
+        assertThat(result.items()).isEqualTo(20);
     }
 }

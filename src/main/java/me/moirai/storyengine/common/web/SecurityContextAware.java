@@ -5,6 +5,7 @@ import java.util.function.Function;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import reactor.core.publisher.Mono;
@@ -29,5 +30,19 @@ public abstract class SecurityContextAware {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(function);
+    }
+
+    protected MoiraiPrincipal getAuthenticatedUser() {
+        return (MoiraiPrincipal) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+    }
+
+    protected String getUserDiscordId() {
+        return getAuthenticatedUser().getDiscordId();
+    }
+
+    protected String getUsername() {
+        return getAuthenticatedUser().getUsername();
     }
 }

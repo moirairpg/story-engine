@@ -27,6 +27,7 @@ public class UpdateAdventureAuthorsNoteByChannelIdHandler
         Adventure adventure = repository.findByChannelId(useCase.getChannelId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
+        // TODO externalize to authorizer
         if (!adventure.canUserWrite(useCase.getRequesterDiscordId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION);
         }

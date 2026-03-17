@@ -8,12 +8,11 @@ import java.util.Map.Entry;
 import org.apache.commons.collections4.CollectionUtils;
 
 import io.micrometer.common.util.StringUtils;
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permissions;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -21,8 +20,8 @@ import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
-public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono<WorldDetails>> {
+@CommandHandler
+public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Mono<WorldDetails>> {
 
     private static final String WORLD_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
@@ -40,29 +39,29 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
     @Override
     public Mono<WorldDetails> execute(CreateWorld command) {
 
-        return moderateContent(command.getAdventureStart())
-                .flatMap(__ -> moderateContent(command.getName()))
-                .flatMap(__ -> moderateContent(command.getDescription()))
+        return moderateContent(command.adventureStart())
+                .flatMap(__ -> moderateContent(command.name()))
+                .flatMap(__ -> moderateContent(command.description()))
                 .map(__ -> {
                     Permissions permissions = Permissions.builder()
-                            .ownerId(command.getRequesterDiscordId())
-                            .usersAllowedToRead(command.getUsersAllowedToRead())
-                            .usersAllowedToWrite(command.getUsersAllowedToWrite())
+                            .ownerId(command.requesterId())
+                            .usersAllowedToRead(command.usersAllowedToRead())
+                            .usersAllowedToWrite(command.usersAllowedToWrite())
                             .build();
 
                     World world = repository.save(World.builder()
-                            .name(command.getName())
-                            .description(command.getDescription())
-                            .adventureStart(command.getAdventureStart())
-                            .visibility(Visibility.fromString(command.getVisibility()))
+                            .name(command.name())
+                            .description(command.description())
+                            .adventureStart(command.adventureStart())
+                            .visibility(command.visibility())
                             .permissions(permissions)
-                            .creatorId(command.getRequesterDiscordId())
+                            .creatorId(command.requesterId())
                             .build());
 
-                    command.getLorebookEntries().forEach(entry -> world.addLorebookEntry(
-                            entry.getName(),
-                            entry.getRegex(),
-                            entry.getDescription()));
+                    command.lorebookEntries().forEach(entry -> world.addLorebookEntry(
+                            entry.name(),
+                            entry.regex(),
+                            entry.description()));
 
                     repository.save(world);
 
@@ -73,18 +72,17 @@ public class CreateWorldHandler extends AbstractUseCaseHandler<CreateWorld, Mono
 
     private WorldDetails mapResult(World world) {
 
-        return WorldDetails.builder()
-                .id(world.getPublicId())
-                .name(world.getName())
-                .description(world.getDescription())
-                .adventureStart(world.getAdventureStart())
-                .visibility(world.getVisibility().name())
-                .ownerId(world.getOwnerId())
-                .usersAllowedToRead(world.getUsersAllowedToRead())
-                .usersAllowedToWrite(world.getUsersAllowedToWrite())
-                .creationDate(world.getCreationDate())
-                .lastUpdateDate(world.getLastUpdateDate())
-                .build();
+        return new WorldDetails(
+                world.getPublicId(),
+                world.getName(),
+                world.getDescription(),
+                world.getAdventureStart(),
+                world.getVisibility().name(),
+                world.getOwnerId(),
+                world.getUsersAllowedToRead(),
+                world.getUsersAllowedToWrite(),
+                world.getCreationDate(),
+                world.getLastUpdateDate());
     }
 
     private Mono<List<String>> moderateContent(String personality) {

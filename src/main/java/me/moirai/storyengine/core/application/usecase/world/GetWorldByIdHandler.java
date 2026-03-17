@@ -1,18 +1,16 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
-public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, WorldDetails> {
+@QueryHandler
+public class GetWorldByIdHandler extends AbstractQueryHandler<GetWorldById, WorldDetails> {
 
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be deleted was not found";
@@ -27,7 +25,7 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Wo
     @Override
     public void validate(GetWorldById request) {
 
-        if (isBlank(request.getId())) {
+        if (request.worldId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -35,10 +33,11 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Wo
     @Override
     public WorldDetails execute(GetWorldById query) {
 
-        World world = repository.findByPublicId(query.getId())
+        World world = repository.findByPublicId(query.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
-        if (!world.canUserRead(query.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserRead(query.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
@@ -47,17 +46,16 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Wo
 
     private WorldDetails mapResult(World world) {
 
-        return WorldDetails.builder()
-                .id(world.getPublicId())
-                .name(world.getName())
-                .description(world.getDescription())
-                .adventureStart(world.getAdventureStart())
-                .visibility(world.getVisibility().name())
-                .ownerId(world.getOwnerId())
-                .usersAllowedToRead(world.getUsersAllowedToRead())
-                .usersAllowedToWrite(world.getUsersAllowedToWrite())
-                .creationDate(world.getCreationDate())
-                .lastUpdateDate(world.getLastUpdateDate())
-                .build();
+        return new WorldDetails(
+                world.getPublicId(),
+                world.getName(),
+                world.getDescription(),
+                world.getAdventureStart(),
+                world.getVisibility().name(),
+                world.getOwnerId(),
+                world.getUsersAllowedToRead(),
+                world.getUsersAllowedToWrite(),
+                world.getCreationDate(),
+                world.getLastUpdateDate());
     }
 }

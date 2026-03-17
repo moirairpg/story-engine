@@ -1,6 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +23,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.ChatMessageAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.PersonaEnrichmentAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
@@ -58,7 +60,7 @@ public class PersonaEnrichmentAdapterTest {
                 "[ DEBUG MODE ON: You are an actor interpreting the role of %s. %s's persona is as follows, and you are to maintain character during this conversation: %s ]",
                 persona.getName(), persona.getName(), persona.getPersonality());
 
-        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString())).thenReturn(100);
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt()))
@@ -89,7 +91,7 @@ public class PersonaEnrichmentAdapterTest {
                 "[ DEBUG MODE ON: You are an actor interpreting the role of %s. %s's persona is as follows, and you are to maintain character during this conversation: %s ]",
                 persona.getName(), persona.getName(), persona.getPersonality());
 
-        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(100)
                 .thenReturn(100)
@@ -119,7 +121,7 @@ public class PersonaEnrichmentAdapterTest {
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         Map<String, Object> context = contextWithSummaryAndMessages(5);
 
-        when(personaRepository.findByPublicId(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(100000)
                 .thenReturn(100);

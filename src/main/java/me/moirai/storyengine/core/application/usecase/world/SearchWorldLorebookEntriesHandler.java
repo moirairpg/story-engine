@@ -1,17 +1,17 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
-import me.moirai.storyengine.core.domain.world.World;
 
-@UseCaseHandler
+@QueryHandler
 public class SearchWorldLorebookEntriesHandler
-        extends AbstractUseCaseHandler<SearchWorldLorebookEntries, SearchWorldLorebookEntriesResult> {
+        extends AbstractQueryHandler<SearchWorldLorebookEntries, SearchWorldLorebookEntriesResult> {
 
     private static final String USER_DOES_NO_PERMISSION = "User does not have permission to view this world";
     private static final String WORLD_NOT_FOUND = "The world where the entries are being search doesn't exist";
@@ -26,10 +26,10 @@ public class SearchWorldLorebookEntriesHandler
     @Override
     public SearchWorldLorebookEntriesResult execute(SearchWorldLorebookEntries query) {
 
-        World world = worldRepository.findByPublicId(query.getWorldId())
+        World world = worldRepository.findByPublicId(query.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
-        if (world.canUserRead(query.getRequesterDiscordId())) {
+        if (world.canUserRead(query.requesterId())) {
             return worldRepository.searchLorebookEntries(query);
         }
 

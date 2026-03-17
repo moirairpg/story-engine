@@ -1,17 +1,15 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
-import me.moirai.storyengine.core.domain.world.World;
 
-@UseCaseHandler
-public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void> {
+@CommandHandler
+public class DeleteWorldHandler extends AbstractCommandHandler<DeleteWorld, Void> {
 
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
@@ -26,7 +24,7 @@ public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void
     @Override
     public void validate(DeleteWorld command) {
 
-        if (isBlank(command.getId())) {
+        if (command.worldId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -34,14 +32,15 @@ public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void
     @Override
     public Void execute(DeleteWorld command) {
 
-        World world = repository.findByPublicId(command.getId())
+        World world = repository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        repository.deleteByPublicId(command.getId());
+        repository.deleteByPublicId(command.worldId());
 
         return null;
     }

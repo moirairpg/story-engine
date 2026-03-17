@@ -3,10 +3,11 @@ package me.moirai.storyengine.core.application.usecase.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,11 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchAdventureLorebookEntriesHandlerTest {
@@ -35,16 +36,16 @@ public class SearchAdventureLorebookEntriesHandlerTest {
     public void searchEntries_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        SearchAdventureLorebookEntries query = SearchAdventureLorebookEntries.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .adventureId("1234")
-                .requesterId("1234")
-                .build();
+        SearchAdventureLorebookEntries query = new SearchAdventureLorebookEntries(
+                AdventureFixture.PUBLIC_ID,
+                null,
+                1,
+                2,
+                "name",
+                "ASC",
+                "1234");
 
-        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -56,18 +57,18 @@ public class SearchAdventureLorebookEntriesHandlerTest {
     public void searchEntries_whenNoPermissionToView_thenThrowException() {
 
         // Given
-        SearchAdventureLorebookEntries query = SearchAdventureLorebookEntries.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .adventureId("1234")
-                .requesterId("1234")
-                .build();
+        SearchAdventureLorebookEntries query = new SearchAdventureLorebookEntries(
+                AdventureFixture.PUBLIC_ID,
+                null,
+                1,
+                2,
+                "name",
+                "ASC",
+                "1234");
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
-        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -79,23 +80,21 @@ public class SearchAdventureLorebookEntriesHandlerTest {
     public void searchEntries_whenValidRequest_thenReturnEntries() {
 
         // Given
-        SearchAdventureLorebookEntries query = SearchAdventureLorebookEntries.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .adventureId("1234")
-                .requesterId("1234")
-                .build();
+        SearchAdventureLorebookEntries query = new SearchAdventureLorebookEntries(
+                AdventureFixture.PUBLIC_ID,
+                null,
+                1,
+                2,
+                "name",
+                "ASC",
+                "1234");
 
-        SearchAdventureLorebookEntriesResult expectedResult = SearchAdventureLorebookEntriesResult.builder()
-                .page(1)
-                .items(2)
-                .build();
+        SearchAdventureLorebookEntriesResult expectedResult = new SearchAdventureLorebookEntriesResult(
+                1, 2, 0L, 0, List.of());
 
         Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
 
-        when(adventureRepository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(adventureRepository.searchLorebookEntries(any(SearchAdventureLorebookEntries.class)))
                 .thenReturn(expectedResult);
 
@@ -104,7 +103,7 @@ public class SearchAdventureLorebookEntriesHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getItems()).isEqualTo(expectedResult.getItems());
-        assertThat(result.getPage()).isEqualTo(expectedResult.getPage());
+        assertThat(result.items()).isEqualTo(expectedResult.items());
+        assertThat(result.page()).isEqualTo(expectedResult.page());
     }
 }

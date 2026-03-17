@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.port.outbound.world;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
@@ -14,11 +15,11 @@ public interface WorldRepository {
 
     Optional<World> findById(Long id);
 
-    Optional<World> findByPublicId(String publicId);
+    Optional<World> findByPublicId(UUID publicId);
 
     void deleteById(Long id);
 
-    void deleteByPublicId(String publicId);
+    void deleteByPublicId(UUID publicId);
 
     SearchWorldsResult search(SearchWorlds request);
 

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,11 +102,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -161,11 +162,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -222,11 +223,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -283,14 +284,14 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
         when(textModerationPort.moderate(anyString()))
                 .thenReturn(Mono.just(badModerationResult));
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -340,11 +341,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -403,11 +404,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -466,11 +467,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -525,11 +526,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -579,11 +580,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 
@@ -637,11 +638,11 @@ public class StoryGenerationAdapterTest {
         when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
                 .thenReturn(Mono.just(context));
 
-        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(context);
 
-        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), any(UUID.class),
                 any(ModelConfigurationRequest.class)))
                 .thenReturn(Mono.just(context));
 

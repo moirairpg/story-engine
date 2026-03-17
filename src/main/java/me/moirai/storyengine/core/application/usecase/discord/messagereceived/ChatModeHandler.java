@@ -1,7 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.discord.messagereceived;
 
-import static me.moirai.storyengine.core.domain.adventure.GameMode.CHAT;
-import static me.moirai.storyengine.core.domain.adventure.Moderation.DISABLED;
+import static me.moirai.storyengine.common.enums.GameMode.CHAT;
+import static me.moirai.storyengine.common.enums.Moderation.DISABLED;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,17 +63,17 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().getAiModel().toString(),
-                        adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
-                        adventure.getModelConfiguration().getAiModel().getHardTokenLimit());
+                .build(adventure.getModelConfiguration().aiModel().toString(),
+                        adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                        adventure.getModelConfiguration().aiModel().getHardTokenLimit());
 
         ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .temperature(adventure.getModelConfiguration().getTemperature())
+                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
+                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
+                .logitBias(adventure.getModelConfiguration().logitBias())
+                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
+                .stopSequences(adventure.getModelConfiguration().stopSequences())
+                .temperature(adventure.getModelConfiguration().temperature())
                 .aiModel(aiModel)
                 .build();
 
@@ -95,11 +95,11 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
                 .adventureId(adventure.getPublicId())
                 .messageHistory(messageHistory)
                 .gameMode(CHAT.name())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .remember(adventure.getContextAttributes().getRemember())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
+                .nudge(adventure.getContextAttributes().nudge())
+                .authorsNote(adventure.getContextAttributes().authorsNote())
+                .remember(adventure.getContextAttributes().remember())
+                .bump(adventure.getContextAttributes().bump())
+                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
                 .build();
     }
 

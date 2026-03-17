@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,16 +16,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResultFixture;
-import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,19 +46,19 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenPersonaNotFound_thenThrowException() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123456"))
-                .usersAllowedToWriteToAdd(set("123456"))
-                .usersAllowedToReadToRemove(set("123456"))
-                .usersAllowedToWriteToRemove(set("123456"))
-                .build();
+        UUID id = PersonaFixture.PUBLIC_ID;
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                null,
+                set("123456"),
+                set("123456"),
+                set("123456"),
+                set("123456"));
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 
@@ -72,19 +74,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNotAuthorized_thenThrowException() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123456"))
-                .usersAllowedToWriteToAdd(set("123456"))
-                .usersAllowedToReadToRemove(set("123456"))
-                .usersAllowedToWriteToRemove(set("123456"))
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                requesterId,
+                set("123456"),
+                set("123456"),
+                set("123456"),
+                set("123456"));
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -92,7 +93,7 @@ public class UpdatePersonaHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 
@@ -108,19 +109,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenValidData_thenPersonaIsUpdated() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123456"))
-                .usersAllowedToWriteToAdd(set("123456"))
-                .usersAllowedToReadToRemove(set("123456"))
-                .usersAllowedToWriteToRemove(set("123456"))
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                requesterId,
+                set("123456"),
+                set("123456"),
+                set("123456"),
+                set("123456"));
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -135,7 +135,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -152,19 +152,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoWriterUsersAreAdded_thenPersonaIsUpdated() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123456"))
-                .usersAllowedToWriteToAdd(null)
-                .usersAllowedToReadToRemove(set("4567"))
-                .usersAllowedToWriteToRemove(set("4567"))
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                requesterId,
+                null,
+                set("4567"),
+                set("123456"),
+                set("4567"));
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -179,7 +178,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -196,19 +195,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoReaderUsersAreAdded_thenPersonaIsUpdated() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(null)
-                .usersAllowedToWriteToAdd(set("123456"))
-                .usersAllowedToReadToRemove(set("4567"))
-                .usersAllowedToWriteToRemove(set("4567"))
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                requesterId,
+                set("123456"),
+                set("4567"),
+                null,
+                set("4567"));
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -223,7 +221,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -240,19 +238,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoReaderUsersAreRemoved_thenPersonaIsUpdated() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123456"))
-                .usersAllowedToWriteToAdd(set("123456"))
-                .usersAllowedToReadToRemove(null)
-                .usersAllowedToWriteToRemove(set("4567"))
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                requesterId,
+                set("123456"),
+                set("123456"),
+                set("123456"),
+                null);
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -267,7 +264,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -284,19 +281,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoWriterUsersAreRemoved_thenPersonaIsUpdated() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123456"))
-                .usersAllowedToWriteToAdd(set("123456"))
-                .usersAllowedToReadToRemove(set("4567"))
-                .usersAllowedToWriteToRemove(null)
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                requesterId,
+                set("123456"),
+                null,
+                set("123456"),
+                set("4567"));
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -311,7 +307,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -328,13 +324,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenPublicToMakePrivate_thenPersonaIsMadePrivate() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .visibility("private")
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                null,
+                null,
+                Visibility.PRIVATE,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         Persona unchangedPersona = PersonaFixture.publicPersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -348,7 +349,7 @@ public class UpdatePersonaHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
 
         // Then
@@ -360,16 +361,21 @@ public class UpdatePersonaHandlerTest {
     }
 
     @Test
-    public void updatePersona_whenInvalidVisibility_thenNothingIsChanged() {
+    public void updatePersona_whenNullVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .visibility("invalid")
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                null,
+                null,
+                null,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -379,7 +385,7 @@ public class UpdatePersonaHandlerTest {
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona().build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
 
         // Then
@@ -394,13 +400,17 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenContentIsFlagged_thenThrowException() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .name("MoirAI")
-                .personality("I am a Discord chatbot")
-                .visibility("PUBLIC")
-                .build();
+        UUID id = PersonaFixture.PUBLIC_ID;
+        UpdatePersona command = new UpdatePersona(
+                id,
+                "MoirAI",
+                "I am a Discord chatbot",
+                Visibility.PUBLIC,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withFlags().build()));
@@ -414,12 +424,18 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenUpdateFieldsAreEmpty_thenPersonaIsNotChanged() {
 
         // Given
-        String id = PersonaFixture.PUBLIC_ID;
+        UUID id = PersonaFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .requesterId(requesterId)
-                .build();
+        UpdatePersona command = new UpdatePersona(
+                id,
+                null,
+                null,
+                null,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -427,7 +443,7 @@ public class UpdatePersonaHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(unchangedPersona);
 
         // Then
@@ -442,10 +458,17 @@ public class UpdatePersonaHandlerTest {
     public void errorWhenIdIsNull() {
 
         // Given
-        String id = null;
-        UpdatePersona command = UpdatePersona.builder()
-                .id(id)
-                .build();
+        UUID id = null;
+        UpdatePersona command = new UpdatePersona(
+                id,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));

@@ -1,16 +1,19 @@
 package me.moirai.storyengine.core.domain.adventure;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.GameMode;
+import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class AdventureFixture {
 
     private static final String OWNER_DISCORD_ID = "586678721356875";
-    public static final String PUBLIC_ID = "857345aa-2222-0000-0000-000000000000";
+    public static final UUID PUBLIC_ID = UUID.fromString("857345aa-2222-0000-0000-000000000000");
     public static final Long NUMERIC_ID = 2L;
 
     public static Adventure.Builder privateSingleplayerAdventure() {
@@ -24,7 +27,7 @@ public class AdventureFixture {
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
-        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini().build());
+        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
         builder.creatorId(OWNER_DISCORD_ID);
         builder.creationDate(OffsetDateTime.now());
@@ -32,8 +35,7 @@ public class AdventureFixture {
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(false);
-        builder.contextAttributes(ContextAttributesFixture.sample().build());
-        builder.version(1);
+        builder.contextAttributes(ContextAttributesFixture.sample());
 
         return builder;
     }
@@ -49,7 +51,7 @@ public class AdventureFixture {
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
-        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini().build());
+        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
         builder.creatorId(OWNER_DISCORD_ID);
         builder.creationDate(OffsetDateTime.now());
@@ -57,8 +59,7 @@ public class AdventureFixture {
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(true);
-        builder.contextAttributes(ContextAttributesFixture.sample().build());
-        builder.version(1);
+        builder.contextAttributes(ContextAttributesFixture.sample());
 
         return builder;
     }
@@ -74,7 +75,7 @@ public class AdventureFixture {
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
-        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini().build());
+        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
         builder.creatorId(OWNER_DISCORD_ID);
         builder.creationDate(OffsetDateTime.now());
@@ -82,8 +83,7 @@ public class AdventureFixture {
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(false);
-        builder.contextAttributes(ContextAttributesFixture.sample().build());
-        builder.version(1);
+        builder.contextAttributes(ContextAttributesFixture.sample());
 
         return builder;
     }
@@ -99,7 +99,7 @@ public class AdventureFixture {
         builder.channelId("CHNLID");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
-        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini().build());
+        builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
         builder.creatorId(OWNER_DISCORD_ID);
         builder.creationDate(OffsetDateTime.now());
@@ -107,8 +107,7 @@ public class AdventureFixture {
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(true);
-        builder.contextAttributes(ContextAttributesFixture.sample().build());
-        builder.version(1);
+        builder.contextAttributes(ContextAttributesFixture.sample());
 
         return builder;
     }

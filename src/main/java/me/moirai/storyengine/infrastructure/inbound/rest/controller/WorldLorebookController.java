@@ -3,8 +3,9 @@ package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.usecases.UseCaseRunner;
+import me.moirai.storyengine.common.cqs.command.CommandRunner;
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
@@ -26,10 +28,8 @@ import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldLorebookEntryRequestMapper;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateLorebookEntryRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.WorldLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import reactor.core.publisher.Mono;
@@ -39,105 +39,115 @@ import reactor.core.publisher.Mono;
 @Tag(name = "World Lorebooks", description = "Endpoints for managing MoirAI World Lorebooks")
 public class WorldLorebookController extends SecurityContextAware {
 
-    private final UseCaseRunner useCaseRunner;
-    private final WorldLorebookEntryRequestMapper requestMapper;
+    private final QueryRunner queryRunner;
+    private final CommandRunner commandRunner;
 
-    public WorldLorebookController(UseCaseRunner useCaseRunner,
-            WorldLorebookEntryRequestMapper requestMapper) {
+    public WorldLorebookController(
+            QueryRunner queryRunner,
+            CommandRunner commandRunner) {
 
-        this.useCaseRunner = useCaseRunner;
-        this.requestMapper = requestMapper;
+        this.queryRunner = queryRunner;
+        this.commandRunner = commandRunner;
     }
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<SearchWorldLorebookEntriesResult> search(
-            @PathVariable(required = true) String worldId,
+            @PathVariable(required = true) UUID worldId,
             LorebookSearchParameters searchParameters) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchWorldLorebookEntries query = SearchWorldLorebookEntries.builder()
-                    .page(searchParameters.getPage())
-                    .size(searchParameters.getSize())
-                    .sortingField(getSortingField(searchParameters.getSortingField()))
-                    .direction(getDirection(searchParameters.getDirection()))
-                    .name(searchParameters.getName())
-                    .requesterId(authenticatedUser.getDiscordId())
-                    .worldId(worldId)
-                    .build();
+            SearchWorldLorebookEntries query = new SearchWorldLorebookEntries(
+                    searchParameters.getName(),
+                    worldId,
+                    searchParameters.getPage(),
+                    searchParameters.getSize(),
+                    getSortingField(searchParameters.getSortingField()),
+                    getDirection(searchParameters.getDirection()),
+                    authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(query);
+            return queryRunner.run(query);
         });
     }
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<WorldLorebookEntryDetails> getLorebookEntryById(
-            @PathVariable(required = true) String worldId,
-            @PathVariable(required = true) String entryId) {
+            @PathVariable(required = true) UUID worldId,
+            @PathVariable(required = true) UUID entryId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
-                    .entryId(entryId)
-                    .worldId(worldId)
-                    .requesterId(authenticatedUser.getDiscordId())
-                    .build();
+            GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
+                    entryId,
+                    worldId,
+                    authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(query);
+            return queryRunner.run(query);
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<WorldLorebookEntryDetails> createLorebookEntry(
-            @PathVariable(required = true) String worldId,
-            @Valid @RequestBody CreateLorebookEntryRequest request) {
+            @PathVariable(required = true) UUID worldId,
+            @Valid @RequestBody WorldLorebookEntryRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorldLorebookEntry command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(command);
+            CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+                    worldId,
+                    request.name(),
+                    request.description(),
+                    request.regex(),
+                    authenticatedUser.getDiscordId());
+
+            return commandRunner.run(command);
         });
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<WorldLorebookEntryDetails> updateLorebookEntry(
-            @PathVariable(required = true) String worldId,
-            @PathVariable(required = true) String entryId,
-            @Valid @RequestBody UpdateLorebookEntryRequest request) {
+            @PathVariable(required = true) UUID worldId,
+            @PathVariable(required = true) UUID entryId,
+            @Valid @RequestBody WorldLorebookEntryRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateWorldLorebookEntry command = requestMapper.toCommand(request, entryId,
-                    worldId, authenticatedUser.getDiscordId());
+            UpdateWorldLorebookEntry command = new UpdateWorldLorebookEntry(
+                    entryId,
+                    worldId,
+                    request.name(),
+                    request.description(),
+                    request.regex(),
+                    authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(command);
+            return commandRunner.run(command);
         });
     }
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<Void> deleteLorebookEntry(
-            @PathVariable(required = true) String worldId,
-            @PathVariable(required = true) String entryId) {
+            @PathVariable(required = true) UUID worldId,
+            @PathVariable(required = true) UUID entryId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorldLorebookEntry command = requestMapper.toCommand(entryId, worldId, authenticatedUser.getDiscordId());
-            useCaseRunner.run(command);
+            DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+                    entryId,
+                    worldId,
+                    authenticatedUser.getDiscordId());
+
+            commandRunner.run(command);
 
             return Mono.empty();
         });
     }
 
+    // TODO remove all of this
     private String getSortingField(SearchSortingField searchSortingField) {
 
         if (searchSortingField != null) {

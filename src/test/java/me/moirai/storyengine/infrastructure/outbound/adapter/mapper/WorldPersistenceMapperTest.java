@@ -35,14 +35,14 @@ public class WorldPersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo(world.getName());
-        assertThat(result.getOwnerId()).isEqualTo(world.getOwnerId());
-        assertThat(result.getCreationDate()).isEqualTo(world.getCreationDate());
-        assertThat(result.getLastUpdateDate()).isEqualTo(world.getLastUpdateDate());
-        assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(world.getUsersAllowedToRead());
-        assertThat(result.getUsersAllowedToWrite()).hasSameElementsAs(world.getUsersAllowedToWrite());
-        assertThat(result.getDescription()).isEqualTo(world.getDescription());
-        assertThat(result.getAdventureStart()).isEqualTo(world.getAdventureStart());
+        assertThat(result.name()).isEqualTo(world.getName());
+        assertThat(result.ownerId()).isEqualTo(world.getOwnerId());
+        assertThat(result.creationDate()).isEqualTo(world.getCreationDate());
+        assertThat(result.lastUpdateDate()).isEqualTo(world.getLastUpdateDate());
+        assertThat(result.usersAllowedToRead()).hasSameElementsAs(world.getUsersAllowedToRead());
+        assertThat(result.usersAllowedToWrite()).hasSameElementsAs(world.getUsersAllowedToWrite());
+        assertThat(result.description()).isEqualTo(world.getDescription());
+        assertThat(result.adventureStart()).isEqualTo(world.getAdventureStart());
     }
 
     @Test
@@ -62,8 +62,8 @@ public class WorldPersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getPage()).isEqualTo(1);
-        assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getItems()).isEqualTo(20);
+        assertThat(result.page()).isEqualTo(1);
+        assertThat(result.totalPages()).isEqualTo(2);
+        assertThat(result.items()).isEqualTo(20);
     }
 }

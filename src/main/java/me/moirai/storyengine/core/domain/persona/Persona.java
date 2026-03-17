@@ -1,19 +1,19 @@
 package me.moirai.storyengine.core.domain.persona;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
-import com.fasterxml.uuid.Generators;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
@@ -24,19 +24,20 @@ public class Persona extends ShareableAsset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
+    @RandomUuid
+    @Column(name = "public_id")
+    private UUID publicId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "personality", nullable = false)
+    @Column(name = "personality")
     private String personality;
 
     private Persona(Builder builder) {
 
         super(builder.creatorId, builder.creationDate,
-                builder.lastUpdateDate, builder.permissions, builder.visibility, builder.version);
+                builder.lastUpdateDate, builder.permissions, builder.visibility);
 
         this.name = builder.name;
         this.personality = builder.personality;
@@ -44,13 +45,6 @@ public class Persona extends ShareableAsset {
 
     protected Persona() {
         super();
-    }
-
-    @PrePersist
-    private void generatePublicId() {
-        if (publicId == null) {
-            publicId = Generators.timeBasedEpochGenerator().generate().toString();
-        }
     }
 
     public static Builder builder() {
@@ -62,7 +56,7 @@ public class Persona extends ShareableAsset {
         return id;
     }
 
-    public String getPublicId() {
+    public UUID getPublicId() {
         return publicId;
     }
 
@@ -93,7 +87,6 @@ public class Persona extends ShareableAsset {
         private String creatorId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
-        private int version;
 
         private Builder() {
         }
@@ -137,12 +130,6 @@ public class Persona extends ShareableAsset {
         public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
 
             this.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public Builder version(int version) {
-
-            this.version = version;
             return this;
         }
 

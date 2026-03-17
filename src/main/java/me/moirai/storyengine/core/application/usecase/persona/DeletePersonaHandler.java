@@ -1,17 +1,14 @@
 package me.moirai.storyengine.core.application.usecase.persona;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.domain.persona.Persona;
 
-@UseCaseHandler
-public class DeletePersonaHandler extends AbstractUseCaseHandler<DeletePersona, Void> {
+@CommandHandler
+public class DeletePersonaHandler extends AbstractCommandHandler<DeletePersona, Void> {
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
@@ -27,7 +24,7 @@ public class DeletePersonaHandler extends AbstractUseCaseHandler<DeletePersona, 
     @Override
     public void validate(DeletePersona request) {
 
-        if (isBlank(request.getId())) {
+        if (request.personaId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -35,14 +32,15 @@ public class DeletePersonaHandler extends AbstractUseCaseHandler<DeletePersona, 
     @Override
     public Void execute(DeletePersona request) {
 
-        Persona persona = repository.findByPublicId(request.getId())
+        var persona = repository.findByPublicId(request.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        if (!persona.canUserWrite(request.getRequesterDiscordId())) {
+        // TODO move to authorization
+        if (!persona.canUserWrite(request.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        repository.deleteByPublicId(request.getId());
+        repository.deleteByPublicId(request.personaId());
 
         return null;
     }

@@ -10,6 +10,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
+import me.moirai.storyengine.common.enums.Visibility;
 
 @MappedSuperclass
 public abstract class ShareableAsset extends Asset {
@@ -21,6 +22,15 @@ public abstract class ShareableAsset extends Asset {
     @Column(name = "visibility")
     private Visibility visibility;
 
+    protected ShareableAsset(String creatorId, OffsetDateTime creationDate,
+            OffsetDateTime lastUpdateDate, Permissions permissions, Visibility visibility) {
+
+        super(creatorId, creationDate, lastUpdateDate);
+        this.permissions = permissions;
+        this.visibility = visibility;
+    }
+
+    // TODO remove this ctor
     protected ShareableAsset(String creatorId, OffsetDateTime creationDate,
             OffsetDateTime lastUpdateDate, Permissions permissions, Visibility visibility, int version) {
 

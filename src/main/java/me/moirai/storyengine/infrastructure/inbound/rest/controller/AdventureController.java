@@ -3,8 +3,9 @@ package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.usecases.UseCaseRunner;
+import me.moirai.storyengine.common.cqs.command.CommandRunner;
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
@@ -26,7 +28,6 @@ import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.AdventureRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureRequest;
@@ -44,14 +45,15 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Adventures", description = "Endpoints for managing MoirAI Adventures")
 public class AdventureController extends SecurityContextAware {
 
-    private final UseCaseRunner useCaseRunner;
-    private final AdventureRequestMapper requestMapper;
+    private final QueryRunner queryRunner;
+    private final CommandRunner commandRunner;
 
-    public AdventureController(UseCaseRunner useCaseRunner,
-            AdventureRequestMapper requestMapper) {
+    public AdventureController(
+            QueryRunner queryRunner,
+            CommandRunner commandRunner) {
 
-        this.useCaseRunner = useCaseRunner;
-        this.requestMapper = requestMapper;
+        this.queryRunner = queryRunner;
+        this.commandRunner = commandRunner;
     }
 
     @GetMapping
@@ -60,78 +62,135 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchAdventures query = SearchAdventures.builder()
-                    .name(searchParameters.getName())
-                    .world(searchParameters.getWorld())
-                    .persona(searchParameters.getPersona())
-                    .ownerId(searchParameters.getOwnerId())
-                    .multiplayer(searchParameters.isMultiplayer())
-                    .page(searchParameters.getPage())
-                    .size(searchParameters.getSize())
-                    .model(getModel(searchParameters.getModel()))
-                    .gameMode(getGameMode(searchParameters.getGameMode()))
-                    .moderation(getModeration(searchParameters.getModeration()))
-                    .sortingField(getSortingField(searchParameters.getSortingField()))
-                    .direction(getDirection(searchParameters.getDirection()))
-                    .visibility(getVisibility(searchParameters.getVisibility()))
-                    .operation(getOperation(searchParameters.getOperation()))
-                    .requesterId(authenticatedUser.getDiscordId())
-                    .build();
+            SearchAdventures query = new SearchAdventures(
+                    searchParameters.getName(),
+                    searchParameters.getWorld(),
+                    searchParameters.getPersona(),
+                    searchParameters.getOwnerId(),
+                    searchParameters.isMultiplayer(),
+                    searchParameters.getPage(),
+                    searchParameters.getSize(),
+                    getModel(searchParameters.getModel()),
+                    getGameMode(searchParameters.getGameMode()),
+                    getModeration(searchParameters.getModeration()),
+                    getSortingField(searchParameters.getSortingField()),
+                    getDirection(searchParameters.getDirection()),
+                    getVisibility(searchParameters.getVisibility()),
+                    getOperation(searchParameters.getOperation()),
+                    authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(query);
+            return queryRunner.run(query);
         });
     }
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canRead(#adventureId, 'Adventure')")
     public Mono<AdventureDetails> getAdventureById(
-            @PathVariable(required = true) String adventureId) {
+            @PathVariable(required = true) UUID adventureId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetAdventureById query = GetAdventureById.build(adventureId, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(query);
+            GetAdventureById query = new GetAdventureById(
+                    adventureId,
+                    authenticatedUser.getDiscordId());
+
+            return queryRunner.run(query);
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<AdventureDetails> createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateAdventure command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(command);
+            CreateAdventure command = new CreateAdventure(
+                    request.name(),
+                    null,
+                    request.worldId(),
+                    request.personaId(),
+                    request.channelId(),
+                    request.visibility(),
+                    request.aiModel(),
+                    request.moderation(),
+                    authenticatedUser.getDiscordId(),
+                    request.gameMode(),
+                    request.nudge(),
+                    request.remember(),
+                    request.authorsNote(),
+                    request.bump(),
+                    request.bumpFrequency(),
+                    request.maxTokenLimit(),
+                    request.temperature(),
+                    request.frequencyPenalty(),
+                    request.presencePenalty(),
+                    request.logitBias(),
+                    request.stopSequences(),
+                    request.usersAllowedToWrite(),
+                    request.usersAllowedToRead(),
+                    request.isMultiplayer());
+
+            return commandRunner.run(command);
         });
     }
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canModify(#adventureId, 'Adventure') && canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<AdventureDetails> updateAdventure(
-            @PathVariable(required = true) String adventureId,
+            @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateAdventure command = requestMapper.toCommand(request, adventureId, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(command);
+            UpdateAdventure command = new UpdateAdventure(
+                    adventureId,
+                    null,
+                    request.adventureStart(),
+                    request.name(),
+                    request.worldId(),
+                    request.personaId(),
+                    request.channelId(),
+                    request.visibility(),
+                    request.aiModel(),
+                    request.moderation(),
+                    authenticatedUser.getDiscordId(),
+                    request.gameMode(),
+                    request.nudge(),
+                    request.remember(),
+                    request.authorsNote(),
+                    request.bump(),
+                    request.bumpFrequency(),
+                    request.maxTokenLimit(),
+                    request.temperature(),
+                    request.frequencyPenalty(),
+                    request.presencePenalty(),
+                    request.logitBiasToAdd(),
+                    request.stopSequencesToAdd(),
+                    request.stopSequencesToRemove(),
+                    request.logitBiasToRemove(),
+                    request.usersAllowedToWriteToAdd(),
+                    request.usersAllowedToWriteToRemove(),
+                    request.usersAllowedToReadToAdd(),
+                    request.usersAllowedToReadToRemove(),
+                    request.isMultiplayer());
+
+            return commandRunner.run(command);
         });
     }
 
     @DeleteMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canModify(#adventureId, 'Adventure')")
     public Mono<Void> deleteAdventure(
-            @PathVariable(required = true) String adventureId) {
+            @PathVariable(required = true) UUID adventureId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteAdventure command = requestMapper.toCommand(adventureId, authenticatedUser.getDiscordId());
-            useCaseRunner.run(command);
+            DeleteAdventure command = new DeleteAdventure(
+                    adventureId,
+                    authenticatedUser.getDiscordId());
+
+            commandRunner.run(command);
 
             return Mono.empty();
         });

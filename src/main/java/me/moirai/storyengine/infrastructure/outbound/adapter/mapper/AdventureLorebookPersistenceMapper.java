@@ -12,28 +12,27 @@ public class AdventureLorebookPersistenceMapper {
 
     public AdventureLorebookEntryDetails mapToResult(AdventureLorebookEntry entry) {
 
-        return AdventureLorebookEntryDetails.builder()
-                .id(entry.getPublicId())
-                .name(entry.getName())
-                .description(entry.getDescription())
-                .regex(entry.getRegex())
-                .playerId(entry.getPlayerId())
-                .isPlayerCharacter(entry.isPlayerCharacter())
-                .creationDate(entry.getCreationDate())
-                .lastUpdateDate(entry.getLastUpdateDate())
-                .build();
+        return new AdventureLorebookEntryDetails(
+                entry.getPublicId(),
+                null,
+                entry.getName(),
+                entry.getRegex(),
+                entry.getDescription(),
+                entry.getPlayerId(),
+                entry.isPlayerCharacter(),
+                entry.getCreationDate(),
+                entry.getLastUpdateDate());
     }
 
     public SearchAdventureLorebookEntriesResult mapToResult(Page<AdventureLorebookEntry> pagedResult) {
-        return SearchAdventureLorebookEntriesResult.builder()
-                .results(pagedResult.getContent()
+        return new SearchAdventureLorebookEntriesResult(
+                pagedResult.getNumber() + 1,
+                pagedResult.getNumberOfElements(),
+                pagedResult.getTotalElements(),
+                pagedResult.getTotalPages(),
+                pagedResult.getContent()
                         .stream()
                         .map(this::mapToResult)
-                        .toList())
-                .page(pagedResult.getNumber() + 1)
-                .items(pagedResult.getNumberOfElements())
-                .totalItems(pagedResult.getTotalElements())
-                .totalPages(pagedResult.getTotalPages())
-                .build();
+                        .toList());
     }
 }

@@ -10,6 +10,7 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,10 +20,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.criteria.Predicate;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.PersonaPersistenceMapper;
 
 @Repository
@@ -62,7 +63,7 @@ public class PersonaRepositoryImpl implements PersonaRepository {
     }
 
     @Override
-    public Optional<Persona> findByPublicId(String publicId) {
+    public Optional<Persona> findByPublicId(UUID publicId) {
 
         return jpaRepository.findByPublicId(publicId);
     }
@@ -74,7 +75,7 @@ public class PersonaRepositoryImpl implements PersonaRepository {
     }
 
     @Override
-    public void deleteByPublicId(String publicId) {
+    public void deleteByPublicId(UUID publicId) {
 
         jpaRepository.deleteByPublicId(publicId);
     }
@@ -86,7 +87,7 @@ public class PersonaRepositoryImpl implements PersonaRepository {
     }
 
     @Override
-    public boolean existsByPublicId(String publicId) {
+    public boolean existsByPublicId(UUID publicId) {
 
         return jpaRepository.existsByPublicId(publicId);
     }
@@ -94,10 +95,10 @@ public class PersonaRepositoryImpl implements PersonaRepository {
     @Override
     public SearchPersonasResult search(SearchPersonas request) {
 
-        int page = extractPageNumber(request.getPage());
-        int size = extractPageSize(request.getSize());
-        String sortByField = extractSortByField(request.getSortingField());
-        Direction direction = extractDirection(request.getDirection());
+        int page = extractPageNumber(request.page());
+        int size = extractPageSize(request.size());
+        String sortByField = extractSortByField(request.sortingField());
+        Direction direction = extractDirection(request.direction());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
         Specification<Persona> query = buildSearchQuery(request);
@@ -111,23 +112,23 @@ public class PersonaRepositoryImpl implements PersonaRepository {
         return (root, cq, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
 
-            if (WRITE.equals(request.getOperation())) {
-                predicates.add(canUserWrite(cb, root, request.getRequesterDiscordId()));
+            if (WRITE.equals(request.operation())) {
+                predicates.add(canUserWrite(cb, root, request.requesterId()));
             } else {
-                predicates.add(canUserRead(cb, root, request.getRequesterDiscordId()));
+                predicates.add(canUserRead(cb, root, request.requesterId()));
             }
 
-            if (isNotBlank(request.getName())) {
-                predicates.add(contains(cb, root, NAME, request.getName()));
+            if (isNotBlank(request.name())) {
+                predicates.add(contains(cb, root, NAME, request.name()));
             }
 
-            if (isNotBlank(request.getOwnerId())) {
+            if (isNotBlank(request.ownerId())) {
                 predicates.add(cb.equal(root.get(PERMISSIONS)
-                        .get(OWNER_DISCORD_ID), cb.literal(request.getOwnerId())));
+                        .get(OWNER_DISCORD_ID), cb.literal(request.ownerId())));
             }
 
-            if (isNotBlank(request.getVisibility())) {
-                predicates.add(contains(cb, root, VISIBILITY, request.getVisibility()));
+            if (request.visibility() != null) {
+                predicates.add(contains(cb, root, VISIBILITY, request.visibility().toString()));
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));

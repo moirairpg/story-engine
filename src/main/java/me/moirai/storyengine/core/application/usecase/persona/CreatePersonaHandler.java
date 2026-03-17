@@ -8,12 +8,11 @@ import java.util.Map.Entry;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permissions;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
@@ -21,8 +20,8 @@ import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
-@UseCaseHandler
-public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, Mono<PersonaDetails>> {
+@CommandHandler
+public class CreatePersonaHandler extends AbstractCommandHandler<CreatePersona, Mono<PersonaDetails>> {
 
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
@@ -37,19 +36,19 @@ public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, 
     @Override
     public Mono<PersonaDetails> execute(CreatePersona command) {
 
-        return moderateContent(command.getPersonality())
-                .flatMap(__ -> moderateContent(command.getName()))
+        return moderateContent(command.personality())
+                .flatMap(__ -> moderateContent(command.name()))
                 .map(__ -> {
-                    Persona.Builder personaBuilder = Persona.builder();
-                    Permissions permissions = Permissions.builder()
-                            .ownerId(command.getRequesterDiscordId())
-                            .usersAllowedToRead(command.getUsersAllowedToRead())
-                            .usersAllowedToWrite(command.getUsersAllowedToWrite())
+                    var permissions = Permissions.builder()
+                            .ownerId(command.requesterId())
+                            .usersAllowedToRead(command.usersAllowedToRead())
+                            .usersAllowedToWrite(command.usersAllowedToWrite())
                             .build();
 
-                    Persona persona = personaBuilder.name(command.getName())
-                            .personality(command.getPersonality())
-                            .visibility(Visibility.fromString(command.getVisibility()))
+                    var persona = Persona.builder()
+                            .name(command.name())
+                            .personality(command.personality())
+                            .visibility(command.visibility())
                             .permissions(permissions)
                             .build();
 
@@ -60,19 +59,19 @@ public class CreatePersonaHandler extends AbstractUseCaseHandler<CreatePersona, 
 
     private PersonaDetails mapResult(Persona persona) {
 
-        return PersonaDetails.builder()
-                .id(persona.getPublicId())
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().name())
-                .creationDate(persona.getCreationDate())
-                .lastUpdateDate(persona.getLastUpdateDate())
-                .ownerId(persona.getOwnerId())
-                .usersAllowedToRead(persona.getUsersAllowedToRead())
-                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
-                .build();
+        return new PersonaDetails(
+                persona.getPublicId(),
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToRead(),
+                persona.getUsersAllowedToWrite(),
+                persona.getCreationDate(),
+                persona.getLastUpdateDate());
     }
 
+    // TODO move to validation
     private Mono<List<String>> moderateContent(String personality) {
 
         if (StringUtils.isBlank(personality)) {

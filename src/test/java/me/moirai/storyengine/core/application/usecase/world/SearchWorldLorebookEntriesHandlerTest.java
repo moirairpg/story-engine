@@ -3,10 +3,10 @@ package me.moirai.storyengine.core.application.usecase.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,16 +35,16 @@ public class SearchWorldLorebookEntriesHandlerTest {
     public void searchEntries_whenWorldNotFound_thenThrowException() {
 
         // Given
-        SearchWorldLorebookEntries query = SearchWorldLorebookEntries.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .worldId(WorldFixture.PUBLIC_ID)
-                .requesterId(WorldFixture.PUBLIC_ID)
-                .build();
+        SearchWorldLorebookEntries query = new SearchWorldLorebookEntries(
+                null,
+                WorldFixture.PUBLIC_ID,
+                1,
+                2,
+                "name",
+                "ASC",
+                WorldFixture.PUBLIC_ID.toString());
 
-        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.empty());
+        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -56,18 +56,18 @@ public class SearchWorldLorebookEntriesHandlerTest {
     public void searchEntries_whenNoPermissionToView_thenThrowException() {
 
         // Given
-        SearchWorldLorebookEntries query = SearchWorldLorebookEntries.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .worldId(WorldFixture.PUBLIC_ID)
-                .requesterId(WorldFixture.PUBLIC_ID)
-                .build();
+        SearchWorldLorebookEntries query = new SearchWorldLorebookEntries(
+                null,
+                WorldFixture.PUBLIC_ID,
+                1,
+                2,
+                "name",
+                "ASC",
+                WorldFixture.PUBLIC_ID.toString());
 
         World world = WorldFixture.privateWorld().build();
 
-        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
 
         // Then
         assertThatThrownBy(() -> handler.execute(query))
@@ -79,23 +79,25 @@ public class SearchWorldLorebookEntriesHandlerTest {
     public void searchEntries_whenValidRequest_thenReturnEntries() {
 
         // Given
-        SearchWorldLorebookEntries query = SearchWorldLorebookEntries.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .worldId(WorldFixture.PUBLIC_ID)
-                .requesterId(WorldFixture.PUBLIC_ID)
-                .build();
+        SearchWorldLorebookEntries query = new SearchWorldLorebookEntries(
+                null,
+                WorldFixture.PUBLIC_ID,
+                1,
+                2,
+                "name",
+                "ASC",
+                WorldFixture.PUBLIC_ID.toString());
 
-        SearchWorldLorebookEntriesResult expectedResult = SearchWorldLorebookEntriesResult.builder()
-                .page(1)
-                .items(2)
-                .build();
+        SearchWorldLorebookEntriesResult expectedResult = new SearchWorldLorebookEntriesResult(
+                1,
+                2,
+                0,
+                0,
+                null);
 
         World world = WorldFixture.publicWorld().build();
 
-        when(worldRepository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(worldRepository.searchLorebookEntries(any(SearchWorldLorebookEntries.class)))
                 .thenReturn(expectedResult);
 
@@ -104,7 +106,7 @@ public class SearchWorldLorebookEntriesHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getItems()).isEqualTo(expectedResult.getItems());
-        assertThat(result.getPage()).isEqualTo(expectedResult.getPage());
+        assertThat(result.items()).isEqualTo(expectedResult.items());
+        assertThat(result.page()).isEqualTo(expectedResult.page());
     }
 }

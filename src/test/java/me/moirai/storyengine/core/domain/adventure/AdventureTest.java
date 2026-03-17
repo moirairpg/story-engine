@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.domain.adventure;
 
-import static me.moirai.storyengine.common.domain.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -13,7 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.common.domain.Permissions;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
+import me.moirai.storyengine.common.enums.GameMode;
+import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 
@@ -30,7 +33,7 @@ public class AdventureTest {
         adventureBuilder.channelId("CHNLID");
         adventureBuilder.moderation(Moderation.STRICT);
         adventureBuilder.visibility(Visibility.fromString("PRIVATE"));
-        adventureBuilder.modelConfiguration(ModelConfigurationFixture.gpt4Mini().build());
+        adventureBuilder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         adventureBuilder.permissions(PermissionsFixture.samplePermissions().build());
         adventureBuilder.gameMode(GameMode.RPG);
 
@@ -281,7 +284,7 @@ public class AdventureTest {
         adventure.updateAiModel(aiModel);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getAiModel()).isEqualTo(aiModel);
+        assertThat(adventure.getModelConfiguration().aiModel()).isEqualTo(aiModel);
     }
 
     @Test
@@ -289,16 +292,15 @@ public class AdventureTest {
 
         // Given
         int maxTokenLimit = 100;
-        ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_MINI;
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini().aiModel(aiModel).build();
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().modelConfiguration(modelConfiguration)
+        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .build();
 
         // When
         adventure.updateMaxTokenLimit(maxTokenLimit);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getMaxTokenLimit()).isEqualTo(maxTokenLimit);
+        assertThat(adventure.getModelConfiguration().maxTokenLimit()).isEqualTo(maxTokenLimit);
     }
 
     @Test
@@ -306,9 +308,8 @@ public class AdventureTest {
 
         // Given
         int maxTokenLimit = 500000;
-        ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_MINI;
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini().aiModel(aiModel).build();
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().modelConfiguration(modelConfiguration)
+        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .build();
 
         // Then
@@ -321,9 +322,8 @@ public class AdventureTest {
 
         // Given
         int maxTokenLimit = 10;
-        ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_MINI;
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini().aiModel(aiModel).build();
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().modelConfiguration(modelConfiguration)
+        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .build();
 
         // Then
@@ -342,7 +342,7 @@ public class AdventureTest {
         adventure.updateTemperature(temperature);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getTemperature()).isEqualTo(temperature);
+        assertThat(adventure.getModelConfiguration().temperature()).isEqualTo(temperature);
     }
 
     @Test
@@ -380,7 +380,7 @@ public class AdventureTest {
         adventure.updatePresencePenalty(presencePenalty);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getPresencePenalty()).isEqualTo(presencePenalty);
+        assertThat(adventure.getModelConfiguration().presencePenalty()).isEqualTo(presencePenalty);
     }
 
     @Test
@@ -418,7 +418,7 @@ public class AdventureTest {
         adventure.updateFrequencyPenalty(frequencyPenalty);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getFrequencyPenalty()).isEqualTo(frequencyPenalty);
+        assertThat(adventure.getModelConfiguration().frequencyPenalty()).isEqualTo(frequencyPenalty);
     }
 
     @Test
@@ -451,9 +451,14 @@ public class AdventureTest {
         // Given
         String token = "TOKEN";
         double bias = 1.3;
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini()
-                .logitBias(new HashMap<>())
-                .build();
+        ModelConfiguration modelConfiguration = new ModelConfiguration(
+                ArtificialIntelligenceModel.GPT4_MINI,
+                100,
+                1.0,
+                0.2,
+                0.2,
+                new HashSet<>(),
+                new HashMap<>());
 
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
@@ -463,7 +468,7 @@ public class AdventureTest {
         adventure.addLogitBias(token, bias);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getLogitBias()).containsEntry(token, bias);
+        assertThat(adventure.getModelConfiguration().logitBias()).containsEntry(token, bias);
     }
 
     @Test
@@ -497,9 +502,14 @@ public class AdventureTest {
 
         // Given
         String token = "TOKEN";
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini()
-                .stopSequences(new HashSet<>())
-                .build();
+        ModelConfiguration modelConfiguration = new ModelConfiguration(
+                ArtificialIntelligenceModel.GPT4_MINI,
+                100,
+                1.0,
+                0.2,
+                0.2,
+                new HashSet<>(),
+                new HashMap<>());
 
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
@@ -509,7 +519,7 @@ public class AdventureTest {
         adventure.addStopSequence(token);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getStopSequences()).containsExactly(token);
+        assertThat(adventure.getModelConfiguration().stopSequences()).containsExactly(token);
     }
 
     @Test
@@ -517,9 +527,14 @@ public class AdventureTest {
 
         // Given
         String token = "TOKEN";
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini()
-                .stopSequences(Collections.singleton(token))
-                .build();
+        ModelConfiguration modelConfiguration = new ModelConfiguration(
+                ArtificialIntelligenceModel.GPT4_MINI,
+                100,
+                1.0,
+                0.2,
+                0.2,
+                new HashSet<>(Collections.singleton(token)),
+                new HashMap<>());
 
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
@@ -529,7 +544,7 @@ public class AdventureTest {
         adventure.removeStopSequence(token);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getStopSequences()).doesNotContain(token);
+        assertThat(adventure.getModelConfiguration().stopSequences()).doesNotContain(token);
     }
 
     @Test
@@ -538,9 +553,14 @@ public class AdventureTest {
         // Given
         String token = "TOKEN";
         double bias = 1.3;
-        ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini()
-                .logitBias(Collections.singletonMap(token, bias))
-                .build();
+        ModelConfiguration modelConfiguration = new ModelConfiguration(
+                ArtificialIntelligenceModel.GPT4_MINI,
+                100,
+                1.0,
+                0.2,
+                0.2,
+                new HashSet<>(),
+                new HashMap<>(Collections.singletonMap(token, bias)));
 
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
@@ -550,7 +570,7 @@ public class AdventureTest {
         adventure.removeLogitBias(token);
 
         // Then
-        assertThat(adventure.getModelConfiguration().getLogitBias()).doesNotContainKey(token);
+        assertThat(adventure.getModelConfiguration().logitBias()).doesNotContainKey(token);
     }
 
     @Test
@@ -681,7 +701,7 @@ public class AdventureTest {
 
         // Then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
-        assertThat(adventure.getContextAttributes().getNudge()).isEqualTo(newNudge);
+        assertThat(adventure.getContextAttributes().nudge()).isEqualTo(newNudge);
     }
 
     @Test
@@ -697,7 +717,7 @@ public class AdventureTest {
 
         // Then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
-        assertThat(adventure.getContextAttributes().getRemember()).isEqualTo(newRemember);
+        assertThat(adventure.getContextAttributes().remember()).isEqualTo(newRemember);
     }
 
     @Test
@@ -713,7 +733,7 @@ public class AdventureTest {
 
         // Then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
-        assertThat(adventure.getContextAttributes().getBump()).isEqualTo(newBump);
+        assertThat(adventure.getContextAttributes().bump()).isEqualTo(newBump);
     }
 
     @Test
@@ -729,7 +749,7 @@ public class AdventureTest {
 
         // Then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
-        assertThat(adventure.getContextAttributes().getBumpFrequency()).isEqualTo(newBumpFrequency);
+        assertThat(adventure.getContextAttributes().bumpFrequency()).isEqualTo(newBumpFrequency);
     }
 
     @Test
@@ -745,6 +765,6 @@ public class AdventureTest {
 
         // Then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
-        assertThat(adventure.getContextAttributes().getAuthorsNote()).isEqualTo(newAuthorsNote);
+        assertThat(adventure.getContextAttributes().authorsNote()).isEqualTo(newAuthorsNote);
     }
 }

@@ -5,20 +5,22 @@ import static org.assertj.core.util.Sets.set;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
-import me.moirai.storyengine.common.domain.Visibility;
-import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
-import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
-import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
+import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
@@ -88,7 +90,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void existsById_ifPersonaNotExists_thenReturnFalse() {
 
         // Given
-        String personaId = "InvalidId";
+        UUID personaId = UUID.randomUUID();
 
         // When
         boolean result = repository.existsByPublicId(personaId);
@@ -116,14 +118,15 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         // Given
         Persona originalPersona = repository.save(PersonaFixture.privatePersona().build());
 
-        Persona worldToUbeUpdated = PersonaFixture.privatePersona()
+        Persona personaTobeUpdated = PersonaFixture.privatePersona()
                 .visibility(Visibility.PUBLIC)
-                .version(originalPersona.getVersion())
                 .build();
-        org.springframework.test.util.ReflectionTestUtils.setField(worldToUbeUpdated, "id", originalPersona.getId());
+
+        ReflectionTestUtils.setField(personaTobeUpdated, "id", originalPersona.getId());
+        ReflectionTestUtils.setField(personaTobeUpdated, "publicId", originalPersona.getPublicId());
 
         // When
-        Persona updatedPersona = repository.save(worldToUbeUpdated);
+        Persona updatedPersona = repository.save(personaTobeUpdated);
 
         // Then
         assertThat(originalPersona.getVersion()).isZero();
@@ -134,7 +137,7 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
     public void emptyResultWhenAssetDoesntExist() {
 
         // Given
-        String personaId = PersonaFixture.PUBLIC_ID;
+        UUID personaId = PersonaFixture.PUBLIC_ID;
 
         // When
         Optional<Persona> retrievedPersonaOptional = repository.findByPublicId(personaId);
@@ -175,20 +178,27 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchPersonas query = SearchPersonas.builder()
-                .requesterId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -213,21 +223,28 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchPersonas query = SearchPersonas.builder()
-                .requesterId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(personas.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(personas.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -252,24 +269,28 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchPersonas query = SearchPersonas.builder()
-                .direction("DESC")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                1,
+                10,
+                null,
+                "DESC",
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(personas.get(2).getName()).isEqualTo(gpt4Omni.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(personas.get(2).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -295,22 +316,28 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .sortingField("name")
-                .requesterId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                "name",
+                null,
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -336,23 +363,28 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .sortingField("name")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                "name",
+                "DESC",
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(2).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(2).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -378,20 +410,26 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                "Number 2",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -420,21 +458,26 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .ownerId(ownerId)
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                "Number 2",
+                ownerId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -469,21 +512,27 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchPersonas query = SearchPersonas.builder()
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -514,21 +563,27 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchPersonas query = SearchPersonas.builder()
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -559,24 +614,27 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchPersonas query = SearchPersonas.builder()
-                .direction("DESC")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                1,
+                10,
+                null,
+                "DESC",
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -608,22 +666,27 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .sortingField("name")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                "name",
+                null,
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Omni.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -655,23 +718,27 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .sortingField("name")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                "name",
+                "DESC",
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(personas.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(personas.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -700,21 +767,26 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                "Number 2",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -746,21 +818,26 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .requesterId(ownerId)
-                .visibility("private")
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Visibility.PRIVATE,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -792,21 +869,26 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .requesterId(ownerId)
-                .visibility("private")
-                .operation("READ")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Visibility.PRIVATE,
+                "READ",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<PersonaDetails> personas = result.getResults();
-        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<PersonaDetails> personas = result.results();
+        assertThat(personas.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -832,19 +914,23 @@ public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTes
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchPersonas query = SearchPersonas.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchPersonas query = new SearchPersonas(
+                "Number 2",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "WRITE",
+                ownerId);
 
         // When
         SearchPersonasResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isEmpty();
+        assertThat(result.results()).isNotNull().isEmpty();
     }
 
 }
-

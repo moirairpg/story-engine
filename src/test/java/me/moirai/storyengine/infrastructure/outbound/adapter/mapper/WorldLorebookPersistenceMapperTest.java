@@ -35,9 +35,9 @@ public class WorldLorebookPersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo(worldLorebookEntry.getName());
-        assertThat(result.getRegex()).isEqualTo(worldLorebookEntry.getRegex());
-        assertThat(result.getDescription()).isEqualTo(worldLorebookEntry.getDescription());
+        assertThat(result.name()).isEqualTo(worldLorebookEntry.getName());
+        assertThat(result.regex()).isEqualTo(worldLorebookEntry.getRegex());
+        assertThat(result.description()).isEqualTo(worldLorebookEntry.getDescription());
     }
 
     @Test
@@ -57,8 +57,8 @@ public class WorldLorebookPersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getPage()).isEqualTo(1);
-        assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getItems()).isEqualTo(20);
+        assertThat(result.page()).isEqualTo(1);
+        assertThat(result.totalPages()).isEqualTo(2);
+        assertThat(result.items()).isEqualTo(20);
     }
 }

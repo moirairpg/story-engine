@@ -98,37 +98,37 @@ public class GetAdventureByChannelIdHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(adventure.getPublicId());
-        assertThat(result.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
-        assertThat(result.getDescription()).isEqualTo(adventure.getDescription());
-        assertThat(result.getChannelId()).isEqualTo(adventure.getChannelId());
-        assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
-        assertThat(result.getName()).isEqualTo(adventure.getName());
-        assertThat(result.getOwnerId()).isEqualTo(adventure.getOwnerId());
-        assertThat(result.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
-        assertThat(result.getModeration()).isEqualTo(adventure.getModeration().name());
-        assertThat(result.getWorldId()).isEqualTo(WorldFixture.PUBLIC_ID);
+        assertThat(result.id()).isEqualTo(adventure.getPublicId());
+        assertThat(result.adventureStart()).isEqualTo(adventure.getAdventureStart());
+        assertThat(result.description()).isEqualTo(adventure.getDescription());
+        assertThat(result.channelId()).isEqualTo(adventure.getChannelId());
+        assertThat(result.gameMode()).isEqualTo(adventure.getGameMode().name());
+        assertThat(result.name()).isEqualTo(adventure.getName());
+        assertThat(result.ownerId()).isEqualTo(adventure.getOwnerId());
+        assertThat(result.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(result.visibility()).isEqualTo(adventure.getVisibility().name());
+        assertThat(result.moderation()).isEqualTo(adventure.getModeration().name());
+        assertThat(result.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(result.isMultiplayer()).isEqualTo(adventure.isMultiplayer());
-        assertThat(result.getCreationDate()).isNotNull();
-        assertThat(result.getLastUpdateDate()).isNotNull();
+        assertThat(result.creationDate()).isNotNull();
+        assertThat(result.lastUpdateDate()).isNotNull();
 
-        assertThat(result.getAuthorsNote()).isEqualTo(adventure.getContextAttributes().getAuthorsNote());
-        assertThat(result.getNudge()).isEqualTo(adventure.getContextAttributes().getNudge());
-        assertThat(result.getRemember()).isEqualTo(adventure.getContextAttributes().getRemember());
-        assertThat(result.getBump()).isEqualTo(adventure.getContextAttributes().getBump());
-        assertThat(result.getBumpFrequency()).isEqualTo(adventure.getContextAttributes().getBumpFrequency());
+        assertThat(result.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
+        assertThat(result.nudge()).isEqualTo(adventure.getContextAttributes().nudge());
+        assertThat(result.remember()).isEqualTo(adventure.getContextAttributes().remember());
+        assertThat(result.bump()).isEqualTo(adventure.getContextAttributes().bump());
+        assertThat(result.bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
 
-        assertThat(result.getAiModel())
-                .isEqualToIgnoringCase(adventure.getModelConfiguration().getAiModel().toString());
-        assertThat(result.getFrequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
-        assertThat(result.getLogitBias()).isEqualTo(adventure.getModelConfiguration().getLogitBias());
-        assertThat(result.getMaxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
-        assertThat(result.getPresencePenalty()).isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
-        assertThat(result.getStopSequences()).isEqualTo(adventure.getModelConfiguration().getStopSequences());
-        assertThat(result.getTemperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
+        assertThat(result.aiModel())
+                .isEqualToIgnoringCase(adventure.getModelConfiguration().aiModel().toString());
+        assertThat(result.frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().frequencyPenalty());
+        assertThat(result.logitBias()).isEqualTo(adventure.getModelConfiguration().logitBias());
+        assertThat(result.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().maxTokenLimit());
+        assertThat(result.presencePenalty()).isEqualTo(adventure.getModelConfiguration().presencePenalty());
+        assertThat(result.stopSequences()).isEqualTo(adventure.getModelConfiguration().stopSequences());
+        assertThat(result.temperature()).isEqualTo(adventure.getModelConfiguration().temperature());
 
-        assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
-        assertThat(result.getUsersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
+        assertThat(result.usersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
+        assertThat(result.usersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
     }
 }

@@ -12,30 +12,28 @@ public class PersonaPersistenceMapper {
 
     public PersonaDetails mapToResult(Persona persona) {
 
-        return PersonaDetails.builder()
-                .id(persona.getPublicId())
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().name())
-                .usersAllowedToRead(persona.getUsersAllowedToRead())
-                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
-                .creationDate(persona.getCreationDate())
-                .lastUpdateDate(persona.getLastUpdateDate())
-                .ownerId(persona.getOwnerId())
-                .build();
+        return new PersonaDetails(
+                persona.getPublicId(),
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToWrite(),
+                persona.getUsersAllowedToRead(),
+                persona.getCreationDate(),
+                persona.getLastUpdateDate());
     }
 
     public SearchPersonasResult mapToResult(Page<Persona> pagedResult) {
 
-        return SearchPersonasResult.builder()
-                .results(pagedResult.getContent()
+        return new SearchPersonasResult(
+                pagedResult.getNumber() + 1,
+                pagedResult.getNumberOfElements(),
+                pagedResult.getTotalElements(),
+                pagedResult.getTotalPages(),
+                pagedResult.getContent()
                         .stream()
                         .map(this::mapToResult)
-                        .toList())
-                .page(pagedResult.getNumber() + 1)
-                .items(pagedResult.getNumberOfElements())
-                .totalItems(pagedResult.getTotalElements())
-                .totalPages(pagedResult.getTotalPages())
-                .build();
+                        .toList());
     }
 }

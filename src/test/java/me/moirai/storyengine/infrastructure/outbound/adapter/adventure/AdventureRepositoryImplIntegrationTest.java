@@ -1,27 +1,28 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import static java.util.Collections.singleton;
-import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.GPT35_TURBO;
-import static me.moirai.storyengine.core.domain.adventure.GameMode.AUTHOR;
-import static me.moirai.storyengine.core.domain.adventure.GameMode.CHAT;
-import static me.moirai.storyengine.core.domain.adventure.GameMode.RPG;
-import static me.moirai.storyengine.core.domain.adventure.Moderation.PERMISSIVE;
-import static me.moirai.storyengine.core.domain.adventure.Moderation.STRICT;
+import static me.moirai.storyengine.common.enums.GameMode.AUTHOR;
+import static me.moirai.storyengine.common.enums.GameMode.CHAT;
+import static me.moirai.storyengine.common.enums.GameMode.RPG;
+import static me.moirai.storyengine.common.enums.Moderation.PERMISSIVE;
+import static me.moirai.storyengine.common.enums.Moderation.STRICT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.list;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import me.moirai.storyengine.AbstractIntegrationTest;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -30,7 +31,6 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
@@ -68,26 +68,26 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(createdAdventure.getCreationDate()).isNotNull();
         assertThat(createdAdventure.getLastUpdateDate()).isNotNull();
 
-        assertThat(createdAdventure.getModelConfiguration().getAiModel().toString())
-                .isEqualTo((adventure.getModelConfiguration().getAiModel().toString()));
+        assertThat(createdAdventure.getModelConfiguration().aiModel().toString())
+                .isEqualTo((adventure.getModelConfiguration().aiModel().toString()));
 
-        assertThat(createdAdventure.getModelConfiguration().getFrequencyPenalty())
-                .isEqualTo((adventure.getModelConfiguration().getFrequencyPenalty()));
+        assertThat(createdAdventure.getModelConfiguration().frequencyPenalty())
+                .isEqualTo((adventure.getModelConfiguration().frequencyPenalty()));
 
-        assertThat(createdAdventure.getModelConfiguration().getPresencePenalty())
-                .isEqualTo((adventure.getModelConfiguration().getPresencePenalty()));
+        assertThat(createdAdventure.getModelConfiguration().presencePenalty())
+                .isEqualTo((adventure.getModelConfiguration().presencePenalty()));
 
-        assertThat(createdAdventure.getModelConfiguration().getTemperature())
-                .isEqualTo((adventure.getModelConfiguration().getTemperature()));
+        assertThat(createdAdventure.getModelConfiguration().temperature())
+                .isEqualTo((adventure.getModelConfiguration().temperature()));
 
-        assertThat(createdAdventure.getModelConfiguration().getLogitBias())
-                .isEqualTo((adventure.getModelConfiguration().getLogitBias()));
+        assertThat(createdAdventure.getModelConfiguration().logitBias())
+                .isEqualTo((adventure.getModelConfiguration().logitBias()));
 
-        assertThat(createdAdventure.getModelConfiguration().getMaxTokenLimit())
-                .isEqualTo((adventure.getModelConfiguration().getMaxTokenLimit()));
+        assertThat(createdAdventure.getModelConfiguration().maxTokenLimit())
+                .isEqualTo((adventure.getModelConfiguration().maxTokenLimit()));
 
-        assertThat(createdAdventure.getModelConfiguration().getStopSequences())
-                .isEqualTo((adventure.getModelConfiguration().getStopSequences()));
+        assertThat(createdAdventure.getModelConfiguration().stopSequences())
+                .isEqualTo((adventure.getModelConfiguration().stopSequences()));
 
     }
 
@@ -95,7 +95,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
     public void emptyResultWhenAssetDoesntExist() {
 
         // Given
-        String adventureId = "WRLDID";
+        UUID adventureId = AdventureFixture.PUBLIC_ID;
 
         // When
         Optional<Adventure> retrievedAdventureOptional = repository.findByPublicId(adventureId);
@@ -123,14 +123,14 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         Adventure originalAdventure = repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .version(0)
                 .build());
 
         Adventure worldToUbeUpdated = AdventureFixture.privateMultiplayerAdventure()
                 .visibility(Visibility.PUBLIC)
-                .version(originalAdventure.getVersion())
                 .build();
+
         ReflectionTestUtils.setField(worldToUbeUpdated, "id", originalAdventure.getId());
+        ReflectionTestUtils.setField(worldToUbeUpdated, "publicId", originalAdventure.getPublicId());
 
         // When
         Adventure updatedAdventure = repository.save(worldToUbeUpdated);
@@ -149,7 +149,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .version(0)
                 .channelId(channelId)
                 .build());
 
@@ -161,7 +160,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Then
         Adventure updatedAdventure = repository.findByChannelId(channelId).get();
-        assertThat(updatedAdventure.getContextAttributes().getRemember()).isEqualTo(remember);
+        assertThat(updatedAdventure.getContextAttributes().remember()).isEqualTo(remember);
     }
 
     @Test
@@ -173,7 +172,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .version(0)
                 .channelId(channelId)
                 .build());
 
@@ -185,7 +183,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Then
         Adventure updatedAdventure = repository.findByChannelId(channelId).get();
-        assertThat(updatedAdventure.getContextAttributes().getAuthorsNote()).isEqualTo(authorsNote);
+        assertThat(updatedAdventure.getContextAttributes().authorsNote()).isEqualTo(authorsNote);
     }
 
     @Test
@@ -197,7 +195,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .version(0)
                 .channelId(channelId)
                 .build());
 
@@ -209,7 +206,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Then
         Adventure updatedAdventure = repository.findByChannelId(channelId).get();
-        assertThat(updatedAdventure.getContextAttributes().getNudge()).isEqualTo(nudge);
+        assertThat(updatedAdventure.getContextAttributes().nudge()).isEqualTo(nudge);
     }
 
     @Test
@@ -222,7 +219,6 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String channelId = "123123123";
 
         repository.save(AdventureFixture.privateMultiplayerAdventure()
-                .version(0)
                 .channelId(channelId)
                 .build());
 
@@ -234,8 +230,8 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         // Then
         Adventure updatedAdventure = repository.findByChannelId(channelId).get();
-        assertThat(updatedAdventure.getContextAttributes().getBump()).isEqualTo(bump);
-        assertThat(updatedAdventure.getContextAttributes().getBumpFrequency()).isEqualTo(bumpFrequency);
+        assertThat(updatedAdventure.getContextAttributes().bump()).isEqualTo(bump);
+        assertThat(updatedAdventure.getContextAttributes().bumpFrequency()).isEqualTo(bumpFrequency);
     }
 
     @Test
@@ -266,20 +262,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(retrievedAdventure.getModeration()).isEqualTo(adventure.getModeration());
         assertThat(retrievedAdventure.getWorldId()).isEqualTo(adventure.getWorldId());
 
-        assertThat(retrievedAdventure.getModelConfiguration().getAiModel())
-                .isEqualTo(adventure.getModelConfiguration().getAiModel());
-        assertThat(retrievedAdventure.getModelConfiguration().getFrequencyPenalty())
-                .isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
-        assertThat(retrievedAdventure.getModelConfiguration().getLogitBias())
-                .isEqualTo(adventure.getModelConfiguration().getLogitBias());
-        assertThat(retrievedAdventure.getModelConfiguration().getMaxTokenLimit())
-                .isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
-        assertThat(retrievedAdventure.getModelConfiguration().getPresencePenalty())
-                .isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
-        assertThat(retrievedAdventure.getModelConfiguration().getStopSequences())
-                .isEqualTo(adventure.getModelConfiguration().getStopSequences());
-        assertThat(retrievedAdventure.getModelConfiguration().getTemperature())
-                .isEqualTo(adventure.getModelConfiguration().getTemperature());
+        assertThat(retrievedAdventure.getModelConfiguration().aiModel())
+                .isEqualTo(adventure.getModelConfiguration().aiModel());
+        assertThat(retrievedAdventure.getModelConfiguration().frequencyPenalty())
+                .isEqualTo(adventure.getModelConfiguration().frequencyPenalty());
+        assertThat(retrievedAdventure.getModelConfiguration().logitBias())
+                .isEqualTo(adventure.getModelConfiguration().logitBias());
+        assertThat(retrievedAdventure.getModelConfiguration().maxTokenLimit())
+                .isEqualTo(adventure.getModelConfiguration().maxTokenLimit());
+        assertThat(retrievedAdventure.getModelConfiguration().presencePenalty())
+                .isEqualTo(adventure.getModelConfiguration().presencePenalty());
+        assertThat(retrievedAdventure.getModelConfiguration().stopSequences())
+                .isEqualTo(adventure.getModelConfiguration().stopSequences());
+        assertThat(retrievedAdventure.getModelConfiguration().temperature())
+                .isEqualTo(adventure.getModelConfiguration().temperature());
 
         assertThat(retrievedAdventure.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
         assertThat(retrievedAdventure.getUsersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
@@ -313,20 +309,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         assertThat(retrievedAdventure.getModeration()).isEqualTo(adventure.getModeration());
         assertThat(retrievedAdventure.getWorldId()).isEqualTo(adventure.getWorldId());
 
-        assertThat(retrievedAdventure.getModelConfiguration().getAiModel())
-                .isEqualTo(adventure.getModelConfiguration().getAiModel());
-        assertThat(retrievedAdventure.getModelConfiguration().getFrequencyPenalty())
-                .isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
-        assertThat(retrievedAdventure.getModelConfiguration().getLogitBias())
-                .isEqualTo(adventure.getModelConfiguration().getLogitBias());
-        assertThat(retrievedAdventure.getModelConfiguration().getMaxTokenLimit())
-                .isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
-        assertThat(retrievedAdventure.getModelConfiguration().getPresencePenalty())
-                .isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
-        assertThat(retrievedAdventure.getModelConfiguration().getStopSequences())
-                .isEqualTo(adventure.getModelConfiguration().getStopSequences());
-        assertThat(retrievedAdventure.getModelConfiguration().getTemperature())
-                .isEqualTo(adventure.getModelConfiguration().getTemperature());
+        assertThat(retrievedAdventure.getModelConfiguration().aiModel())
+                .isEqualTo(adventure.getModelConfiguration().aiModel());
+        assertThat(retrievedAdventure.getModelConfiguration().frequencyPenalty())
+                .isEqualTo(adventure.getModelConfiguration().frequencyPenalty());
+        assertThat(retrievedAdventure.getModelConfiguration().logitBias())
+                .isEqualTo(adventure.getModelConfiguration().logitBias());
+        assertThat(retrievedAdventure.getModelConfiguration().maxTokenLimit())
+                .isEqualTo(adventure.getModelConfiguration().maxTokenLimit());
+        assertThat(retrievedAdventure.getModelConfiguration().presencePenalty())
+                .isEqualTo(adventure.getModelConfiguration().presencePenalty());
+        assertThat(retrievedAdventure.getModelConfiguration().stopSequences())
+                .isEqualTo(adventure.getModelConfiguration().stopSequences());
+        assertThat(retrievedAdventure.getModelConfiguration().temperature())
+                .isEqualTo(adventure.getModelConfiguration().temperature());
 
         assertThat(retrievedAdventure.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
         assertThat(retrievedAdventure.getUsersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
@@ -336,10 +332,10 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
     public void emptyResultWhenAssetDoesntExistGettingByChannelId() {
 
         // Given
-        String adventureId = "WRLDID";
+        String channelId = "WRLDID";
 
         // When
-        Optional<Adventure> retrievedAdventureOptional = repository.findByChannelId(adventureId);
+        Optional<Adventure> retrievedAdventureOptional = repository.findByChannelId(channelId);
 
         // Then
         assertThat(retrievedAdventureOptional).isNotNull().isEmpty();
@@ -377,20 +373,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -400,19 +395,17 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
@@ -420,21 +413,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -444,19 +436,17 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
@@ -464,22 +454,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .direction("DESC")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, "DESC", null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty();
+        assertThat(result.results()).isNotNull().isNotEmpty();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(2).getName()).isEqualTo(gpt4Omni.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(2).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -490,42 +478,38 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("name")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "name", null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty();
+        assertThat(result.results()).isNotNull().isNotEmpty();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -536,43 +520,38 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("name")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "name", "DESC", null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty();
+        assertThat(result.results()).isNotNull().isNotEmpty();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(2).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(2).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -583,34 +562,31 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("modelConfiguration.aiModel")
-                .direction("ASC")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "modelConfiguration.aiModel", "ASC", null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -621,34 +597,31 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("modelConfiguration.aiModel")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "modelConfiguration.aiModel", "DESC", null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -660,14 +633,14 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
@@ -679,25 +652,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("moderation")
-                .direction("ASC")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, 1, 10, null, null, null, "moderation", "ASC", null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty();
+        assertThat(result.results()).isNotNull().isNotEmpty();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
-        assertThat(adventures.get(2).getName()).isEqualTo(gpt4Omni.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt354k.getName());
+        assertThat(adventures.get(2).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -708,36 +676,31 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("modelConfiguration.aiModel")
-                .direction("DESC")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, 1, 10, null, null, null, "modelConfiguration.aiModel", "DESC", null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -747,34 +710,32 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         String ownerId = "586678721356875";
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .model("GPT4_MINI")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, "GPT4_MINI", null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -785,34 +746,32 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .visibility("PRIVATE")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, null, "PRIVATE", null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -823,13 +782,13 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
@@ -838,23 +797,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .visibility("PRIVATE")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, null, "PRIVATE", "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -865,42 +821,38 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                "Number 2", null, null, null, false, null, null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -912,14 +864,14 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
@@ -931,20 +883,18 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .moderation("PERMISSIVE")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, "PERMISSIVE", null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures).extracting(AdventureDetails::getName)
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures).extracting(AdventureDetails::name)
                 .containsExactlyInAnyOrder(gpt4Mini.getName(), gpt354k.getName());
     }
 
@@ -963,19 +913,17 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.save(adventure);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .world(worldId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, worldId, null, null, false, null, null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
     }
 
     @Test
@@ -993,19 +941,17 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.save(adventure);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .persona(personaId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, personaId, null, false, null, null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
     }
 
     @Test
@@ -1040,21 +986,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1067,7 +1011,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1075,14 +1019,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
@@ -1090,21 +1032,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1117,7 +1057,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1125,14 +1065,12 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
@@ -1140,22 +1078,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .direction("DESC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, null, "DESC", null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -1169,7 +1104,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1178,36 +1113,31 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("name")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "name", null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Omni.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -1221,7 +1151,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(ownerId)
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1230,37 +1160,31 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("name")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "name", "DESC", null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1271,7 +1195,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1280,30 +1204,26 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("modelConfiguration.aiModel")
-                .direction("ASC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "modelConfiguration.aiModel", "ASC", null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1314,7 +1234,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1323,30 +1243,26 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("modelConfiguration.aiModel")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, null, "modelConfiguration.aiModel", "DESC", null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1358,7 +1274,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1368,7 +1284,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
@@ -1383,25 +1299,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("moderation")
-                .direction("ASC")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, 1, 10, null, null, null, "moderation", "ASC", null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -1412,7 +1322,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1421,32 +1331,26 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .sortingField("modelConfiguration.aiModel")
-                .direction("DESC")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, 1, 10, null, null, null, "modelConfiguration.aiModel", "DESC", null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1457,13 +1361,13 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
         Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
@@ -1472,31 +1376,26 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .model("GPT35_TURBO")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, "GPT35_TURBO", null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt354k.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -1507,7 +1406,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1516,37 +1415,32 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                 .permissions(PermissionsFixture.samplePermissions()
                         .usersAllowedToWrite(singleton(ownerId))
                         .build())
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
         Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
-                        .aiModel(GPT35_TURBO)
-                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt35Turbo())
                 .channelId("CHNLID3")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                "Number 2", null, null, null, false, null, null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1558,7 +1452,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .build();
 
@@ -1568,7 +1462,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                         .ownerId(ownerId)
                         .build())
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .build();
 
@@ -1583,22 +1477,19 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .moderation("PERMISSIVE")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, null, "PERMISSIVE", null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(adventures.get(1).getName()).isEqualTo(gpt354k.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(adventures.get(1).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -1610,7 +1501,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .gameMode(CHAT)
                 .build();
@@ -1621,7 +1512,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                         .ownerId(ownerId)
                         .build())
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .gameMode(RPG)
                 .build();
@@ -1638,22 +1529,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .gameMode("RPG")
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, "RPG", null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1665,7 +1554,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .gameMode(AUTHOR)
                 .build();
@@ -1677,7 +1566,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                         .ownerId(ownerId)
                         .build())
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .gameMode(CHAT)
                 .build();
@@ -1694,23 +1583,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .gameMode("CHAT")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, null, false, null, null, null, "CHAT", null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1721,7 +1607,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
         Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .name("Number 1")
                 .moderation(STRICT)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni())
                 .channelId("CHNLID1")
                 .gameMode(AUTHOR)
                 .build();
@@ -1732,7 +1618,7 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
                         .ownerId(ownerId)
                         .build())
                 .moderation(PERMISSIVE)
-                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .channelId("CHNLID2")
                 .gameMode(CHAT)
                 .build();
@@ -1746,22 +1632,20 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchAdventures query = SearchAdventures.builder()
-                .ownerId(ownerId)
-                .requesterId(ownerId)
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, null, ownerId, false, null, null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
 
-        List<AdventureDetails> adventures = result.getResults();
-        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<AdventureDetails> adventures = result.results();
+        assertThat(adventures.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -1779,20 +1663,17 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.save(adventure);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .world(worldId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, worldId, null, null, false, null, null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
     }
 
     @Test
@@ -1810,20 +1691,17 @@ public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationT
 
         jpaRepository.save(adventure);
 
-        SearchAdventures query = SearchAdventures.builder()
-                .requesterId(ownerId)
-                .persona(personaId)
-                .operation("WRITE")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null, null, personaId, null, false, null, null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchAdventuresResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result.getTotalItems()).isOne();
-        assertThat(result.getTotalPages()).isOne();
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.totalItems()).isOne();
+        assertThat(result.totalPages()).isOne();
     }
 
     @Test

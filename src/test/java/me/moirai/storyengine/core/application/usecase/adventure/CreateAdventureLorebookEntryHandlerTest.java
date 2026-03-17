@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,9 +42,13 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenAdventureIdIsNull_thenThrowException() {
 
         // Given
-        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.sampleLorebookEntry()
-                .adventureId(null)
-                .build();
+        CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+                null,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                null,
+                "1234");
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -53,9 +58,13 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenNameIdIsNull_thenThrowException() {
 
         // Given
-        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.sampleLorebookEntry()
-                .name(null)
-                .build();
+        CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+                AdventureFixture.PUBLIC_ID,
+                null,
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                null,
+                "1234");
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -65,9 +74,13 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenDescriptionIdIsNull_thenThrowException() {
 
         // Given
-        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.sampleLorebookEntry()
-                .description(null)
-                .build();
+        CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+                AdventureFixture.PUBLIC_ID,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                null,
+                null,
+                "1234");
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -78,9 +91,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
 
         // Given
         String requesterId = "1234";
-        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry()
-                .requesterId(requesterId)
-                .build();
+        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry();
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -92,7 +103,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 .contentFlagged(false)
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(adventure));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
         when(repository.save(any())).thenReturn(adventure);
 
@@ -100,7 +111,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getName()).isEqualTo(command.getName());
+                    assertThat(result.name()).isEqualTo(command.name());
                 })
                 .verifyComplete();
     }

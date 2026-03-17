@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.port.inbound.model.SearchModels;
 import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
-import me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel;
 
 @UseCaseHandler
 public class SearchModelsHandler extends AbstractUseCaseHandler<SearchModels, List<AiModelResult>> {

@@ -3,10 +3,10 @@ package me.moirai.storyengine.core.application.usecase.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.application.usecase.world.request.CreateWorldLorebookEntryFixture;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
@@ -45,9 +44,12 @@ public class CreateWorldLorebookEntryHandlerTest {
     public void errorWhenWorldIdIsNull() {
 
         // Given
-        CreateWorldLorebookEntry command = CreateWorldLorebookEntryFixture.sampleLorebookEntry()
-                .worldId(null)
-                .build();
+        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+                null,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -57,9 +59,12 @@ public class CreateWorldLorebookEntryHandlerTest {
     public void errorWhenNameIsNull() {
 
         // Given
-        CreateWorldLorebookEntry command = CreateWorldLorebookEntryFixture.sampleLorebookEntry()
-                .name(null)
-                .build();
+        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+                WorldFixture.PUBLIC_ID,
+                null,
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -69,9 +74,12 @@ public class CreateWorldLorebookEntryHandlerTest {
     public void errorWhenDescriptionIsNull() {
 
         // Given
-        CreateWorldLorebookEntry command = CreateWorldLorebookEntryFixture.sampleLorebookEntry()
-                .description(null)
-                .build();
+        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+                WorldFixture.PUBLIC_ID,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                null,
+                null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -82,9 +90,12 @@ public class CreateWorldLorebookEntryHandlerTest {
 
         // Given
         String requesterId = "OWNER123";
-        CreateWorldLorebookEntry command = CreateWorldLorebookEntryFixture.sampleLorebookEntry()
-                .requesterId(requesterId)
-                .build();
+        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+                WorldFixture.PUBLIC_ID,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                requesterId);
 
         World world = WorldFixture.privateWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -92,7 +103,7 @@ public class CreateWorldLorebookEntryHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
         // When
@@ -100,6 +111,6 @@ public class CreateWorldLorebookEntryHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo(command.getName());
+        assertThat(result.name()).isEqualTo(command.name());
     }
 }

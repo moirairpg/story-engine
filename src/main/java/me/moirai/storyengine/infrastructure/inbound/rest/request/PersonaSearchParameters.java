@@ -1,9 +1,9 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.request;
 
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
 
 public class PersonaSearchParameters {
 
@@ -13,7 +13,7 @@ public class PersonaSearchParameters {
     private Integer size;
     private SearchSortingField sortingField;
     private SearchDirection direction;
-    private SearchVisibility visibility;
+    private Visibility visibility;
     private SearchOperation operation;
 
     public PersonaSearchParameters() {
@@ -67,11 +67,11 @@ public class PersonaSearchParameters {
         this.direction = direction;
     }
 
-    public SearchVisibility getVisibility() {
+    public Visibility getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(SearchVisibility visibility) {
+    public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
     }
 

@@ -4,41 +4,43 @@ import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 
 public class SearchAdventuresFixture {
 
-    public static SearchAdventures.Builder writeAccess() {
+    public static SearchAdventures writeAccess() {
 
-        return SearchAdventures.builder()
-                .name("Adventure")
-                .gameMode("RPG")
-                .model("GPT3_TURBO")
-                .moderation("PERMISSIVE")
-                .multiplayer(false)
-                .operation("WRITE")
-                .ownerId("1234")
-                .page(1)
-                .persona("1234")
-                .requesterId("1234")
-                .size(10)
-                .sortingField("name")
-                .visibility("PUBLIC")
-                .world("1234");
+        return new SearchAdventures(
+                "Adventure",
+                "1234",
+                "1234",
+                "1234",
+                false,
+                1,
+                10,
+                "GPT3_TURBO",
+                "RPG",
+                "PERMISSIVE",
+                "name",
+                "ASC",
+                "PUBLIC",
+                "WRITE",
+                "1234");
     }
 
-    public static SearchAdventures.Builder readAccess() {
+    public static SearchAdventures readAccess() {
 
-        return SearchAdventures.builder()
-                .name("Adventure")
-                .gameMode("RPG")
-                .model("GPT3_TURBO")
-                .moderation("PERMISSIVE")
-                .multiplayer(false)
-                .operation("READ")
-                .ownerId("1234")
-                .page(1)
-                .persona("1234")
-                .requesterId("1234")
-                .size(10)
-                .sortingField("name")
-                .visibility("PUBLIC")
-                .world("1234");
+        return new SearchAdventures(
+                "Adventure",
+                "1234",
+                "1234",
+                "1234",
+                false,
+                1,
+                10,
+                "GPT3_TURBO",
+                "RPG",
+                "PERMISSIVE",
+                "name",
+                "ASC",
+                "PUBLIC",
+                "READ",
+                "1234");
     }
 }

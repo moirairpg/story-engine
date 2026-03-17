@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 public class GameModeTest {

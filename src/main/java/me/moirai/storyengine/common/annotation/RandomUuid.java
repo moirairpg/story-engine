@@ -5,12 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.annotations.IdGeneratorType;
+import org.hibernate.annotations.ValueGenerationType;
 
-import me.moirai.storyengine.common.dbutil.UuidIdentifierGenerator;
+import me.moirai.storyengine.common.dbutil.UuidGenerator;
 
-@IdGeneratorType(UuidIdentifierGenerator.class)
+@ValueGenerationType(generatedBy = UuidGenerator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
-public @interface UuidIdentifier {
+public @interface RandomUuid {
 }

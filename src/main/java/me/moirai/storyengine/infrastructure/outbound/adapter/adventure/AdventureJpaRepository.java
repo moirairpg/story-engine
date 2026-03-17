@@ -1,6 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,9 +15,9 @@ public interface AdventureJpaRepository
 
     Optional<Adventure> findByChannelId(String channelId);
 
-    Optional<Adventure> findByPublicId(String publicId);
+    Optional<Adventure> findByPublicId(UUID publicId);
 
-    void deleteByPublicId(String publicId);
+    void deleteByPublicId(UUID publicId);
 
     @Query("SELECT cc.gameMode FROM Adventure cc WHERE cc.channelId = :channelId")
     String getGameModeByChannelId(String channelId);

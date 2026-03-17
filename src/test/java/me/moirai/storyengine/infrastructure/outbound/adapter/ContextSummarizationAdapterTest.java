@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter;
 
-import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.GPT4_MINI;
+import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT4_MINI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.any;

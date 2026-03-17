@@ -5,36 +5,67 @@ import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 public class CreateAdventureFixture {
 
-    public static CreateAdventure.Builder sample() {
+    public static CreateAdventure sample() {
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
-        return CreateAdventure.builder()
-                .name(adventure.getName())
-                .personaId(PersonaFixture.PUBLIC_ID)
-                .worldId(String.valueOf(adventure.getWorldId()))
-                .channelId(adventure.getChannelId())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .moderation("strict")
-                .usersAllowedToRead(adventure.getUsersAllowedToRead())
-                .usersAllowedToWrite(adventure.getUsersAllowedToWrite())
-                .temperature(1.7)
-                .gameMode(adventure.getGameMode().name())
-                .description(adventure.getDescription())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .remember(adventure.getContextAttributes().getRemember())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .isMultiplayer(adventure.isMultiplayer())
-                .visibility("private")
-                .requesterId("RQSTRID");
+        return new CreateAdventure(
+                adventure.getName(),
+                adventure.getDescription(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                "private",
+                adventure.getModelConfiguration().aiModel().toString(),
+                "strict",
+                "RQSTRID",
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                1.7,
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().logitBias(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getUsersAllowedToWrite(),
+                adventure.getUsersAllowedToRead(),
+                adventure.isMultiplayer());
+    }
+
+    public static CreateAdventure sampleWithRequesterId(String requesterId) {
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        return new CreateAdventure(
+                adventure.getName(),
+                adventure.getDescription(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                "private",
+                adventure.getModelConfiguration().aiModel().toString(),
+                "strict",
+                requesterId,
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                1.7,
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().logitBias(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getUsersAllowedToWrite(),
+                adventure.getUsersAllowedToRead(),
+                adventure.isMultiplayer());
     }
 }

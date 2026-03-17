@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.application.usecase.world;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -10,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
@@ -36,7 +37,10 @@ public class DeleteWorldLorebookEntryHandlerTest {
     public void errorWhenEntryIdIsNull() {
 
         // Given
-        DeleteWorldLorebookEntry command = DeleteWorldLorebookEntry.builder().build();
+        DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+                null,
+                WorldFixture.PUBLIC_ID,
+                "RQSTRID");
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -47,9 +51,10 @@ public class DeleteWorldLorebookEntryHandlerTest {
     public void errorWhenWorldIdIsNull() {
 
         // Given
-        DeleteWorldLorebookEntry command = DeleteWorldLorebookEntry.builder()
-                .lorebookEntryId("DUMMY")
-                .build();
+        DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+                WorldLorebookEntryFixture.PUBLIC_ID,
+                null,
+                "RQSTRID");
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -60,15 +65,12 @@ public class DeleteWorldLorebookEntryHandlerTest {
     public void deleteWorld() {
 
         // Given
-        String id = "WRDID";
-        String worldId = WorldFixture.PUBLIC_ID;
         String requesterId = "4234324";
 
-        DeleteWorldLorebookEntry command = DeleteWorldLorebookEntry.builder()
-                .lorebookEntryId(id)
-                .worldId(worldId)
-                .requesterId(requesterId)
-                .build();
+        DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+                WorldLorebookEntryFixture.PUBLIC_ID,
+                WorldFixture.PUBLIC_ID,
+                requesterId);
 
         World baseWorld = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -77,9 +79,9 @@ public class DeleteWorldLorebookEntryHandlerTest {
                 .build();
 
         World world = spy(baseWorld);
-        doNothing().when(world).removeLorebookEntry(anyString());
+        doNothing().when(world).removeLorebookEntry(any(UUID.class));
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(world));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
         // When

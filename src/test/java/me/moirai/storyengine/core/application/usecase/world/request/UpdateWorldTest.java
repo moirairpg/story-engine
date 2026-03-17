@@ -1,11 +1,12 @@
 package me.moirai.storyengine.core.application.usecase.world.request;
 
-import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Sets.set;
 
 import org.junit.jupiter.api.Test;
+
+import me.moirai.storyengine.common.enums.Visibility;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 
 public class UpdateWorldTest {
 
@@ -13,51 +14,53 @@ public class UpdateWorldTest {
     public void buildObject_whenAllValuesAreValid_thenCreateInstance() {
 
         // Given
-        UpdateWorld.Builder updateWorldBuilder = UpdateWorld.builder()
-                .adventureStart("SomeStart")
-                .description("SomeDesc")
-                .name("SomeName")
-                .visibility("PUBLIC")
-                .usersAllowedToReadToAdd(set("123123"))
-                .usersAllowedToReadToRemove(set("123123"))
-                .usersAllowedToWriteToAdd(set("123123"))
-                .usersAllowedToWriteToRemove(set("123123"));
-
-        // When
-        UpdateWorld result = updateWorldBuilder.build();
+        UpdateWorld result = new UpdateWorld(
+                null,
+                "SomeName",
+                "SomeDesc",
+                "SomeStart",
+                Visibility.PUBLIC,
+                null,
+                set("123123"),
+                set("123123"),
+                set("123123"),
+                set("123123"));
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isNotNull();
-        assertThat(result.getAdventureStart()).isNotNull();
-        assertThat(result.getDescription()).isNotNull();
-        assertThat(result.getUsersAllowedToReadToAdd()).isNotNull().isNotEmpty();
-        assertThat(result.getUsersAllowedToReadToRemove()).isNotNull().isNotEmpty();
-        assertThat(result.getUsersAllowedToWriteToAdd()).isNotNull().isNotEmpty();
-        assertThat(result.getUsersAllowedToWriteToRemove()).isNotNull().isNotEmpty();
+        assertThat(result.name()).isNotNull();
+        assertThat(result.adventureStart()).isNotNull();
+        assertThat(result.description()).isNotNull();
+        assertThat(result.usersAllowedToReadToAdd()).isNotNull().isNotEmpty();
+        assertThat(result.usersAllowedToReadToRemove()).isNotNull().isNotEmpty();
+        assertThat(result.usersAllowedToWriteToAdd()).isNotNull().isNotEmpty();
+        assertThat(result.usersAllowedToWriteToRemove()).isNotNull().isNotEmpty();
     }
 
     @Test
-    public void buildObject_whenModifiedListsAreNull_thenCreateInstanceWithEmptyLists() {
+    public void buildObject_whenModifiedListsAreNull_thenCreateInstanceWithNullLists() {
 
         // Given
-        UpdateWorld.Builder updateWorldBuilder = UpdateWorld.builder()
-                .adventureStart("SomeStart")
-                .description("SomeDesc")
-                .name("SomeName")
-                .visibility("PUBLIC");
-
-        // When
-        UpdateWorld result = updateWorldBuilder.build();
+        UpdateWorld result = new UpdateWorld(
+                null,
+                "SomeName",
+                "SomeDesc",
+                "SomeStart",
+                Visibility.PUBLIC,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isNotNull();
-        assertThat(result.getAdventureStart()).isNotNull();
-        assertThat(result.getDescription()).isNotNull();
-        assertThat(result.getUsersAllowedToReadToAdd()).isNotNull().isEmpty();
-        assertThat(result.getUsersAllowedToReadToRemove()).isNotNull().isEmpty();
-        assertThat(result.getUsersAllowedToWriteToAdd()).isNotNull().isEmpty();
-        assertThat(result.getUsersAllowedToWriteToRemove()).isNotNull().isEmpty();
+        assertThat(result.name()).isNotNull();
+        assertThat(result.adventureStart()).isNotNull();
+        assertThat(result.description()).isNotNull();
+        assertThat(result.usersAllowedToReadToAdd()).isNull();
+        assertThat(result.usersAllowedToReadToRemove()).isNull();
+        assertThat(result.usersAllowedToWriteToAdd()).isNull();
+        assertThat(result.usersAllowedToWriteToRemove()).isNull();
     }
 }

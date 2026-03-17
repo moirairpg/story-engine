@@ -1,14 +1,15 @@
 package me.moirai.storyengine.core.domain.adventure;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
 
 @Entity
@@ -19,30 +20,31 @@ public class AdventureLorebookEntry extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
+    @RandomUuid
+    @Column(name = "public_id")
+    private UUID publicId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "regex", nullable = false)
+    @Column(name = "regex")
     private String regex;
 
     @Column(name = "player_id")
     private String playerId;
 
-    @Column(name = "is_player_character", nullable = false)
+    @Column(name = "is_player_character")
     private boolean isPlayerCharacter;
 
-    @Column(name = "adventure_id", insertable = false, updatable = false)
+    @Column(name = "adventure_id")
     private Long adventureId;
 
     private AdventureLorebookEntry(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate, builder.version);
+        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
@@ -54,13 +56,6 @@ public class AdventureLorebookEntry extends Asset {
         super();
     }
 
-    @PrePersist
-    private void generatePublicId() {
-        if (publicId == null) {
-            publicId = java.util.UUID.randomUUID().toString();
-        }
-    }
-
     public static Builder builder() {
 
         return new Builder();
@@ -70,7 +65,7 @@ public class AdventureLorebookEntry extends Asset {
         return id;
     }
 
-    public String getPublicId() {
+    public UUID getPublicId() {
         return publicId;
     }
 
@@ -131,7 +126,6 @@ public class AdventureLorebookEntry extends Asset {
         private boolean isPlayerCharacter;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
-        private int version;
 
         private Builder() {
         }
@@ -181,12 +175,6 @@ public class AdventureLorebookEntry extends Asset {
         public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
 
             this.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public Builder version(int version) {
-
-            this.version = version;
             return this;
         }
 

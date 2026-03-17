@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -19,11 +20,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
+import me.moirai.storyengine.common.enums.GameMode;
+import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
@@ -35,36 +39,37 @@ public class Adventure extends ShareableAsset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
+    @RandomUuid
+    @Column(name = "public_id")
+    private UUID publicId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "world_id", nullable = false)
+    @Column(name = "world_id")
     private Long worldId;
 
-    @Column(name = "persona_id", nullable = false)
+    @Column(name = "persona_id")
     private Long personaId;
 
-    @Column(name = "channel_id", nullable = false)
+    @Column(name = "channel_id")
     private String channelId;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "adventure_start", nullable = false)
+    @Column(name = "adventure_start")
     private String adventureStart;
 
-    @Column(name = "is_multiplayer", nullable = false)
+    @Column(name = "is_multiplayer")
     private boolean isMultiplayer;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "game_mode", nullable = false)
+    @Column(name = "game_mode")
     private GameMode gameMode;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "moderation", nullable = false)
+    @Column(name = "moderation")
     private Moderation moderation;
 
     @Embedded
@@ -74,13 +79,13 @@ public class Adventure extends ShareableAsset {
     private ModelConfiguration modelConfiguration;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "adventure_id", nullable = false)
+    @JoinColumn(name = "adventure_id")
     private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
 
     private Adventure(Builder builder) {
 
         super(builder.creatorId, builder.creationDate,
-                builder.lastUpdateDate, builder.permissions, builder.visibility, builder.version);
+                builder.lastUpdateDate, builder.permissions, builder.visibility);
 
         this.name = builder.name;
         this.description = builder.description;
@@ -99,18 +104,11 @@ public class Adventure extends ShareableAsset {
         super();
     }
 
-    @PrePersist
-    private void generatePublicId() {
-        if (publicId == null) {
-            publicId = java.util.UUID.randomUUID().toString();
-        }
-    }
-
     public Long getId() {
         return id;
     }
 
-    public String getPublicId() {
+    public UUID getPublicId() {
         return publicId;
     }
 
@@ -319,7 +317,7 @@ public class Adventure extends ShareableAsset {
     }
 
     public AdventureLorebookEntry updateLorebookEntry(
-            String entryId,
+            UUID entryId,
             String name,
             String regex,
             String description,
@@ -340,13 +338,13 @@ public class Adventure extends ShareableAsset {
         return entry;
     }
 
-    public void removeLorebookEntry(String entryId) {
+    public void removeLorebookEntry(UUID entryId) {
 
         AdventureLorebookEntry entry = getLorebookEntryById(entryId);
         lorebook.remove(entry);
     }
 
-    public AdventureLorebookEntry getLorebookEntryById(String entryId) {
+    public AdventureLorebookEntry getLorebookEntryById(UUID entryId) {
 
         return lorebook.stream()
                 .filter(e -> entryId.equals(e.getPublicId()))
@@ -386,7 +384,6 @@ public class Adventure extends ShareableAsset {
         private String creatorId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
-        private int version;
 
         private Builder() {
         }
@@ -484,12 +481,6 @@ public class Adventure extends ShareableAsset {
         public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
 
             this.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public Builder version(int version) {
-
-            this.version = version;
             return this;
         }
 

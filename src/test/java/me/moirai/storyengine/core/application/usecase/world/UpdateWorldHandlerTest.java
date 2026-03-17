@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.application.model.result.TextModerationResultFixture;
@@ -43,17 +44,20 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenFieldsAreProvided_thenUpdateWorld() {
 
         // Given
-        String id = "WRDID";
+        UUID id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
         String newName = "NEW NAME";
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .name("MoirAI")
-                .description("This is an RPG world")
-                .adventureStart("As you enter the city, people around you start looking at you.")
-                .visibility("PUBLIC")
-                .requesterId(requesterId)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                id,
+                "MoirAI",
+                "This is an RPG world",
+                "As you enter the city, people around you start looking at you.",
+                Visibility.PUBLIC,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         World expectedUpdatedWorld = WorldFixture.privateWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -68,7 +72,7 @@ public class UpdateWorldHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedUpdatedWorld);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -77,7 +81,7 @@ public class UpdateWorldHandlerTest {
         StepVerifier.create(handler.handle(command))
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
-                    assertThat(result.getLastUpdateDate()).isEqualTo(expectedUpdatedWorld.getLastUpdateDate());
+                    assertThat(result.lastUpdateDate()).isEqualTo(expectedUpdatedWorld.getLastUpdateDate());
                 })
                 .verifyComplete();
     }
@@ -86,16 +90,19 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenValidData_thenWorldIsUpdated() {
 
         // Given
-        String id = WorldFixture.PUBLIC_ID;
+        UUID id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .name("MoirAI")
-                .description("This is an RPG world")
-                .adventureStart("As you enter the city, people around you start looking at you.")
-                .visibility("PUBLIC")
-                .requesterId(requesterId)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                id,
+                "MoirAI",
+                "This is an RPG world",
+                "As you enter the city, people around you start looking at you.",
+                Visibility.PUBLIC,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         World unchangedWorld = WorldFixture.privateWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -116,7 +123,7 @@ public class UpdateWorldHandlerTest {
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedUpdatedWorld);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -132,16 +139,19 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenEmptyUpdateFields_thenWorldIsNotChanged() {
 
         // Given
-        String id = WorldFixture.PUBLIC_ID;
+        UUID id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .name(null)
-                .description(null)
-                .adventureStart(null)
-                .visibility(null)
-                .requesterId(requesterId)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                id,
+                null,
+                null,
+                null,
+                null,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         World unchangedWorld = WorldFixture.privateWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -149,7 +159,7 @@ public class UpdateWorldHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
 
         // Then
@@ -163,13 +173,19 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenPublicToBeMadePrivate_thenWorldIsMadePrivate() {
 
         // Given
-        String id = WorldFixture.PUBLIC_ID;
+        UUID id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .visibility("private")
-                .requesterId(requesterId)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                id,
+                null,
+                null,
+                null,
+                Visibility.PRIVATE,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         World unchangedWorld = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -183,7 +199,7 @@ public class UpdateWorldHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedWorld);
 
         // Then
@@ -197,13 +213,19 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenInvalidVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = WorldFixture.PUBLIC_ID;
+        UUID id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .visibility("invalid")
-                .requesterId(requesterId)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                id,
+                null,
+                null,
+                null,
+                null,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         World unchangedWorld = WorldFixture.privateWorld()
                 .permissions(PermissionsFixture.samplePermissions()
@@ -211,7 +233,7 @@ public class UpdateWorldHandlerTest {
                         .build())
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
 
         // Then
@@ -225,24 +247,26 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenAccessDenied_thenExceptionIsThrown() {
 
         // Given
-        String id = "WRDID";
+        UUID id = WorldFixture.PUBLIC_ID;
         String requesterId = "RQSTRID";
-        String newName = "NEW NAME";
 
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .name("MoirAI")
-                .description("This is an RPG world")
-                .adventureStart("As you enter the city, people around you start looking at you.")
-                .visibility("PUBLIC")
-                .requesterId(requesterId)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                id,
+                "MoirAI",
+                "This is an RPG world",
+                "As you enter the city, people around you start looking at you.",
+                Visibility.PUBLIC,
+                requesterId,
+                null,
+                null,
+                null,
+                null);
 
         World unchangedWorld = WorldFixture.privateWorld()
-                .name(newName)
+                .name("NEW NAME")
                 .build();
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 
@@ -255,10 +279,17 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenIdIsNull_thenExceptionIsThrown() {
 
         // Given
-        String id = null;
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -269,14 +300,17 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenContentIsFlagged_thenExceptionIsThrown() {
 
         // Given
-        String id = WorldFixture.PUBLIC_ID;
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .name("MoirAI")
-                .description("This is an RPG world")
-                .adventureStart("As you enter the city, people around you start looking at you.")
-                .visibility("PUBLIC")
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                WorldFixture.PUBLIC_ID,
+                "MoirAI",
+                "This is an RPG world",
+                "As you enter the city, people around you start looking at you.",
+                Visibility.PUBLIC,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withFlags().build()));
@@ -290,13 +324,19 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
-        String id = WorldFixture.PUBLIC_ID;
-        UpdateWorld command = UpdateWorld.builder()
-                .id(id)
-                .name("SomeNewName")
-                .build();
+        UpdateWorld command = new UpdateWorld(
+                WorldFixture.PUBLIC_ID,
+                "SomeNewName",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
-        when(repository.findByPublicId(anyString())).thenReturn(Optional.empty());
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
 

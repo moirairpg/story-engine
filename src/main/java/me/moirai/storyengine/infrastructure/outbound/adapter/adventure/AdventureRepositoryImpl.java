@@ -10,6 +10,7 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,15 +20,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.criteria.Predicate;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.AdventurePersistenceMapper;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.AdventureLorebookPersistenceMapper;
+import me.moirai.storyengine.infrastructure.outbound.adapter.mapper.AdventurePersistenceMapper;
 
 @Repository
 public class AdventureRepositoryImpl implements AdventureRepository {
@@ -80,7 +81,7 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     }
 
     @Override
-    public void deleteByPublicId(String publicId) {
+    public void deleteByPublicId(UUID publicId) {
 
         jpaRepository.deleteByPublicId(publicId);
     }
@@ -116,7 +117,7 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     }
 
     @Override
-    public Optional<Adventure> findByPublicId(String publicId) {
+    public Optional<Adventure> findByPublicId(UUID publicId) {
 
         return jpaRepository.findByPublicId(publicId);
     }
@@ -130,10 +131,10 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     @Override
     public SearchAdventuresResult search(SearchAdventures request) {
 
-        int page = extractPageNumber(request.getPage());
-        int size = extractPageSize(request.getSize());
-        String sortByField = extractSortByField(request.getSortingField());
-        Direction direction = extractDirection(request.getDirection());
+        int page = extractPageNumber(request.page());
+        int size = extractPageSize(request.size());
+        String sortByField = extractSortByField(request.sortingField());
+        Direction direction = extractDirection(request.direction());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
         Specification<Adventure> query = buildSearchQuery(request);
@@ -145,10 +146,10 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     @Override
     public SearchAdventureLorebookEntriesResult searchLorebookEntries(SearchAdventureLorebookEntries request) {
 
-        int page = extractPageNumber(request.getPage());
-        int size = extractPageSize(request.getSize());
-        String sortByField = extractLorebookSortByField(request.getSortingField());
-        Direction direction = extractDirection(request.getDirection());
+        int page = extractPageNumber(request.page());
+        int size = extractPageSize(request.size());
+        String sortByField = extractLorebookSortByField(request.sortingField());
+        Direction direction = extractDirection(request.direction());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
         Specification<AdventureLorebookEntry> query = buildLorebookSearchQuery(request);
@@ -168,44 +169,44 @@ public class AdventureRepositoryImpl implements AdventureRepository {
         return (root, cq, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
 
-            if (WRITE.equals(request.getOperation())) {
-                predicates.add(canUserWrite(cb, root, request.getRequesterDiscordId()));
+            if (WRITE.equals(request.operation())) {
+                predicates.add(canUserWrite(cb, root, request.requesterId()));
             } else {
-                predicates.add(canUserRead(cb, root, request.getRequesterDiscordId()));
+                predicates.add(canUserRead(cb, root, request.requesterId()));
             }
 
-            if (isNotBlank(request.getName())) {
-                predicates.add(contains(cb, root, NAME, request.getName()));
+            if (isNotBlank(request.name())) {
+                predicates.add(contains(cb, root, NAME, request.name()));
             }
 
-            if (isNotBlank(request.getWorld())) {
-                predicates.add(contains(cb, root, WORLD_ID, request.getWorld()));
+            if (isNotBlank(request.worldName())) {
+                predicates.add(contains(cb, root, WORLD_ID, request.worldName()));
             }
 
-            if (isNotBlank(request.getPersona())) {
-                predicates.add(contains(cb, root, PERSONA_ID, request.getPersona()));
+            if (isNotBlank(request.personaName())) {
+                predicates.add(contains(cb, root, PERSONA_ID, request.personaName()));
             }
 
-            if (isNotBlank(request.getOwnerId())) {
+            if (isNotBlank(request.ownerId())) {
                 predicates.add(cb.equal(root.get(PERMISSIONS)
-                        .get(OWNER_DISCORD_ID), cb.literal(request.getOwnerId())));
+                        .get(OWNER_DISCORD_ID), cb.literal(request.ownerId())));
             }
 
-            if (isNotBlank(request.getModel())) {
+            if (isNotBlank(request.model())) {
                 predicates.add(cb.like(cb.upper(cb.toString(root.get(MODEL_CONFIGURATION)
-                        .get(AI_MODEL))), cb.literal(request.getModel().toUpperCase())));
+                        .get(AI_MODEL))), cb.literal(request.model().toUpperCase())));
             }
 
-            if (isNotBlank(request.getGameMode())) {
-                predicates.add(contains(cb, root, GAME_MODE, request.getGameMode()));
+            if (isNotBlank(request.gameMode())) {
+                predicates.add(contains(cb, root, GAME_MODE, request.gameMode()));
             }
 
-            if (isNotBlank(request.getModeration())) {
-                predicates.add(contains(cb, root, MODERATION, request.getModeration()));
+            if (isNotBlank(request.moderation())) {
+                predicates.add(contains(cb, root, MODERATION, request.moderation()));
             }
 
-            if (isNotBlank(request.getVisibility())) {
-                predicates.add(contains(cb, root, VISIBILITY, request.getVisibility()));
+            if (isNotBlank(request.visibility())) {
+                predicates.add(contains(cb, root, VISIBILITY, request.visibility()));
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -217,10 +218,10 @@ public class AdventureRepositoryImpl implements AdventureRepository {
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get(ADVENTURE_ID), query.getAdventureId()));
+            predicates.add(cb.equal(root.get(ADVENTURE_ID), query.adventureId()));
 
-            if (isNotBlank(query.getName())) {
-                predicates.add(contains(cb, root, NAME, query.getName()));
+            if (isNotBlank(query.name())) {
+                predicates.add(contains(cb, root, NAME, query.name()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

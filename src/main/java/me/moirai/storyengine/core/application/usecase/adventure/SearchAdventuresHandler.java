@@ -1,13 +1,13 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
-@UseCaseHandler
-public class SearchAdventuresHandler extends AbstractUseCaseHandler<SearchAdventures, SearchAdventuresResult> {
+@QueryHandler
+public class SearchAdventuresHandler extends AbstractQueryHandler<SearchAdventures, SearchAdventuresResult> {
 
     private final AdventureRepository repository;
 

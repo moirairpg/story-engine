@@ -2,13 +2,13 @@ package me.moirai.storyengine.core.domain.adventure;
 
 public class ContextAttributesFixture {
 
-    public static ContextAttributes.Builder sample() {
+    public static ContextAttributes sample() {
 
-        return ContextAttributes.builder()
-                .authorsNote("Author's note")
-                .nudge("Nudge")
-                .remember("Remember")
-                .bump("Bump")
-                .bumpFrequency(1);
+        return new ContextAttributes(
+                "Nudge",
+                "Author's note",
+                "Remember",
+                "Bump",
+                1);
     }
 }

@@ -1,18 +1,18 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
+@CommandHandler
 public class UpdateWorldLorebookEntryHandler
-        extends AbstractUseCaseHandler<UpdateWorldLorebookEntry, WorldLorebookEntryDetails> {
+        extends AbstractCommandHandler<UpdateWorldLorebookEntry, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_UPDATED_WAS_NOT_FOUND = "World to be updated was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD = "User does not have permission to modify this world";
@@ -27,32 +27,33 @@ public class UpdateWorldLorebookEntryHandler
     @Override
     public WorldLorebookEntryDetails execute(UpdateWorldLorebookEntry command) {
 
-        World world = repository.findByPublicId(command.getWorldId())
+        World world = repository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserWrite(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD);
         }
 
         WorldLorebookEntry lorebookEntry = world.updateLorebookEntry(
-                command.getId(),
-                command.getName(),
-                command.getRegex(),
-                command.getDescription());
+                command.entryId(),
+                command.name(),
+                command.regex(),
+                command.requesterId());
 
         repository.save(world);
-        return mapResult(lorebookEntry);
+        return mapResult(world, lorebookEntry);
     }
 
-    private WorldLorebookEntryDetails mapResult(WorldLorebookEntry savedEntry) {
+    private WorldLorebookEntryDetails mapResult(World world, WorldLorebookEntry savedEntry) {
 
-        return WorldLorebookEntryDetails.builder()
-                .id(savedEntry.getPublicId())
-                .name(savedEntry.getName())
-                .regex(savedEntry.getRegex())
-                .description(savedEntry.getDescription())
-                .creationDate(savedEntry.getCreationDate())
-                .lastUpdateDate(savedEntry.getLastUpdateDate())
-                .build();
+        return new WorldLorebookEntryDetails(
+                savedEntry.getPublicId(),
+                world.getPublicId(),
+                savedEntry.getName(),
+                savedEntry.getRegex(),
+                savedEntry.getDescription(),
+                savedEntry.getCreationDate(),
+                savedEntry.getLastUpdateDate());
     }
 }

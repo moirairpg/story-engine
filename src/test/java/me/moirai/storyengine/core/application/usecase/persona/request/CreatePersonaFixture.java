@@ -7,15 +7,15 @@ import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 
 public class CreatePersonaFixture {
 
-    public static CreatePersona.Builder createPrivatePersona() {
+    public static CreatePersona createPrivatePersona() {
 
         Persona persona = PersonaFixture.privatePersona().build();
-        return CreatePersona.builder()
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().toString())
-                .requesterId(persona.getOwnerId())
-                .usersAllowedToWrite(persona.getUsersAllowedToRead())
-                .usersAllowedToRead(persona.getUsersAllowedToWrite());
+        return new CreatePersona(
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToRead(),
+                persona.getUsersAllowedToWrite());
     }
 }

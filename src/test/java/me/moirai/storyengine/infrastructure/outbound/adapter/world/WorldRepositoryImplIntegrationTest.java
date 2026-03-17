@@ -1,11 +1,12 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.world;
 
-import static me.moirai.storyengine.common.domain.Visibility.PUBLIC;
+import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Sets.set;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
     public void emptyResultWhenAssetDoesntExist() {
 
         // Given
-        String worldId = WorldFixture.PUBLIC_ID;
+        UUID worldId = WorldFixture.PUBLIC_ID;
 
         // When
         Optional<World> retrievedWorldOptional = repository.findByPublicId(worldId);
@@ -115,9 +116,10 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         World worldToUbeUpdated = WorldFixture.privateWorld()
                 .visibility(PUBLIC)
-                .version(originalWorld.getVersion())
                 .build();
+
         ReflectionTestUtils.setField(worldToUbeUpdated, "id", originalWorld.getId());
+        ReflectionTestUtils.setField(worldToUbeUpdated, "publicId", originalWorld.getPublicId());
 
         // When
         World updatedWorld = repository.save(worldToUbeUpdated);
@@ -159,20 +161,19 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -197,21 +198,20 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(worlds.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(worlds.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -236,22 +236,20 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchWorlds query = SearchWorlds.builder()
-                .direction("DESC")
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, "DESC", null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(worlds.get(2).getName()).isEqualTo(gpt4Omni.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(worlds.get(2).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -280,24 +278,20 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .ownerId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, ownerId, 1, 10, null, null, null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -323,24 +317,20 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .sortingField("name")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, 1, 10, "name", null, null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(2).getName()).isEqualTo(gpt354k.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(2).name()).isEqualTo(gpt354k.getName());
     }
 
     @Test
@@ -366,23 +356,20 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .sortingField("name")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, "name", "DESC", null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(3);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(2).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(2).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -408,20 +395,18 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                "Number 2", null, null, null, null, null, null, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -447,20 +432,18 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .visibility(visibilityToSearch)
-                .requesterId(ownerId)
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, null, visibilityToSearch, null, ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -492,21 +475,18 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .visibility(visibilityToSearch)
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, null, visibilityToSearch, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -541,21 +521,19 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -586,21 +564,19 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchWorlds query = SearchWorlds.builder()
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -631,22 +607,19 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
         jpaRepository.save(gpt4Mini);
         jpaRepository.save(gpt354k);
 
-        SearchWorlds query = SearchWorlds.builder()
-                .direction("DESC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, null, "DESC", null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt354k.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt354k.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -678,24 +651,19 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .sortingField("name")
-                .page(1)
-                .size(10)
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, 1, 10, "name", null, null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Omni.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Omni.getName());
     }
 
     @Test
@@ -727,23 +695,19 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .sortingField("name")
-                .direction("DESC")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null, null, null, null, "name", "DESC", null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(2);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(2);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Omni.getName());
-        assertThat(worlds.get(1).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Omni.getName());
+        assertThat(worlds.get(1).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -772,21 +736,18 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                "Number 2", null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.results()).isNotNull().isNotEmpty().hasSize(1);
 
-        List<WorldDetails> worlds = result.getResults();
-        assertThat(worlds.get(0).getName()).isEqualTo(gpt4Mini.getName());
+        List<WorldDetails> worlds = result.results();
+        assertThat(worlds.get(0).name()).isEqualTo(gpt4Mini.getName());
     }
 
     @Test
@@ -815,18 +776,15 @@ public class WorldRepositoryImplIntegrationTest extends AbstractIntegrationTest 
 
         jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
 
-        SearchWorlds query = SearchWorlds.builder()
-                .name("Number 2")
-                .requesterId(ownerId)
-                .operation("WRITE")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                "Number 2", null, null, null, null, null, null, "WRITE", ownerId);
 
         // When
         SearchWorldsResult result = repository.search(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getResults()).isNotNull().isEmpty();
+        assertThat(result.results()).isNotNull().isEmpty();
     }
 
 }

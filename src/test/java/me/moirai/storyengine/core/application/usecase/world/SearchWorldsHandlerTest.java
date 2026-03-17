@@ -27,17 +27,23 @@ public class SearchWorldsHandlerTest {
     public void searchWorlds() {
 
         // Given
-        SearchWorlds query = SearchWorlds.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .build();
+        SearchWorlds query = new SearchWorlds(
+                null,
+                null,
+                1,
+                2,
+                "name",
+                "ASC",
+                null,
+                null,
+                null);
 
-        SearchWorldsResult expectedResult = SearchWorldsResult.builder()
-                .page(1)
-                .items(2)
-                .build();
+        SearchWorldsResult expectedResult = new SearchWorldsResult(
+                1,
+                2,
+                0,
+                0,
+                null);
 
         when(repository.search(any(SearchWorlds.class)))
                 .thenReturn(expectedResult);
@@ -47,7 +53,7 @@ public class SearchWorldsHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getItems()).isEqualTo(expectedResult.getItems());
-        assertThat(result.getPage()).isEqualTo(expectedResult.getPage());
+        assertThat(result.items()).isEqualTo(expectedResult.items());
+        assertThat(result.page()).isEqualTo(expectedResult.page());
     }
 }

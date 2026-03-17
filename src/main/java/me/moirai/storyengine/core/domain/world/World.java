@@ -4,10 +4,10 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.uuid.Generators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,11 +16,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Permissions;
 import me.moirai.storyengine.common.domain.ShareableAsset;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
@@ -32,26 +32,27 @@ public class World extends ShareableAsset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
+    @RandomUuid
+    @Column(name = "public_id")
+    private UUID publicId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "adventure_start", nullable = false)
+    @Column(name = "adventure_start")
     private String adventureStart;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "world_id", nullable = false)
+    @JoinColumn(name = "world_id")
     private List<WorldLorebookEntry> lorebook = new ArrayList<>();
 
     private World(Builder builder) {
 
         super(builder.creatorId, builder.creationDate,
-                builder.lastUpdateDate, builder.permissions, builder.visibility, builder.version);
+                builder.lastUpdateDate, builder.permissions, builder.visibility);
 
         this.name = builder.name;
         this.description = builder.description;
@@ -60,13 +61,6 @@ public class World extends ShareableAsset {
 
     protected World() {
         super();
-    }
-
-    @PrePersist
-    private void generatePublicId() {
-        if (publicId == null) {
-            publicId = Generators.timeBasedEpochGenerator().generate().toString();
-        }
     }
 
     public static Builder builder() {
@@ -78,7 +72,7 @@ public class World extends ShareableAsset {
         return id;
     }
 
-    public String getPublicId() {
+    public UUID getPublicId() {
         return publicId;
     }
 
@@ -113,7 +107,10 @@ public class World extends ShareableAsset {
         this.adventureStart = adventureStart;
     }
 
-    public WorldLorebookEntry addLorebookEntry(String name, String regex, String description) {
+    public WorldLorebookEntry addLorebookEntry(
+            String name,
+            String regex,
+            String description) {
 
         WorldLorebookEntry entry = WorldLorebookEntry.builder()
                 .name(name)
@@ -125,7 +122,11 @@ public class World extends ShareableAsset {
         return entry;
     }
 
-    public WorldLorebookEntry updateLorebookEntry(String entryId, String name, String regex, String description) {
+    public WorldLorebookEntry updateLorebookEntry(
+            UUID entryId,
+            String name,
+            String regex,
+            String description) {
 
         WorldLorebookEntry entry = getLorebookEntryById(entryId);
         entry.updateName(name);
@@ -135,13 +136,13 @@ public class World extends ShareableAsset {
         return entry;
     }
 
-    public void removeLorebookEntry(String entryId) {
+    public void removeLorebookEntry(UUID entryId) {
 
         WorldLorebookEntry entry = getLorebookEntryById(entryId);
         lorebook.remove(entry);
     }
 
-    public WorldLorebookEntry getLorebookEntryById(String entryId) {
+    public WorldLorebookEntry getLorebookEntryById(UUID entryId) {
 
         return lorebook.stream()
                 .filter(e -> e.getPublicId().equals(entryId))
@@ -166,7 +167,6 @@ public class World extends ShareableAsset {
         private String creatorId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
-        private int version;
 
         private Builder() {
         }
@@ -216,12 +216,6 @@ public class World extends ShareableAsset {
         public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
 
             this.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public Builder version(int version) {
-
-            this.version = version;
             return this;
         }
 

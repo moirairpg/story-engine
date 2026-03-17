@@ -35,16 +35,16 @@ public class AdventurePersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(adventure.getPublicId());
-        assertThat(result.getName()).isEqualTo(adventure.getName());
-        assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
-        assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
-        assertThat(result.getUsersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
-        assertThat(result.getCreationDate()).isEqualTo(adventure.getCreationDate());
-        assertThat(result.getLastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
-        assertThat(result.getOwnerId()).isEqualTo(adventure.getOwnerId());
-        assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
-        assertThat(result.getPersonaId()).isEqualTo(adventure.getPersonaId());
+        assertThat(result.id()).isEqualTo(adventure.getPublicId());
+        assertThat(result.name()).isEqualTo(adventure.getName());
+        assertThat(result.visibility()).isEqualTo(adventure.getVisibility().name());
+        assertThat(result.usersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
+        assertThat(result.usersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
+        assertThat(result.creationDate()).isEqualTo(adventure.getCreationDate());
+        assertThat(result.lastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
+        assertThat(result.ownerId()).isEqualTo(adventure.getOwnerId());
+        assertThat(result.gameMode()).isEqualTo(adventure.getGameMode().name());
+        assertThat(result.personaId()).isEqualTo(adventure.getPersonaId());
     }
 
     @Test
@@ -64,8 +64,8 @@ public class AdventurePersistenceMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getPage()).isEqualTo(1);
-        assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getItems()).isEqualTo(20);
+        assertThat(result.page()).isEqualTo(1);
+        assertThat(result.totalPages()).isEqualTo(2);
+        assertThat(result.items()).isEqualTo(20);
     }
 }

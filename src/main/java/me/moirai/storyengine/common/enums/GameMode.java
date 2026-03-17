@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.domain.adventure;
+package me.moirai.storyengine.common.enums;
 
 import java.util.Arrays;
 

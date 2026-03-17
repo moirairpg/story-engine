@@ -21,177 +21,406 @@ public class UpdateAdventureTest {
 
         // Given
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
-        UpdateAdventure.Builder builder = UpdateAdventure.builder()
-                .id(AdventureFixture.PUBLIC_ID)
-                .name(adventure.getName())
-                .description(adventure.getDescription())
-                .worldId(WorldFixture.PUBLIC_ID)
-                .personaId(PersonaFixture.PUBLIC_ID)
-                .channelId(adventure.getChannelId())
-                .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .moderation(adventure.getModeration().name())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .temperature(adventure.getModelConfiguration().getTemperature())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .stopSequencesToAdd(adventure.getModelConfiguration().getStopSequences())
-                .stopSequencesToRemove(adventure.getModelConfiguration().getStopSequences())
-                .logitBiasToAdd(Maps.newHashMap("TKNID", 99D))
-                .logitBiasToRemove(Collections.singleton("TKN"))
-                .usersAllowedToWriteToAdd(Collections.singleton("USRID"))
-                .usersAllowedToWriteToRemove(Collections.singleton("USRID"))
-                .usersAllowedToReadToAdd(Collections.singleton("USRID"))
-                .usersAllowedToReadToRemove(Collections.singleton("USRID"))
-                .gameMode(adventure.getGameMode().name())
-                .requesterId(adventure.getOwnerId())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .remember(adventure.getContextAttributes().getRemember())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .isMultiplayer(adventure.isMultiplayer())
-                .adventureStart(adventure.getAdventureStart())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit());
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                AdventureFixture.PUBLIC_ID,
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                adventure.getName(),
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                adventure.getOwnerId(),
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                Maps.newHashMap("TKNID", 99D),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().stopSequences(),
+                Collections.singleton("TKN"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                Collections.singleton("USRID"),
+                adventure.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getId()).isEqualTo(AdventureFixture.PUBLIC_ID);
-        assertThat(updateAdventure.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
-        assertThat(updateAdventure.getDescription()).isEqualTo(adventure.getDescription());
-        assertThat(updateAdventure.getChannelId()).isEqualTo(adventure.getChannelId());
-        assertThat(updateAdventure.getGameMode()).isEqualToIgnoringCase(adventure.getGameMode().name());
-        assertThat(updateAdventure.getName()).isEqualTo(adventure.getName());
-        assertThat(updateAdventure.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(updateAdventure.getWorldId()).isEqualTo(WorldFixture.PUBLIC_ID);
-        assertThat(updateAdventure.getVisibility()).isEqualToIgnoringCase(adventure.getVisibility().name());
-        assertThat(updateAdventure.getPresencePenalty())
-                .isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
-        assertThat(updateAdventure.getFrequencyPenalty())
-                .isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
-        assertThat(updateAdventure.getTemperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
-        assertThat(updateAdventure.getMaxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
-        assertThat(updateAdventure.getRemember()).isEqualTo(adventure.getContextAttributes().getRemember());
-        assertThat(updateAdventure.getAuthorsNote()).isEqualTo(adventure.getContextAttributes().getAuthorsNote());
-        assertThat(updateAdventure.getNudge()).isEqualTo(adventure.getContextAttributes().getNudge());
-        assertThat(updateAdventure.getBump()).isEqualTo(adventure.getContextAttributes().getBump());
-        assertThat(updateAdventure.getBumpFrequency()).isEqualTo(adventure.getContextAttributes().getBumpFrequency());
-
-        assertThat(updateAdventure.getAiModel())
-                .isEqualToIgnoringCase(adventure.getModelConfiguration().getAiModel().toString());
+        assertThat(updateAdventure.adventureId()).isEqualTo(AdventureFixture.PUBLIC_ID);
+        assertThat(updateAdventure.adventureStart()).isEqualTo(adventure.getAdventureStart());
+        assertThat(updateAdventure.description()).isEqualTo(adventure.getDescription());
+        assertThat(updateAdventure.channelId()).isEqualTo(adventure.getChannelId());
+        assertThat(updateAdventure.gameMode()).isEqualToIgnoringCase(adventure.getGameMode().name());
+        assertThat(updateAdventure.name()).isEqualTo(adventure.getName());
+        assertThat(updateAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(updateAdventure.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
+        assertThat(updateAdventure.visibility()).isEqualToIgnoringCase(adventure.getVisibility().name());
+        assertThat(updateAdventure.presencePenalty())
+                .isEqualTo(adventure.getModelConfiguration().presencePenalty());
+        assertThat(updateAdventure.frequencyPenalty())
+                .isEqualTo(adventure.getModelConfiguration().frequencyPenalty());
+        assertThat(updateAdventure.temperature()).isEqualTo(adventure.getModelConfiguration().temperature());
+        assertThat(updateAdventure.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().maxTokenLimit());
+        assertThat(updateAdventure.remember()).isEqualTo(adventure.getContextAttributes().remember());
+        assertThat(updateAdventure.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
+        assertThat(updateAdventure.nudge()).isEqualTo(adventure.getContextAttributes().nudge());
+        assertThat(updateAdventure.bump()).isEqualTo(adventure.getContextAttributes().bump());
+        assertThat(updateAdventure.bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
+        assertThat(updateAdventure.aiModel())
+                .isEqualToIgnoringCase(adventure.getModelConfiguration().aiModel().toString());
     }
 
     @Test
     public void updateAdventure_whenStopSequencesToAddIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .stopSequencesToAdd(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                null,
+                sample.stopSequencesToRemove(),
+                sample.logitBiasToRemove(),
+                sample.usersAllowedToWriteToAdd(),
+                sample.usersAllowedToWriteToRemove(),
+                sample.usersAllowedToReadToAdd(),
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getStopSequencesToAdd()).isNotNull().isEmpty();
+        assertThat(updateAdventure.stopSequencesToAdd()).isNull();
     }
 
     @Test
     public void updateAdventure_whenStopSequencesToRemoveIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .stopSequencesToRemove(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                sample.stopSequencesToAdd(),
+                null,
+                sample.logitBiasToRemove(),
+                sample.usersAllowedToWriteToAdd(),
+                sample.usersAllowedToWriteToRemove(),
+                sample.usersAllowedToReadToAdd(),
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getStopSequencesToRemove()).isNotNull().isEmpty();
+        assertThat(updateAdventure.stopSequencesToRemove()).isNull();
     }
 
     @Test
     public void updateAdventure_whenLogitBiasToAddIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .logitBiasToAdd(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                null,
+                sample.stopSequencesToAdd(),
+                sample.stopSequencesToRemove(),
+                sample.logitBiasToRemove(),
+                sample.usersAllowedToWriteToAdd(),
+                sample.usersAllowedToWriteToRemove(),
+                sample.usersAllowedToReadToAdd(),
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getLogitBiasToAdd()).isNotNull().isEmpty();
+        assertThat(updateAdventure.logitBiasToAdd()).isNull();
     }
 
     @Test
     public void updateAdventure_whenLogitBiasToRemoveIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .logitBiasToRemove(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                sample.stopSequencesToAdd(),
+                sample.stopSequencesToRemove(),
+                null,
+                sample.usersAllowedToWriteToAdd(),
+                sample.usersAllowedToWriteToRemove(),
+                sample.usersAllowedToReadToAdd(),
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getLogitBiasToRemove()).isNotNull().isEmpty();
+        assertThat(updateAdventure.logitBiasToRemove()).isNull();
     }
 
     @Test
     public void updateAdventure_whenUsersAllowedToWriteToAddIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .usersAllowedToWriteToAdd(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                sample.stopSequencesToAdd(),
+                sample.stopSequencesToRemove(),
+                sample.logitBiasToRemove(),
+                null,
+                sample.usersAllowedToWriteToRemove(),
+                sample.usersAllowedToReadToAdd(),
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getUsersAllowedToWriteToAdd()).isNotNull().isEmpty();
+        assertThat(updateAdventure.usersAllowedToWriteToAdd()).isNull();
     }
 
     @Test
     public void updateAdventure_whenUsersAllowedToWriteToRemoveIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .usersAllowedToWriteToRemove(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                sample.stopSequencesToAdd(),
+                sample.stopSequencesToRemove(),
+                sample.logitBiasToRemove(),
+                sample.usersAllowedToWriteToAdd(),
+                null,
+                sample.usersAllowedToReadToAdd(),
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getUsersAllowedToWriteToRemove()).isNotNull().isEmpty();
+        assertThat(updateAdventure.usersAllowedToWriteToRemove()).isNull();
     }
 
     @Test
     public void updateAdventure_whenUsersAllowedToReadToAddIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .usersAllowedToReadToAdd(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                sample.stopSequencesToAdd(),
+                sample.stopSequencesToRemove(),
+                sample.logitBiasToRemove(),
+                sample.usersAllowedToWriteToAdd(),
+                sample.usersAllowedToWriteToRemove(),
+                null,
+                sample.usersAllowedToReadToRemove(),
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getUsersAllowedToReadToAdd()).isNotNull().isEmpty();
+        assertThat(updateAdventure.usersAllowedToReadToAdd()).isNull();
     }
 
     @Test
     public void updateAdventure_whenUsersAllowedToReadToRemoveIsNull_thenListIsEmpty() {
 
         // Given
-        UpdateAdventure.Builder builder = UpdateAdventureFixture.sample()
-                .usersAllowedToReadToRemove(null);
+        UpdateAdventure sample = UpdateAdventureFixture.sample();
 
         // When
-        UpdateAdventure updateAdventure = builder.build();
+        UpdateAdventure updateAdventure = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.channelId(),
+                sample.visibility(),
+                sample.aiModel(),
+                sample.moderation(),
+                sample.requesterId(),
+                sample.gameMode(),
+                sample.nudge(),
+                sample.remember(),
+                sample.authorsNote(),
+                sample.bump(),
+                sample.bumpFrequency(),
+                sample.maxTokenLimit(),
+                sample.temperature(),
+                sample.frequencyPenalty(),
+                sample.presencePenalty(),
+                sample.logitBiasToAdd(),
+                sample.stopSequencesToAdd(),
+                sample.stopSequencesToRemove(),
+                sample.logitBiasToRemove(),
+                sample.usersAllowedToWriteToAdd(),
+                sample.usersAllowedToWriteToRemove(),
+                sample.usersAllowedToReadToAdd(),
+                null,
+                sample.isMultiplayer());
 
         // Then
-        assertThat(updateAdventure.getUsersAllowedToReadToRemove()).isNotNull().isEmpty();
+        assertThat(updateAdventure.usersAllowedToReadToRemove()).isNull();
     }
 }

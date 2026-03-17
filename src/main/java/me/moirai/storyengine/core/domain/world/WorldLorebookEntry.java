@@ -1,15 +1,15 @@
 package me.moirai.storyengine.core.domain.world;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
-import com.fasterxml.uuid.Generators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
 
 @Entity
@@ -20,21 +20,22 @@ public class WorldLorebookEntry extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
+    @RandomUuid
+    @Column(name = "public_id")
+    private UUID publicId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "regex", nullable = false)
+    @Column(name = "regex")
     private String regex;
 
     private WorldLorebookEntry(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate, builder.version);
+        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);
 
         this.name = builder.name;
         this.regex = builder.regex;
@@ -43,13 +44,6 @@ public class WorldLorebookEntry extends Asset {
 
     protected WorldLorebookEntry() {
         super();
-    }
-
-    @PrePersist
-    private void generatePublicId() {
-        if (publicId == null) {
-            publicId = Generators.timeBasedEpochGenerator().generate().toString();
-        }
     }
 
     public static Builder builder() {
@@ -61,7 +55,7 @@ public class WorldLorebookEntry extends Asset {
         return id;
     }
 
-    public String getPublicId() {
+    public UUID getPublicId() {
         return publicId;
     }
 
@@ -100,7 +94,6 @@ public class WorldLorebookEntry extends Asset {
         private String creatorId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
-        private int version;
 
         private Builder() {
         }
@@ -138,12 +131,6 @@ public class WorldLorebookEntry extends Asset {
         public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
 
             this.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public Builder version(int version) {
-
-            this.version = version;
             return this;
         }
 

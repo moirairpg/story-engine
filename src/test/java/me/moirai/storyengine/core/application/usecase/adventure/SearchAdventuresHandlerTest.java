@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,17 +29,24 @@ public class SearchAdventuresHandlerTest {
     public void searchAdventures() {
 
         // Given
-        SearchAdventures query = SearchAdventures.builder()
-                .direction("ASC")
-                .page(1)
-                .size(2)
-                .sortingField("name")
-                .build();
+        SearchAdventures query = new SearchAdventures(
+                null,
+                null,
+                null,
+                null,
+                false,
+                1,
+                2,
+                null,
+                null,
+                null,
+                "name",
+                "ASC",
+                null,
+                null,
+                null);
 
-        SearchAdventuresResult expectedResult = SearchAdventuresResult.builder()
-                .page(1)
-                .items(2)
-                .build();
+        SearchAdventuresResult expectedResult = new SearchAdventuresResult(1, 0, 2, 0L, List.of());
 
         when(repository.search(any(SearchAdventures.class)))
                 .thenReturn(expectedResult);
@@ -47,7 +56,7 @@ public class SearchAdventuresHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getItems()).isEqualTo(expectedResult.getItems());
-        assertThat(result.getPage()).isEqualTo(expectedResult.getPage());
+        assertThat(result.items()).isEqualTo(expectedResult.items());
+        assertThat(result.page()).isEqualTo(expectedResult.page());
     }
 }

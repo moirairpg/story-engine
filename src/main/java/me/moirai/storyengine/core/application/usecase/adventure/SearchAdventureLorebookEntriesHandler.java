@@ -1,17 +1,17 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 
-@UseCaseHandler
+@QueryHandler
 public class SearchAdventureLorebookEntriesHandler
-        extends AbstractUseCaseHandler<SearchAdventureLorebookEntries, SearchAdventureLorebookEntriesResult> {
+        extends AbstractQueryHandler<SearchAdventureLorebookEntries, SearchAdventureLorebookEntriesResult> {
 
     private static final String USER_DOES_NO_PERMISSION = "User does not have permission to view this adventure";
     private static final String ADVENTURE_NOT_FOUND = "The adventure where the entries are being search doesn't exist";
@@ -26,10 +26,11 @@ public class SearchAdventureLorebookEntriesHandler
     @Override
     public SearchAdventureLorebookEntriesResult execute(SearchAdventureLorebookEntries query) {
 
-        Adventure adventure = adventureRepository.findByPublicId(query.getAdventureId())
+        Adventure adventure = adventureRepository.findByPublicId(query.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
-        if (adventure.canUserRead(query.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (adventure.canUserRead(query.requesterId())) {
             return adventureRepository.searchLorebookEntries(query);
         }
 

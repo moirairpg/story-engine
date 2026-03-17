@@ -1,18 +1,20 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import static me.moirai.storyengine.core.domain.adventure.ArtificialIntelligenceModel.fromString;
+import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.fromString;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import java.util.UUID;
+
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permissions;
-import me.moirai.storyengine.common.domain.Visibility;
+import me.moirai.storyengine.common.enums.GameMode;
+import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributes;
-import me.moirai.storyengine.core.domain.adventure.GameMode;
 import me.moirai.storyengine.core.domain.adventure.ModelConfiguration;
-import me.moirai.storyengine.core.domain.adventure.Moderation;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -21,8 +23,8 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
-public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventure, AdventureDetails> {
+@CommandHandler
+public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventure, AdventureDetails> {
 
     private static final String USER_NO_PERMISSION_IN_WORLD = "User does not have permission to view the world to be linked to this adventure";
     private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to view the persona to be linked to this adventure";
@@ -56,17 +58,17 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
         Adventure adventure = repository.save(Adventure.builder()
                 .modelConfiguration(modelConfiguration)
                 .permissions(permissions)
-                .name(command.getName())
+                .name(command.name())
                 .personaId(persona.getId())
                 .worldId(world.getId())
-                .channelId(command.getChannelId())
-                .gameMode(GameMode.fromString(command.getGameMode()))
-                .visibility(Visibility.fromString(command.getVisibility()))
-                .moderation(Moderation.fromString(command.getModeration()))
+                .channelId(command.channelId())
+                .gameMode(GameMode.fromString(command.gameMode()))
+                .visibility(Visibility.fromString(command.visibility()))
+                .moderation(Moderation.fromString(command.moderation()))
                 .isMultiplayer(command.isMultiplayer())
                 .adventureStart(world.getAdventureStart())
                 .contextAttributes(contextAttributes)
-                .description(command.getDescription())
+                .description(command.description())
                 .build());
 
         world.getLorebook().forEach(worldEntry -> adventure.addLorebookEntry(
@@ -80,46 +82,45 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
         return mapResult(adventure, persona.getPublicId(), world.getPublicId());
     }
 
-    private AdventureDetails mapResult(Adventure adventure, String personaPublicId, String worldPublicId) {
+    private AdventureDetails mapResult(Adventure adventure, UUID personaPublicId, UUID worldPublicId) {
 
-        return AdventureDetails.builder()
-                .id(adventure.getPublicId())
-                .name(adventure.getName())
-                .worldId(worldPublicId)
-                .personaId(personaPublicId)
-                .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
-                .moderation(adventure.getModeration().name())
-                .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
-                .temperature(adventure.getModelConfiguration().getTemperature())
-                .frequencyPenalty(adventure.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().getPresencePenalty())
-                .stopSequences(adventure.getModelConfiguration().getStopSequences())
-                .logitBias(adventure.getModelConfiguration().getLogitBias())
-                .usersAllowedToWrite(adventure.getUsersAllowedToWrite())
-                .usersAllowedToRead(adventure.getUsersAllowedToRead())
-                .ownerId(adventure.getOwnerId())
-                .creationDate(adventure.getCreationDate())
-                .lastUpdateDate(adventure.getLastUpdateDate())
-                .description(adventure.getDescription())
-                .adventureStart(adventure.getAdventureStart())
-                .channelId(adventure.getChannelId())
-                .gameMode(adventure.getGameMode().name())
-                .authorsNote(adventure.getContextAttributes().getAuthorsNote())
-                .nudge(adventure.getContextAttributes().getNudge())
-                .remember(adventure.getContextAttributes().getRemember())
-                .bump(adventure.getContextAttributes().getBump())
-                .bumpFrequency(adventure.getContextAttributes().getBumpFrequency())
-                .isMultiplayer(adventure.isMultiplayer())
-                .build();
+        return new AdventureDetails(
+                adventure.getPublicId(),
+                adventure.getName(),
+                adventure.getDescription(),
+                adventure.getAdventureStart(),
+                worldPublicId,
+                personaPublicId,
+                adventure.getChannelId(),
+                adventure.getVisibility().name(),
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModeration().name(),
+                adventure.getGameMode().name(),
+                adventure.getOwnerId(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.isMultiplayer(),
+                adventure.getCreationDate(),
+                adventure.getLastUpdateDate(),
+                adventure.getModelConfiguration().logitBias(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getUsersAllowedToRead(),
+                adventure.getUsersAllowedToWrite());
     }
 
     private Persona getPersonaToBeLinked(CreateAdventure command) {
 
-        Persona persona = personaRepository.findByPublicId(command.getPersonaId())
+        Persona persona = personaRepository.findByPublicId(command.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_DOES_NOT_EXIST));
 
-        if (!persona.canUserRead(command.getRequesterDiscordId())) {
+        if (!persona.canUserRead(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
@@ -128,10 +129,10 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
 
     private World getWorldTobeLinked(CreateAdventure command) {
 
-        World world = worldRepository.findByPublicId(command.getWorldId())
+        World world = worldRepository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_DOES_NOT_EXIST));
 
-        if (!world.canUserRead(command.getRequesterDiscordId())) {
+        if (!world.canUserRead(command.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_WORLD);
         }
 
@@ -140,34 +141,32 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
 
     private ContextAttributes buildContextAttributes(CreateAdventure command) {
 
-        return ContextAttributes.builder()
-                .authorsNote(command.getAuthorsNote())
-                .nudge(command.getNudge())
-                .remember(command.getRemember())
-                .bump(command.getBump())
-                .bumpFrequency(command.getBumpFrequency())
-                .build();
+        return new ContextAttributes(
+                command.nudge(),
+                command.authorsNote(),
+                command.remember(),
+                command.bump(),
+                command.bumpFrequency());
     }
 
     private Permissions buildPermissions(CreateAdventure command) {
 
         return Permissions.builder()
-                .ownerId(command.getRequesterDiscordId())
-                .usersAllowedToRead(command.getUsersAllowedToRead())
-                .usersAllowedToWrite(command.getUsersAllowedToWrite())
+                .ownerId(command.requesterId())
+                .usersAllowedToRead(command.usersAllowedToRead())
+                .usersAllowedToWrite(command.usersAllowedToWrite())
                 .build();
     }
 
     private ModelConfiguration buildModelConfiguration(CreateAdventure command) {
 
-        return ModelConfiguration.builder()
-                .aiModel(fromString(command.getAiModel()))
-                .frequencyPenalty(command.getFrequencyPenalty())
-                .presencePenalty(command.getPresencePenalty())
-                .temperature(command.getTemperature())
-                .logitBias(command.getLogitBias())
-                .maxTokenLimit(command.getMaxTokenLimit())
-                .stopSequences(command.getStopSequences())
-                .build();
+        return new ModelConfiguration(
+                fromString(command.aiModel()),
+                command.maxTokenLimit(),
+                command.temperature(),
+                command.frequencyPenalty(),
+                command.presencePenalty(),
+                command.stopSequences(),
+                command.logitBias());
     }
 }

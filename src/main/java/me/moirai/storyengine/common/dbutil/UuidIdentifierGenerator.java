@@ -1,6 +1,7 @@
 package me.moirai.storyengine.common.dbutil;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.UUID;
+
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
@@ -13,13 +14,13 @@ public class UuidIdentifierGenerator implements IdentifierGenerator {
     public Object generate(SharedSessionContractImplementor session, Object object)
             throws HibernateException {
 
-        final String id = (String) session.getEntityPersister(null, object)
+        var id = (UUID) session.getEntityPersister(null, object)
                 .getIdentifier(object, session);
 
-        if (StringUtils.isNotBlank(id)) {
+        if (id != null) {
             return id;
         }
 
-        return Generators.timeBasedEpochGenerator().generate().toString();
+        return Generators.timeBasedEpochGenerator().generate();
     }
 }

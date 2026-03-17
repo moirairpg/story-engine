@@ -1,19 +1,18 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import org.apache.commons.lang3.StringUtils;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
-public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetWorldLorebookEntryById, WorldLorebookEntryDetails> {
+@QueryHandler
+public class GetWorldLorebookEntryByIdHandler
+        extends AbstractQueryHandler<GetWorldLorebookEntryById, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD = "User does not have permission to view this world";
@@ -28,11 +27,11 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public void validate(GetWorldLorebookEntryById query) {
 
-        if (StringUtils.isBlank(query.getEntryId())) {
+        if (query.entryId() == null) {
             throw new IllegalArgumentException("Lorebook entry ID cannot be null");
         }
 
-        if (StringUtils.isBlank(query.getWorldId())) {
+        if (query.worldId() == null) {
             throw new IllegalArgumentException("World ID cannot be null");
         }
     }
@@ -40,27 +39,28 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public WorldLorebookEntryDetails execute(GetWorldLorebookEntryById query) {
 
-        World world = repository.findByPublicId(query.getWorldId())
+        World world = repository.findByPublicId(query.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-        if (!world.canUserRead(query.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!world.canUserRead(query.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD);
         }
 
-        WorldLorebookEntry entry = world.getLorebookEntryById(query.getEntryId());
+        WorldLorebookEntry entry = world.getLorebookEntryById(query.entryId());
 
-        return mapResult(entry);
+        return mapResult(world, entry);
     }
 
-    private WorldLorebookEntryDetails mapResult(WorldLorebookEntry entry) {
+    private WorldLorebookEntryDetails mapResult(World world, WorldLorebookEntry entry) {
 
-        return WorldLorebookEntryDetails.builder()
-                .id(entry.getPublicId())
-                .name(entry.getName())
-                .regex(entry.getRegex())
-                .description(entry.getDescription())
-                .creationDate(entry.getCreationDate())
-                .lastUpdateDate(entry.getLastUpdateDate())
-                .build();
+        return new WorldLorebookEntryDetails(
+                entry.getPublicId(),
+                world.getPublicId(),
+                entry.getName(),
+                entry.getRegex(),
+                entry.getDescription(),
+                entry.getCreationDate(),
+                entry.getLastUpdateDate());
     }
 }

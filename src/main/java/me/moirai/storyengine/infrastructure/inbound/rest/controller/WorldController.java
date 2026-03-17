@@ -1,10 +1,12 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.usecases.UseCaseRunner;
+import me.moirai.storyengine.common.cqs.command.CommandRunner;
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
@@ -26,7 +29,6 @@ import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
-import me.moirai.storyengine.infrastructure.inbound.rest.mapper.WorldRequestMapper;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.WorldSearchParameters;
@@ -41,14 +43,15 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Worlds", description = "Endpoints for managing MoirAI Worlds")
 public class WorldController extends SecurityContextAware {
 
-    private final UseCaseRunner useCaseRunner;
-    private final WorldRequestMapper requestMapper;
+    private final QueryRunner queryRunner;
+    private final CommandRunner commandRunner;
 
-    public WorldController(UseCaseRunner useCaseRunner,
-            WorldRequestMapper requestMapper) {
+    public WorldController(
+            QueryRunner queryRunner,
+            CommandRunner commandRunner) {
 
-        this.useCaseRunner = useCaseRunner;
-        this.requestMapper = requestMapper;
+        this.queryRunner = queryRunner;
+        this.commandRunner = commandRunner;
     }
 
     @GetMapping
@@ -57,31 +60,29 @@ public class WorldController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            SearchWorlds query = SearchWorlds.builder()
-                    .name(searchParameters.getName())
-                    .ownerId(searchParameters.getOwnerId())
-                    .page(searchParameters.getPage())
-                    .size(searchParameters.getSize())
-                    .sortingField(getSortingField(searchParameters.getSortingField()))
-                    .direction(getDirection(searchParameters.getDirection()))
-                    .visibility(getVisibility(searchParameters.getVisibility()))
-                    .operation(getOperation(searchParameters.getOperation()))
-                    .requesterId(authenticatedUser.getDiscordId())
-                    .build();
+            SearchWorlds query = new SearchWorlds(
+                    searchParameters.getName(),
+                    searchParameters.getOwnerId(),
+                    searchParameters.getPage(),
+                    searchParameters.getSize(),
+                    getSortingField(searchParameters.getSortingField()),
+                    getDirection(searchParameters.getDirection()),
+                    getVisibility(searchParameters.getVisibility()),
+                    getOperation(searchParameters.getOperation()),
+                    authenticatedUser.getDiscordId());
 
-            return useCaseRunner.run(query);
+            return queryRunner.run(query);
         });
     }
 
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canRead(#worldId, 'World')")
-    public Mono<WorldDetails> getWorldById(@PathVariable(required = true) String worldId) {
+    public Mono<WorldDetails> getWorldById(@PathVariable(required = true) UUID worldId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldById query = GetWorldById.build(worldId, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(query);
+            GetWorldById query = new GetWorldById(worldId, authenticatedUser.getDiscordId());
+            return queryRunner.run(query);
         });
     }
 
@@ -91,38 +92,62 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorld command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(command);
+            CreateWorld command = new CreateWorld(
+                    request.name(),
+                    request.description(),
+                    request.adventureStart(),
+                    request.visibility(),
+                    emptyIfNull(request.lorebook()).stream()
+                            .map(entry -> new CreateWorld.LorebookEntry(
+                                    entry.name(),
+                                    entry.regex(),
+                                    entry.description()))
+                            .toList(),
+                    request.usersAllowedToWrite(),
+                    request.usersAllowedToRead(),
+                    authenticatedUser.getDiscordId());
+
+            return commandRunner.run(command);
         });
     }
 
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<WorldDetails> updateWorld(@PathVariable(required = true) String worldId,
+    public Mono<WorldDetails> updateWorld(@PathVariable(required = true) UUID worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateWorld command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
-            return useCaseRunner.run(command);
+            UpdateWorld command = new UpdateWorld(
+                    worldId,
+                    request.name(),
+                    request.description(),
+                    request.adventureStart(),
+                    request.visibility(),
+                    authenticatedUser.getDiscordId(),
+                    request.usersAllowedToWriteToAdd(),
+                    request.usersAllowedToWriteToRemove(),
+                    request.usersAllowedToReadToAdd(),
+                    request.usersAllowedToReadToRemove());
+
+            return commandRunner.run(command);
         });
     }
 
     @DeleteMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("canModify(#worldId, 'World')")
-    public Mono<Void> deleteWorld(@PathVariable(required = true) String worldId) {
+    public Mono<Void> deleteWorld(@PathVariable(required = true) UUID worldId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorld command = DeleteWorld.build(worldId, authenticatedUser.getDiscordId());
-            useCaseRunner.run(command);
+            DeleteWorld command = new DeleteWorld(worldId, authenticatedUser.getDiscordId());
+            commandRunner.run(command);
 
             return Mono.empty();
         });
     }
 
+    // TODO remove all of this
     private String getSortingField(SearchSortingField searchSortingField) {
 
         if (searchSortingField != null) {

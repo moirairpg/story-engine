@@ -1,27 +1,29 @@
 package me.moirai.storyengine.core.application.usecase.adventure.request;
 
+import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 
 public class CreateAdventureLorebookEntryFixture {
 
-    public static CreateAdventureLorebookEntry.Builder sampleLorebookEntry() {
+    public static CreateAdventureLorebookEntry sampleLorebookEntry() {
 
-        return CreateAdventureLorebookEntry.builder()
-                .name("Volin Habar")
-                .description("Volin Habar is a warrior that fights with a sword.")
-                .regex("[Vv]olin [Hh]abar|[Vv]oha")
-                .adventureId("ADVID")
-                .requesterId("1234");
+        return new CreateAdventureLorebookEntry(
+                AdventureFixture.PUBLIC_ID,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                null,
+                "1234");
     }
 
-    public static CreateAdventureLorebookEntry.Builder samplePlayerCharacterLorebookEntry() {
+    public static CreateAdventureLorebookEntry samplePlayerCharacterLorebookEntry() {
 
-        return CreateAdventureLorebookEntry.builder()
-                .name("Volin Habar")
-                .description("Volin Habar is a warrior that fights with a sword.")
-                .regex("[Vv]olin [Hh]abar|[Vv]oha")
-                .playerId("2423423423423")
-                .adventureId("ADVID")
-                .requesterId("1234");
+        return new CreateAdventureLorebookEntry(
+                AdventureFixture.PUBLIC_ID,
+                "Volin Habar",
+                "[Vv]olin [Hh]abar|[Vv]oha",
+                "Volin Habar is a warrior that fights with a sword.",
+                "2423423423423",
+                "1234");
     }
 }

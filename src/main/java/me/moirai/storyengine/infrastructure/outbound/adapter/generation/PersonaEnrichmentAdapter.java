@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static me.moirai.storyengine.common.util.DefaultStringProcessors.replacePersonaNamePlaceholderWith;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,7 +44,9 @@ public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
     }
 
     @Override
-    public Mono<Map<String, Object>> enrichContextWithPersona(Map<String, Object> context, String personaId,
+    public Mono<Map<String, Object>> enrichContextWithPersona(
+            Map<String, Object> context,
+            UUID personaId,
             ModelConfigurationRequest modelConfiguration) {
 
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();

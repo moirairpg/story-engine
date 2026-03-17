@@ -1,18 +1,16 @@
 package me.moirai.storyengine.core.application.usecase.persona;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.domain.persona.Persona;
 
-@UseCaseHandler
-public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById, PersonaDetails> {
+@QueryHandler
+public class GetPersonaByIdHandler extends AbstractQueryHandler<GetPersonaById, PersonaDetails> {
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
@@ -27,7 +25,7 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     @Override
     public void validate(GetPersonaById request) {
 
-        if (isBlank(request.getId())) {
+        if (request.personaId() == null) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -35,10 +33,11 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     @Override
     public PersonaDetails execute(GetPersonaById query) {
 
-        Persona persona = repository.findByPublicId(query.getId())
+        var persona = repository.findByPublicId(query.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        if (!persona.canUserRead(query.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!persona.canUserRead(query.requesterId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
@@ -47,16 +46,15 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
 
     private PersonaDetails mapResult(Persona persona) {
 
-        return PersonaDetails.builder()
-                .id(persona.getPublicId())
-                .name(persona.getName())
-                .personality(persona.getPersonality())
-                .visibility(persona.getVisibility().name())
-                .creationDate(persona.getCreationDate())
-                .lastUpdateDate(persona.getLastUpdateDate())
-                .ownerId(persona.getOwnerId())
-                .usersAllowedToRead(persona.getUsersAllowedToRead())
-                .usersAllowedToWrite(persona.getUsersAllowedToWrite())
-                .build();
+        return new PersonaDetails(
+                persona.getPublicId(),
+                persona.getName(),
+                persona.getPersonality(),
+                persona.getVisibility(),
+                persona.getOwnerId(),
+                persona.getUsersAllowedToRead(),
+                persona.getUsersAllowedToWrite(),
+                persona.getCreationDate(),
+                persona.getLastUpdateDate());
     }
 }

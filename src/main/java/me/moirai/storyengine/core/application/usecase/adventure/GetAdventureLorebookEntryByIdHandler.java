@@ -1,19 +1,17 @@
 package me.moirai.storyengine.core.application.usecase.adventure;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
-@UseCaseHandler
-public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler<GetAdventureLorebookEntryById, AdventureLorebookEntryDetails> {
+@QueryHandler
+public class GetAdventureLorebookEntryByIdHandler extends AbstractQueryHandler<GetAdventureLorebookEntryById, AdventureLorebookEntryDetails> {
 
     private static final String ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND = "Adventure to be viewed was not found";
     private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_ADVENTURE = "User does not have permission to view this adventure";
@@ -28,11 +26,11 @@ public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler
     @Override
     public void validate(GetAdventureLorebookEntryById query) {
 
-        if (isBlank(query.getEntryId())) {
+        if (query.entryId() == null) {
             throw new IllegalArgumentException("Lorebook entry ID cannot be null");
         }
 
-        if (isBlank(query.getAdventureId())) {
+        if (query.adventureId() == null) {
             throw new IllegalArgumentException("Adventure ID cannot be null");
         }
     }
@@ -40,29 +38,30 @@ public class GetAdventureLorebookEntryByIdHandler extends AbstractUseCaseHandler
     @Override
     public AdventureLorebookEntryDetails execute(GetAdventureLorebookEntryById query) {
 
-        Adventure adventure = repository.findByPublicId(query.getAdventureId())
+        Adventure adventure = repository.findByPublicId(query.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-        if (!adventure.canUserRead(query.getRequesterDiscordId())) {
+        // TODO externalize to authorizer
+        if (!adventure.canUserRead(query.requesterId())) {
             throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_ADVENTURE);
         }
 
-        AdventureLorebookEntry entry = adventure.getLorebookEntryById(query.getEntryId());
+        AdventureLorebookEntry entry = adventure.getLorebookEntryById(query.entryId());
 
         return mapResult(entry);
     }
 
     private AdventureLorebookEntryDetails mapResult(AdventureLorebookEntry entry) {
 
-        return AdventureLorebookEntryDetails.builder()
-                .id(entry.getPublicId())
-                .name(entry.getName())
-                .regex(entry.getRegex())
-                .description(entry.getDescription())
-                .playerId(entry.getPlayerId())
-                .isPlayerCharacter(entry.isPlayerCharacter())
-                .creationDate(entry.getCreationDate())
-                .lastUpdateDate(entry.getLastUpdateDate())
-                .build();
+        return new AdventureLorebookEntryDetails(
+                entry.getPublicId(),
+                null,
+                entry.getName(),
+                entry.getRegex(),
+                entry.getDescription(),
+                entry.getPlayerId(),
+                entry.isPlayerCharacter(),
+                entry.getCreationDate(),
+                entry.getLastUpdateDate());
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,8 +58,10 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
     }
 
     @Override
-    public Map<String, Object> enrichContextWithLorebookForRpg(List<DiscordMessageData> rawMessageHistory,
-            String adventureId, ModelConfigurationRequest modelConfiguration) {
+    public Map<String, Object> enrichContextWithLorebookForRpg(
+            List<DiscordMessageData> rawMessageHistory,
+            UUID adventureId,
+            ModelConfigurationRequest modelConfiguration) {
 
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
         int reservedTokensForLorebook = (int) Math.floor(totalTokens * 0.30);
@@ -79,7 +82,9 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
     }
 
     @Override
-    public Map<String, Object> enrichContextWithLorebook(List<DiscordMessageData> rawMessageHistory, String adventureId,
+    public Map<String, Object> enrichContextWithLorebook(
+            List<DiscordMessageData> rawMessageHistory,
+            UUID adventureId,
             ModelConfigurationRequest modelConfiguration) {
 
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
@@ -104,14 +109,15 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
         return chatMessageService.addMessagesToContext(enrichedContext, reservedTokensForLorebook);
     }
 
-    private List<AdventureLorebookEntry> findLorebookEntries(String adventureId,
+    private List<AdventureLorebookEntry> findLorebookEntries(
+            UUID adventureId,
             List<DiscordMessageData> rawMessageHistory) {
 
         List<AdventureLorebookEntry> entriesInHistory = findLorebookEntriesInHistory(adventureId, rawMessageHistory);
         List<AdventureLorebookEntry> entriesByMention = findLorebookEntriesByMention(adventureId, rawMessageHistory);
         List<AdventureLorebookEntry> entriesByAuthor = findLorebookEntriesByAuthor(adventureId, rawMessageHistory);
 
-        Set<String> entryIdsNotDuplicated = new HashSet<>();
+        Set<UUID> entryIdsNotDuplicated = new HashSet<>();
         return Stream.of(entriesInHistory, entriesByMention, entriesByAuthor)
                 .flatMap(Collection::stream)
                 .filter(entry -> entry.getPublicId() != null && entryIdsNotDuplicated.add(entry.getPublicId()))
@@ -119,7 +125,8 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
     }
 
     private List<AdventureLorebookEntry> findLorebookEntriesInHistory(
-            String adventureId, List<DiscordMessageData> rawMessageHistory) {
+            UUID adventureId,
+            List<DiscordMessageData> rawMessageHistory) {
 
         List<String> messageHistory = rawMessageHistory.stream()
                 .map(DiscordMessageData::getContent)
@@ -131,7 +138,8 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
         return adventure.getLorebookEntriesByRegex(stringifyList(messageHistory));
     }
 
-    private List<AdventureLorebookEntry> findLorebookEntriesByMention(String adventureId,
+    private List<AdventureLorebookEntry> findLorebookEntriesByMention(
+            UUID adventureId,
             List<DiscordMessageData> rawMessageHistory) {
 
         return rawMessageHistory.stream()
@@ -140,7 +148,8 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                 .toList();
     }
 
-    private List<AdventureLorebookEntry> findLorebookEntriesByAuthor(String adventureId,
+    private List<AdventureLorebookEntry> findLorebookEntriesByAuthor(
+            UUID adventureId,
             List<DiscordMessageData> rawMessageHistory) {
 
         return rawMessageHistory.stream()
@@ -161,7 +170,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                 .toList();
     }
 
-    private AdventureLorebookEntry findLorebookEntryByPlayerDiscordId(String playerId, String adventureId) {
+    private AdventureLorebookEntry findLorebookEntryByPlayerDiscordId(String playerId, UUID adventureId) {
 
         Adventure adventure = adventureRepository.findByPublicId(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_VIEWED_WAS_NOT_FOUND));

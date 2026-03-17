@@ -1,27 +1,11 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
-import me.moirai.storyengine.common.usecases.UseCase;
+import java.util.UUID;
 
-public final class DeleteAdventure extends UseCase<Void> {
+import me.moirai.storyengine.common.cqs.command.Command;
 
-    private final String id;
-    private final String requesterId;
-
-    private DeleteAdventure(String id, String requesterId) {
-        this.id = id;
-        this.requesterId = requesterId;
-    }
-
-    public static DeleteAdventure build(String id, String requesterId) {
-
-        return new DeleteAdventure(id, requesterId);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterId;
-    }
+public record DeleteAdventure(
+        UUID adventureId,
+        String requesterId)
+        implements Command<Void> {
 }

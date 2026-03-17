@@ -1,13 +1,13 @@
 package me.moirai.storyengine.core.application.usecase.world;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
-import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
+import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
-@UseCaseHandler
-public class SearchWorldsHandler extends AbstractUseCaseHandler<SearchWorlds, SearchWorldsResult> {
+@QueryHandler
+public class SearchWorldsHandler extends AbstractQueryHandler<SearchWorlds, SearchWorldsResult> {
 
     private final WorldRepository repository;
 
