@@ -8,22 +8,20 @@ import java.util.List;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mono<Void>> {
+public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Void> {
 
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
     private static final String COMMAND_ONLY_WHEN_LAST_MESSAGE_BY_BOT = "This command can only be used if the last message in channel was sent by the bot.";
@@ -34,7 +32,8 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
     private final AdventureRepository adventureRepository;
     private final PersonaRepository personaRepository;
 
-    public RetryCommandHandler(DiscordChannelPort discordChannelPort,
+    public RetryCommandHandler(
+            DiscordChannelPort discordChannelPort,
             StoryGenerationPort storyGenerationPort,
             AdventureRepository adventureRepository,
             PersonaRepository personaRepository) {
@@ -46,38 +45,35 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
     }
 
     @Override
-    public Mono<Void> execute(RetryCommand useCase) {
+    public Void execute(RetryCommand useCase) {
 
-        try {
-            DiscordMessageData lastMessageSent = discordChannelPort.getLastMessageIn(useCase.getChannelId())
-                    .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
+        var lastMessageSent = discordChannelPort.getLastMessageIn(useCase.getChannelId())
+                .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
-            if (!lastMessageSent.getAuthor().getId().equals(useCase.getBotId())) {
-                return Mono.error(() -> new IllegalStateException(COMMAND_ONLY_WHEN_LAST_MESSAGE_BY_BOT));
-            }
-
-            discordChannelPort.deleteMessageById(useCase.getChannelId(), lastMessageSent.getId());
-
-            return adventureRepository.findByChannelId(useCase.getChannelId())
-                    .filter(adventure -> adventure.getChannelId().equals(useCase.getChannelId()))
-                    .map(adventure -> buildGenerationRequest(useCase, adventure))
-                    .map(storyGenerationPort::continueStory)
-                    .orElseGet(Mono::empty);
-        } catch (IllegalStateException e) {
-            return Mono.error(e);
-        } catch (Exception e) {
-            return Mono.error(
-                    () -> new IllegalStateException("An error occurred while retrying generation of output"));
+        if (!lastMessageSent.getAuthor().getId().equals(useCase.getBotId())) {
+            throw new IllegalStateException(COMMAND_ONLY_WHEN_LAST_MESSAGE_BY_BOT);
         }
+
+        discordChannelPort.deleteMessageById(useCase.getChannelId(), lastMessageSent.getId());
+
+        var adventure = adventureRepository.findByChannelId(useCase.getChannelId())
+                .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
+
+        if (useCase.getChannelId().equals(adventure.getChannelId())) {
+            var generationRequest = buildGenerationRequest(useCase, adventure);
+            storyGenerationPort.continueStory(generationRequest);
+        }
+
+        return null;
     }
 
     private StoryGenerationRequest buildGenerationRequest(RetryCommand useCase,
             Adventure adventure) {
 
-        Persona persona = personaRepository.findById(adventure.getPersonaId())
+        var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
+        var modelConfigurationRequest = ModelConfigurationRequest.builder()
                 .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
                 .presencePenalty(adventure.getModelConfiguration().presencePenalty())
                 .logitBias(adventure.getModelConfiguration().logitBias())
@@ -90,12 +86,12 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
                                 adventure.getModelConfiguration().aiModel().getHardTokenLimit()))
                 .build();
 
-        boolean isModerationEnabled = !adventure.getModeration().equals(DISABLED);
-        ModerationConfigurationRequest moderation = ModerationConfigurationRequest
+        var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
+        var moderation = ModerationConfigurationRequest
                 .build(isModerationEnabled, adventure.getModeration().isAbsolute(),
                         adventure.getModeration().getThresholds());
 
-        List<DiscordMessageData> messageHistory = getMessageHistory(useCase.getChannelId());
+        var messageHistory = getMessageHistory(useCase.getChannelId());
 
         return StoryGenerationRequest.builder()
                 .botId(useCase.getBotId())
@@ -119,10 +115,10 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
 
     private List<DiscordMessageData> getMessageHistory(String channelId) {
 
-        DiscordMessageData lastMessageSent = discordChannelPort.getLastMessageIn(channelId)
+        var lastMessageSent = discordChannelPort.getLastMessageIn(channelId)
                 .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
-        List<DiscordMessageData> messageHistory = new ArrayList<>(discordChannelPort
+        var messageHistory = new ArrayList<>(discordChannelPort
                 .retrieveEntireHistoryBefore(lastMessageSent.getId(), channelId));
 
         messageHistory.addFirst(lastMessageSent);

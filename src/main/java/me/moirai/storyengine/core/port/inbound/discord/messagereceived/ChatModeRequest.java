@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.moirai.storyengine.common.usecases.UseCase;
-import reactor.core.publisher.Mono;
 
-public final class ChatModeRequest extends UseCase<Mono<Void>> {
+public final class ChatModeRequest extends UseCase<Void> {
 
     private final String authordDiscordId;
     private final String messageId;

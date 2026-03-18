@@ -1,7 +1,8 @@
 package me.moirai.storyengine.infrastructure.security.authentication;
 
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
@@ -10,10 +11,9 @@ import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
-import reactor.core.publisher.Mono;
 
 @Service
-public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
+public class MoiraiUserDetailsService implements UserDetailsService {
 
     private final DiscordAuthenticationPort discordAuthenticationPort;
     private final QueryRunner queryRunner;
@@ -27,12 +27,13 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
     }
 
     @Override
-    public Mono<UserDetails> findByUsername(String tokenCluster) {
+    public UserDetails loadUserByUsername(String tokenCluster) throws UsernameNotFoundException {
 
         var authorizationToken = tokenCluster.split(" / ")[0];
         var refreshToken = tokenCluster.split(" / ")[1];
-        return discordAuthenticationPort.retrieveLoggedUser(authorizationToken)
-                .map(userDetails -> getUserDetails(userDetails, authorizationToken, refreshToken));
+        var loggedUser = discordAuthenticationPort.retrieveLoggedUser(authorizationToken);
+
+        return getUserDetails(loggedUser, authorizationToken, refreshToken);
     }
 
     private MoiraiPrincipal getUserDetails(

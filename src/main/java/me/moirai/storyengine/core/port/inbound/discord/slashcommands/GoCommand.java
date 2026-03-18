@@ -1,9 +1,8 @@
 package me.moirai.storyengine.core.port.inbound.discord.slashcommands;
 
 import me.moirai.storyengine.common.usecases.UseCase;
-import reactor.core.publisher.Mono;
 
-public final class GoCommand extends UseCase<Mono<Void>> {
+public final class GoCommand extends UseCase<Void> {
 
     private final String botId;
     private final String channelId;

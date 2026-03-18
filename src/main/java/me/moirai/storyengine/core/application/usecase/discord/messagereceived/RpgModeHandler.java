@@ -9,22 +9,20 @@ import java.util.List;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.RpgModeRequest;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<Void>> {
+public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Void> {
 
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
     private static final String PERSONA_NOT_FOUND = "Adventure has no persona linked to it";
@@ -34,7 +32,8 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
     private final PersonaRepository personaRepository;
     private final DiscordChannelPort discordChannelPort;
 
-    public RpgModeHandler(StoryGenerationPort storyGenerationPort,
+    public RpgModeHandler(
+            StoryGenerationPort storyGenerationPort,
             AdventureRepository adventureRepository,
             PersonaRepository personaRepository,
             DiscordChannelPort discordChannelPort) {
@@ -46,33 +45,30 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
     }
 
     @Override
-    public Mono<Void> execute(RpgModeRequest query) {
+    public Void execute(RpgModeRequest query) {
 
-        return adventureRepository.findByChannelId(query.getChannelId())
-                .filter(adventure -> adventure.getChannelId().equals(query.getChannelId()))
-                .map(adventure -> {
-                    StoryGenerationRequest generationRequest = buildGenerationRequest(query, adventure);
+        var adventure = adventureRepository.findByChannelId(query.getChannelId())
+                .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
 
-                    if (adventure.isMultiplayer()) {
-                        return Mono.<Void>empty();
-                    }
+        if (query.getChannelId().equals(adventure.getChannelId())) {
+            var generationRequest = buildGenerationRequest(query, adventure);
+            storyGenerationPort.continueStory(generationRequest);
+        }
 
-                    return storyGenerationPort.continueStory(generationRequest);
-                })
-                .orElseGet(Mono::empty);
+        return null;
     }
 
     private StoryGenerationRequest buildGenerationRequest(RpgModeRequest useCase, Adventure adventure) {
 
-        Persona persona = personaRepository.findById(adventure.getPersonaId())
+        var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        AiModelRequest aiModel = AiModelRequest
+        var aiModel = AiModelRequest
                 .build(adventure.getModelConfiguration().aiModel().toString(),
                         adventure.getModelConfiguration().aiModel().getOfficialModelName(),
                         adventure.getModelConfiguration().aiModel().getHardTokenLimit());
 
-        ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
+        var modelConfigurationRequest = ModelConfigurationRequest.builder()
                 .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
                 .presencePenalty(adventure.getModelConfiguration().presencePenalty())
                 .logitBias(adventure.getModelConfiguration().logitBias())
@@ -82,12 +78,12 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
                 .aiModel(aiModel)
                 .build();
 
-        boolean isModerationEnabled = !adventure.getModeration().equals(DISABLED);
-        ModerationConfigurationRequest moderation = ModerationConfigurationRequest
+        var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
+        var moderation = ModerationConfigurationRequest
                 .build(isModerationEnabled, adventure.getModeration().isAbsolute(),
                         adventure.getModeration().getThresholds());
 
-        List<DiscordMessageData> messageHistory = getMessageHistory(useCase.getChannelId());
+        var messageHistory = getMessageHistory(useCase.getChannelId());
 
         return StoryGenerationRequest.builder()
                 .botNickname(useCase.getBotNickname())
@@ -110,10 +106,10 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
 
     private List<DiscordMessageData> getMessageHistory(String channelId) {
 
-        DiscordMessageData lastMessageSent = discordChannelPort.getLastMessageIn(channelId)
+        var lastMessageSent = discordChannelPort.getLastMessageIn(channelId)
                 .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
-        List<DiscordMessageData> messageHistory = new ArrayList<>(discordChannelPort
+        var messageHistory = new ArrayList<DiscordMessageData>(discordChannelPort
                 .retrieveEntireHistoryBefore(lastMessageSent.getId(), channelId));
 
         messageHistory.addFirst(lastMessageSent);

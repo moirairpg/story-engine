@@ -16,7 +16,6 @@ import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/user")
@@ -37,10 +36,10 @@ public class UserDetailsController extends SecurityContextAware {
     @GetMapping("/{discordUserId}")
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("isAdmin()")
-    public Mono<UserDetailsResult> getUserByDiscordId(@PathVariable(required = true) String discordUserId) {
+    public UserDetailsResult getUserByDiscordId(@PathVariable(required = true) String discordUserId) {
 
-        return Mono.just(new GetUserDetailsByDiscordId(discordUserId))
-                .map(queryRunner::run);
+        var query = new GetUserDetailsByDiscordId(discordUserId);
+        return queryRunner.run(query);
     }
 
     @DeleteMapping("/{discordUserId}")

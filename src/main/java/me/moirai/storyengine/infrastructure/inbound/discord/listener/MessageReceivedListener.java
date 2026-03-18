@@ -67,92 +67,98 @@ public class MessageReceivedListener extends ListenerAdapter {
 
     private void processAuthorMode(MessageReceivedEvent event, String botUsername, String botNickname) {
 
-        Message message = event.getMessage();
-        Member author = event.getMember();
-        Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
-        List<String> mentions = message.getMentions()
-                .getMembers()
-                .stream()
-                .map(Member::getId)
-                .toList();
+        try {
+            Message message = event.getMessage();
+            Member author = event.getMember();
+            Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
+            List<String> mentions = message.getMentions()
+                    .getMembers()
+                    .stream()
+                    .map(Member::getId)
+                    .toList();
 
-        String guildId = event.getGuild().getId();
-        String channelId = event.getChannel().getId();
+            String guildId = event.getGuild().getId();
+            String channelId = event.getChannel().getId();
 
-        AuthorModeRequest request = AuthorModeRequest.builder()
-                .authordDiscordId(author.getId())
-                .channelId(channelId)
-                .messageId(message.getId())
-                .guildId(guildId)
-                .isBotMentioned(mentions.contains(bot.getId()))
-                .mentionedUsersIds(mentions)
-                .botUsername(botUsername)
-                .botNickname(botNickname)
-                .build();
+            AuthorModeRequest request = AuthorModeRequest.builder()
+                    .authordDiscordId(author.getId())
+                    .channelId(channelId)
+                    .messageId(message.getId())
+                    .guildId(guildId)
+                    .isBotMentioned(mentions.contains(bot.getId()))
+                    .mentionedUsersIds(mentions)
+                    .botUsername(botUsername)
+                    .botNickname(botNickname)
+                    .build();
 
-        useCaseRunner.run(request)
-                .doOnError(error -> handleError(event, error))
-                .subscribe();
+            useCaseRunner.run(request);
+        } catch (Exception e) {
+            handleError(event, e);
+        }
     }
 
     private void processRpgMode(MessageReceivedEvent event, String botUsername, String botNickname) {
 
-        Message message = event.getMessage();
-        Member author = event.getMember();
-        Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
-        List<String> mentions = message.getMentions()
-                .getMembers()
-                .stream()
-                .map(Member::getId)
-                .toList();
+        try {
+            Message message = event.getMessage();
+            Member author = event.getMember();
+            Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
+            List<String> mentions = message.getMentions()
+                    .getMembers()
+                    .stream()
+                    .map(Member::getId)
+                    .toList();
 
-        String guildId = event.getGuild().getId();
-        String channelId = event.getChannel().getId();
+            String guildId = event.getGuild().getId();
+            String channelId = event.getChannel().getId();
 
-        RpgModeRequest request = RpgModeRequest.builder()
-                .authordDiscordId(author.getId())
-                .channelId(channelId)
-                .messageId(message.getId())
-                .guildId(guildId)
-                .isBotMentioned(mentions.contains(bot.getId()))
-                .mentionedUsersIds(mentions)
-                .botUsername(botUsername)
-                .botNickname(botNickname)
-                .build();
+            RpgModeRequest request = RpgModeRequest.builder()
+                    .authordDiscordId(author.getId())
+                    .channelId(channelId)
+                    .messageId(message.getId())
+                    .guildId(guildId)
+                    .isBotMentioned(mentions.contains(bot.getId()))
+                    .mentionedUsersIds(mentions)
+                    .botUsername(botUsername)
+                    .botNickname(botNickname)
+                    .build();
 
-        useCaseRunner.run(request)
-                .doOnError(error -> handleError(event, error))
-                .subscribe();
+            useCaseRunner.run(request);
+        } catch (Exception e) {
+            handleError(event, e);
+        }
     }
 
     private void processChatMode(MessageReceivedEvent event, String botUsername, String botNickname) {
 
-        Message message = event.getMessage();
-        Member author = event.getMember();
-        Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
-        List<String> mentions = message.getMentions()
-                .getMembers()
-                .stream()
-                .map(Member::getId)
-                .toList();
+        try {
+            Message message = event.getMessage();
+            Member author = event.getMember();
+            Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
+            List<String> mentions = message.getMentions()
+                    .getMembers()
+                    .stream()
+                    .map(Member::getId)
+                    .toList();
 
-        String guildId = event.getGuild().getId();
-        String channelId = event.getChannel().getId();
+            String guildId = event.getGuild().getId();
+            String channelId = event.getChannel().getId();
 
-        ChatModeRequest request = ChatModeRequest.builder()
-                .authordDiscordId(author.getId())
-                .channelId(channelId)
-                .messageId(message.getId())
-                .guildId(guildId)
-                .isBotMentioned(mentions.contains(bot.getId()))
-                .mentionedUsersIds(mentions)
-                .botUsername(botUsername)
-                .botNickname(botNickname)
-                .build();
+            ChatModeRequest request = ChatModeRequest.builder()
+                    .authordDiscordId(author.getId())
+                    .channelId(channelId)
+                    .messageId(message.getId())
+                    .guildId(guildId)
+                    .isBotMentioned(mentions.contains(bot.getId()))
+                    .mentionedUsersIds(mentions)
+                    .botUsername(botUsername)
+                    .botNickname(botNickname)
+                    .build();
 
-        useCaseRunner.run(request)
-                .doOnError(error -> handleError(event, error))
-                .subscribe();
+            useCaseRunner.run(request);
+        } catch (Exception e) {
+            handleError(event, e);
+        }
     }
 
     private void handleError(MessageReceivedEvent event, Throwable error) {

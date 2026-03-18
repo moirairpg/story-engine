@@ -12,11 +12,12 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 
 @Component
 @SuppressWarnings("unchecked")
-public class ChatMessageAdapter {
+public class ChatMessageAdapter implements ChatMessagePort {
 
     private static final String MESSAGE_HISTORY = "messageHistory";
     private static final String RETRIEVED_MESSAGES = "retrievedMessages";
@@ -27,6 +28,7 @@ public class ChatMessageAdapter {
         this.tokenizerPort = tokenizerPort;
     }
 
+    @Override
     public Map<String, Object> addMessagesToContext(Map<String, Object> context, int reservedTokens) {
 
         List<DiscordMessageData> retrievedMessages = (List<DiscordMessageData>) context.get(RETRIEVED_MESSAGES);
@@ -52,6 +54,7 @@ public class ChatMessageAdapter {
         return context;
     }
 
+    @Override
     public Map<String, Object> addMessagesToContext(Map<String, Object> context,
             int reservedTokens, int amountOfMessage) {
 
@@ -80,6 +83,7 @@ public class ChatMessageAdapter {
         return context;
     }
 
+    @Override
     public Map<String, Object> addMessagesToContext(Map<String, Object> context,
             int reservedTokens, String assetManipulated) {
 

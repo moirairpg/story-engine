@@ -29,6 +29,7 @@ import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
@@ -45,12 +46,12 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
 
     private final TokenizerPort tokenizerPort;
     private final AdventureRepository adventureRepository;
-    private final ChatMessageAdapter chatMessageService;
+    private final ChatMessagePort chatMessageService;
 
     public LorebookEnrichmentAdapter(
             TokenizerPort tokenizerPort,
             AdventureRepository adventureRepository,
-            ChatMessageAdapter chatMessageService) {
+            ChatMessagePort chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;
         this.adventureRepository = adventureRepository;

@@ -1,24 +1,27 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.generation;
 
+import java.io.IOException;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
-import reactor.core.publisher.Mono;
 
 @Component
 public class TextCompletionAdapter implements TextCompletionPort {
@@ -35,35 +38,40 @@ public class TextCompletionAdapter implements TextCompletionPort {
     private static final Predicate<HttpStatusCode> UNAUTHORIZED = statusCode -> statusCode
             .isSameCodeAs(HttpStatusCode.valueOf(401));
 
+    private final String token;
     private final String completionsUri;
-    private final WebClient webClient;
+    private final RestClient discordClient;
+    private final ObjectMapper objectMapper;
 
-    public TextCompletionAdapter(@Value("${moirai.openai.api.base-url}") String baseUrl,
+    public TextCompletionAdapter(
             @Value("${moirai.openai.api.completions-uri}") String completionsUri,
             @Value("${moirai.openai.api.token}") String token,
-            WebClient.Builder webClientBuilder) {
+            RestClient discordClient,
+            ObjectMapper objectMapper) {
 
+        this.token = token;
         this.completionsUri = completionsUri;
-        this.webClient = webClientBuilder.baseUrl(baseUrl)
-                .defaultHeaders(headers -> {
-                    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-                    headers.add(HttpHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
-                })
-                .build();
+        this.discordClient = discordClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public Mono<TextGenerationResult> generateTextFrom(TextGenerationRequest request) {
+    public TextGenerationResult generateTextFrom(TextGenerationRequest request) {
 
-        return webClient.post()
+        var response = discordClient.post()
                 .uri(completionsUri)
-                .bodyValue(toRequest(request))
+                .headers(headers -> {
+                    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+                    headers.add(HttpHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
+                })
+                .body(toRequest(request))
                 .retrieve()
                 .onStatus(UNAUTHORIZED, this::handleUnauthorized)
                 .onStatus(BAD_REQUEST, this::handleBadRequest)
                 .onStatus(HttpStatusCode::isError, this::handleUnknownError)
-                .bodyToMono(CompletionResponse.class)
-                .map(this::toResult);
+                .body(CompletionResponse.class);
+
+        return toResult(response);
     }
 
     private CompletionRequest toRequest(TextGenerationRequest request) {
@@ -93,28 +101,27 @@ public class TextCompletionAdapter implements TextCompletionPort {
                 .build();
     }
 
-    private Mono<? extends Throwable> handleUnauthorized(ClientResponse clientResponse) {
-
-        return Mono.error(new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR));
+    private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
+        throw new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
     }
 
-    private Mono<? extends Throwable> handleBadRequest(ClientResponse clientResponse) {
+    private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        return clientResponse.bodyToMono(CompletionResponseError.class)
-                .map(resp -> {
-                    LOG.error(BAD_REQUEST_ERROR + " -> {}", resp);
-                    return new OpenAiApiException(HttpStatus.BAD_REQUEST, resp.getType(), resp.getMessage(),
-                            String.format(BAD_REQUEST_ERROR, resp.getType(), resp.getMessage()));
-                });
+        var error = mapErrorResponse(response);
+        LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
+        throw new OpenAiApiException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
+                String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
     }
 
-    private Mono<? extends Throwable> handleUnknownError(ClientResponse clientResponse) {
+    private void handleUnknownError(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        return clientResponse.bodyToMono(CompletionResponseError.class)
-                .map(resp -> {
-                    LOG.error(UNKNOWN_ERROR + " -> {}", resp);
-                    return new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, resp.getType(), resp.getMessage(),
-                            String.format(UNKNOWN_ERROR, resp.getType(), resp.getMessage()));
-                });
+        var error = mapErrorResponse(response);
+        LOG.error(UNKNOWN_ERROR + " -> {}", error);
+        throw new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
+                String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
+    }
+
+    private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }

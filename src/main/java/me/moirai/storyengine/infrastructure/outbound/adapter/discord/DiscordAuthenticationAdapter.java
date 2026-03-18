@@ -4,37 +4,35 @@ import static java.lang.String.format;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import me.moirai.storyengine.common.exception.AuthenticationFailedException;
-import me.moirai.storyengine.common.exception.DiscordApiException;
+import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordTokenRevocationRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
 
 @Component
 public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
@@ -57,35 +55,68 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     private final String tokenUri;
     private final String tokenRevokeUri;
     private final ObjectMapper objectMapper;
-    private final WebClient webClient;
+    private final RestClient discordClient;
 
-    public DiscordAuthenticationAdapter(@Value("${moirai.discord.api.base-url}") String discordBaseUrl,
+    public DiscordAuthenticationAdapter(
+            @Value("${moirai.discord.api.base-url}") String discordBaseUrl,
             @Value("${moirai.discord.api.users-uri}") String usersUri,
             @Value("${moirai.discord.api.token-uri}") String tokenUri,
             @Value("${moirai.discord.api.token-revoke-uri}") String tokenRevokeUri,
-            WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
+            RestClient discordClient,
+            ObjectMapper objectMapper) {
 
         this.objectMapper = objectMapper;
         this.usersUri = usersUri;
         this.tokenUri = tokenUri;
         this.tokenRevokeUri = tokenRevokeUri;
-        this.webClient = webClientBuilder.baseUrl(discordBaseUrl).build();
+        this.discordClient = discordClient;
     }
 
     @Override
-    public Mono<AuthenticateUserResult> authenticate(DiscordAuthRequest request) {
+    public AuthenticateUserResult authenticate(DiscordAuthRequest request) {
 
-        return postForAuthentication(tokenUri, request)
-                .bodyToMono(DiscordAuthResponse.class)
-                .map(this::toResult);
+        var response = postForAuthentication(tokenUri, request)
+                .body(DiscordAuthResponse.class);
+
+        return toResult(response);
     }
 
     @Override
-    public Mono<AuthenticateUserResult> refreshSessionToken(RefreshSessionTokenRequest request) {
+    public AuthenticateUserResult refreshSessionToken(RefreshSessionTokenRequest request) {
 
-        return postForAuthentication(tokenUri, request)
-                .bodyToMono(DiscordAuthResponse.class)
-                .map(this::toResult);
+        var response = postForAuthentication(tokenUri, request)
+                .body(DiscordAuthResponse.class);
+
+        return toResult(response);
+    }
+
+    @Override
+    public DiscordUserDataResponse retrieveLoggedUser(String token) {
+
+        return discordClient.get()
+                .uri(format(usersUri, "@me"))
+                .headers(headers -> {
+                    headers.add(AUTHORIZATION, format(BEARER, token));
+                    headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
+                })
+                .retrieve()
+                .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
+                .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
+                .onStatus(HttpStatusCode::isError, this::handleUnknownError)
+                .body(DiscordUserDataResponse.class);
+    }
+
+    @Override
+    public void logout(String clientId, String clientSecret, String token, String tokenTypeHint) {
+
+        var request = new DiscordTokenRevocationRequest(
+                clientId,
+                clientSecret,
+                token,
+                tokenTypeHint);
+
+        postForAuthentication(tokenRevokeUri, request)
+                .body(Void.class);
     }
 
     private AuthenticateUserResult toResult(DiscordAuthResponse response) {
@@ -98,35 +129,6 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
                 response.tokenType());
     }
 
-    @Override
-    public Mono<DiscordUserDataResponse> retrieveLoggedUser(String token) {
-
-        return webClient.get()
-                .uri(format(usersUri, "@me"))
-                .headers(headers -> {
-                    headers.add(AUTHORIZATION, format(BEARER, token));
-                    headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
-                })
-                .retrieve()
-                .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
-                .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
-                .onStatus(HttpStatusCode::isError, this::handleUnknownError)
-                .bodyToMono(DiscordUserDataResponse.class);
-    }
-
-    @Override
-    public Mono<Void> logout(String clientId, String clientSecret, String token, String tokenTypeHint) {
-
-        var request = new DiscordTokenRevocationRequest(
-                clientId,
-                clientSecret,
-                token,
-                tokenTypeHint);
-
-        return postForAuthentication(tokenRevokeUri, request)
-                .bodyToMono(Void.class);
-    }
-
     private ResponseSpec postForAuthentication(String url, Object request) {
 
         var valueMap = new LinkedMultiValueMap<String, String>();
@@ -134,43 +136,41 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
         });
 
         valueMap.setAll(fieldMap);
-        return webClient.post()
+
+        return discordClient.post()
                 .uri(url)
                 .headers(headers -> {
                     headers.add(CONTENT_TYPE, CONTENT_TYPE_VALUE);
                     headers.add(ACCEPT, CONTENT_TYPE_VALUE);
                 })
-                .body(BodyInserters.fromFormData(valueMap))
+                .body(valueMap)
                 .retrieve()
                 .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
                 .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
                 .onStatus(HttpStatusCode::isError, this::handleUnknownError);
     }
 
-    private Mono<? extends Throwable> handleUnauthorized(ClientResponse clientResponse) {
-
-        return Mono.error(new AuthenticationFailedException(AUTHENTICATION_ERROR, AUTHENTICATION_ERROR));
+    private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
+        throw new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
     }
 
-    private Mono<? extends Throwable> handleBadRequest(ClientResponse clientResponse) {
+    private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        return clientResponse.bodyToMono(DiscordErrorResponse.class)
-                .map(resp -> {
-                    LOG.error(BAD_REQUEST_ERROR + " -> {}", resp);
-                    return new DiscordApiException(BAD_REQUEST, resp.getError(),
-                            resp.getErrorDescription(),
-                            format(BAD_REQUEST_ERROR, resp.getError(), resp.getErrorDescription()));
-                });
+        var error = mapErrorResponse(response);
+        LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
+        throw new OpenAiApiException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
+                String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
     }
 
-    private Mono<? extends Throwable> handleUnknownError(ClientResponse clientResponse) {
+    private void handleUnknownError(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        return clientResponse.bodyToMono(DiscordErrorResponse.class)
-                .map(resp -> {
-                    LOG.error(UNKNOWN_ERROR + " -> {}", resp);
-                    return new DiscordApiException(INTERNAL_SERVER_ERROR, resp.getError(),
-                            resp.getErrorDescription(),
-                            format(UNKNOWN_ERROR, resp.getError(), resp.getErrorDescription()));
-                });
+        var error = mapErrorResponse(response);
+        LOG.error(UNKNOWN_ERROR + " -> {}", error);
+        throw new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
+                String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
+    }
+
+    private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }

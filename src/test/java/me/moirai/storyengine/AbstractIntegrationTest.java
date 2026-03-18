@@ -2,10 +2,10 @@ package me.moirai.storyengine;
 
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
@@ -13,7 +13,7 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
-import me.moirai.storyengine.core.port.outbound.generation.ReactiveTextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.infrastructure.config.JdaConfig;
 import net.dv8tion.jda.api.JDA;
 
@@ -24,25 +24,25 @@ public abstract class AbstractIntegrationTest {
     @Mock
     private DiscordAuthenticationPort discordAuthenticationPort;
 
-    @MockBean
+    @MockitoBean
     private DiscordChannelPort discordChannelOperationsPort;
 
-    @MockBean
+    @MockitoBean
     private PersonaEnrichmentPort inputEnrichmentService;
 
-    @MockBean
+    @MockitoBean
     private StorySummarizationPort contextSummarizationService;
 
-    @MockBean
+    @MockitoBean
     private JDA jda;
 
-    @MockBean
+    @MockitoBean
     private TextCompletionPort textCompletionPort;
 
-    @MockBean
-    private ReactiveTextModerationPort textModerationPort;
+    @MockitoBean
+    private TextModerationPort textModerationPort;
 
-    @MockBean
+    @MockitoBean
     private JdaConfig jdaConfig;
 
     private static final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";

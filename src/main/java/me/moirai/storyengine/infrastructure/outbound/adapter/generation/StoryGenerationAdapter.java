@@ -1,6 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.generation;
 
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static me.moirai.storyengine.common.enums.AiRole.ASSISTANT;
 import static me.moirai.storyengine.common.enums.AiRole.USER;
@@ -42,8 +41,7 @@ import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPor
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
-import me.moirai.storyengine.core.port.outbound.generation.ReactiveTextModerationPort;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 
 @Component
 @SuppressWarnings("unchecked")
@@ -62,14 +60,15 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
     private final LorebookEnrichmentPort lorebookEnrichmentPort;
     private final PersonaEnrichmentPort personaEnrichmentPort;
     private final TextCompletionPort textCompletionPort;
-    private final ReactiveTextModerationPort textModerationPort;
+    private final TextModerationPort textModerationPort;
 
-    public StoryGenerationAdapter(StorySummarizationPort summarizationPort,
+    public StoryGenerationAdapter(
+            StorySummarizationPort summarizationPort,
             DiscordChannelPort discordChannelPort,
             LorebookEnrichmentPort lorebookEnrichmentPort,
             PersonaEnrichmentPort personaEnrichmentPort,
             TextCompletionPort textCompletionPort,
-            ReactiveTextModerationPort textModerationPort) {
+            TextModerationPort textModerationPort) {
 
         this.discordChannelPort = discordChannelPort;
         this.summarizationPort = summarizationPort;
@@ -80,23 +79,34 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
     }
 
     @Override
-    public Mono<Void> continueStory(StoryGenerationRequest request) {
+    public void continueStory(StoryGenerationRequest request) {
 
-        return Mono.just(request.getMessageHistory())
-                .map(messageHistory -> enrichWithLorebook(request, messageHistory))
-                .flatMap(contextWithLorebook -> summarizationPort.summarizeContextWith(contextWithLorebook, request))
-                .flatMap(contextWithSummary -> personaEnrichmentPort.enrichContextWithPersona(
-                        contextWithSummary, request.getPersonaId(), request.getModelConfiguration()))
-                .map(contextWithPersona -> processEnrichedContext(contextWithPersona, request))
-                .flatMap(processedContext -> moderateInput(processedContext, request.getModeration()))
-                .flatMap(processedContext -> generateAiOutput(request, processedContext))
-                .flatMap(aiOutput -> moderateOutput(aiOutput, request.getModeration()))
-                .doOnNext(generatedOutput -> sendOutputTo(request.getChannelId(),
-                        request.getBotUsername(), request.getBotNickname(), generatedOutput))
-                .then();
+        var enrichedContext = enrichContext(request, request.getMessageHistory());
+        var aiOutput = generateOutput(request, enrichedContext);
+        var moderatedOutput = moderateOutput(aiOutput, request.getModeration());
+
+        sendOutputTo(request.getChannelId(), request.getBotUsername(), request.getBotNickname(), moderatedOutput);
     }
 
-    private Map<String, Object> enrichWithLorebook(StoryGenerationRequest request,
+    private TextGenerationResult generateOutput(StoryGenerationRequest request, Map<String, Object> context) {
+
+        var processedContext = processEnrichedContext(context, request);
+        var moderatedContext = moderateInput(processedContext, request.getModeration());
+        return generateAiOutput(request, moderatedContext);
+    }
+
+    private Map<String, Object> enrichContext(
+            StoryGenerationRequest request,
+            List<DiscordMessageData> messageHistory) {
+
+        var contextWithLorebook = enrichWithLorebook(request, request.getMessageHistory());
+        var contextWithSummary = summarizationPort.summarizeContextWith(contextWithLorebook, request);
+        return personaEnrichmentPort.enrichContextWithPersona(
+                contextWithSummary, request.getPersonaId(), request.getModelConfiguration());
+    }
+
+    private Map<String, Object> enrichWithLorebook(
+            StoryGenerationRequest request,
             List<DiscordMessageData> messageHistory) {
 
         if (request.getGameMode().equals(RPG)) {
@@ -108,15 +118,18 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
                 request.getAdventureId(), request.getModelConfiguration());
     }
 
-    private Mono<TextGenerationResult> generateAiOutput(StoryGenerationRequest query,
+    private TextGenerationResult generateAiOutput(
+            StoryGenerationRequest query,
             List<ChatMessage> processedContext) {
+
         TextGenerationRequest textGenerationRequest = buildTextGenerationRequest(query,
                 processedContext);
 
         return textCompletionPort.generateTextFrom(textGenerationRequest);
     }
 
-    private TextGenerationRequest buildTextGenerationRequest(StoryGenerationRequest query,
+    private TextGenerationRequest buildTextGenerationRequest(
+            StoryGenerationRequest query,
             List<ChatMessage> processedContext) {
 
         return TextGenerationRequest.builder()
@@ -131,7 +144,8 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
                 .build();
     }
 
-    private List<ChatMessage> processEnrichedContext(Map<String, Object> unsortedContext,
+    private List<ChatMessage> processEnrichedContext(
+            Map<String, Object> unsortedContext,
             StoryGenerationRequest request) {
 
         List<ChatMessage> processedContext = new ArrayList<>();
@@ -248,55 +262,53 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
         discordChannelPort.sendTextMessageTo(messageChannelId, output);
     }
 
-    private Mono<List<ChatMessage>> moderateInput(List<ChatMessage> messages,
+    private List<ChatMessage> moderateInput(
+            List<ChatMessage> messages,
             ModerationConfigurationRequest moderation) {
 
         String messageHistory = messages.stream()
                 .map(ChatMessage::content)
                 .collect(joining("\n"));
 
-        return getTopicsFlaggedByModeration(messageHistory, moderation)
-                .map(result -> {
-                    if (!result.isEmpty()) {
-                        throw new ModerationException("Inappropriate content found in message history", result);
-                    }
+        var flaggedTopics = getTopicsFlaggedByModeration(messageHistory, moderation);
 
-                    return messages;
-                });
+        if (!flaggedTopics.isEmpty()) {
+            throw new ModerationException("Inappropriate content found in message history", flaggedTopics);
+        }
+
+        return messages;
     }
 
-    private Mono<String> moderateOutput(TextGenerationResult generationResult,
+    private String moderateOutput(
+            TextGenerationResult generationResult,
             ModerationConfigurationRequest moderation) {
 
-        return getTopicsFlaggedByModeration(generationResult.getOutputText(), moderation)
-                .map(result -> {
-                    if (!result.isEmpty()) {
-                        throw new ModerationException("Inappropriate content found in AI's output", result);
-                    }
+        var flaggedTopics = getTopicsFlaggedByModeration(generationResult.getOutputText(), moderation);
+        if (!flaggedTopics.isEmpty()) {
+            throw new ModerationException("Inappropriate content found in AI's output", flaggedTopics);
+        }
 
-                    return generationResult.getOutputText();
-                });
+        return generationResult.getOutputText();
     }
 
-    private Mono<List<String>> getTopicsFlaggedByModeration(String input, ModerationConfigurationRequest moderation) {
+    private List<String> getTopicsFlaggedByModeration(String input, ModerationConfigurationRequest moderation) {
 
-        return textModerationPort.moderate(input)
-                .map(result -> {
-                    if (moderation.isAbsolute()) {
-                        if (result.isContentFlagged()) {
-                            return result.flaggedTopics();
-                        }
+        var moderationResult = textModerationPort.moderate(input);
 
-                        return emptyList();
-                    }
+        if (moderation.isAbsolute()) {
+            if (moderationResult.isContentFlagged()) {
+                return moderationResult.flaggedTopics();
+            }
 
-                    return result.moderationScores()
-                            .entrySet()
-                            .stream()
-                            .filter(entry -> isTopicFlagged(entry, moderation))
-                            .map(Map.Entry::getKey)
-                            .toList();
-                });
+            return List.of();
+        }
+
+        return moderationResult.moderationScores()
+                .entrySet()
+                .stream()
+                .filter(entry -> isTopicFlagged(entry, moderation))
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     private boolean isTopicFlagged(Entry<String, Double> entry, ModerationConfigurationRequest moderation) {

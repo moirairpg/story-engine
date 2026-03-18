@@ -4,24 +4,22 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.common.exception.AuthenticationFailedException;
-import me.moirai.storyengine.common.exception.DiscordApiException;
+import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorResponse;
-import reactor.test.StepVerifier;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
+
+import java.util.HashMap;
 
 public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
@@ -32,22 +30,26 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
     @BeforeEach
     void before() {
 
+        var restClient = RestClient.builder()
+                .baseUrl("http://localhost:" + PORT)
+                .build();
+
         adapter = new DiscordAuthenticationAdapter("http://localhost:" + PORT,
-                "/users", "/token", "/token/revoke",
-                WebClient.builder(), objectMapper);
+                "/users/%s", "/token", "/token/revoke",
+                restClient, objectMapper);
     }
 
     @Test
     public void refreshToken() throws JsonProcessingException {
 
         // Given
-        RefreshSessionTokenRequest request = RefreshSessionTokenRequest.builder()
+        var request = RefreshSessionTokenRequest.builder()
                 .clientId(DUMMY_VALUE)
                 .clientSecret(DUMMY_VALUE)
                 .grantType(DUMMY_VALUE)
                 .build();
 
-        Map<String, Object> response = new HashMap<>();
+        var response = new HashMap<String, Object>();
         response.put("access_token", DUMMY_VALUE);
         response.put("expires_in", 424234L);
         response.put("refresh_token", DUMMY_VALUE);
@@ -56,19 +58,18 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         prepareWebserverFor(response, 200);
 
+        // When
+        var result = adapter.refreshSessionToken(request);
+
         // Then
-        StepVerifier.create(adapter.refreshSessionToken(request))
-                .assertNext(resp -> {
-                    assertThat(resp).isNotNull();
-                })
-                .verifyComplete();
+        assertThat(result).isNotNull();
     }
 
     @Test
     public void authenticateOnDiscord() throws JsonProcessingException {
 
         // Given
-        DiscordAuthRequest request = DiscordAuthRequest.builder()
+        var request = DiscordAuthRequest.builder()
                 .clientId(DUMMY_VALUE)
                 .clientSecret(DUMMY_VALUE)
                 .code(DUMMY_VALUE)
@@ -77,7 +78,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
                 .scope(DUMMY_VALUE)
                 .build();
 
-        Map<String, Object> response = new HashMap<>();
+        var response = new HashMap<String, Object>();
         response.put("access_token", DUMMY_VALUE);
         response.put("expires_in", 424234L);
         response.put("refresh_token", DUMMY_VALUE);
@@ -86,19 +87,18 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         prepareWebserverFor(response, 200);
 
+        // When
+        var result = adapter.authenticate(request);
+
         // Then
-        StepVerifier.create(adapter.authenticate(request))
-                .assertNext(resp -> {
-                    assertThat(resp).isNotNull();
-                })
-                .verifyComplete();
+        assertThat(result).isNotNull();
     }
 
     @Test
     public void unauthorizedWhenAuthenticateOnDiscord() {
 
         // Given
-        DiscordAuthRequest request = DiscordAuthRequest.builder()
+        var request = DiscordAuthRequest.builder()
                 .clientId(DUMMY_VALUE)
                 .clientSecret(DUMMY_VALUE)
                 .code(DUMMY_VALUE)
@@ -110,17 +110,15 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(401);
 
         // Then
-        StepVerifier.create(adapter.authenticate(request))
-                .expectError(AuthenticationFailedException.class)
-                .verify();
+        assertThatThrownBy(() -> adapter.authenticate(request))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
-    public void badRequestWhenAuthenticateOnDiscord()
-            throws JsonProcessingException {
+    public void badRequestWhenAuthenticateOnDiscord() throws JsonProcessingException {
 
         // Given
-        DiscordAuthRequest request = DiscordAuthRequest.builder()
+        var request = DiscordAuthRequest.builder()
                 .clientId(DUMMY_VALUE)
                 .clientSecret(DUMMY_VALUE)
                 .code(DUMMY_VALUE)
@@ -129,24 +127,25 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
                 .scope(DUMMY_VALUE)
                 .build();
 
-        DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
-                .errorDescription(DUMMY_VALUE)
-                .error(DUMMY_VALUE)
+        var errorResponse = CompletionResponseError.builder()
+                .message(DUMMY_VALUE)
+                .type(DUMMY_VALUE)
+                .code(DUMMY_VALUE)
+                .param(DUMMY_VALUE)
                 .build();
 
         prepareWebserverFor(errorResponse, 400);
 
         // Then
-        StepVerifier.create(adapter.authenticate(request))
-                .verifyError(DiscordApiException.class);
+        assertThatThrownBy(() -> adapter.authenticate(request))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
-    public void internalErrorWhenAuthenticateOnDiscord()
-            throws JsonProcessingException {
+    public void internalErrorWhenAuthenticateOnDiscord() throws JsonProcessingException {
 
         // Given
-        DiscordAuthRequest request = DiscordAuthRequest.builder()
+        var request = DiscordAuthRequest.builder()
                 .clientId(DUMMY_VALUE)
                 .clientSecret(DUMMY_VALUE)
                 .code(DUMMY_VALUE)
@@ -155,16 +154,18 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
                 .scope(DUMMY_VALUE)
                 .build();
 
-        DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
-                .errorDescription(DUMMY_VALUE)
-                .error(DUMMY_VALUE)
+        var errorResponse = CompletionResponseError.builder()
+                .message(DUMMY_VALUE)
+                .type(DUMMY_VALUE)
+                .code(DUMMY_VALUE)
+                .param(DUMMY_VALUE)
                 .build();
 
         prepareWebserverFor(errorResponse, 500);
 
         // Then
-        StepVerifier.create(adapter.authenticate(request))
-                .verifyError(DiscordApiException.class);
+        assertThatThrownBy(() -> adapter.authenticate(request))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
@@ -173,9 +174,8 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         wireMockServer.stubFor(any(anyUrl())
                 .willReturn(aResponse().withHeader(CONTENT_TYPE, APPLICATION_JSON)));
 
-        // Then
-        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .verifyComplete();
+        // When/Then - no exception
+        adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE);
     }
 
     @Test
@@ -184,52 +184,53 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(401);
 
         // Then
-        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .expectError(AuthenticationFailedException.class)
-                .verify();
+        assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
-    public void badRequestWhenLogoutOnDiscord()
-            throws JsonProcessingException {
+    public void badRequestWhenLogoutOnDiscord() throws JsonProcessingException {
 
         // Given
-        DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
-                .errorDescription(DUMMY_VALUE)
-                .error(DUMMY_VALUE)
+        var errorResponse = CompletionResponseError.builder()
+                .message(DUMMY_VALUE)
+                .type(DUMMY_VALUE)
+                .code(DUMMY_VALUE)
+                .param(DUMMY_VALUE)
                 .build();
 
         prepareWebserverFor(errorResponse, 400);
 
         // Then
-        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .verifyError(DiscordApiException.class);
+        assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
-    public void internalErrorWhenLogoutOnDiscord()
-            throws JsonProcessingException {
+    public void internalErrorWhenLogoutOnDiscord() throws JsonProcessingException {
 
         // Given
-        DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
-                .errorDescription(DUMMY_VALUE)
-                .error(DUMMY_VALUE)
+        var errorResponse = CompletionResponseError.builder()
+                .message(DUMMY_VALUE)
+                .type(DUMMY_VALUE)
+                .code(DUMMY_VALUE)
+                .param(DUMMY_VALUE)
                 .build();
 
         prepareWebserverFor(errorResponse, 500);
 
         // Then
-        StepVerifier.create(adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .verifyError(DiscordApiException.class);
+        assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
     public void getLoggedUser() throws JsonProcessingException {
 
         // Given
-        String token = "TOKEN";
+        var token = "TOKEN";
 
-        DiscordUserDataResponse response = new DiscordUserDataResponse(
+        var response = new DiscordUserDataResponse(
                 null,
                 "username",
                 "displayName",
@@ -239,61 +240,63 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         prepareWebserverFor(response, 200);
 
+        // When
+        var result = adapter.retrieveLoggedUser(token);
+
         // Then
-        StepVerifier.create(adapter.retrieveLoggedUser(token))
-                .assertNext(resp -> {
-                    assertThat(resp).isNotNull();
-                })
-                .verifyComplete();
+        assertThat(result).isNotNull();
     }
 
     @Test
     public void unauthorizedWhenGetLoggedUser() {
 
         // Given
-        String token = "TOKEN";
+        var token = "TOKEN";
 
         prepareWebserverFor(401);
 
         // Then
-        StepVerifier.create(adapter.retrieveLoggedUser(token))
-                .expectError(AuthenticationFailedException.class)
-                .verify();
+        assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
     public void badRequestWhenGetLoggedUser() throws JsonProcessingException {
 
         // Given
-        String token = "TOKEN";
+        var token = "TOKEN";
 
-        DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
-                .errorDescription(DUMMY_VALUE)
-                .error(DUMMY_VALUE)
+        var errorResponse = CompletionResponseError.builder()
+                .message(DUMMY_VALUE)
+                .type(DUMMY_VALUE)
+                .code(DUMMY_VALUE)
+                .param(DUMMY_VALUE)
                 .build();
 
         prepareWebserverFor(errorResponse, 400);
 
         // Then
-        StepVerifier.create(adapter.retrieveLoggedUser(token))
-                .verifyError(DiscordApiException.class);
+        assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
+                .isInstanceOf(OpenAiApiException.class);
     }
 
     @Test
     public void internalErrorWhenGetLoggedUser() throws JsonProcessingException {
 
         // Given
-        String token = "TOKEN";
+        var token = "TOKEN";
 
-        DiscordErrorResponse errorResponse = DiscordErrorResponse.builder()
-                .errorDescription(DUMMY_VALUE)
-                .error(DUMMY_VALUE)
+        var errorResponse = CompletionResponseError.builder()
+                .message(DUMMY_VALUE)
+                .type(DUMMY_VALUE)
+                .code(DUMMY_VALUE)
+                .param(DUMMY_VALUE)
                 .build();
 
         prepareWebserverFor(errorResponse, 500);
 
         // Then
-        StepVerifier.create(adapter.retrieveLoggedUser(token))
-                .verifyError(DiscordApiException.class);
+        assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
+                .isInstanceOf(OpenAiApiException.class);
     }
 }

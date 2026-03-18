@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.usecases.UseCaseRunner;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.GoCommand;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.HelpCommand;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
@@ -254,31 +254,35 @@ public class SlashCommandListener extends ListenerAdapter {
         event.replyModal(modal).complete();
     }
 
-    private void processStartCommand(SlashCommandInteractionEvent event,
-            TextChannel textChannel, Guild guild, Member bot) {
+    private void processStartCommand(
+            SlashCommandInteractionEvent event,
+            TextChannel textChannel,
+            Guild guild,
+            Member bot) {
 
         event.getChannel().sendTyping().complete();
         InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
                 getCommandPhrase(startCommandPhrasesBeforeRunning));
 
-        String botUsername = bot.getUser().getName();
-        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
-                : botUsername;
+        try {
+            String botUsername = bot.getUser().getName();
+            String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
+                    : botUsername;
 
-        StartCommand useCase = StartCommand.builder()
-                .botId(bot.getId())
-                .botNickname(botNickname)
-                .botUsername(botUsername)
-                .guildId(guild.getId())
-                .channelId(textChannel.getId())
-                .build();
+            StartCommand useCase = StartCommand.builder()
+                    .botId(bot.getId())
+                    .botNickname(botNickname)
+                    .botUsername(botUsername)
+                    .guildId(guild.getId())
+                    .channelId(textChannel.getId())
+                    .build();
 
-        useCaseRunner.run(useCase)
-                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
-                        getCommandPhrase(startCommandPhrasesAfterRunning)))
-                .doOnError(error -> discordListenerHelper.updateNotification(interactionHook,
-                        error.getMessage()))
-                .subscribe();
+            useCaseRunner.run(useCase);
+            discordListenerHelper.updateNotification(interactionHook,
+                    getCommandPhrase(startCommandPhrasesAfterRunning));
+        } catch (Exception e) {
+            discordListenerHelper.updateNotification(interactionHook, e.getMessage());
+        }
     }
 
     private void processGoCommand(SlashCommandInteractionEvent event, TextChannel textChannel,
@@ -287,24 +291,25 @@ public class SlashCommandListener extends ListenerAdapter {
         event.getChannel().sendTyping().complete();
         InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
                 getCommandPhrase(goCommandPhrasesBeforeRunning));
+        try {
+            String botUsername = bot.getUser().getName();
+            String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
+                    : botUsername;
 
-        String botUsername = bot.getUser().getName();
-        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
-                : botUsername;
+            GoCommand useCase = GoCommand.builder()
+                    .botId(bot.getId())
+                    .botNickname(botNickname)
+                    .botUsername(botUsername)
+                    .guildId(guild.getId())
+                    .channelId(textChannel.getId())
+                    .build();
 
-        GoCommand useCase = GoCommand.builder()
-                .botId(bot.getId())
-                .botNickname(botNickname)
-                .botUsername(botUsername)
-                .guildId(guild.getId())
-                .channelId(textChannel.getId())
-                .build();
-
-        useCaseRunner.run(useCase)
-                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
-                        getCommandPhrase(goCommandPhrasesAfterRunning)))
-                .doOnError(error -> errorHandler.handleError(interactionHook, error))
-                .subscribe();
+            useCaseRunner.run(useCase);
+            discordListenerHelper.updateNotification(interactionHook,
+                    getCommandPhrase(goCommandPhrasesAfterRunning));
+        } catch (Exception e) {
+            errorHandler.handleError(interactionHook, e);
+        }
     }
 
     private void processRetryCommand(SlashCommandInteractionEvent event, TextChannel textChannel,
@@ -313,24 +318,25 @@ public class SlashCommandListener extends ListenerAdapter {
         event.getChannel().sendTyping().complete();
         InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
                 getCommandPhrase(retryCommandPhrasesBeforeRunning));
+        try {
+            String botUsername = bot.getUser().getName();
+            String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
+                    : botUsername;
 
-        String botUsername = bot.getUser().getName();
-        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
-                : botUsername;
+            RetryCommand useCase = RetryCommand.builder()
+                    .botId(bot.getId())
+                    .botNickname(botNickname)
+                    .botUsername(botUsername)
+                    .guildId(guild.getId())
+                    .channelId(textChannel.getId())
+                    .build();
 
-        RetryCommand useCase = RetryCommand.builder()
-                .botId(bot.getId())
-                .botNickname(botNickname)
-                .botUsername(botUsername)
-                .guildId(guild.getId())
-                .channelId(textChannel.getId())
-                .build();
-
-        useCaseRunner.run(useCase)
-                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
-                        getCommandPhrase(retryCommandPhrasesAfterRunning)))
-                .doOnError(error -> errorHandler.handleError(interactionHook, error))
-                .subscribe();
+            useCaseRunner.run(useCase);
+            discordListenerHelper.updateNotification(interactionHook,
+                    getCommandPhrase(retryCommandPhrasesAfterRunning));
+        } catch (Exception e) {
+            errorHandler.handleError(interactionHook, e);
+        }
     }
 
     private String mapTokenizationResultToMessage(TokenizeResult tokenizationResult) {

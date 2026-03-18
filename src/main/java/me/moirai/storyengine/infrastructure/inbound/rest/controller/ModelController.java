@@ -14,7 +14,6 @@ import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
 import me.moirai.storyengine.core.port.inbound.model.SearchModels;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/model")
@@ -29,13 +28,11 @@ public class ModelController extends SecurityContextAware {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<List<AiModelResult>> getAllAiModels(
+    public List<AiModelResult> getAllAiModels(
             @RequestParam(required = false) String modelName,
             @RequestParam(required = false) String tokenLimit) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-            var query = new SearchModels(modelName, tokenLimit);
-            return queryRunner.run(query);
-        });
+        var query = new SearchModels(modelName, tokenLimit);
+        return queryRunner.run(query);
     }
 }

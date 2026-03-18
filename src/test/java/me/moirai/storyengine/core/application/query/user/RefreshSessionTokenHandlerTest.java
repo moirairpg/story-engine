@@ -14,8 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class RefreshSessionTokenHandlerTest {
@@ -52,18 +50,17 @@ public class RefreshSessionTokenHandlerTest {
                 "type",
                 "scope");
 
-        when(discordAuthenticationPort.refreshSessionToken(any())).thenReturn(Mono.just(authResponse));
+        when(discordAuthenticationPort.refreshSessionToken(any())).thenReturn(authResponse);
+
+        // When
+        var result = handler.handle(request);
 
         // Then
-        StepVerifier.create(handler.handle(request))
-                .assertNext(result -> {
-                    assertThat(result).isNotNull();
-                    assertThat(result.accessToken()).isNotNull().isNotEmpty();
-                    assertThat(result.expiresIn()).isNotNull();
-                    assertThat(result.refreshToken()).isNotNull().isNotEmpty();
-                    assertThat(result.scope()).isNotNull().isNotEmpty();
-                    assertThat(result.tokenType()).isNotNull().isNotEmpty();
-                })
-                .verifyComplete();
+        assertThat(result).isNotNull();
+        assertThat(result.accessToken()).isNotNull().isNotEmpty();
+        assertThat(result.expiresIn()).isNotNull();
+        assertThat(result.refreshToken()).isNotNull().isNotEmpty();
+        assertThat(result.scope()).isNotNull().isNotEmpty();
+        assertThat(result.tokenType()).isNotNull().isNotEmpty();
     }
 }

@@ -3,13 +3,11 @@ package me.moirai.storyengine.infrastructure.outbound.adapter;
 import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT4_MINI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -23,111 +21,105 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import me.moirai.storyengine.AbstractWebMockTest;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
-import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
-import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
-import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
-import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResultFixture;
+import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
-import me.moirai.storyengine.infrastructure.outbound.adapter.generation.ChatMessageAdapter;
+import me.moirai.storyengine.common.dto.ChatMessage;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponse;
+import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseChoice;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.StorySummarizationAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.StoryGenerationRequestFixture;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
-public class ContextSummarizationAdapterTest {
-
-    @Mock
-    private DiscordChannelPort discordChannelOperationsPort;
-
-    @Mock
-    private TextCompletionPort openAiPort;
+public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
 
     @Mock
     private TokenizerPort tokenizerPort;
 
     @Mock
-    private ChatMessageAdapter chatMessageService;
+    private ChatMessagePort chatMessageService;
 
     private StorySummarizationAdapter service;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
-        final String summarizationInstruction = "Generate summary of the story so far";
-        service = new StorySummarizationAdapter(summarizationInstruction, openAiPort, tokenizerPort, chatMessageService);
+        var restClient = RestClient.builder()
+                .baseUrl("http://localhost:" + PORT)
+                .build();
+
+        service = new StorySummarizationAdapter("Generate summary of the story so far",
+                "/completions", "test-token", tokenizerPort, chatMessageService,
+                restClient, objectMapper);
     }
 
     @Test
-    public void summarizeWith_validInput_thenSummaryGenerated() {
+    public void summarizeWith_validInput_thenSummaryGenerated() throws JsonProcessingException {
 
         // Given
-        String generatedSummary = "Generated summary";
-        StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
+        var generatedSummary = "Generated summary";
+        var storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini().build())
                 .build();
 
-        Map<String, Object> context = createContextWithMessageNumber(3);
+        var context = createContextWithMessageNumber(3);
 
-        when(openAiPort.generateTextFrom(any(TextGenerationRequest.class)))
-                .thenReturn(Mono.just(TextGenerationResultFixture.create()
-                        .outputText(generatedSummary)
-                        .build()));
+        prepareWebserverFor(completionResponseWith(generatedSummary), 200);
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyInt()))
                 .thenReturn(context);
+        when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyString()))
+                .thenReturn(context);
 
         // When
-        Mono<Map<String, Object>> result = service.summarizeContextWith(context, storyGenerationRequest);
+        var result = service.summarizeContextWith(context, storyGenerationRequest);
 
         // Then
-        StepVerifier.create(result)
-                .expectNextMatches(processedContext -> (processedContext.containsKey("summary")
-                        && processedContext.get("summary").equals(generatedSummary)))
-                .verifyComplete();
+        assertThat(result).containsKey("summary");
+        assertThat(result.get("summary")).isEqualTo(generatedSummary);
     }
 
     @Test
-    public void summarizeWith_emptyMessageHistory_thenEmptySummaryReturned() {
+    public void summarizeWith_emptyMessageHistory_thenEmptySummaryReturned() throws JsonProcessingException {
 
         // Given
-        StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
+        var storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini().build())
                 .build();
-        Map<String, Object> context = createContextWithMessageNumber(3);
 
-        when(openAiPort.generateTextFrom(any(TextGenerationRequest.class)))
-                .thenReturn(Mono.just(TextGenerationResultFixture.create()
-                        .outputText("")
-                        .build()));
+        var context = createContextWithMessageNumber(3);
+
+        prepareWebserverFor(completionResponseWith(""), 200);
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyInt()))
                 .thenReturn(context);
+        when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyString()))
+                .thenReturn(context);
 
         // When
-        Mono<Map<String, Object>> result = service.summarizeContextWith(context, storyGenerationRequest);
+        var result = service.summarizeContextWith(context, storyGenerationRequest);
 
         // Then
-        StepVerifier.create(result)
-                .expectNextMatches(processedContext -> processedContext.containsKey("summary")
-                        && ((String) processedContext.get("summary")).isEmpty())
-                .verifyComplete();
+        assertThat(result).containsKey("summary");
+        assertThat((String) result.get("summary")).isEmpty();
     }
 
     @Test
-    public void summarizeWith_whenSummaryExceedsTokenLimit_thenSummaryShouldBeTrimmed() {
+    public void summarizeWith_whenSummaryExceedsTokenLimit_thenSummaryShouldBeTrimmed() throws JsonProcessingException {
 
         // Given
-        String longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor. Mauris iaculis pharetra leo.";
-        String trimmedSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor.";
-        StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
+        var longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor. Mauris iaculis pharetra leo.";
+        var trimmedSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor.";
+        var storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
                         .aiModel(AiModelRequest.build(
                                 GPT4_MINI.toString(),
@@ -136,12 +128,9 @@ public class ContextSummarizationAdapterTest {
                         .build())
                 .build();
 
-        Map<String, Object> context = createContextWithMessageNumber(3);
+        var context = createContextWithMessageNumber(3);
 
-        when(openAiPort.generateTextFrom(any(TextGenerationRequest.class)))
-                .thenReturn(Mono.just(TextGenerationResultFixture.create()
-                        .outputText(longSummary)
-                        .build()));
+        prepareWebserverFor(completionResponseWith(longSummary), 200);
 
         when(tokenizerPort.getTokenCountFrom(not(eq(longSummary))))
                 .thenReturn(1000)
@@ -159,33 +148,29 @@ public class ContextSummarizationAdapterTest {
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyInt()))
                 .thenReturn(context);
+        when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyString()))
+                .thenReturn(context);
 
         // When
-        Mono<Map<String, Object>> result = service.summarizeContextWith(context, storyGenerationRequest);
+        var result = service.summarizeContextWith(context, storyGenerationRequest);
 
         // Then
-        StepVerifier.create(result)
-                .assertNext(processedContext -> {
-                    assertThat(processedContext).containsKey("summary");
-                    assertThat(processedContext).containsKey("messageHistory");
+        assertThat(result).containsKey("summary");
+        assertThat(result).containsKey("messageHistory");
 
-                    String summary = (String) processedContext.get("summary");
-                    assertThat(summary).isNotBlank().isEqualTo(trimmedSummary);
+        var summary = (String) result.get("summary");
+        assertThat(summary).isNotBlank().isEqualTo(trimmedSummary);
 
-                    List<String> messageHistory = (List<String>) processedContext.get("messageHistory");
-                    assertThat(messageHistory).isNotNull().isNotEmpty().hasSize(3);
-                })
-                .verifyComplete();
-
-        verify(openAiPort, times(1)).generateTextFrom(any(TextGenerationRequest.class));
+        var messageHistory = (List<String>) result.get("messageHistory");
+        assertThat(messageHistory).isNotNull().isNotEmpty().hasSize(3);
     }
 
     @Test
-    public void summarizeWith_whenSingleSentenceSummaryExceedsTokenLimit_thenSummaryShouldBeTrimmedToNothing() {
+    public void summarizeWith_whenSingleSentenceSummaryExceedsTokenLimit_thenSummaryShouldBeTrimmedToNothing() throws JsonProcessingException {
 
         // Given
-        String longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-        StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
+        var longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+        var storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
                         .aiModel(AiModelRequest.build(
                                 GPT4_MINI.toString(),
@@ -194,12 +179,9 @@ public class ContextSummarizationAdapterTest {
                         .build())
                 .build();
 
-        Map<String, Object> context = createContextWithMessageNumber(3);
+        var context = createContextWithMessageNumber(3);
 
-        when(openAiPort.generateTextFrom(any(TextGenerationRequest.class)))
-                .thenReturn(Mono.just(TextGenerationResultFixture.create()
-                        .outputText(longSummary)
-                        .build()));
+        prepareWebserverFor(completionResponseWith(longSummary), 200);
 
         when(tokenizerPort.getTokenCountFrom(not(eq(longSummary))))
                 .thenReturn(1000)
@@ -217,33 +199,29 @@ public class ContextSummarizationAdapterTest {
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyInt()))
                 .thenReturn(context);
+        when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyString()))
+                .thenReturn(context);
 
         // When
-        Mono<Map<String, Object>> result = service.summarizeContextWith(context, storyGenerationRequest);
+        var result = service.summarizeContextWith(context, storyGenerationRequest);
 
         // Then
-        StepVerifier.create(result)
-                .assertNext(processedContext -> {
-                    assertThat(processedContext).containsKey("summary");
-                    assertThat(processedContext).containsKey("messageHistory");
+        assertThat(result).containsKey("summary");
+        assertThat(result).containsKey("messageHistory");
 
-                    String summary = (String) processedContext.get("summary");
-                    assertThat(summary).isBlank();
+        var summary = (String) result.get("summary");
+        assertThat(summary).isBlank();
 
-                    List<String> messageHistory = (List<String>) processedContext.get("messageHistory");
-                    assertThat(messageHistory).isNotNull().isNotEmpty().hasSize(3);
-                })
-                .verifyComplete();
-
-        verify(openAiPort, times(1)).generateTextFrom(any(TextGenerationRequest.class));
+        var messageHistory = (List<String>) result.get("messageHistory");
+        assertThat(messageHistory).isNotNull().isNotEmpty().hasSize(3);
     }
 
     @Test
-    public void summarizeWith_whenSummaryNotExceedsTokenLimit_thenSummaryShouldNotBeTrimmed() {
+    public void summarizeWith_whenSummaryNotExceedsTokenLimit_thenSummaryShouldNotBeTrimmed() throws JsonProcessingException {
 
         // Given
-        String longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor. Mauris iaculis pharetra leo.";
-        StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
+        var longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor. Mauris iaculis pharetra leo.";
+        var storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
                         .aiModel(AiModelRequest.build(
                                 GPT4_MINI.toString(),
@@ -252,12 +230,9 @@ public class ContextSummarizationAdapterTest {
                         .build())
                 .build();
 
-        Map<String, Object> context = createContextWithMessageNumber(3);
+        var context = createContextWithMessageNumber(3);
 
-        when(openAiPort.generateTextFrom(any(TextGenerationRequest.class)))
-                .thenReturn(Mono.just(TextGenerationResultFixture.create()
-                        .outputText(longSummary)
-                        .build()));
+        prepareWebserverFor(completionResponseWith(longSummary), 200);
 
         when(tokenizerPort.getTokenCountFrom(not(eq(longSummary))))
                 .thenReturn(1000)
@@ -275,48 +250,57 @@ public class ContextSummarizationAdapterTest {
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyInt()))
                 .thenReturn(context);
+        when(chatMessageService.addMessagesToContext(anyMap(), anyInt(), anyString()))
+                .thenReturn(context);
 
         // When
-        Mono<Map<String, Object>> result = service.summarizeContextWith(context, storyGenerationRequest);
+        var result = service.summarizeContextWith(context, storyGenerationRequest);
 
         // Then
-        StepVerifier.create(result)
-                .assertNext(processedContext -> {
-                    assertThat(processedContext).containsKey("summary");
-                    assertThat(processedContext).containsKey("messageHistory");
+        assertThat(result).containsKey("summary");
+        assertThat(result).containsKey("messageHistory");
 
-                    String summary = (String) processedContext.get("summary");
-                    assertThat(summary).isNotBlank().isEqualTo(longSummary);
+        var summary = (String) result.get("summary");
+        assertThat(summary).isNotBlank().isEqualTo(longSummary);
 
-                    List<String> messageHistory = (List<String>) processedContext.get("messageHistory");
-                    assertThat(messageHistory).isNotNull().isNotEmpty().hasSize(3);
-                    assertThat(messageHistory).first().isEqualTo("Message 1");
-                    assertThat(messageHistory).last().isEqualTo("Message 3");
-                })
-                .verifyComplete();
-
-        verify(openAiPort, times(1)).generateTextFrom(any(TextGenerationRequest.class));
+        var messageHistory = (List<String>) result.get("messageHistory");
+        assertThat(messageHistory).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(messageHistory).first().isEqualTo("Message 1");
+        assertThat(messageHistory).last().isEqualTo("Message 3");
     }
 
     private Map<String, Object> createContextWithMessageNumber(int items) {
 
-        List<DiscordMessageData> messageDataList = new ArrayList<>();
+        var messageDataList = new ArrayList<DiscordMessageData>();
         for (int i = 0; i < items; i++) {
-            int messageNumber = i + 1;
+            var messageNumber = i + 1;
             messageDataList.add(DiscordMessageDataFixture.messageData()
                     .id(String.valueOf(messageNumber))
                     .content(String.format("Message %s", messageNumber))
                     .build());
         }
 
-        List<String> messageStringList = messageDataList.stream()
+        var messageStringList = messageDataList.stream()
                 .map(DiscordMessageData::getContent)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        Map<String, Object> context = new HashMap<>();
+        var context = new HashMap<String, Object>();
         context.put("retrievedMessages", messageDataList);
         context.put("messageHistory", messageStringList);
 
         return context;
+    }
+
+    private CompletionResponse completionResponseWith(String text) {
+
+        var choice = CompletionResponseChoice.builder()
+                .index(0)
+                .message(ChatMessage.asAssistant(text))
+                .finishReason("stop")
+                .build();
+
+        return CompletionResponse.builder()
+                .choices(List.of(choice))
+                .build();
     }
 }

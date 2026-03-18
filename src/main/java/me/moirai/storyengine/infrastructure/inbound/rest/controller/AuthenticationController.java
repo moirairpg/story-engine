@@ -5,23 +5,20 @@ import static me.moirai.storyengine.infrastructure.security.authentication.Moira
 import static me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie.SESSION_COOKIE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.net.URI;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
@@ -31,7 +28,6 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessio
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie;
-import reactor.core.publisher.Mono;
 
 @Hidden
 @RestController
@@ -43,7 +39,6 @@ public class AuthenticationController extends SecurityContextAware {
     private static final String TOKEN_TYPE_HINT = "access_token";
     private static final int EXPIRE_IMMEDIATELY = 0;
     private static final boolean SECURE = true;
-    private static final HttpStatusCode REDIRECT = HttpStatusCode.valueOf(302);
 
     private final String clientId;
     private final String clientSecret;
@@ -74,105 +69,88 @@ public class AuthenticationController extends SecurityContextAware {
 
     @GetMapping("/code")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<ServerHttpResponse> codeExchange(
-            @RequestParam(required = false) String code, ServerWebExchange exchange) {
+    public void codeExchange(
+            @RequestParam(required = false) String code,
+            HttpServletResponse response) throws IOException {
 
         if (isBlank(code)) {
-            exchange.getResponse().setStatusCode(REDIRECT);
-            exchange.getResponse().getHeaders().setLocation(URI.create(failPath));
-
-            return Mono.just(exchange.getResponse());
+            response.sendRedirect(failPath);
+            return;
         }
 
         var query = new AuthenticateUser(code);
-        return queryRunner.run(query)
-                .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
+        var authenticatedUser = queryRunner.run(query);
+
+        handleSessionAuthentication(response, authenticatedUser, successPath);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<ServerHttpResponse> logout(ServerWebExchange exchange, Authentication authentication) {
+    public void logout(HttpServletResponse response) throws IOException {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        discordAuthenticationPort.logout(clientId, clientSecret,
+                getAuthenticatedUser().authorizationToken(), TOKEN_TYPE_HINT);
 
-            return discordAuthenticationPort.logout(clientId, clientSecret,
-                    authenticatedUser.authorizationToken(), TOKEN_TYPE_HINT)
-                    .thenReturn(handleSessionTermination(exchange));
-        });
+        handleSessionTermination(response);
     }
 
     @PostMapping("/refresh")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<ServerHttpResponse> refreshSession(ServerWebExchange exchange) {
+    public void refreshSession(HttpServletResponse response) throws IOException {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new RefreshSessionToken(getAuthenticatedUser().refreshToken());
+        var authenticatedUser = queryRunner.run(query);
 
-            var query = new RefreshSessionToken(authenticatedUser.refreshToken());
-            return queryRunner.run(query)
-                    .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
-        });
+        handleSessionAuthentication(response, authenticatedUser, successPath);
     }
 
     @GetMapping("/user")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<UserDetailsResult> getAuthenticatedUserDetails() {
+    public UserDetailsResult getAuthenticatedUserDetails() {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-
-            var query = new GetUserDetailsByDiscordId(authenticatedUser.discordId());
-            return queryRunner.run(query);
-        });
+        var query = new GetUserDetailsByDiscordId(authenticatedUserId());
+        return queryRunner.run(query);
     }
 
-    private ServerHttpResponse handleSessionAuthentication(
-            ServerWebExchange exchange, AuthenticateUserResult authResult) {
+    private void handleSessionAuthentication(
+            HttpServletResponse response,
+            AuthenticateUserResult authResult,
+            String redirectPath) throws IOException {
 
-        var sessionCookie = createCookie(SESSION_COOKIE, authResult.accessToken());
-        var refreshCookie = createCookie(REFRESH_COOKIE, authResult.refreshToken());
-        var expiryCookie = createCookie(EXPIRY_COOKIE, String.valueOf(authResult.expiresIn()));
-
-        exchange.getResponse().setStatusCode(REDIRECT);
-        exchange.getResponse().getHeaders().setLocation(URI.create(successPath));
-        exchange.getResponse().addCookie(sessionCookie);
-        exchange.getResponse().addCookie(refreshCookie);
-        exchange.getResponse().addCookie(expiryCookie);
-
-        return exchange.getResponse();
+        response.addCookie(createCookie(SESSION_COOKIE, authResult.accessToken()));
+        response.addCookie(createCookie(REFRESH_COOKIE, authResult.refreshToken()));
+        response.addCookie(createCookie(EXPIRY_COOKIE, String.valueOf(authResult.expiresIn())));
+        response.sendRedirect(redirectPath);
     }
 
-    private ServerHttpResponse handleSessionTermination(ServerWebExchange exchange) {
+    private void handleSessionTermination(HttpServletResponse response) throws IOException {
 
-        var sessionCookie = expireCookie(SESSION_COOKIE);
-        var refreshCookie = expireCookie(REFRESH_COOKIE);
-        var expiryCookie = expireCookie(EXPIRY_COOKIE);
-
-        exchange.getResponse().setStatusCode(REDIRECT);
-        exchange.getResponse().getHeaders().setLocation(URI.create(logoutPath));
-        exchange.getResponse().addCookie(sessionCookie);
-        exchange.getResponse().addCookie(refreshCookie);
-        exchange.getResponse().addCookie(expiryCookie);
-
-        return exchange.getResponse();
+        response.addCookie(expireCookie(SESSION_COOKIE));
+        response.addCookie(expireCookie(REFRESH_COOKIE));
+        response.addCookie(expireCookie(EXPIRY_COOKIE));
+        response.sendRedirect(logoutPath);
     }
 
-    private ResponseCookie createCookie(MoiraiCookie cookie, String cookieValue) {
+    private Cookie createCookie(MoiraiCookie cookie, String cookieValue) {
 
-        return ResponseCookie.from(cookie.getName(), cookieValue)
-                .httpOnly(cookie.isHttpOnly())
-                .path(ROOT)
-                .sameSite(NONE)
-                .secure(SECURE)
-                .build();
+        var servletCookie = new Cookie(cookie.getName(), cookieValue);
+        servletCookie.setHttpOnly(cookie.isHttpOnly());
+        servletCookie.setPath(ROOT);
+        servletCookie.setAttribute("SameSite", NONE);
+        servletCookie.setSecure(SECURE);
+
+        return servletCookie;
     }
 
-    private ResponseCookie expireCookie(MoiraiCookie cookie) {
+    private Cookie expireCookie(MoiraiCookie cookie) {
 
-        return ResponseCookie.from(cookie.getName(), null)
-                .httpOnly(cookie.isHttpOnly())
-                .path(ROOT)
-                .sameSite(NONE)
-                .secure(SECURE)
-                .maxAge(EXPIRE_IMMEDIATELY)
-                .build();
+        var servletCookie = new Cookie(cookie.getName(), null);
+        servletCookie.setHttpOnly(cookie.isHttpOnly());
+        servletCookie.setPath(ROOT);
+        servletCookie.setAttribute("SameSite", NONE);
+        servletCookie.setSecure(SECURE);
+        servletCookie.setMaxAge(EXPIRE_IMMEDIATELY);
+
+        return servletCookie;
     }
 }

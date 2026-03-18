@@ -22,10 +22,9 @@ import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
-import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mono<Void>> {
+public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Void> {
 
     private static final String CHAT_FORMAT = "%s said: %s";
 
@@ -35,7 +34,8 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
     private final StoryGenerationPort storyGenerationPort;
     private final DiscordChannelPort discordChannelPort;
 
-    public StartCommandHandler(StoryGenerationPort storyGenerationPort,
+    public StartCommandHandler(
+            StoryGenerationPort storyGenerationPort,
             WorldRepository worldRepository,
             PersonaRepository personaRepository,
             AdventureRepository adventureRepository,
@@ -49,20 +49,17 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
     }
 
     @Override
-    public Mono<Void> execute(StartCommand useCase) {
+    public Void execute(StartCommand useCase) {
 
-        try {
-            return adventureRepository.findByChannelId(useCase.getChannelId())
-                    .filter(adventure -> adventure.getChannelId().equals(useCase.getChannelId()))
-                    .map(adventure -> buildGenerationRequest(useCase, adventure))
-                    .map(storyGenerationPort::continueStory)
-                    .orElseGet(Mono::empty);
-        } catch (AssetNotFoundException e) {
-            return Mono.error(() -> e);
-        } catch (Exception e) {
-            return Mono.error(
-                    () -> new IllegalStateException("An error occurred while generating output"));
+        var adventure = adventureRepository.findByChannelId(useCase.getChannelId())
+                .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
+
+        if (useCase.getChannelId().equals(adventure.getChannelId())) {
+            var generationRequest = buildGenerationRequest(useCase, adventure);
+            storyGenerationPort.continueStory(generationRequest);
         }
+
+        return null;
     }
 
     private StoryGenerationRequest buildGenerationRequest(StartCommand useCase, Adventure adventure) {

@@ -20,8 +20,6 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateU
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticateUserHandlerTest {
@@ -79,20 +77,19 @@ public class AuthenticateUserHandlerTest {
                 "scope",
                 "type");
 
-        when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResult));
-        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(discordUserData));
+        when(discordAuthenticationPort.authenticate(any())).thenReturn(authResult);
+        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(discordUserData);
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
 
+        // When
+        var result = handler.handle(query);
+
         // Then
-        StepVerifier.create(handler.handle(query))
-                .assertNext(result -> {
-                    assertThat(result.accessToken()).isEqualTo(authResult.accessToken());
-                    assertThat(result.refreshToken()).isEqualTo(authResult.refreshToken());
-                    assertThat(result.expiresIn()).isEqualTo(authResult.expiresIn());
-                    assertThat(result.tokenType()).isEqualTo(authResult.tokenType());
-                    assertThat(result.scope()).isEqualTo(authResult.scope());
-                })
-                .verifyComplete();
+        assertThat(result.accessToken()).isEqualTo(authResult.accessToken());
+        assertThat(result.refreshToken()).isEqualTo(authResult.refreshToken());
+        assertThat(result.expiresIn()).isEqualTo(authResult.expiresIn());
+        assertThat(result.tokenType()).isEqualTo(authResult.tokenType());
+        assertThat(result.scope()).isEqualTo(authResult.scope());
     }
 
     @Test
@@ -119,20 +116,19 @@ public class AuthenticateUserHandlerTest {
                 "scope",
                 "type");
 
-        when(discordAuthenticationPort.authenticate(any())).thenReturn(Mono.just(authResult));
-        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(discordUserData));
+        when(discordAuthenticationPort.authenticate(any())).thenReturn(authResult);
+        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(discordUserData);
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.empty());
         when(repository.save(any())).thenReturn(user);
 
+        // When
+        var result = handler.handle(query);
+
         // Then
-        StepVerifier.create(handler.handle(query))
-                .assertNext(result -> {
-                    assertThat(result.accessToken()).isEqualTo(authResult.accessToken());
-                    assertThat(result.refreshToken()).isEqualTo(authResult.refreshToken());
-                    assertThat(result.expiresIn()).isEqualTo(authResult.expiresIn());
-                    assertThat(result.tokenType()).isEqualTo(authResult.tokenType());
-                    assertThat(result.scope()).isEqualTo(authResult.scope());
-                })
-                .verifyComplete();
+        assertThat(result.accessToken()).isEqualTo(authResult.accessToken());
+        assertThat(result.refreshToken()).isEqualTo(authResult.refreshToken());
+        assertThat(result.expiresIn()).isEqualTo(authResult.expiresIn());
+        assertThat(result.tokenType()).isEqualTo(authResult.tokenType());
+        assertThat(result.scope()).isEqualTo(authResult.scope());
     }
 }

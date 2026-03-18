@@ -1,20 +1,18 @@
 package me.moirai.storyengine.infrastructure.security.authentication.config;
 
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION;
-
 import org.mockito.Mock;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
-import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiUserDetailsService;
 import me.moirai.storyengine.infrastructure.security.authentication.filter.AuthenticationFilter;
 
 @TestConfiguration
-@EnableWebFluxSecurity
+@EnableWebSecurity
 public class AuthenticationSecurityConfigTest {
 
     private static final String[] IGNORED_PATHS = { "/auth/code" };
@@ -25,14 +23,16 @@ public class AuthenticationSecurityConfigTest {
     private MoiraiUserDetailsService userDetailsService;
 
     @Bean
-    SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        return http.authorizeExchange(exchange -> exchange.anyExchange().permitAll())
+        return http
                 .addFilterBefore(new AuthenticationFilter(
-                        IGNORED_PATHS, FAIL_PATH, LOGOUT_PATH, userDetailsService), AUTHENTICATION)
-                .authorizeExchange(exchanges -> exchanges.pathMatchers(IGNORED_PATHS).permitAll())
-                .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-                .csrf(CsrfSpec::disable)
+                        IGNORED_PATHS, FAIL_PATH, LOGOUT_PATH, userDetailsService),
+                        UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(IGNORED_PATHS).permitAll()
+                        .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
                 .build();
     }
 }

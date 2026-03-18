@@ -19,8 +19,6 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetail
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class MoiraiUserDetailsServiceTest {
@@ -59,18 +57,17 @@ public class MoiraiUserDetailsServiceTest {
                 null,
                 OffsetDateTime.parse("2024-12-01T14:00:00Z")));
 
-        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(Mono.just(response));
+        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(response);
+
+        // When
+        var userDetails = service.loadUserByUsername(token);
 
         // Then
-        StepVerifier.create(service.findByUsername(token))
-                .assertNext(userDetails -> {
-                    MoiraiPrincipal principal = (MoiraiPrincipal) userDetails;
-                    assertThat(principal).isNotNull();
-                    assertThat(principal.getUsername()).isEqualTo(response.username());
-                    assertThat(principal.email()).isEqualTo(response.email());
-                    assertThat(principal.authorizationToken()).isEqualTo("AUTH_TOKEN");
-                    assertThat(principal.refreshToken()).isEqualTo("REFRESH_TOKEN");
-                })
-                .verifyComplete();
+        var principal = (MoiraiPrincipal) userDetails;
+        assertThat(principal).isNotNull();
+        assertThat(principal.getUsername()).isEqualTo(response.username());
+        assertThat(principal.email()).isEqualTo(response.email());
+        assertThat(principal.authorizationToken()).isEqualTo("AUTH_TOKEN");
+        assertThat(principal.refreshToken()).isEqualTo("REFRESH_TOKEN");
     }
 }

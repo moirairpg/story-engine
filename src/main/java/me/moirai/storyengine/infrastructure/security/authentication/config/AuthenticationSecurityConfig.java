@@ -1,61 +1,61 @@
 package me.moirai.storyengine.infrastructure.security.authentication.config;
 
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity.CorsSpec;
-import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
-import org.springframework.security.config.web.server.ServerHttpSecurity.FormLoginSpec;
-import org.springframework.security.config.web.server.ServerHttpSecurity.HttpBasicSpec;
-import org.springframework.security.config.web.server.ServerHttpSecurity.LogoutSpec;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiUserDetailsService;
 import me.moirai.storyengine.infrastructure.security.authentication.filter.AuthenticationFilter;
 
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebSecurity
+@EnableMethodSecurity
 public class AuthenticationSecurityConfig {
 
-    private final String[] ignoredPaths;
+    private final String[] unsecuredPaths;
     private final String authenticationFailedPath;
     private final String logoutPath;
     private final MoiraiUserDetailsService userDetailsService;
 
     public AuthenticationSecurityConfig(
-            @Value("${moirai.security.ignored-paths}") String[] ignoredPaths,
+            @Value("${moirai.security.ignored-paths}") String[] unsecuredPaths,
             @Value("${moirai.security.redirect-path.fail}") String authenticationFailedPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
             MoiraiUserDetailsService userDetailsService) {
 
-        this.ignoredPaths = ignoredPaths;
+        this.unsecuredPaths = unsecuredPaths;
         this.authenticationFailedPath = authenticationFailedPath;
         this.logoutPath = logoutPath;
         this.userDetailsService = userDetailsService;
     }
 
     @Bean
-    SecurityWebFilterChain configure(ServerHttpSecurity http) {
+    SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        HttpStatusServerEntryPoint unauthorizedEntryPoint = new HttpStatusServerEntryPoint(UNAUTHORIZED);
-        return http.httpBasic(HttpBasicSpec::disable)
-                .formLogin(FormLoginSpec::disable)
-                .logout(LogoutSpec::disable)
+        return http
+                .httpBasic(basic -> basic.disable())
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable())
                 .addFilterBefore(new AuthenticationFilter(
-                        ignoredPaths, authenticationFailedPath, logoutPath, userDetailsService), AUTHENTICATION)
-                .authorizeExchange(exchanges -> exchanges.pathMatchers(ignoredPaths).permitAll())
-                .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+                        unsecuredPaths, authenticationFailedPath, logoutPath, userDetailsService),
+                        UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(unsecuredPaths).permitAll()
+                        .anyRequest().authenticated())
                 .oauth2Login(withDefaults())
-                .csrf(CsrfSpec::disable)
-                .cors(CorsSpec::disable)
-                .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedEntryPoint))
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .exceptionHandling(handler -> handler
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .build();
     }
 }

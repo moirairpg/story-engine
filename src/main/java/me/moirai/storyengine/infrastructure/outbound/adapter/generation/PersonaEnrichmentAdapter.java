@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import reactor.core.publisher.Mono;
 
 @Component
 @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
@@ -31,12 +31,12 @@ public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
 
     private final TokenizerPort tokenizerPort;
     private final PersonaRepository personaRepository;
-    private final ChatMessageAdapter chatMessageService;
+    private final ChatMessagePort chatMessageService;
 
     public PersonaEnrichmentAdapter(
             TokenizerPort tokenizerPort,
             PersonaRepository personaRepository,
-            ChatMessageAdapter chatMessageService) {
+            ChatMessagePort chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;
         this.personaRepository = personaRepository;
@@ -44,7 +44,7 @@ public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
     }
 
     @Override
-    public Mono<Map<String, Object>> enrichContextWithPersona(
+    public Map<String, Object> enrichContextWithPersona(
             Map<String, Object> context,
             UUID personaId,
             ModelConfigurationRequest modelConfiguration) {
@@ -52,10 +52,11 @@ public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
         int reservedTokensForPersona = (int) Math.floor(totalTokens * 0.20);
 
-        return Mono.just(personaRepository.findByPublicId(personaId)
-                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND)))
-                .map(persona -> addPersonaToContext(persona, context, reservedTokensForPersona))
-                .map(ctx -> chatMessageService.addMessagesToContext(ctx, reservedTokensForPersona));
+        var persona = personaRepository.findByPublicId(personaId)
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+
+        var contextWithPersona = addPersonaToContext(persona, context, reservedTokensForPersona);
+        return chatMessageService.addMessagesToContext(contextWithPersona, reservedTokensForPersona);
     }
 
     private Map<String, Object> addPersonaToContext(Persona persona,

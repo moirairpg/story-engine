@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.discord.slashcommands;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -15,20 +16,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetailsFixture;
-import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 public class RetryGenerationHandlerTest extends AbstractDiscordTest {
 
@@ -51,14 +48,14 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
     public void retryCommand_whenLastMessageElegible_thenShouldDeleteItAndRegenerateOutput() {
 
         // Given
-        String botId = "BOTID";
-        String channelId = "CHID";
+        var botId = "BOTID";
+        var channelId = "CHID";
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+        var adventure = AdventureFixture.publicMultiplayerAdventure()
                 .channelId(channelId)
                 .build();
 
-        RetryCommand useCase = RetryCommand.builder()
+        var useCase = RetryCommand.builder()
                 .botId(botId)
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -66,28 +63,25 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        DiscordMessageData chatMessageData = DiscordMessageDataFixture.messageData()
+        var chatMessageData = DiscordMessageDataFixture.messageData()
                 .author(DiscordUserDetailsFixture.create()
                         .id(botId)
                         .build())
                 .build();
 
-        ArgumentCaptor<StoryGenerationRequest> generationRequestCaptor = ArgumentCaptor
-                .forClass(StoryGenerationRequest.class);
+        var generationRequestCaptor = ArgumentCaptor.forClass(StoryGenerationRequest.class);
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
         when(discordChannelPort.getLastMessageIn(anyString())).thenReturn(Optional.of(chatMessageData));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
-        Mono<Void> result = handler.execute(useCase);
+        handler.execute(useCase);
 
         // Then
-        StepVerifier.create(result).verifyComplete();
-
         verify(storyGenerationPort, times(1)).continueStory(generationRequestCaptor.capture());
 
-        StoryGenerationRequest generationRequest = generationRequestCaptor.getValue();
+        var generationRequest = generationRequestCaptor.getValue();
         assertThat(generationRequest).isNotNull();
         assertThat(generationRequest.getBotId()).isEqualTo(useCase.getBotId());
         assertThat(generationRequest.getBotNickname()).isEqualTo(useCase.getBotNickname());
@@ -102,11 +96,11 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
     public void retryCommand_whenLastMessageAuthorIsNotBot_thenThrowException() {
 
         // Given
-        String botId = "BOTID";
-        String channelId = "CHID";
-        String expectedErrorMessage = "This command can only be used if the last message in channel was sent by the bot.";
+        var botId = "BOTID";
+        var channelId = "CHID";
+        var expectedErrorMessage = "This command can only be used if the last message in channel was sent by the bot.";
 
-        RetryCommand useCase = RetryCommand.builder()
+        var useCase = RetryCommand.builder()
                 .botId(botId)
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -114,7 +108,7 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        DiscordMessageData chatMessageData = DiscordMessageDataFixture.messageData()
+        var chatMessageData = DiscordMessageDataFixture.messageData()
                 .author(DiscordUserDetailsFixture.create()
                         .id("SMID")
                         .build())
@@ -122,22 +116,20 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
 
         when(discordChannelPort.getLastMessageIn(anyString())).thenReturn(Optional.of(chatMessageData));
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage(expectedErrorMessage);
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .hasMessage(expectedErrorMessage);
     }
 
     @Test
     public void retryCommand_whenNoMessagesInChannel_thenThrowException() {
 
         // Given
-        String botId = "BOTID";
-        String channelId = "CHID";
-        String expectedErrorMessage = "Channel has no messages";
+        var botId = "BOTID";
+        var channelId = "CHID";
+        var expectedErrorMessage = "Channel has no messages";
 
-        RetryCommand useCase = RetryCommand.builder()
+        var useCase = RetryCommand.builder()
                 .botId(botId)
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -147,22 +139,19 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
 
         when(discordChannelPort.getLastMessageIn(anyString())).thenReturn(Optional.empty());
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage(expectedErrorMessage);
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .hasMessage(expectedErrorMessage);
     }
 
     @Test
     public void retryCommand_whenUnknownError_thenThrowException() {
 
         // Given
-        String botId = "BOTID";
-        String channelId = "CHID";
-        String expectedErrorMessage = "An error occurred while retrying generation of output";
+        var botId = "BOTID";
+        var channelId = "CHID";
 
-        RetryCommand useCase = RetryCommand.builder()
+        var useCase = RetryCommand.builder()
                 .botId(botId)
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -172,26 +161,24 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
 
         when(discordChannelPort.getLastMessageIn(anyString())).thenThrow(RuntimeException.class);
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage(expectedErrorMessage);
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     public void retryCommand_whenRetrieveUserMessageAndChannelIsEmpty_thenThrowException() {
 
         // Given
-        String botId = "BOTID";
-        String channelId = "CHID";
-        String expectedErrorMessage = "Channel has no messages";
+        var botId = "BOTID";
+        var channelId = "CHID";
+        var expectedErrorMessage = "Channel has no messages";
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+        var adventure = AdventureFixture.publicMultiplayerAdventure()
                 .channelId(channelId)
                 .build();
 
-        RetryCommand useCase = RetryCommand.builder()
+        var useCase = RetryCommand.builder()
                 .botId(botId)
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -199,36 +186,32 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        DiscordMessageData chatMessageData = DiscordMessageDataFixture.messageData()
+        var chatMessageData = DiscordMessageDataFixture.messageData()
                 .author(DiscordUserDetailsFixture.create()
                         .id(botId)
                         .build())
                 .build();
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
-
         when(discordChannelPort.getLastMessageIn(anyString()))
                 .thenReturn(Optional.of(chatMessageData))
                 .thenReturn(Optional.empty());
-
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage(expectedErrorMessage);
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .hasMessage(expectedErrorMessage);
     }
 
     @Test
     public void retryCommand_whenRetrieveLastMessageAndChannelIsEmpty_thenThrowException() {
 
         // Given
-        String botId = "BOTID";
-        String channelId = "CHID";
-        String expectedErrorMessage = "Channel has no messages";
+        var botId = "BOTID";
+        var channelId = "CHID";
+        var expectedErrorMessage = "Channel has no messages";
 
-        RetryCommand useCase = RetryCommand.builder()
+        var useCase = RetryCommand.builder()
                 .botId(botId)
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -238,10 +221,8 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
 
         when(discordChannelPort.getLastMessageIn(anyString())).thenReturn(Optional.empty());
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage(expectedErrorMessage);
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .hasMessage(expectedErrorMessage);
     }
 }

@@ -25,7 +25,7 @@ import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
 @Component
 public class TextModerationAdapter implements TextModerationPort {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ReactiveTextModerationAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TextModerationAdapter.class);
 
     private static final String AUTHENTICATION_ERROR = "Error authenticating user on OpenAI";
     private static final String UNKNOWN_ERROR = "Error on OpenAI Moderation API";

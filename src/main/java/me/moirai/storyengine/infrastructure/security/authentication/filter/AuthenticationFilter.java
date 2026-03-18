@@ -5,74 +5,94 @@ import static me.moirai.storyengine.infrastructure.security.authentication.Moira
 import static me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie.SESSION_COOKIE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.io.IOException;
 import java.util.List;
 
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
-import org.springframework.web.server.WebFilterChain;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiUserDetailsService;
-import me.moirai.storyengine.infrastructure.security.authentication.SecuritySessionContext;
-import reactor.core.publisher.Mono;
 
-public class AuthenticationFilter implements WebFilter {
+public class AuthenticationFilter extends OncePerRequestFilter {
 
-    private static final HttpStatusCode HTTP_UNAUTHORIZED = HttpStatusCode.valueOf(401);
+    private static final int HTTP_UNAUTHORIZED = 401;
 
-    private final List<String> ignoredPaths;
+    private final List<String> unsecuredPaths;
     private final String authenticationFailedPath;
     private final String authenticationTerminatedPath;
     private final MoiraiUserDetailsService userDetailsService;
 
-    public AuthenticationFilter(String[] ignoredPaths,
+    public AuthenticationFilter(
+            String[] unsecuredPaths,
             String authenticationFailedPath,
             String authenticationTerminatedPath,
             MoiraiUserDetailsService userDetailsService) {
 
-        this.ignoredPaths = asList(ignoredPaths);
+        this.unsecuredPaths = asList(unsecuredPaths);
         this.authenticationFailedPath = authenticationFailedPath;
         this.authenticationTerminatedPath = authenticationTerminatedPath;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
-    public @NonNull Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        String requestPath = exchange.getRequest().getPath().value();
+        var requestPath = request.getRequestURI();
 
         if (isPathInExceptionList(requestPath)) {
-            return chain.filter(exchange);
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        HttpCookie sessionCookie = exchange.getRequest().getCookies().getFirst(SESSION_COOKIE.getName());
-        HttpCookie refreshCookie = exchange.getRequest().getCookies().getFirst(REFRESH_COOKIE.getName());
-        if (sessionCookie == null || isBlank(sessionCookie.getValue())) {
-            exchange.getResponse().setStatusCode(HTTP_UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
+        var sessionCookieValue = getCookieValue(request, SESSION_COOKIE.getName());
+        var refreshCookieValue = getCookieValue(request, REFRESH_COOKIE.getName());
+
+        if (isBlank(sessionCookieValue)) {
+            response.setStatus(HTTP_UNAUTHORIZED);
+            return;
         }
 
-        return userDetailsService.findByUsername(String.format("%s / %s", sessionCookie.getValue(), refreshCookie.getValue()))
-                .flatMap(userDetails -> {
-                    MoiraiPrincipal user = (MoiraiPrincipal) userDetails;
-                    UsernamePasswordAuthenticationToken authenticatedPrincipal = new UsernamePasswordAuthenticationToken(
-                            user, null, user.getAuthorities());
+        var tokenCluster = String.format("%s / %s", sessionCookieValue, refreshCookieValue);
+        var userDetails = userDetailsService.loadUserByUsername(tokenCluster);
+        var user = (MoiraiPrincipal) userDetails;
+        var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-                    return chain.filter(exchange)
-                            .contextWrite(SecuritySessionContext.createContext(authenticatedPrincipal));
-                });
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        filterChain.doFilter(request, response);
+    }
+
+    private String getCookieValue(HttpServletRequest request, String cookieName) {
+
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookieName.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 
     private boolean isPathInExceptionList(String path) {
 
-        boolean isAuthFailPath = authenticationFailedPath.equals(path);
-        boolean isAuthLogoutPath = authenticationTerminatedPath.equals(path);
-        boolean isPathInExceptionList = ignoredPaths.stream().anyMatch(ignoredPath -> ignoredPath.contains(path));
+        var isAuthFailPath = authenticationFailedPath.equals(path);
+        var isAuthLogoutPath = authenticationTerminatedPath.equals(path);
+        var isPathInExceptionList = unsecuredPaths.stream().anyMatch(ignoredPath -> ignoredPath.contains(path));
 
         return isPathInExceptionList || isAuthFailPath || isAuthLogoutPath;
     }

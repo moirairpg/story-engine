@@ -9,22 +9,21 @@ import java.util.List;
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
+import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import reactor.core.publisher.Mono;
 
 @UseCaseHandler
-public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mono<Void>> {
+public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Void> {
 
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
     private static final String PERSONA_NOT_FOUND = "Adventure has no persona linked to it";
@@ -34,7 +33,8 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
     private final PersonaRepository personaRepository;
     private final DiscordChannelPort discordChannelPort;
 
-    public ChatModeHandler(StoryGenerationPort storyGenerationPort,
+    public ChatModeHandler(
+            StoryGenerationPort storyGenerationPort,
             AdventureRepository adventureRepository,
             PersonaRepository personaRepository,
             DiscordChannelPort discordChannelPort) {
@@ -46,15 +46,17 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
     }
 
     @Override
-    public Mono<Void> execute(ChatModeRequest query) {
+    public Void execute(ChatModeRequest query) {
 
-        return adventureRepository.findByChannelId(query.getChannelId())
-                .filter(adventure -> adventure.getChannelId().equals(query.getChannelId()))
-                .map(adventure -> {
-                    StoryGenerationRequest generationRequest = buildGenerationRequest(query, adventure);
-                    return storyGenerationPort.continueStory(generationRequest);
-                })
-                .orElseGet(Mono::empty);
+        var adventure = adventureRepository.findByChannelId(query.getChannelId())
+                .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
+
+        if (query.getChannelId().equals(adventure.getChannelId())) {
+            var generationRequest = buildGenerationRequest(query, adventure);
+            storyGenerationPort.continueStory(generationRequest);
+        }
+
+        return null;
     }
 
     private StoryGenerationRequest buildGenerationRequest(ChatModeRequest useCase, Adventure adventure) {

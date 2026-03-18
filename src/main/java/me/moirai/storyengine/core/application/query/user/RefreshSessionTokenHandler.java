@@ -10,11 +10,10 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateU
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
-import reactor.core.publisher.Mono;
 
 @QueryHandler
 public class RefreshSessionTokenHandler
-        extends AbstractQueryHandler<RefreshSessionToken, Mono<AuthenticateUserResult>> {
+        extends AbstractQueryHandler<RefreshSessionToken, AuthenticateUserResult> {
 
     private static final String DISCORD_GRANT_TYPE = "refresh_token";
 
@@ -41,7 +40,7 @@ public class RefreshSessionTokenHandler
     }
 
     @Override
-    public Mono<AuthenticateUserResult> execute(RefreshSessionToken useCase) {
+    public AuthenticateUserResult execute(RefreshSessionToken useCase) {
 
         var request = createDiscordAuthRequest(useCase.refreshToken());
         return discordAuthenticationPort.refreshSessionToken(request);

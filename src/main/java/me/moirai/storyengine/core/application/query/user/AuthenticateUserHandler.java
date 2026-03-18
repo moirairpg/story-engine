@@ -14,10 +14,9 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
-import reactor.core.publisher.Mono;
 
 @QueryHandler
-public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUser, Mono<AuthenticateUserResult>> {
+public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUser, AuthenticateUserResult> {
 
     private static final String DISCORD_SCOPE = "identify";
     private static final String DISCORD_GRANT_TYPE = "authorization_code";
@@ -51,11 +50,12 @@ public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUs
     }
 
     @Override
-    public Mono<AuthenticateUserResult> execute(AuthenticateUser useCase) {
+    public AuthenticateUserResult execute(AuthenticateUser useCase) {
 
         var request = createDiscordAuthRequest(useCase.authenticationCode());
-        return discordAuthenticationPort.authenticate(request)
-                .flatMap(this::createUserIfNotExists);
+        var response = discordAuthenticationPort.authenticate(request);
+
+        return createUserIfNotExists(response);
     }
 
     private DiscordAuthRequest createDiscordAuthRequest(String code) {
@@ -70,15 +70,14 @@ public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUs
                 .build();
     }
 
-    private Mono<AuthenticateUserResult> createUserIfNotExists(AuthenticateUserResult authenticateUserResult) {
+    private AuthenticateUserResult createUserIfNotExists(AuthenticateUserResult authenticateUserResult) {
 
-        return discordAuthenticationPort.retrieveLoggedUser(authenticateUserResult.accessToken())
-                .map(discordUserDetails -> {
-                    repository.findByDiscordId(discordUserDetails.id())
-                            .orElseGet(() -> createUser(discordUserDetails));
+        var discordUserDetails = discordAuthenticationPort.retrieveLoggedUser(authenticateUserResult.accessToken());
 
-                    return authenticateUserResult;
-                });
+        repository.findByDiscordId(discordUserDetails.id())
+                .orElseGet(() -> createUser(discordUserDetails));
+
+        return authenticateUserResult;
     }
 
     private User createUser(DiscordUserDataResponse discordUserDetails) {

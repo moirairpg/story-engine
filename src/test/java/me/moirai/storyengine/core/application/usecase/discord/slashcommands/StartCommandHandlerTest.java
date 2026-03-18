@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.application.usecase.discord.slashcommands;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -17,10 +18,8 @@ import org.mockito.Mock;
 import me.moirai.storyengine.AbstractDiscordTest;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
@@ -28,8 +27,6 @@ import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 public class StartCommandHandlerTest extends AbstractDiscordTest {
 
@@ -55,13 +52,13 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
     public void startCommand_whenIssued_thenSendAdventureStartAndCallGeneration() {
 
         // Given
-        String channelId = "CHID";
+        var channelId = "CHID";
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+        var adventure = AdventureFixture.publicMultiplayerAdventure()
                 .channelId(channelId)
                 .build();
 
-        StartCommand useCase = StartCommand.builder()
+        var useCase = StartCommand.builder()
                 .botId("BOTID")
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -69,29 +66,23 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        World world = WorldFixture.privateWorld().build();
+        var world = WorldFixture.privateWorld().build();
 
-        ArgumentCaptor<StoryGenerationRequest> generationRequestCaptor = ArgumentCaptor
-                .forClass(StoryGenerationRequest.class);
+        var generationRequestCaptor = ArgumentCaptor.forClass(StoryGenerationRequest.class);
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
-
         when(discordChannelPort.retrieveEntireHistoryFrom(anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
-
         when(worldRepository.findById(anyLong())).thenReturn(Optional.of(world));
-
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
 
         // When
-        Mono<Void> result = handler.execute(useCase);
+        handler.execute(useCase);
 
         // Then
-        StepVerifier.create(result).verifyComplete();
-
         verify(storyGenerationPort, times(1)).continueStory(generationRequestCaptor.capture());
 
-        StoryGenerationRequest generationRequest = generationRequestCaptor.getValue();
+        var generationRequest = generationRequestCaptor.getValue();
         assertThat(generationRequest).isNotNull();
         assertThat(generationRequest.getBotId()).isEqualTo(useCase.getBotId());
         assertThat(generationRequest.getBotNickname()).isEqualTo(useCase.getBotNickname());
@@ -106,9 +97,9 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
     public void startCommand_whenUnknownError_thenThrowException() {
 
         // Given
-        String channelId = "CHID";
+        var channelId = "CHID";
 
-        StartCommand useCase = StartCommand.builder()
+        var useCase = StartCommand.builder()
                 .botId("BOTID")
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -117,25 +108,21 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
                 .build();
 
         when(adventureRepository.findByChannelId(anyString())).thenThrow(RuntimeException.class);
-
         when(discordChannelPort.retrieveEntireHistoryFrom(anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage("An error occurred while generating output");
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     public void startCommand_whenAdventureHasNoWorld_thenThrowException() {
 
         // Given
-        String channelId = "CHID";
-        String expectedErrorMessage = "Adventure has no world linked to it";
+        var channelId = "CHID";
 
-        StartCommand useCase = StartCommand.builder()
+        var useCase = StartCommand.builder()
                 .botId("BOTID")
                 .botNickname("nickname")
                 .botUsername("user.name")
@@ -143,21 +130,17 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure()
+        var adventure = AdventureFixture.publicMultiplayerAdventure()
                 .channelId(channelId)
                 .build();
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
-
         when(discordChannelPort.retrieveEntireHistoryFrom(anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
-
         when(worldRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // When
-        Mono<Void> result = handler.execute(useCase);
-
         // Then
-        StepVerifier.create(result).verifyErrorMessage(expectedErrorMessage);
+        assertThatThrownBy(() -> handler.execute(useCase))
+                .hasMessage("Adventure has no world linked to it");
     }
 }
