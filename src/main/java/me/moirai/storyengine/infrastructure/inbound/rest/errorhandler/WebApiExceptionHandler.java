@@ -34,6 +34,7 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.exception.OpenAiApiException;
+import me.moirai.storyengine.common.exception.UnauthorizedException;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.ErrorResponse;
 import reactor.core.publisher.Mono;
 
@@ -147,6 +148,18 @@ public class WebApiExceptionHandler extends AbstractErrorWebExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(code = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> unauthorizedError(UnauthorizedException exception) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(HttpStatus.FORBIDDEN)
+                .message(exception.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
