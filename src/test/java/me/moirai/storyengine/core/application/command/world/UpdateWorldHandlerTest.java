@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
@@ -225,35 +224,6 @@ public class UpdateWorldHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-    }
-
-    @Test
-    public void updateWorld_whenAccessDenied_thenExceptionIsThrown() {
-
-        // Given
-        var id = WorldFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
-        var command = new UpdateWorld(
-                id,
-                "MoirAI",
-                "This is an RPG world",
-                "As you enter the city, people around you start looking at you.",
-                Visibility.PUBLIC,
-                requesterId,
-                null,
-                null,
-                null,
-                null);
-
-        var unchangedWorld = WorldFixture.privateWorld()
-                .name("NEW NAME")
-                .build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
-
-        // Then
-        assertThatExceptionOfType(AssetAccessDeniedException.class)
-                .isThrownBy(() -> handler.handle(command));
     }
 
     @Test

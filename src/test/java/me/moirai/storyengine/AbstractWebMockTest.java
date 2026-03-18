@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 public abstract class AbstractWebMockTest {
 
@@ -26,7 +27,10 @@ public abstract class AbstractWebMockTest {
 
         objectMapper = new ObjectMapper();
 
-        wireMockServer = new WireMockServer(PORT);
+        wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
+                .port(PORT)
+                .http2PlainDisabled(true));
+
         wireMockServer.start();
     }
 

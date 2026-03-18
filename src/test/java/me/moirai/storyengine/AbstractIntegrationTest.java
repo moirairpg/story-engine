@@ -6,6 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
@@ -14,7 +15,9 @@ import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort
 import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.infrastructure.config.DiscordApiConfig;
 import me.moirai.storyengine.infrastructure.config.JdaConfig;
+import me.moirai.storyengine.infrastructure.config.OpenAiApiConfig;
 import net.dv8tion.jda.api.JDA;
 
 @ActiveProfiles({ "test", "prompts" })
@@ -41,6 +44,18 @@ public abstract class AbstractIntegrationTest {
 
     @MockitoBean
     private TextModerationPort textModerationPort;
+
+    @MockitoBean
+    private OpenAiApiConfig openAiApiConfig;
+
+    @MockitoBean
+    private DiscordApiConfig discordApiConfig;
+
+    @MockitoBean
+    private RestClient discordClient;
+
+    @MockitoBean
+    private RestClient openAiClient;
 
     @MockitoBean
     private JdaConfig jdaConfig;

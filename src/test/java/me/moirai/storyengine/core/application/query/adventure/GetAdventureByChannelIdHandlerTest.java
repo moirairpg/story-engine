@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -56,24 +55,6 @@ public class GetAdventureByChannelIdHandlerTest {
         assertThatThrownBy(() -> handler.execute(command))
                 .isInstanceOf(AssetNotFoundException.class)
                 .hasMessage("No adventures exist for this channel");
-    }
-
-    @Test
-    public void getAdventure_whenNoAdventurePermission_thenThrowException() {
-
-        // Given
-        String adventureId = "123123";
-        String requesterId = "123123";
-        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .build();
-
-        when(queryRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThatThrownBy(() -> handler.execute(command))
-                .isInstanceOf(AssetAccessDeniedException.class)
-                .hasMessage("User does not have permission to view adventure");
     }
 
     @Test

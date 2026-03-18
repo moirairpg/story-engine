@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.application.query.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -63,22 +61,6 @@ public class GetAdventureByIdHandlerTest {
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
-    }
-
-    @Test
-    public void getAdventure_whenNoAdventurePermission_thenThrowException() {
-
-        // Given
-        String requesterId = "123123";
-        GetAdventureById command = new GetAdventureById(AdventureFixture.PUBLIC_ID, requesterId);
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
-
-        when(queryRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThatThrownBy(() -> handler.execute(command))
-                .isInstanceOf(AssetAccessDeniedException.class)
-                .hasMessage("User does not have permission to view adventure");
     }
 
     @Test

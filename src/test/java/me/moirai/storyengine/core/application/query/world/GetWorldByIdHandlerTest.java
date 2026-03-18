@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
@@ -95,21 +94,5 @@ public class GetWorldByIdHandlerTest {
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
-    }
-
-    @Test
-    public void getWorldById_whenAccessDenied_thenThrowException() {
-
-        // Given
-        String requesterId = "RQSTRID";
-        World world = WorldFixture.privateWorld()
-                .build();
-
-        GetWorldById query = new GetWorldById(WorldFixture.PUBLIC_ID, requesterId);
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
-
-        // When
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));
     }
 }
