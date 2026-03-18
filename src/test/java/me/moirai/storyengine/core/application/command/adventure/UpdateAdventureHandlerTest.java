@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -100,21 +99,6 @@ public class UpdateAdventureHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.execute(updateAdventure));
-    }
-
-    @Test
-    public void updateAdventure_whenNoAdventurePermission_thenThrowException() {
-
-        // Given
-        String requesterUserId = "LALALA";
-        UpdateAdventure updateAdventure = UpdateAdventureFixture.sampleWithRequesterId(requesterUserId);
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.execute(updateAdventure));
     }
 
     @Test

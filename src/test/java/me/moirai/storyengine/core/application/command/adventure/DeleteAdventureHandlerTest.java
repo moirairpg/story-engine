@@ -2,8 +2,6 @@ package me.moirai.storyengine.core.application.command.adventure;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -17,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
@@ -71,29 +68,5 @@ public class DeleteAdventureHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void deleteAdventure_whenProperPermission_thenAdventureIsDeleted() {
-
-        // Given
-        String requesterId = "RQSTRID";
-        DeleteAdventure command = new DeleteAdventure(AdventureFixture.PUBLIC_ID, requesterId);
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verify(repository, times(1)).findByPublicId(any(UUID.class));
-        verify(repository, times(1)).deleteByPublicId(any(UUID.class));
     }
 }

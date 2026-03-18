@@ -5,7 +5,6 @@ import java.util.Set;
 
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.enums.Visibility;
-import reactor.core.publisher.Mono;
 
 public record CreateWorld(
         String name,
@@ -16,11 +15,11 @@ public record CreateWorld(
         Set<String> usersAllowedToWrite,
         Set<String> usersAllowedToRead,
         String requesterId)
-        implements Command<Mono<WorldDetails>> {
+        implements Command<WorldDetails> {
+
     public record LorebookEntry(
             String name,
             String regex,
-            String description)
-            implements Command<WorldLorebookEntryDetails> {
+            String description) {
     }
 }

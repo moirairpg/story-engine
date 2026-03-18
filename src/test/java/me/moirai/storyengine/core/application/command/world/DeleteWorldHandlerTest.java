@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
@@ -81,23 +80,6 @@ public class DeleteWorldHandlerTest {
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
-                .isThrownBy(() -> handler.handle(command));
-    }
-
-    @Test
-    public void deleteWorld_whenAccessDenied_thenThrowException() {
-
-        // Given
-        String requesterId = "RQSTRID";
-        DeleteWorld command = new DeleteWorld(WorldFixture.PUBLIC_ID, requesterId);
-
-        World world = WorldFixture.privateWorld()
-                .build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
-
-        // Then
-        assertThatExceptionOfType(AssetAccessDeniedException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 }

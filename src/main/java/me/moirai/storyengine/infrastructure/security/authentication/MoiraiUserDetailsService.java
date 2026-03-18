@@ -45,6 +45,7 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
             var moiraiUser = queryRunner.run(query);
 
             return new MoiraiPrincipal(
+                    moiraiUser.publicId(),
                     moiraiUser.discordId(),
                     moiraiUser.username(),
                     discordUser.email(),

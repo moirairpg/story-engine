@@ -36,7 +36,8 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDir
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/world")
@@ -57,95 +58,81 @@ public class WorldController extends SecurityContextAware {
     // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchWorldsResult> search(WorldSearchParameters searchParameters) {
+    public SearchWorldsResult search(WorldSearchParameters searchParameters) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new SearchWorlds(
+                searchParameters.getName(),
+                searchParameters.getOwnerId(),
+                searchParameters.getPage(),
+                searchParameters.getSize(),
+                getSortingField(searchParameters.getSortingField()),
+                getDirection(searchParameters.getDirection()),
+                getVisibility(searchParameters.getVisibility()),
+                getOperation(searchParameters.getOperation()),
+                authenticatedUserId());
 
-            var query = new SearchWorlds(
-                    searchParameters.getName(),
-                    searchParameters.getOwnerId(),
-                    searchParameters.getPage(),
-                    searchParameters.getSize(),
-                    getSortingField(searchParameters.getSortingField()),
-                    getDirection(searchParameters.getDirection()),
-                    getVisibility(searchParameters.getVisibility()),
-                    getOperation(searchParameters.getOperation()),
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<WorldDetails> getWorldById(@PathVariable(required = true) UUID worldId) {
+    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "path:worldId")
+    public WorldDetails getWorldById(@PathVariable(required = true) UUID worldId) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-
-            var query = new GetWorldById(worldId, authenticatedUser.discordId());
-            return queryRunner.run(query);
-        });
+        var query = new GetWorldById(worldId, authenticatedUserId());
+        return queryRunner.run(query);
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<WorldDetails> createWorld(@Valid @RequestBody CreateWorldRequest request) {
+    public WorldDetails createWorld(@Valid @RequestBody CreateWorldRequest request) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new CreateWorld(
+                request.name(),
+                request.description(),
+                request.adventureStart(),
+                request.visibility(),
+                emptyIfNull(request.lorebook()).stream()
+                        .map(entry -> new CreateWorld.LorebookEntry(
+                                entry.name(),
+                                entry.regex(),
+                                entry.description()))
+                        .toList(),
+                request.usersAllowedToWrite(),
+                request.usersAllowedToRead(),
+                authenticatedUserId());
 
-            var command = new CreateWorld(
-                    request.name(),
-                    request.description(),
-                    request.adventureStart(),
-                    request.visibility(),
-                    emptyIfNull(request.lorebook()).stream()
-                            .map(entry -> new CreateWorld.LorebookEntry(
-                                    entry.name(),
-                                    entry.regex(),
-                                    entry.description()))
-                            .toList(),
-                    request.usersAllowedToWrite(),
-                    request.usersAllowedToRead(),
-                    authenticatedUser.discordId());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<WorldDetails> updateWorld(@PathVariable(required = true) UUID worldId,
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "path:worldId")
+    public WorldDetails updateWorld(@PathVariable(required = true) UUID worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new UpdateWorld(
+                worldId,
+                request.name(),
+                request.description(),
+                request.adventureStart(),
+                request.visibility(),
+                authenticatedUserId(),
+                request.usersAllowedToWriteToAdd(),
+                request.usersAllowedToWriteToRemove(),
+                request.usersAllowedToReadToAdd(),
+                request.usersAllowedToReadToRemove());
 
-            var command = new UpdateWorld(
-                    worldId,
-                    request.name(),
-                    request.description(),
-                    request.adventureStart(),
-                    request.visibility(),
-                    authenticatedUser.discordId(),
-                    request.usersAllowedToWriteToAdd(),
-                    request.usersAllowedToWriteToRemove(),
-                    request.usersAllowedToReadToAdd(),
-                    request.usersAllowedToReadToRemove());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @DeleteMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<Void> deleteWorld(@PathVariable(required = true) UUID worldId) {
+    @Authorize(operation = AuthorizationOperation.DELETE_WORLD, fields = "path:worldId")
+    public void deleteWorld(@PathVariable(required = true) UUID worldId) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            var command = new DeleteWorld(worldId, authenticatedUser.discordId());
-            commandRunner.run(command);
-
-            return Mono.empty();
-        });
+        var command = new DeleteWorld(worldId, authenticatedUserId());
+        commandRunner.run(command);
     }
 
     // TODO remove all of this

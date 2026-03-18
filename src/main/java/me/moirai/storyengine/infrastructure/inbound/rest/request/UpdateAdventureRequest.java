@@ -13,9 +13,11 @@ import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
+import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
 
+// TODO enrich to make world optional
 public record UpdateAdventureRequest(
-        @NotEmpty(message = "cannot be empty") String name,
+        @Moderated @NotEmpty(message = "cannot be empty") String name,
         @NotNull(message = "cannot be null") UUID worldId,
         @NotNull(message = "cannot be null") UUID personaId,
         @NotEmpty(message = "cannot be empty") String channelId,
@@ -36,10 +38,10 @@ public record UpdateAdventureRequest(
         Set<String> usersAllowedToWriteToRemove,
         Set<String> usersAllowedToReadToAdd,
         Set<String> usersAllowedToReadToRemove,
-        String adventureStart,
-        String nudge,
-        String authorsNote,
-        String remember,
-        String bump,
+        @Moderated String adventureStart,
+        @Moderated String nudge,
+        @Moderated String authorsNote,
+        @Moderated String remember,
+        @Moderated String bump,
         Integer bumpFrequency) {
 }

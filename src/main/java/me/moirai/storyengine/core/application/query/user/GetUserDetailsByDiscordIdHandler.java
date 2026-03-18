@@ -53,6 +53,7 @@ public class GetUserDetailsByDiscordIdHandler
                 .orElse(discordDetails.getUsername());
 
         return new UserDetailsResult(
+                moiraiUser.getPublicId(),
                 moiraiUser.getDiscordId(),
                 discordDetails.getUsername(),
                 nickname,

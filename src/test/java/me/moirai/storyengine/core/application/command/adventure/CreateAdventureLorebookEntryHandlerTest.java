@@ -3,7 +3,6 @@ package me.moirai.storyengine.core.application.command.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -16,21 +15,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.CreateAdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateAdventureLorebookEntryHandlerTest {
-
-    @Mock
-    private TextModerationPort moderationPort;
 
     @Mock
     private AdventureRepository repository;
@@ -42,7 +33,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenAdventureIdIsNull_thenThrowException() {
 
         // Given
-        CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+        var command = new CreateAdventureLorebookEntry(
                 null,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
@@ -58,7 +49,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenNameIdIsNull_thenThrowException() {
 
         // Given
-        CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+        var command = new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 null,
                 "[Vv]olin [Hh]abar|[Vv]oha",
@@ -74,7 +65,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenDescriptionIdIsNull_thenThrowException() {
 
         // Given
-        CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
+        var command = new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
@@ -90,29 +81,23 @@ public class CreateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenTriggered_thenCallService() {
 
         // Given
-        String requesterId = "1234";
-        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry();
+        var requesterId = "1234";
+        var command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry();
 
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        TextModerationResult moderationResult = TextModerationResult.builder()
-                .contentFlagged(false)
-                .build();
-
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
         when(repository.save(any())).thenReturn(adventure);
 
+        // When
+        var result = handler.handle(command);
+
         // Then
-        StepVerifier.create(handler.handle(command))
-                .assertNext(result -> {
-                    assertThat(result).isNotNull();
-                    assertThat(result.name()).isEqualTo(command.name());
-                })
-                .verifyComplete();
+        assertThat(result).isNotNull();
+        assertThat(result.name()).isEqualTo(command.name());
     }
 }

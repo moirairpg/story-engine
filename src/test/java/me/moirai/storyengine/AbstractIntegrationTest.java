@@ -13,7 +13,7 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.ReactiveTextModerationPort;
 import me.moirai.storyengine.infrastructure.config.JdaConfig;
 import net.dv8tion.jda.api.JDA;
 
@@ -40,7 +40,7 @@ public abstract class AbstractIntegrationTest {
     private TextCompletionPort textCompletionPort;
 
     @MockBean
-    private TextModerationPort textModerationPort;
+    private ReactiveTextModerationPort textModerationPort;
 
     @MockBean
     private JdaConfig jdaConfig;

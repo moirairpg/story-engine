@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.application.query.persona;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
@@ -14,7 +13,6 @@ public class GetPersonaByIdHandler extends AbstractQueryHandler<GetPersonaById, 
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
-    private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to view the persona";
 
     private final PersonaRepository repository;
 
@@ -35,11 +33,6 @@ public class GetPersonaByIdHandler extends AbstractQueryHandler<GetPersonaById, 
 
         var persona = repository.findByPublicId(query.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
-
-        // TODO externalize to authorizer
-        if (!persona.canUserRead(query.requesterId())) {
-            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
-        }
 
         return mapResult(persona);
     }

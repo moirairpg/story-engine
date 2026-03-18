@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
@@ -57,23 +56,6 @@ public class DeletePersonaHandlerTest {
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
-                .isThrownBy(() -> handler.handle(command));
-    }
-
-    @Test
-    public void deletePersona_whenAccessDenied_thenThrowException() {
-
-        // Given
-        UUID id = PersonaFixture.PUBLIC_ID;
-        String requesterId = "RQSTRID";
-        DeletePersona command = new DeletePersona(id, requesterId);
-
-        Persona persona = PersonaFixture.privatePersona().build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
-
-        // Then
-        assertThatExceptionOfType(AssetAccessDeniedException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 

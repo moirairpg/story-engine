@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.application.query.world;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
@@ -14,7 +13,6 @@ public class GetWorldByIdHandler extends AbstractQueryHandler<GetWorldById, Worl
 
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be deleted was not found";
-    private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to view the persona";
 
     private final WorldRepository repository;
 
@@ -35,11 +33,6 @@ public class GetWorldByIdHandler extends AbstractQueryHandler<GetWorldById, Worl
 
         var world = repository.findByPublicId(query.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
-
-        // TODO externalize to authorizer
-        if (!world.canUserRead(query.requesterId())) {
-            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
-        }
 
         return mapResult(world);
     }

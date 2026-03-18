@@ -3,7 +3,6 @@ package me.moirai.storyengine.core.application.query.adventure;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -18,7 +17,6 @@ public class GetAdventureByChannelIdHandler
         extends AbstractUseCaseHandler<GetAdventureByChannelId, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "No adventures exist for this channel";
-    private static final String USER_NO_PERMISSION = "User does not have permission to view adventure";
     private static final String PERSONA_NOT_FOUND = "Persona not found";
     private static final String WORLD_NOT_FOUND = "World not found";
 
@@ -26,7 +24,11 @@ public class GetAdventureByChannelIdHandler
     private final PersonaRepository personaRepository;
     private final WorldRepository worldRepository;
 
-    public GetAdventureByChannelIdHandler(AdventureRepository queryRepository, PersonaRepository personaRepository, WorldRepository worldRepository) {
+    public GetAdventureByChannelIdHandler(
+            AdventureRepository queryRepository,
+            PersonaRepository personaRepository,
+            WorldRepository worldRepository) {
+
         this.queryRepository = queryRepository;
         this.personaRepository = personaRepository;
         this.worldRepository = worldRepository;
@@ -37,10 +39,6 @@ public class GetAdventureByChannelIdHandler
 
         var adventure = queryRepository.findByChannelId(useCase.getChannelId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
-
-        if (!adventure.canUserRead(useCase.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(USER_NO_PERMISSION);
-        }
 
         var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));

@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -18,7 +17,6 @@ public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureBy
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be viewed was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
-    private static final String USER_NO_PERMISSION = "User does not have permission to view adventure";
     private static final String PERSONA_NOT_FOUND = "Persona not found";
     private static final String WORLD_NOT_FOUND = "World not found";
 
@@ -26,7 +24,11 @@ public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureBy
     private final PersonaRepository personaRepository;
     private final WorldRepository worldRepository;
 
-    public GetAdventureByIdHandler(AdventureRepository queryRepository, PersonaRepository personaRepository, WorldRepository worldRepository) {
+    public GetAdventureByIdHandler(
+            AdventureRepository queryRepository,
+            PersonaRepository personaRepository,
+            WorldRepository worldRepository) {
+
         this.queryRepository = queryRepository;
         this.personaRepository = personaRepository;
         this.worldRepository = worldRepository;
@@ -45,10 +47,6 @@ public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureBy
 
         var adventure = queryRepository.findByPublicId(query.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
-
-        if (!adventure.canUserRead(query.requesterId())) {
-            throw new AssetAccessDeniedException(USER_NO_PERMISSION);
-        }
 
         var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));

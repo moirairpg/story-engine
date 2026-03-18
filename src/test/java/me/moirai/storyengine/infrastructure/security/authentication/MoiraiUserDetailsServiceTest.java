@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +51,7 @@ public class MoiraiUserDetailsServiceTest {
                 null);
 
         when(queryRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(new UserDetailsResult(
+                UUID.randomUUID(),
                 "12345",
                 username,
                 nickname,

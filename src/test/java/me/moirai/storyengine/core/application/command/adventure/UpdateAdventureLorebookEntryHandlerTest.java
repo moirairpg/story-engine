@@ -18,22 +18,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateAdventureLorebookEntryHandlerTest {
-
-    @Mock
-    private TextModerationPort moderationPort;
 
     @Mock
     private AdventureRepository repository;
@@ -45,7 +36,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenEntryIdIsNull_thenThrowException() {
 
         // Given
-        UpdateAdventureLorebookEntry command = new UpdateAdventureLorebookEntry(
+        var command = new UpdateAdventureLorebookEntry(
                 null,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
@@ -62,7 +53,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenAdventureIdIsNull_thenThrowException() {
 
         // Given
-        UpdateAdventureLorebookEntry command = new UpdateAdventureLorebookEntry(
+        var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 null,
                 "Volin Habar",
@@ -79,7 +70,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenNameIdIsNull_thenThrowException() {
 
         // Given
-        UpdateAdventureLorebookEntry command = new UpdateAdventureLorebookEntry(
+        var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 null,
@@ -96,7 +87,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenDescriptionIdIsNull_thenThrowException() {
 
         // Given
-        UpdateAdventureLorebookEntry command = new UpdateAdventureLorebookEntry(
+        var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
@@ -113,8 +104,8 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenTriggered_thenCallService() {
 
         // Given
-        String requesterId = "1234";
-        UpdateAdventureLorebookEntry command = new UpdateAdventureLorebookEntry(
+        var requesterId = "1234";
+        var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
@@ -123,31 +114,25 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 "2423423423423",
                 requesterId);
 
-        AdventureLorebookEntry existingEntry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
+        var existingEntry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
 
-        Adventure baseAdventure = AdventureFixture.privateMultiplayerAdventure()
+        var baseAdventure = AdventureFixture.privateMultiplayerAdventure()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerId(requesterId)
                         .build())
                 .build();
 
-        Adventure adventure = spy(baseAdventure);
+        var adventure = spy(baseAdventure);
         doReturn(existingEntry).when(adventure).updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString(), anyString());
 
-        TextModerationResult moderationResult = TextModerationResult.builder()
-                .contentFlagged(false)
-                .build();
-
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
         when(repository.save(any())).thenReturn(adventure);
 
+        // When
+        var result = handler.handle(command);
+
         // Then
-        StepVerifier.create(handler.handle(command))
-                .assertNext(result -> {
-                    assertThat(result).isNotNull();
-                    assertThat(result.lastUpdateDate()).isNotNull();
-                })
-                .verifyComplete();
+        assertThat(result).isNotNull();
+        assertThat(result.lastUpdateDate()).isNotNull();
     }
 }

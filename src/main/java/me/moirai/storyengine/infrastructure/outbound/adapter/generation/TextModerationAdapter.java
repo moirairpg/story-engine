@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.generation;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -8,23 +9,23 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
-import reactor.core.publisher.Mono;
 
 @Component
 public class TextModerationAdapter implements TextModerationPort {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TextModerationAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReactiveTextModerationAdapter.class);
 
     private static final String AUTHENTICATION_ERROR = "Error authenticating user on OpenAI";
     private static final String UNKNOWN_ERROR = "Error on OpenAI Moderation API";
@@ -37,84 +38,79 @@ public class TextModerationAdapter implements TextModerationPort {
             .isSameCodeAs(HttpStatusCode.valueOf(401));
 
     private final String moderationUrl;
-    private final WebClient webClient;
+    private final RestClient openAiClient;
+    private final ObjectMapper objectMapper;
 
-    public TextModerationAdapter(@Value("${moirai.openai.api.base-url}") String baseUrl,
+    public TextModerationAdapter(
             @Value("${moirai.openai.api.moderation-uri}") String moderationUrl,
-            @Value("${moirai.openai.api.token}") String token,
-            WebClient.Builder webClientBuilder) {
+            RestClient openAiClient,
+            ObjectMapper objectMapper) {
 
         this.moderationUrl = moderationUrl;
-        this.webClient = webClientBuilder.baseUrl(baseUrl)
-                .defaultHeaders(headers -> {
-                    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-                    headers.add(HttpHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
-                })
-                .build();
+        this.openAiClient = openAiClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public Mono<TextModerationResult> moderate(String text) {
+    public TextModerationResult moderate(String text) {
 
-        ModerationRequest request = ModerationRequest.build(text);
-        return webClient.post()
+        var request = new ModerationRequest(text);
+        var response = openAiClient.post()
                 .uri(moderationUrl)
-                .bodyValue(request)
+                .body(request)
                 .retrieve()
                 .onStatus(UNAUTHORIZED, this::handleUnauthorized)
                 .onStatus(BAD_REQUEST, this::handleBadRequest)
                 .onStatus(HttpStatusCode::isError, this::handleUnknownError)
-                .bodyToMono(ModerationResponse.class)
-                .map(this::toResult);
+                .body(ModerationResponse.class);
+
+        return toResult(response);
     }
 
     private TextModerationResult toResult(ModerationResponse response) {
 
-        return TextModerationResult.builder()
-                .contentFlagged(response.getResults().get(0).getFlagged())
-                .flaggedTopics(response.getResults()
-                        .get(0)
-                        .getCategories()
-                        .entrySet()
-                        .stream()
-                        .filter(this::isTopicFlagged)
-                        .map(Entry::getKey)
-                        .toList())
-                .moderationScores(response.getResults()
-                        .get(0)
-                        .getCategoryScores()
-                        .entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> Double.valueOf(entry.getValue()))))
-                .build();
+        var result = response.getResults().get(0);
+
+        var flaggedTopics = result.getCategories()
+                .entrySet()
+                .stream()
+                .filter(this::isTopicFlagged)
+                .map(Entry::getKey)
+                .toList();
+
+        var moderationScores = result.getCategoryScores()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Double.valueOf(entry.getValue())));
+
+        return new TextModerationResult(result.getFlagged(), moderationScores, flaggedTopics);
     }
 
     private boolean isTopicFlagged(Entry<String, Boolean> entry) {
         return entry.getValue();
     }
 
-    private Mono<? extends Throwable> handleUnauthorized(ClientResponse clientResponse) {
-
-        return Mono.error(new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR));
+    private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
+        throw new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
     }
 
-    private Mono<? extends Throwable> handleBadRequest(ClientResponse clientResponse) {
+    private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        return clientResponse.bodyToMono(CompletionResponseError.class)
-                .map(resp -> {
-                    LOG.error(BAD_REQUEST_ERROR + " -> {}", resp);
-                    return new OpenAiApiException(HttpStatus.BAD_REQUEST, resp.getType(), resp.getMessage(),
-                            String.format(BAD_REQUEST_ERROR, resp.getType(), resp.getMessage()));
-                });
+        var error = mapErrorResponse(response);
+        LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
+        throw new OpenAiApiException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
+                String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
     }
 
-    private Mono<? extends Throwable> handleUnknownError(ClientResponse clientResponse) {
+    private void handleUnknownError(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        return clientResponse.bodyToMono(CompletionResponseError.class)
-                .map(resp -> {
-                    LOG.error(UNKNOWN_ERROR + " -> {}", resp);
-                    return new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, resp.getType(), resp.getMessage(),
-                            String.format(UNKNOWN_ERROR, resp.getType(), resp.getMessage()));
-                });
+        var error = mapErrorResponse(response);
+        LOG.error(UNKNOWN_ERROR + " -> {}", error);
+        throw new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
+                String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
+    }
+
+    private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }

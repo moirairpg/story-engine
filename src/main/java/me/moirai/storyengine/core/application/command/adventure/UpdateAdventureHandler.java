@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -19,7 +18,6 @@ import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 @CommandHandler
 public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventure, AdventureDetails> {
 
-    private static final String USER_NO_PERMISSION = "User does not have permission to delete adventure";
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
     private static final String PERSONA_NOT_FOUND = "Persona not found";
@@ -49,11 +47,6 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
 
         var adventure = repository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
-
-        // TODO externalize to authorizer
-        if (!adventure.canUserWrite(command.requesterId())) {
-            throw new AssetAccessDeniedException(USER_NO_PERMISSION);
-        }
 
         var persona = personaRepository.findByPublicId(command.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));

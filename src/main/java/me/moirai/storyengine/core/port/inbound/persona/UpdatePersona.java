@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.enums.Visibility;
-import reactor.core.publisher.Mono;
 
 public record UpdatePersona(
         UUID personaId,
@@ -16,5 +15,6 @@ public record UpdatePersona(
         Set<String> usersAllowedToWriteToAdd,
         Set<String> usersAllowedToWriteToRemove,
         Set<String> usersAllowedToReadToAdd,
-        Set<String> usersAllowedToReadToRemove) implements Command<Mono<PersonaDetails>> {
+        Set<String> usersAllowedToReadToRemove)
+        implements Command<PersonaDetails> {
 }

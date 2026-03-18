@@ -2,6 +2,7 @@ package me.moirai.storyengine.infrastructure.security.authentication;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import me.moirai.storyengine.common.enums.Role;
 
 public record MoiraiPrincipal(
+    UUID publicId,
     String discordId,
     String username,
     String email,

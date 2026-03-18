@@ -1,14 +1,15 @@
 package me.moirai.storyengine.infrastructure.security.authorization;
 
 public enum AuthorizationOperation {
-    READ_PERSONA,
-    MODIFY_PERSONA,
-    READ_ADVENTURE,
-    MODIFY_ADVENTURE,
+    UPDATE_PERSONA,
+    DELETE_PERSONA,
+    VIEW_PERSONA,
+
+    UPDATE_WORLD,
+    DELETE_WORLD,
+    VIEW_WORLD,
+
+    UPDATE_ADVENTURE,
     DELETE_ADVENTURE,
-    CREATE_ADVENTURE,
-    READ_WORLD,
-    MODIFY_WORLD,
-    ADMIN_ONLY,
-    AUTHENTICATED_USER
+    VIEW_ADVENTURE,
 }

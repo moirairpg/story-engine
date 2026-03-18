@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.enums.Visibility;
-import reactor.core.publisher.Mono;
 
 public record UpdateWorld(
         UUID worldId,
@@ -17,5 +16,6 @@ public record UpdateWorld(
         Set<String> usersAllowedToWriteToAdd,
         Set<String> usersAllowedToWriteToRemove,
         Set<String> usersAllowedToReadToAdd,
-        Set<String> usersAllowedToReadToRemove) implements Command<Mono<WorldDetails>> {
+        Set<String> usersAllowedToReadToRemove)
+        implements Command<WorldDetails> {
 }

@@ -34,7 +34,8 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdatePersonaRe
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/persona")
@@ -55,88 +56,78 @@ public class PersonaController extends SecurityContextAware {
     // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchPersonasResult> search(PersonaSearchParameters searchParameters) {
+    public SearchPersonasResult search(
+            PersonaSearchParameters searchParameters) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new SearchPersonas(
+                searchParameters.getName(),
+                searchParameters.getOwnerId(),
+                searchParameters.getPage(),
+                searchParameters.getSize(),
+                getSortingField(searchParameters.getSortingField()),
+                getDirection(searchParameters.getDirection()),
+                searchParameters.getVisibility(),
+                getOperation(searchParameters.getOperation()),
+                authenticatedUserId());
 
-            var query = new SearchPersonas(
-                    searchParameters.getName(),
-                    searchParameters.getOwnerId(),
-                    searchParameters.getPage(),
-                    searchParameters.getSize(),
-                    getSortingField(searchParameters.getSortingField()),
-                    getDirection(searchParameters.getDirection()),
-                    searchParameters.getVisibility(),
-                    getOperation(searchParameters.getOperation()),
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @GetMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<PersonaDetails> getPersonaById(@PathVariable(required = true) UUID personaId) {
+    @Authorize(operation = AuthorizationOperation.VIEW_PERSONA, fields = "path:personaId")
+    public PersonaDetails getPersonaById(
+            @PathVariable(required = true) UUID personaId) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-
-            var query = new GetPersonaById(personaId, authenticatedUser.discordId());
-            return queryRunner.run(query);
-        });
+        var query = new GetPersonaById(personaId, authenticatedUserId());
+        return queryRunner.run(query);
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<PersonaDetails> createPersona(@Valid @RequestBody CreatePersonaRequest request) {
+    public PersonaDetails createPersona(
+            @Valid @RequestBody CreatePersonaRequest request) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new CreatePersona(
+                request.name(),
+                request.personality(),
+                request.visibility(),
+                authenticatedUserId(),
+                request.usersAllowedToRead(),
+                request.usersAllowedToWrite());
 
-            var command = new CreatePersona(
-                    request.name(),
-                    request.personality(),
-                    request.visibility(),
-                    authenticatedUser.discordId(),
-                    request.usersAllowedToRead(),
-                    request.usersAllowedToWrite());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @PutMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<PersonaDetails> updatePersona(
+    @Authorize(operation = AuthorizationOperation.UPDATE_PERSONA, fields = "path:personaId")
+    public PersonaDetails updatePersona(
             @PathVariable(required = true) UUID personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new UpdatePersona(
+                personaId,
+                request.name(),
+                request.personality(),
+                request.visibility(),
+                authenticatedUserId(),
+                request.usersAllowedToWriteToAdd(),
+                request.usersAllowedToReadToAdd(),
+                request.usersAllowedToWriteToRemove(),
+                request.usersAllowedToReadToRemove());
 
-            var command = new UpdatePersona(
-                    personaId,
-                    request.name(),
-                    request.personality(),
-                    request.visibility(),
-                    authenticatedUser.discordId(),
-                    request.usersAllowedToWriteToAdd(),
-                    request.usersAllowedToReadToAdd(),
-                    request.usersAllowedToWriteToRemove(),
-                    request.usersAllowedToReadToRemove());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @DeleteMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<Void> deletePersona(@PathVariable(required = true) UUID personaId) {
+    @Authorize(operation = AuthorizationOperation.DELETE_PERSONA, fields = "path:personaId")
+    public void deletePersona(
+            @PathVariable(required = true) UUID personaId) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            var command = new DeletePersona(personaId, authenticatedUser.discordId());
-            commandRunner.run(command);
-
-            return Mono.empty();
-        });
+        var command = new DeletePersona(personaId, authenticatedUserId());
+        commandRunner.run(command);
     }
 
     // TODO remove all of this

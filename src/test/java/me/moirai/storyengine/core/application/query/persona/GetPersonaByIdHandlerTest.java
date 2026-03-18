@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.persona.Persona;
@@ -80,21 +79,5 @@ public class GetPersonaByIdHandlerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(PersonaFixture.PUBLIC_ID);
-    }
-
-    @Test
-    public void getPersonaById_whenAccessDenied_thenThrowException() {
-
-        // Given
-        String requesterId = "RQSTRID";
-        Persona persona = PersonaFixture.privatePersona().build();
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-
-        GetPersonaById query = new GetPersonaById(PersonaFixture.PUBLIC_ID, requesterId);
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
-
-        // When
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));
     }
 }

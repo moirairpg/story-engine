@@ -42,7 +42,7 @@ import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPor
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.ReactiveTextModerationPort;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -62,14 +62,14 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
     private final LorebookEnrichmentPort lorebookEnrichmentPort;
     private final PersonaEnrichmentPort personaEnrichmentPort;
     private final TextCompletionPort textCompletionPort;
-    private final TextModerationPort textModerationPort;
+    private final ReactiveTextModerationPort textModerationPort;
 
     public StoryGenerationAdapter(StorySummarizationPort summarizationPort,
             DiscordChannelPort discordChannelPort,
             LorebookEnrichmentPort lorebookEnrichmentPort,
             PersonaEnrichmentPort personaEnrichmentPort,
             TextCompletionPort textCompletionPort,
-            TextModerationPort textModerationPort) {
+            ReactiveTextModerationPort textModerationPort) {
 
         this.discordChannelPort = discordChannelPort;
         this.summarizationPort = summarizationPort;
@@ -284,13 +284,13 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
                 .map(result -> {
                     if (moderation.isAbsolute()) {
                         if (result.isContentFlagged()) {
-                            return result.getFlaggedTopics();
+                            return result.flaggedTopics();
                         }
 
                         return emptyList();
                     }
 
-                    return result.getModerationScores()
+                    return result.moderationScores()
                             .entrySet()
                             .stream()
                             .filter(entry -> isTopicFlagged(entry, moderation))

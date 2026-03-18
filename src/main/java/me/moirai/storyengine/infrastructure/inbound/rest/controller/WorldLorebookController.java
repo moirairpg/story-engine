@@ -32,7 +32,8 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchP
 import me.moirai.storyengine.infrastructure.inbound.rest.request.WorldLorebookEntryRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/world/{worldId}/lorebook")
@@ -53,99 +54,86 @@ public class WorldLorebookController extends SecurityContextAware {
     // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchWorldLorebookEntriesResult> search(
+    public SearchWorldLorebookEntriesResult search(
             @PathVariable(required = true) UUID worldId,
             LorebookSearchParameters searchParameters) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new SearchWorldLorebookEntries(
+                searchParameters.getName(),
+                worldId,
+                searchParameters.getPage(),
+                searchParameters.getSize(),
+                getSortingField(searchParameters.getSortingField()),
+                getDirection(searchParameters.getDirection()),
+                authenticatedUserId());
 
-            var query = new SearchWorldLorebookEntries(
-                    searchParameters.getName(),
-                    worldId,
-                    searchParameters.getPage(),
-                    searchParameters.getSize(),
-                    getSortingField(searchParameters.getSortingField()),
-                    getDirection(searchParameters.getDirection()),
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<WorldLorebookEntryDetails> getLorebookEntryById(
+    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "path:worldId")
+    public WorldLorebookEntryDetails getLorebookEntryById(
             @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new GetWorldLorebookEntryById(
+                entryId,
+                worldId,
+                authenticatedUserId());
 
-            var query = new GetWorldLorebookEntryById(
-                    entryId,
-                    worldId,
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<WorldLorebookEntryDetails> createLorebookEntry(
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "path:worldId")
+    public WorldLorebookEntryDetails createLorebookEntry(
             @PathVariable(required = true) UUID worldId,
             @Valid @RequestBody WorldLorebookEntryRequest request) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new CreateWorldLorebookEntry(
+                worldId,
+                request.name(),
+                request.description(),
+                request.regex(),
+                authenticatedUserId());
 
-            var command = new CreateWorldLorebookEntry(
-                    worldId,
-                    request.name(),
-                    request.description(),
-                    request.regex(),
-                    authenticatedUser.discordId());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<WorldLorebookEntryDetails> updateLorebookEntry(
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "path:worldId")
+    public WorldLorebookEntryDetails updateLorebookEntry(
             @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId,
             @Valid @RequestBody WorldLorebookEntryRequest request) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new UpdateWorldLorebookEntry(
+                entryId,
+                worldId,
+                request.name(),
+                request.description(),
+                request.regex(),
+                authenticatedUserId());
 
-            var command = new UpdateWorldLorebookEntry(
-                    entryId,
-                    worldId,
-                    request.name(),
-                    request.description(),
-                    request.regex(),
-                    authenticatedUser.discordId());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<Void> deleteLorebookEntry(
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "path:worldId")
+    public void deleteLorebookEntry(
             @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new DeleteWorldLorebookEntry(
+                entryId,
+                worldId,
+                authenticatedUserId());
 
-            var command = new DeleteWorldLorebookEntry(
-                    entryId,
-                    worldId,
-                    authenticatedUser.discordId());
-
-            commandRunner.run(command);
-
-            return Mono.empty();
-        });
+        commandRunner.run(command);
     }
 
     // TODO remove all of this

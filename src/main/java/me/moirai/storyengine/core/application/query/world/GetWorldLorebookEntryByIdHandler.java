@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.application.query.world;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
@@ -15,7 +14,6 @@ public class GetWorldLorebookEntryByIdHandler
         extends AbstractQueryHandler<GetWorldLorebookEntryById, WorldLorebookEntryDetails> {
 
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
-    private static final String USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD = "User does not have permission to view this world";
 
     private final WorldRepository repository;
 
@@ -41,11 +39,6 @@ public class GetWorldLorebookEntryByIdHandler
 
         var world = repository.findByPublicId(query.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-
-        // TODO externalize to authorizer
-        if (!world.canUserRead(query.requesterId())) {
-            throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_VIEW_THIS_WORLD);
-        }
 
         var entry = world.getLorebookEntryById(query.entryId());
 

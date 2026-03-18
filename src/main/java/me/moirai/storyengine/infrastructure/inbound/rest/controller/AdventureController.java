@@ -38,7 +38,8 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchMod
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/adventure")
@@ -59,142 +60,122 @@ public class AdventureController extends SecurityContextAware {
     // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchAdventuresResult> search(AdventureSearchParameters searchParameters) {
+    public SearchAdventuresResult search(AdventureSearchParameters searchParameters) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new SearchAdventures(
+                searchParameters.getName(),
+                searchParameters.getWorld(),
+                searchParameters.getPersona(),
+                searchParameters.getOwnerId(),
+                searchParameters.isMultiplayer(),
+                searchParameters.getPage(),
+                searchParameters.getSize(),
+                getModel(searchParameters.getModel()),
+                getGameMode(searchParameters.getGameMode()),
+                getModeration(searchParameters.getModeration()),
+                getSortingField(searchParameters.getSortingField()),
+                getDirection(searchParameters.getDirection()),
+                getVisibility(searchParameters.getVisibility()),
+                getOperation(searchParameters.getOperation()),
+                authenticatedUserId());
 
-            var query = new SearchAdventures(
-                    searchParameters.getName(),
-                    searchParameters.getWorld(),
-                    searchParameters.getPersona(),
-                    searchParameters.getOwnerId(),
-                    searchParameters.isMultiplayer(),
-                    searchParameters.getPage(),
-                    searchParameters.getSize(),
-                    getModel(searchParameters.getModel()),
-                    getGameMode(searchParameters.getGameMode()),
-                    getModeration(searchParameters.getModeration()),
-                    getSortingField(searchParameters.getSortingField()),
-                    getDirection(searchParameters.getDirection()),
-                    getVisibility(searchParameters.getVisibility()),
-                    getOperation(searchParameters.getOperation()),
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<AdventureDetails> getAdventureById(
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "path:adventureId")
+    public AdventureDetails getAdventureById(
             @PathVariable(required = true) UUID adventureId) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-
-            var query = new GetAdventureById(
-                    adventureId,
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        var query = new GetAdventureById(adventureId, authenticatedUserId());
+        return queryRunner.run(query);
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<AdventureDetails> createAdventure(
+    public AdventureDetails createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new CreateAdventure(
+                request.name(),
+                null,
+                request.worldId(),
+                request.personaId(),
+                request.channelId(),
+                request.visibility(),
+                request.aiModel(),
+                request.moderation(),
+                authenticatedUserId(),
+                request.gameMode(),
+                request.nudge(),
+                request.remember(),
+                request.authorsNote(),
+                request.bump(),
+                request.bumpFrequency(),
+                request.maxTokenLimit(),
+                request.temperature(),
+                request.frequencyPenalty(),
+                request.presencePenalty(),
+                request.logitBias(),
+                request.stopSequences(),
+                request.usersAllowedToWrite(),
+                request.usersAllowedToRead(),
+                request.isMultiplayer());
 
-            var command = new CreateAdventure(
-                    request.name(),
-                    null,
-                    request.worldId(),
-                    request.personaId(),
-                    request.channelId(),
-                    request.visibility(),
-                    request.aiModel(),
-                    request.moderation(),
-                    authenticatedUser.discordId(),
-                    request.gameMode(),
-                    request.nudge(),
-                    request.remember(),
-                    request.authorsNote(),
-                    request.bump(),
-                    request.bumpFrequency(),
-                    request.maxTokenLimit(),
-                    request.temperature(),
-                    request.frequencyPenalty(),
-                    request.presencePenalty(),
-                    request.logitBias(),
-                    request.stopSequences(),
-                    request.usersAllowedToWrite(),
-                    request.usersAllowedToRead(),
-                    request.isMultiplayer());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<AdventureDetails> updateAdventure(
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    public AdventureDetails updateAdventure(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new UpdateAdventure(
+                adventureId,
+                null,
+                request.adventureStart(),
+                request.name(),
+                request.worldId(),
+                request.personaId(),
+                request.channelId(),
+                request.visibility(),
+                request.aiModel(),
+                request.moderation(),
+                authenticatedUserId(),
+                request.gameMode(),
+                request.nudge(),
+                request.remember(),
+                request.authorsNote(),
+                request.bump(),
+                request.bumpFrequency(),
+                request.maxTokenLimit(),
+                request.temperature(),
+                request.frequencyPenalty(),
+                request.presencePenalty(),
+                request.logitBiasToAdd(),
+                request.stopSequencesToAdd(),
+                request.stopSequencesToRemove(),
+                request.logitBiasToRemove(),
+                request.usersAllowedToWriteToAdd(),
+                request.usersAllowedToWriteToRemove(),
+                request.usersAllowedToReadToAdd(),
+                request.usersAllowedToReadToRemove(),
+                request.isMultiplayer());
 
-            var command = new UpdateAdventure(
-                    adventureId,
-                    null,
-                    request.adventureStart(),
-                    request.name(),
-                    request.worldId(),
-                    request.personaId(),
-                    request.channelId(),
-                    request.visibility(),
-                    request.aiModel(),
-                    request.moderation(),
-                    authenticatedUser.discordId(),
-                    request.gameMode(),
-                    request.nudge(),
-                    request.remember(),
-                    request.authorsNote(),
-                    request.bump(),
-                    request.bumpFrequency(),
-                    request.maxTokenLimit(),
-                    request.temperature(),
-                    request.frequencyPenalty(),
-                    request.presencePenalty(),
-                    request.logitBiasToAdd(),
-                    request.stopSequencesToAdd(),
-                    request.stopSequencesToRemove(),
-                    request.logitBiasToRemove(),
-                    request.usersAllowedToWriteToAdd(),
-                    request.usersAllowedToWriteToRemove(),
-                    request.usersAllowedToReadToAdd(),
-                    request.usersAllowedToReadToRemove(),
-                    request.isMultiplayer());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @DeleteMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<Void> deleteAdventure(
+    @Authorize(operation = AuthorizationOperation.DELETE_ADVENTURE, fields = "path:adventureId")
+    public void deleteAdventure(
             @PathVariable(required = true) UUID adventureId) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
-
-            var command = new DeleteAdventure(
-                    adventureId,
-                    authenticatedUser.discordId());
-
-            commandRunner.run(command);
-
-            return Mono.empty();
-        });
+        var command = new DeleteAdventure(adventureId, authenticatedUserId());
+        commandRunner.run(command);
     }
 
     // TODO remove all of this

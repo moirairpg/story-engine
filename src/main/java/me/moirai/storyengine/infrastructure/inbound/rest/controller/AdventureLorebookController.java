@@ -32,7 +32,8 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureLorebo
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import reactor.core.publisher.Mono;
+import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/adventure/{adventureId}/lorebook")
@@ -53,101 +54,88 @@ public class AdventureLorebookController extends SecurityContextAware {
     // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<SearchAdventureLorebookEntriesResult> search(
+    public SearchAdventureLorebookEntriesResult search(
             @PathVariable(required = true) UUID adventureId,
             LorebookSearchParameters searchParameters) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new SearchAdventureLorebookEntries(
+                adventureId,
+                searchParameters.getName(),
+                searchParameters.getPage(),
+                searchParameters.getSize(),
+                getSortingField(searchParameters.getSortingField()),
+                getDirection(searchParameters.getDirection()),
+                authenticatedUserId());
 
-            var query = new SearchAdventureLorebookEntries(
-                    adventureId,
-                    searchParameters.getName(),
-                    searchParameters.getPage(),
-                    searchParameters.getSize(),
-                    getSortingField(searchParameters.getSortingField()),
-                    getDirection(searchParameters.getDirection()),
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<AdventureLorebookEntryDetails> getLorebookEntryById(
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "path:adventureId")
+    public AdventureLorebookEntryDetails getLorebookEntryById(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID entryId) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
+        var query = new GetAdventureLorebookEntryById(
+                entryId,
+                adventureId,
+                authenticatedUserId());
 
-            var query = new GetAdventureLorebookEntryById(
-                    entryId,
-                    adventureId,
-                    authenticatedUser.discordId());
-
-            return queryRunner.run(query);
-        });
+        return queryRunner.run(query);
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<AdventureLorebookEntryDetails> createLorebookEntry(
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    public AdventureLorebookEntryDetails createLorebookEntry(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody AdventureLorebookEntryRequest request) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new CreateAdventureLorebookEntry(
+                adventureId,
+                request.name(),
+                request.regex(),
+                request.description(),
+                request.playerId(),
+                authenticatedUserId());
 
-            var command = new CreateAdventureLorebookEntry(
-                    adventureId,
-                    request.name(),
-                    request.regex(),
-                    request.description(),
-                    request.playerId(),
-                    authenticatedUser.discordId());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<AdventureLorebookEntryDetails> updateLorebookEntry(
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    public AdventureLorebookEntryDetails updateLorebookEntry(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID entryId,
             @Valid @RequestBody AdventureLorebookEntryRequest request) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new UpdateAdventureLorebookEntry(
+                entryId,
+                adventureId,
+                request.name(),
+                request.regex(),
+                request.description(),
+                request.playerId(),
+                authenticatedUserId());
 
-            var command = new UpdateAdventureLorebookEntry(
-                    entryId,
-                    adventureId,
-                    request.name(),
-                    request.regex(),
-                    request.description(),
-                    request.playerId(),
-                    authenticatedUser.discordId());
-
-            return commandRunner.run(command);
-        });
+        return commandRunner.run(command);
     }
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<Void> deleteLorebookEntry(
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    public void deleteLorebookEntry(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID entryId) {
 
-        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+        var command = new DeleteAdventureLorebookEntry(
+                entryId,
+                adventureId,
+                authenticatedUserId());
 
-            var command = new DeleteAdventureLorebookEntry(
-                    entryId,
-                    adventureId,
-                    authenticatedUser.discordId());
-
-            commandRunner.run(command);
-
-            return Mono.empty();
-        });
+        commandRunner.run(command);
     }
 
     // TODO remove all of this

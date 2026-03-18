@@ -38,11 +38,11 @@ public abstract class SecurityContextAware {
                 .getPrincipal();
     }
 
-    protected String getUserDiscordId() {
+    protected String authenticatedUserId() {
         return getAuthenticatedUser().discordId();
     }
 
-    protected String getUsername() {
+    protected String authenticatedUsername() {
         return getAuthenticatedUser().username();
     }
 }

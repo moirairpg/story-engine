@@ -33,8 +33,9 @@ import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationReques
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
-import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.generation.ReactiveTextModerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationResult;
+import me.moirai.storyengine.core.port.outbound.generation.TextModerationResultFixture;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -57,7 +58,7 @@ public class StoryGenerationAdapterTest {
     private TextCompletionPort textCompletionPort;
 
     @Mock
-    private TextModerationPort textModerationPort;
+    private ReactiveTextModerationPort textModerationPort;
 
     @InjectMocks
     private StoryGenerationAdapter adapter;
@@ -108,10 +109,7 @@ public class StoryGenerationAdapterTest {
                 .outputText(generatedText)
                 .build();
 
-        TextModerationResult cleanModeration = TextModerationResult.builder()
-                .contentFlagged(false)
-                .flaggedTopics(List.of())
-                .build();
+        TextModerationResult cleanModeration = TextModerationResultFixture.withoutFlags();
 
         when(lorebookEnrichmentPort.enrichContextWithLorebook(any(), eq(adventureId), eq(modelConfig)))
                 .thenReturn(lorebookContext);
@@ -171,10 +169,7 @@ public class StoryGenerationAdapterTest {
                 .outputText(generatedText)
                 .build();
 
-        TextModerationResult cleanModeration = TextModerationResult.builder()
-                .contentFlagged(false)
-                .flaggedTopics(List.of())
-                .build();
+        TextModerationResult cleanModeration = TextModerationResultFixture.withoutFlags();
 
         when(lorebookEnrichmentPort.enrichContextWithLorebookForRpg(any(), eq(adventureId), eq(modelConfig)))
                 .thenReturn(lorebookContext);
@@ -229,10 +224,7 @@ public class StoryGenerationAdapterTest {
         Map<String, Object> summarizedContext = buildEnrichedContext(botUsername);
         Map<String, Object> personaContext = buildEnrichedContext(botUsername);
 
-        TextModerationResult flaggedModeration = TextModerationResult.builder()
-                .contentFlagged(true)
-                .flaggedTopics(List.of("violence"))
-                .build();
+        TextModerationResult flaggedModeration = TextModerationResultFixture.withFlags();
 
         when(lorebookEnrichmentPort.enrichContextWithLorebook(any(), eq(adventureId), eq(modelConfig)))
                 .thenReturn(lorebookContext);
