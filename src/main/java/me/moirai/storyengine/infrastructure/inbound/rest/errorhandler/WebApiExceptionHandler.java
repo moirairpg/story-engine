@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import io.micrometer.common.util.StringUtils;
@@ -63,16 +63,16 @@ public class WebApiExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_CONTENT)
     @ExceptionHandler(BusinessRuleViolationException.class)
     public ResponseEntity<ErrorResponse> assetNotFound(BusinessRuleViolationException exception) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(HttpStatus.UNPROCESSABLE_ENTITY)
+                .code(HttpStatus.UNPROCESSABLE_CONTENT)
                 .details(Collections.singletonList(exception.getMessage()))
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
@@ -151,7 +151,7 @@ public class WebApiExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_CONTENT)
     @ExceptionHandler(ModerationException.class)
     public ResponseEntity<ErrorResponse> moderationFailed(ModerationException exception) {
 
@@ -160,12 +160,12 @@ public class WebApiExceptionHandler {
                 .toList();
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(HttpStatus.UNPROCESSABLE_ENTITY)
+                .code(HttpStatus.UNPROCESSABLE_CONTENT)
                 .message(exception.getMessage())
                 .details(details)
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
     @ExceptionHandler(DiscordApiException.class)
