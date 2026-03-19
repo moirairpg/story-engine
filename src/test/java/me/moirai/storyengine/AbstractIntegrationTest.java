@@ -1,6 +1,7 @@
 package me.moirai.storyengine;
 
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -9,6 +10,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestClient;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+import me.moirai.storyengine.common.testutil.DbTestHelper;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort;
@@ -23,6 +25,9 @@ import net.dv8tion.jda.api.JDA;
 @ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
 public abstract class AbstractIntegrationTest {
+
+    @Autowired
+    private DbTestHelper dbTestHelper;
 
     @Mock
     private DiscordAuthenticationPort discordAuthenticationPort;
@@ -60,7 +65,7 @@ public abstract class AbstractIntegrationTest {
     @MockitoBean
     private JdaConfig jdaConfig;
 
-    private static final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
+    private static final String POSTGRES_IMAGE_NAME = "postgres:18-alpine";
 
     @SuppressWarnings("resource")
     static PostgreSQLContainer container = new PostgreSQLContainer(POSTGRES_IMAGE_NAME)
@@ -76,5 +81,25 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.url", container::getJdbcUrl);
         registry.add("spring.datasource.username", container::getUsername);
         registry.add("spring.datasource.password", container::getPassword);
+    }
+
+    protected <T> void insert(Object value, Class<T> type) {
+        dbTestHelper.insert(value, type);
+    }
+
+    protected <T> void clearAndInsert(Object value, Class<T> type) {
+        dbTestHelper.clearAndInsert(value, type);
+    }
+
+    protected <T> void update(Object value, Object primaryKeyValue, Class<T> type) {
+        dbTestHelper.update(value, primaryKeyValue, type);
+    }
+
+    protected <T> void clear(Class<T> type) {
+        dbTestHelper.clear(type);
+    }
+
+    protected void clearDatabase() {
+        dbTestHelper.clearDatabase();
     }
 }
