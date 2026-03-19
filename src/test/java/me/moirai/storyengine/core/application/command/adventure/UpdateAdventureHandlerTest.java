@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.adventure;
 
 import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 

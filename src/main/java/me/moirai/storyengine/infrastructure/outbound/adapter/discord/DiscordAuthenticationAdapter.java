@@ -22,8 +22,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
@@ -54,7 +54,7 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     private final String usersUri;
     private final String tokenUri;
     private final String tokenRevokeUri;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final RestClient discordClient;
 
     public DiscordAuthenticationAdapter(
@@ -63,9 +63,9 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
             @Value("${moirai.discord.api.token-uri}") String tokenUri,
             @Value("${moirai.discord.api.token-revoke-uri}") String tokenRevokeUri,
             RestClient discordClient,
-            ObjectMapper objectMapper) {
+            JsonMapper jsonMapper) {
 
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.usersUri = usersUri;
         this.tokenUri = tokenUri;
         this.tokenRevokeUri = tokenRevokeUri;
@@ -132,7 +132,7 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     private ResponseSpec postForAuthentication(String url, Object request) {
 
         var valueMap = new LinkedMultiValueMap<String, String>();
-        var fieldMap = objectMapper.convertValue(request, new TypeReference<Map<String, String>>() {
+        var fieldMap = jsonMapper.convertValue(request, new TypeReference<Map<String, String>>() {
         });
 
         valueMap.setAll(fieldMap);
@@ -171,6 +171,6 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     }
 
     private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
-        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
+        return jsonMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }

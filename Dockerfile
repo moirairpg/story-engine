@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21.0.4_7-jdk-ubi9-minimal AS builder
+FROM eclipse-temurin:25-jdk-ubi10-minimal AS builder
 
 WORKDIR /opt/moirai
 
@@ -11,7 +11,7 @@ RUN microdnf install -y yum && \
     yum install -y maven && \
     mvn clean install -DskipTests
 
-FROM eclipse-temurin:21.0.4_7-jre-ubi9-minimal AS runner
+FROM eclipse-temurin:25-jre-ubi10-minimal AS runner
 
 ENV DISCORD_BOT_CLIENT_ID=
 ENV DISCORD_BOT_CLIENT_SECRET=

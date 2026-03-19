@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -22,17 +22,17 @@ public class StringObjectMapConverter implements AttributeConverter<Map<String, 
 
     private static final Logger LOG = LoggerFactory.getLogger(StringObjectMapConverter.class);
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
-    public StringObjectMapConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public StringObjectMapConverter(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
     public String convertToDatabaseColumn(Map<String, Object> inputMap) {
 
         try {
-            return objectMapper.writeValueAsString(MapUtils.emptyIfNull(inputMap));
+            return jsonMapper.writeValueAsString(MapUtils.emptyIfNull(inputMap));
         } catch (Exception e) {
             LOG.error(ERROR_SERIALIZING_MAP, e);
             throw new IllegalStateException(ERROR_SERIALIZING_MAP, e);
@@ -48,7 +48,7 @@ public class StringObjectMapConverter implements AttributeConverter<Map<String, 
                 return emptyMap();
             }
 
-            return objectMapper.readValue(inputString, Map.class);
+            return jsonMapper.readValue(inputString, Map.class);
         } catch (Exception e) {
             LOG.error(ERROR_DESERIALIZING_MAP, e);
             throw new IllegalStateException(ERROR_DESERIALIZING_MAP, e);

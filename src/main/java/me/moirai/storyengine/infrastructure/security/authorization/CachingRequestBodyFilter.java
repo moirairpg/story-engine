@@ -21,6 +21,6 @@ public class CachingRequestBodyFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        chain.doFilter(new ContentCachingRequestWrapper(request), response);
+        chain.doFilter(new ContentCachingRequestWrapper(request, request.getContentLength()), response);
     }
 }

@@ -59,7 +59,7 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
 
         service = new StorySummarizationAdapter("Generate summary of the story so far",
                 "/completions", "test-token", tokenizerPort, chatMessageService,
-                restClient, objectMapper);
+                restClient, jsonMapper);
     }
 
     @Test

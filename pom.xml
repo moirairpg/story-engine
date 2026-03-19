@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.11</version>
+        <version>4.0.3</version>
         <relativePath />
     </parent>
 
@@ -20,17 +20,16 @@
 
     <properties>
         <github.global.server>github</github.global.server>
-        <java.version>21</java.version>
-        <testcontainers.version>1.19.7</testcontainers.version>
-        <springdoc.version>2.4.0</springdoc.version>
+        <java.version>25</java.version>
+        <testcontainers.version>2.0.3</testcontainers.version>
+        <springdoc.version>3.0.2</springdoc.version>
         <tokenizer.version>1.1.0</tokenizer.version>
-        <uuid-generator.version>4.3.0</uuid-generator.version>
-        <apache.commons.lang.version>3.14.0</apache.commons.lang.version>
-        <apache.commons.collections.version>4.4</apache.commons.collections.version>
-        <jackson.dataformat.version>2.16.1</jackson.dataformat.version>
+        <uuid-generator.version>5.2.0</uuid-generator.version>
+        <apache.commons.lang.version>3.20.0</apache.commons.lang.version>
+        <apache.commons.collections.version>4.5.0</apache.commons.collections.version>
         <wiremock.version>3.9.1</wiremock.version>
         <jda.version>5.1.2</jda.version>
-        <jacoco.version>0.8.13</jacoco.version>
+        <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <dependencies>
@@ -87,23 +86,21 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

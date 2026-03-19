@@ -5,7 +5,7 @@ services:
     restart: always
     container_name: postgresql
     hostname: postgresql
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     networks:
       - moirai_network
     ports:

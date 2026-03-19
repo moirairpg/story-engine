@@ -1,8 +1,9 @@
 package me.moirai.storyengine.core.port.outbound.discord;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonDeserialize(builder = RefreshSessionTokenRequest.Builder.class)
 public class RefreshSessionTokenRequest {

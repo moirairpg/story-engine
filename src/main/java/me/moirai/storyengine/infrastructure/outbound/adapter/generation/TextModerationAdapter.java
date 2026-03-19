@@ -16,7 +16,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
@@ -39,16 +39,16 @@ public class TextModerationAdapter implements TextModerationPort {
 
     private final String moderationUrl;
     private final RestClient openAiClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     public TextModerationAdapter(
             @Value("${moirai.openai.api.moderation-uri}") String moderationUrl,
             RestClient openAiClient,
-            ObjectMapper objectMapper) {
+            JsonMapper jsonMapper) {
 
         this.moderationUrl = moderationUrl;
         this.openAiClient = openAiClient;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -111,6 +111,6 @@ public class TextModerationAdapter implements TextModerationPort {
     }
 
     private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
-        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
+        return jsonMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }

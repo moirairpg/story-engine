@@ -28,7 +28,7 @@ class TextModerationAdapterTest extends AbstractWebMockTest {
                 .baseUrl("http://localhost:" + PORT)
                 .build();
 
-        adapter = new TextModerationAdapter("/moderation", restClient, objectMapper);
+        adapter = new TextModerationAdapter("/moderation", restClient, jsonMapper);
     }
 
     @Test

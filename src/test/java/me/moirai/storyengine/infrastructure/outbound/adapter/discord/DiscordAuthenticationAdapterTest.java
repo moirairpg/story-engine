@@ -36,7 +36,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         adapter = new DiscordAuthenticationAdapter("http://localhost:" + PORT,
                 "/users/%s", "/token", "/token/revoke",
-                restClient, objectMapper);
+                restClient, jsonMapper);
     }
 
     @Test

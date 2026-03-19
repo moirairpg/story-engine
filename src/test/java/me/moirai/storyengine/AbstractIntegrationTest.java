@@ -7,7 +7,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
@@ -63,7 +63,7 @@ public abstract class AbstractIntegrationTest {
     private static final String POSTGRES_IMAGE_NAME = "postgres:15-alpine";
 
     @SuppressWarnings("resource")
-    static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(POSTGRES_IMAGE_NAME)
+    static PostgreSQLContainer container = new PostgreSQLContainer(POSTGRES_IMAGE_NAME)
             .withDatabaseName("moirai")
             .withUsername("moirai")
             .withPassword("moirai");

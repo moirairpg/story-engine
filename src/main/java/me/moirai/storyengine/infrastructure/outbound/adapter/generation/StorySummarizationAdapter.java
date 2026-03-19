@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.exception.OpenAiApiException;
@@ -65,7 +65,7 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
     private final String token;
     private final String completionsUri;
     private final RestClient discordClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final String summarizationInstriction;
     private final TokenizerPort tokenizerPort;
     private final ChatMessagePort chatMessageService;
@@ -77,7 +77,7 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
             TokenizerPort tokenizerPort,
             ChatMessagePort chatMessageService,
             RestClient discordClient,
-            ObjectMapper objectMapper) {
+            JsonMapper jsonMapper) {
 
         this.summarizationInstriction = summarizationInstriction;
         this.completionsUri = completionsUri;
@@ -85,7 +85,7 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
         this.tokenizerPort = tokenizerPort;
         this.chatMessageService = chatMessageService;
         this.discordClient = discordClient;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -245,6 +245,6 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
     }
 
     private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
-        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
+        return jsonMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
@@ -20,12 +20,12 @@ public abstract class AbstractWebMockTest {
     protected static final int PORT = 1551;
 
     protected static WireMockServer wireMockServer;
-    protected static ObjectMapper objectMapper;
+    protected static JsonMapper jsonMapper;
 
     @BeforeAll
     static void setUp() {
 
-        objectMapper = new ObjectMapper();
+        jsonMapper = new JsonMapper();
 
         wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
                 .port(PORT)
@@ -45,7 +45,7 @@ public abstract class AbstractWebMockTest {
         wireMockServer.stubFor(any(anyUrl())
                 .willReturn(aResponse()
                         .withStatus(httpStatus)
-                        .withBody(objectMapper.writeValueAsString(response))
+                        .withBody(jsonMapper.writeValueAsString(response))
                         .withHeader(CONTENT_TYPE, APPLICATION_JSON)));
     }
 

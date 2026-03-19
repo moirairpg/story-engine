@@ -9,23 +9,22 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import me.moirai.storyengine.common.exception.UnauthorizedException;
 import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private final OperationAuthorizerFactory authorizerFactory;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
-    public AuthorizationInterceptor(OperationAuthorizerFactory authorizerFactory, ObjectMapper objectMapper) {
+    public AuthorizationInterceptor(OperationAuthorizerFactory authorizerFactory, JsonMapper jsonMapper) {
         this.authorizerFactory = authorizerFactory;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -99,7 +98,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return null;
         }
 
-        return objectMapper.readTree(body);
+        return jsonMapper.readTree(body);
     }
 
     private Object navigatePath(JsonNode root, String dotPath) {
@@ -114,8 +113,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (current == null || current.isNull() || current.isMissingNode()) {
             return null;
         }
-        if (current.isTextual()) {
-            return current.textValue();
+        if (current.isString()) {
+            return current.asString();
         }
         return current.toString();
     }

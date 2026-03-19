@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.exception.OpenAiApiException;
@@ -41,18 +41,18 @@ public class TextCompletionAdapter implements TextCompletionPort {
     private final String token;
     private final String completionsUri;
     private final RestClient discordClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     public TextCompletionAdapter(
             @Value("${moirai.openai.api.completions-uri}") String completionsUri,
             @Value("${moirai.openai.api.token}") String token,
             RestClient discordClient,
-            ObjectMapper objectMapper) {
+            JsonMapper jsonMapper) {
 
         this.token = token;
         this.completionsUri = completionsUri;
         this.discordClient = discordClient;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -122,6 +122,6 @@ public class TextCompletionAdapter implements TextCompletionPort {
     }
 
     private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
-        return objectMapper.readValue(response.getBody(), CompletionResponseError.class);
+        return jsonMapper.readValue(response.getBody(), CompletionResponseError.class);
     }
 }
