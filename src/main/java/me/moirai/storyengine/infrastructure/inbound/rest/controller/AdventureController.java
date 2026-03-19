@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
@@ -38,8 +40,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchMod
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
-import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/adventure")
@@ -84,7 +84,7 @@ public class AdventureController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
     public AdventureDetails getAdventureById(
             @PathVariable(required = true) UUID adventureId) {
 
@@ -128,7 +128,7 @@ public class AdventureController extends SecurityContextAware {
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public AdventureDetails updateAdventure(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
@@ -170,7 +170,7 @@ public class AdventureController extends SecurityContextAware {
 
     @DeleteMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DELETE_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.DELETE_ADVENTURE, fields = "#adventureId")
     public void deleteAdventure(
             @PathVariable(required = true) UUID adventureId) {
 

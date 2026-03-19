@@ -1,8 +1,8 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import static me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie.EXPIRY_COOKIE;
-import static me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie.REFRESH_COOKIE;
-import static me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie.SESSION_COOKIE;
+import static me.moirai.storyengine.common.security.authentication.MoiraiCookie.EXPIRY_COOKIE;
+import static me.moirai.storyengine.common.security.authentication.MoiraiCookie.REFRESH_COOKIE;
+import static me.moirai.storyengine.common.security.authentication.MoiraiCookie.SESSION_COOKIE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authentication.MoiraiCookie;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
@@ -27,7 +28,6 @@ import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetail
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import me.moirai.storyengine.infrastructure.security.authentication.MoiraiCookie;
 
 @Hidden
 @RestController

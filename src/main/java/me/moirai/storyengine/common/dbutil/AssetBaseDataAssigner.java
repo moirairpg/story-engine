@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import me.moirai.storyengine.common.domain.Asset;
-import me.moirai.storyengine.infrastructure.security.authentication.MoiraiPrincipal;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 
 public class AssetBaseDataAssigner {
 

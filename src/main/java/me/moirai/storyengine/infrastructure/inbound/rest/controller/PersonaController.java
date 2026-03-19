@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
@@ -34,8 +36,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdatePersonaRe
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/persona")
@@ -75,7 +75,7 @@ public class PersonaController extends SecurityContextAware {
 
     @GetMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_PERSONA, fields = "path:personaId")
+    @Authorize(operation = AuthorizationOperation.VIEW_PERSONA, fields = "#personaId")
     public PersonaDetails getPersonaById(
             @PathVariable(required = true) UUID personaId) {
 
@@ -101,7 +101,7 @@ public class PersonaController extends SecurityContextAware {
 
     @PutMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_PERSONA, fields = "path:personaId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_PERSONA, fields = "#personaId")
     public PersonaDetails updatePersona(
             @PathVariable(required = true) UUID personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
@@ -122,7 +122,7 @@ public class PersonaController extends SecurityContextAware {
 
     @DeleteMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DELETE_PERSONA, fields = "path:personaId")
+    @Authorize(operation = AuthorizationOperation.DELETE_PERSONA, fields = "#personaId")
     public void deletePersona(
             @PathVariable(required = true) UUID personaId) {
 

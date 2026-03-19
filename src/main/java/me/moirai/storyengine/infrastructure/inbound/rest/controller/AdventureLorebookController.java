@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
@@ -32,8 +34,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureLorebo
 import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/adventure/{adventureId}/lorebook")
@@ -72,7 +72,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
     public AdventureLorebookEntryDetails getLorebookEntryById(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID entryId) {
@@ -87,7 +87,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public AdventureLorebookEntryDetails createLorebookEntry(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody AdventureLorebookEntryRequest request) {
@@ -105,7 +105,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public AdventureLorebookEntryDetails updateLorebookEntry(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID entryId,
@@ -125,7 +125,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "path:adventureId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void deleteLorebookEntry(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID entryId) {

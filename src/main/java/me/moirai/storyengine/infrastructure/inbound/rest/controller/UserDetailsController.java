@@ -1,7 +1,6 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,8 +9,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserByDiscordId;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
@@ -35,7 +36,7 @@ public class UserDetailsController extends SecurityContextAware {
 
     @GetMapping("/{discordUserId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("isAdmin()")
+    @Authorize(operation = AuthorizationOperation.MANAGE_USER, fields = "#discordUserId")
     public UserDetailsResult getUserByDiscordId(@PathVariable(required = true) String discordUserId) {
 
         var query = new GetUserDetailsByDiscordId(discordUserId);
@@ -44,7 +45,7 @@ public class UserDetailsController extends SecurityContextAware {
 
     @DeleteMapping("/{discordUserId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @PreAuthorize("isAdmin() || isAuthenticatedUser(#discordUserId)")
+    @Authorize(operation = AuthorizationOperation.MANAGE_USER, fields = "#discordUserId")
     public void deleteUserByDiscordId(@PathVariable(required = true) String discordUserId) {
 
         var command = new DeleteUserByDiscordId(discordUserId);

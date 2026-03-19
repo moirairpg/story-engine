@@ -4,12 +4,13 @@ import static me.moirai.storyengine.common.enums.Role.ADMIN;
 import static me.moirai.storyengine.common.enums.Role.PLAYER;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class UserFixture {
 
-    public static final String PUBLIC_ID = "aabbccdd-1111-0000-0000-000000000000";
+    public static final UUID PUBLIC_ID = UUID.fromString("aabbccdd-1111-0000-0000-000000000000");
     public static final Long NUMERIC_ID = 1L;
 
     public static User.Builder player() {

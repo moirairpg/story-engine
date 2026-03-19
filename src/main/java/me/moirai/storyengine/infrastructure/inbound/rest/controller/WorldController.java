@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
@@ -36,8 +38,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDir
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
-import me.moirai.storyengine.infrastructure.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.infrastructure.security.authorization.Authorize;
 
 @RestController
 @RequestMapping("/world")
@@ -76,7 +76,7 @@ public class WorldController extends SecurityContextAware {
 
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "path:worldId")
+    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "#worldId")
     public WorldDetails getWorldById(@PathVariable(required = true) UUID worldId) {
 
         var query = new GetWorldById(worldId, authenticatedUserId());
@@ -107,7 +107,7 @@ public class WorldController extends SecurityContextAware {
 
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "path:worldId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public WorldDetails updateWorld(@PathVariable(required = true) UUID worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
@@ -128,7 +128,7 @@ public class WorldController extends SecurityContextAware {
 
     @DeleteMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DELETE_WORLD, fields = "path:worldId")
+    @Authorize(operation = AuthorizationOperation.DELETE_WORLD, fields = "#worldId")
     public void deleteWorld(@PathVariable(required = true) UUID worldId) {
 
         var command = new DeleteWorld(worldId, authenticatedUserId());
