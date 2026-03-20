@@ -83,15 +83,15 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.password", container::getPassword);
     }
 
-    protected <T> void insert(Object value, Class<T> type) {
-        dbTestHelper.insert(value, type);
+    protected <T> T insert(Object value, Class<T> type) {
+        return dbTestHelper.insert(value, type);
     }
 
-    protected <T> void clearAndInsert(Object value, Class<T> type) {
-        dbTestHelper.clearAndInsert(value, type);
+    protected <T> T clearAndInsert(Object value, Class<T> type) {
+        return dbTestHelper.clearAndInsert(value, type);
     }
 
-    protected <T> void update(Object value, Object primaryKeyValue, Class<T> type) {
+    protected <T> void update(Object value, Long primaryKeyValue, Class<T> type) {
         dbTestHelper.update(value, primaryKeyValue, type);
     }
 

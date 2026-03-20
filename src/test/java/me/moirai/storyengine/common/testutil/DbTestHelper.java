@@ -22,6 +22,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -30,6 +31,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import me.moirai.storyengine.common.annotation.RandomUuid;
@@ -43,28 +45,45 @@ public class DbTestHelper {
         this.jdbcClient = jdbcClient;
     }
 
-    public <T> void insert(Object value, Class<T> type) {
+    @SuppressWarnings("unchecked")
+    public <T> T insert(Object value, Class<T> type) {
+
         validateEntity(type);
         applyUuidGeneration(value, type);
+        applyEntityListeners(value, type);
+
         var tableName = resolveTableName(type);
         var params = buildParamMap(collectFields(type), value);
         var columns = String.join(", ", params.keySet());
+        var idField = resolveIdField(type);
+        var idColumn = resolveColumnName(idField);
         var placeholders = params.keySet().stream()
                 .map(k -> ":" + k)
                 .collect(joining(", "));
-        jdbcClient.sql("INSERT INTO " + tableName + " (" + columns + ") VALUES (" + placeholders + ")")
+
+        var generatedId = jdbcClient
+                .sql("INSERT INTO " + tableName + " (" + columns + ") VALUES (" + placeholders + ") RETURNING "
+                        + idColumn)
                 .params(params)
-                .update();
+                .query(Long.class)
+                .single();
+
+        updateWithGeneratedId(value, idField, generatedId);
+        insertOneToManyChildren(value, type, generatedId);
+
+        return (T) value;
     }
 
-    public <T> void clearAndInsert(Object value, Class<T> type) {
+    public <T> T clearAndInsert(Object value, Class<T> type) {
         clear(type);
-        insert(value, type);
+        return insert(value, type);
     }
 
-    public <T> void update(Object value, Object primaryKeyValue, Class<T> type) {
+    public <T> void update(Object value, Long primaryKeyValue, Class<T> type) {
+
         validateEntity(type);
         applyUuidGeneration(value, type);
+
         var tableName = resolveTableName(type);
         var idField = resolveIdField(type);
         var idColumn = resolveColumnName(idField);
@@ -72,15 +91,20 @@ public class DbTestHelper {
         var nonIdFields = allFields.stream()
                 .filter(f -> !f.equals(idField))
                 .toList();
+
         var params = new HashMap<>(buildParamMap(nonIdFields, value));
         params.put("pkValue", primaryKeyValue);
+
         var setClauses = params.keySet().stream()
                 .filter(k -> !k.equals("pkValue"))
                 .map(k -> k + " = :" + k)
                 .collect(joining(", "));
+
         jdbcClient.sql("UPDATE " + tableName + " SET " + setClauses + " WHERE " + idColumn + " = :pkValue")
                 .params(params)
                 .update();
+
+        replaceOneToManyChildren(value, type, primaryKeyValue);
     }
 
     public <T> void clear(Class<T> type) {
@@ -91,6 +115,7 @@ public class DbTestHelper {
     public void clearDatabase() {
         var scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
+
         var tableNames = scanner.findCandidateComponents("me.moirai.storyengine")
                 .stream()
                 .map(bd -> {
@@ -102,6 +127,7 @@ public class DbTestHelper {
                 })
                 .map(this::resolveTableName)
                 .collect(joining(", "));
+
         jdbcClient.sql("TRUNCATE TABLE " + tableNames + " RESTART IDENTITY CASCADE").update();
     }
 
@@ -116,25 +142,38 @@ public class DbTestHelper {
         if (table != null && !table.name().isBlank()) {
             return table.name();
         }
+
         return toSnakeCase(type.getSimpleName());
     }
 
     private List<Field> collectFields(Class<?> type) {
         var result = new ArrayList<Field>();
         var current = type;
+
         while (current != null && current != Object.class) {
             if (current == type || current.isAnnotationPresent(MappedSuperclass.class)) {
                 for (var field : current.getDeclaredFields()) {
-                    if (Modifier.isStatic(field.getModifiers())) continue;
-                    if (Modifier.isTransient(field.getModifiers())) continue;
-                    if (field.isAnnotationPresent(Transient.class)) continue;
-                    if (field.isAnnotationPresent(OneToMany.class)) continue;
-                    if (field.isAnnotationPresent(ManyToMany.class)) continue;
+                    if (Modifier.isStatic(field.getModifiers()))
+                        continue;
+
+                    if (Modifier.isTransient(field.getModifiers()))
+                        continue;
+
+                    if (field.isAnnotationPresent(Transient.class))
+                        continue;
+
+                    if (field.isAnnotationPresent(OneToMany.class))
+                        continue;
+
+                    if (field.isAnnotationPresent(ManyToMany.class))
+                        continue;
                     result.add(field);
                 }
             }
+
             current = current.getSuperclass();
         }
+
         return result;
     }
 
@@ -142,12 +181,21 @@ public class DbTestHelper {
         var result = new ArrayList<Field>();
         var embeddableType = embeddedField.getType();
         for (var field : embeddableType.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) continue;
-            if (Modifier.isTransient(field.getModifiers())) continue;
-            if (field.isAnnotationPresent(Transient.class)) continue;
-            if (field.isAnnotationPresent(Formula.class)) continue;
+            if (Modifier.isStatic(field.getModifiers()))
+                continue;
+
+            if (Modifier.isTransient(field.getModifiers()))
+                continue;
+
+            if (field.isAnnotationPresent(Transient.class))
+                continue;
+
+            if (field.isAnnotationPresent(Formula.class))
+                continue;
+
             result.add(field);
         }
+
         return result;
     }
 
@@ -157,6 +205,7 @@ public class DbTestHelper {
                 return field;
             }
         }
+
         throw new IllegalStateException("No @Id field found on " + type.getName());
     }
 
@@ -165,20 +214,89 @@ public class DbTestHelper {
         if (column != null && !column.name().isBlank()) {
             return column.name();
         }
+
         return toSnakeCase(field.getName());
+    }
+
+    private void updateWithGeneratedId(Object value, Field idField, Long generatedId) {
+        try {
+            idField.setAccessible(true);
+            idField.set(value, generatedId);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void applyUuidGeneration(Object value, Class<?> type) {
         try {
             for (var field : collectFields(type)) {
-                if (!field.isAnnotationPresent(RandomUuid.class)) continue;
+                if (!field.isAnnotationPresent(RandomUuid.class))
+                    continue;
+
                 field.setAccessible(true);
-                if (field.get(value) != null) continue;
+                if (field.get(value) != null)
+                    continue;
+
                 field.set(value, Generators.timeBasedEpochGenerator().generate());
             }
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private void insertOneToManyChildren(Object parent, Class<?> parentType, Long parentId) {
+        try {
+            for (var field : collectOneToManyFields(parentType)) {
+                field.setAccessible(true);
+                var collection = (Iterable<?>) field.get(parent);
+                if (collection == null)
+                    continue;
+
+                var fkColumnName = field.getAnnotation(JoinColumn.class).name();
+
+                for (var child : collection) {
+                    var childType = child.getClass();
+                    applyUuidGeneration(child, childType);
+                    applyEntityListeners(child, childType);
+
+                    var tableName = resolveTableName(childType);
+                    var params = new HashMap<>(buildParamMap(collectFields(childType), child));
+                    params.put(fkColumnName, parentId);
+
+                    var columns = String.join(", ", params.keySet());
+                    var placeholders = params.keySet().stream().map(k -> ":" + k).collect(joining(", "));
+                    var idField = resolveIdField(childType);
+                    var idColumn = resolveColumnName(idField);
+                    var generatedChildId = jdbcClient
+                            .sql("INSERT INTO " + tableName + " (" + columns + ") VALUES (" + placeholders
+                                    + ") RETURNING " + idColumn)
+                            .params(params)
+                            .query(Long.class)
+                            .single();
+
+                    updateWithGeneratedId(child, idField, generatedChildId);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private List<Field> collectOneToManyFields(Class<?> type) {
+
+        var result = new ArrayList<Field>();
+        var current = type;
+        while (current != null && current != Object.class) {
+            for (var field : current.getDeclaredFields()) {
+                if (field.isAnnotationPresent(OneToMany.class) && field.isAnnotationPresent(JoinColumn.class)) {
+                    result.add(field);
+                }
+            }
+
+            current = current.getSuperclass();
+        }
+
+        return result;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -188,7 +306,10 @@ public class DbTestHelper {
             for (var field : fields) {
                 field.setAccessible(true);
                 var fieldValue = field.get(value);
-                if (field.isAnnotationPresent(GeneratedValue.class) && fieldValue == null) continue;
+
+                if (field.isAnnotationPresent(GeneratedValue.class) && fieldValue == null)
+                    continue;
+
                 if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
                     var joinColumn = field.getAnnotation(JoinColumn.class);
                     var columnName = (joinColumn != null && !joinColumn.name().isBlank())
@@ -228,6 +349,40 @@ public class DbTestHelper {
             return params;
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private void replaceOneToManyChildren(Object parent, Class<?> parentType, Long parentId) {
+        for (var field : collectOneToManyFields(parentType)) {
+            var fkColumnName = field.getAnnotation(JoinColumn.class).name();
+            var childType = (Class<?>) ((java.lang.reflect.ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+            jdbcClient.sql("DELETE FROM " + resolveTableName(childType) + " WHERE " + fkColumnName + " = :parentId")
+                    .param("parentId", parentId)
+                    .update();
+        }
+        insertOneToManyChildren(parent, parentType, parentId);
+    }
+
+    private void applyEntityListeners(Object value, Class<?> type) {
+        var current = type;
+        while (current != null && current != Object.class) {
+            var listeners = current.getAnnotation(EntityListeners.class);
+            if (listeners != null) {
+                for (var listenerClass : listeners.value()) {
+                    for (var method : listenerClass.getDeclaredMethods()) {
+                        if (method.isAnnotationPresent(PrePersist.class)) {
+                            try {
+                                var listener = listenerClass.getDeclaredConstructor().newInstance();
+                                method.setAccessible(true);
+                                method.invoke(listener, value);
+                            } catch (ReflectiveOperationException e) {
+                                throw new IllegalStateException(e);
+                            }
+                        }
+                    }
+                }
+            }
+            current = current.getSuperclass();
         }
     }
 
