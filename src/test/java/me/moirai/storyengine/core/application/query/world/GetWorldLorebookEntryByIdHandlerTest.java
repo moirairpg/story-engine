@@ -3,8 +3,6 @@ package me.moirai.storyengine.core.application.query.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -15,22 +13,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldLorebookReader;
 
 @ExtendWith(MockitoExtension.class)
 public class GetWorldLorebookEntryByIdHandlerTest {
 
     @Mock
-    private WorldRepository repository;
+    private WorldLorebookReader reader;
 
     @InjectMocks
     private GetWorldLorebookEntryByIdHandler handler;
@@ -49,10 +44,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void errorWhenEntryIdIsNull() {
 
         // Given
-        GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
-                null,
-                WorldFixture.PUBLIC_ID,
-                null);
+        var query = new GetWorldLorebookEntryById(null, WorldFixture.PUBLIC_ID, null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -62,48 +54,44 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void errorWhenWorldIdIsNull() {
 
         // Given
-        GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
-                WorldLorebookEntryFixture.PUBLIC_ID,
-                null,
-                null);
+        var query = new GetWorldLorebookEntryById(WorldLorebookEntryFixture.PUBLIC_ID, null, null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
     }
 
     @Test
-    public void getWorldLorebookEntryById() {
+    public void getWorldLorebookEntryById_whenNotFound_thenThrowException() {
 
         // Given
-        UUID publicId = WorldLorebookEntryFixture.PUBLIC_ID;
-        UUID worldId = WorldFixture.PUBLIC_ID;
-        String requesterId = "4314324";
+        var query = new GetWorldLorebookEntryById(
+                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID, "4314324");
 
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-        ReflectionTestUtils.setField(entry, "id", WorldLorebookEntryFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(entry, "publicId", publicId);
+        when(reader.getWorldLorebookEntryById(any(UUID.class), any(UUID.class))).thenReturn(Optional.empty());
 
-        World baseWorld = WorldFixture.publicWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        // Then
+        assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
+    }
 
-        World world = spy(baseWorld);
-        doReturn(entry).when(world).getLorebookEntryById(any(UUID.class));
+    @Test
+    public void getWorldLorebookEntryById_whenFound_thenReturnDetails() {
 
-        GetWorldLorebookEntryById query = new GetWorldLorebookEntryById(
-                publicId,
-                worldId,
-                requesterId);
+        // Given
+        var expectedDetails = new WorldLorebookEntryDetails(
+                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID,
+                "White River", "[Ww]hite", "Description", null, null);
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
+        var query = new GetWorldLorebookEntryById(
+                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID, "4314324");
+
+        when(reader.getWorldLorebookEntryById(any(UUID.class), any(UUID.class)))
+                .thenReturn(Optional.of(expectedDetails));
 
         // When
         WorldLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(entry.getPublicId());
+        assertThat(result.id()).isEqualTo(WorldLorebookEntryFixture.PUBLIC_ID);
     }
 }

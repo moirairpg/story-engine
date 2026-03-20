@@ -13,21 +13,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaReader;
 
 @ExtendWith(MockitoExtension.class)
 public class GetPersonaByIdHandlerTest {
 
     @Mock
-    private PersonaRepository repository;
+    private PersonaReader reader;
 
     @InjectMocks
     private GetPersonaByIdHandler handler;
@@ -36,8 +33,7 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenIdIsNull_thenThrowException() {
 
         // Given
-        String requesterId = "RQSTRID";
-        GetPersonaById query = new GetPersonaById(null, requesterId);
+        var query = new GetPersonaById(null, "RQSTRID");
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -47,10 +43,9 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenPersonaNotFound_thenThrowException() {
 
         // Given
-        String requesterId = "RQSTRID";
-        GetPersonaById query = new GetPersonaById(PersonaFixture.PUBLIC_ID, requesterId);
+        var query = new GetPersonaById(PersonaFixture.PUBLIC_ID, "RQSTRID");
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
+        when(reader.getPersonaById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
@@ -60,21 +55,17 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenPersonaExists_thenReturnPersonaDetails() {
 
         // Given
-        String requesterId = "RQSTRID";
-        Persona persona = PersonaFixture.privatePersona()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
-        ReflectionTestUtils.setField(persona, "id", 1L);
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
+        var expectedDetails = new PersonaDetails(
+                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a bot", null, "owner1",
+                java.util.Set.of(), java.util.Set.of(),
+                null, null);
 
-        GetPersonaById query = new GetPersonaById(PersonaFixture.PUBLIC_ID, requesterId);
+        var query = new GetPersonaById(PersonaFixture.PUBLIC_ID, "RQSTRID");
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
+        when(reader.getPersonaById(any(UUID.class))).thenReturn(Optional.of(expectedDetails));
 
         // When
-        PersonaDetails result = handler.handle(query);
+        var result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

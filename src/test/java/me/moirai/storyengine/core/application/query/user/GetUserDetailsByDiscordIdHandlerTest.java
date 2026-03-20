@@ -5,25 +5,28 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetailsFixture;
-import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
-import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
 
     @Mock
-    private UserRepository repository;
+    private UserReader userReader;
 
     @Mock
     private DiscordUserDetailsPort discordUserDetailsPort;
@@ -40,12 +43,10 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .id(query.discordUserId())
                 .build();
 
-        var user = UserFixture.player()
-                .discordId(query.discordUserId())
-                .build();
+        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, OffsetDateTime.now());
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
-        when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
+        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
 
         // When
         var result = handler.handle(query);
@@ -67,12 +68,10 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .nickname(null)
                 .build();
 
-        var user = UserFixture.player()
-                .discordId(query.discordUserId())
-                .build();
+        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, OffsetDateTime.now());
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
-        when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
+        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
 
         // When
         var result = handler.execute(query);
@@ -111,7 +110,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .build();
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
-        when(repository.findByDiscordId(anyString())).thenReturn(Optional.empty());
+        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)

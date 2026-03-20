@@ -14,21 +14,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
 @ExtendWith(MockitoExtension.class)
 public class GetWorldByIdHandlerTest {
 
     @Mock
-    private WorldRepository repository;
+    private WorldReader reader;
 
     @InjectMocks
     private GetWorldByIdHandler handler;
@@ -47,19 +44,13 @@ public class GetWorldByIdHandlerTest {
     public void getWorldById() {
 
         // Given
-        String requesterId = "84REAC";
-        World world = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var expectedDetails = new WorldDetails(
+                WorldFixture.PUBLIC_ID, "MoirAI", "desc", "start", "PUBLIC",
+                "owner1", java.util.Set.of(), java.util.Set.of(), null, null);
 
-        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
+        var query = new GetWorldById(WorldFixture.PUBLIC_ID, "84REAC");
 
-        GetWorldById query = new GetWorldById(WorldFixture.PUBLIC_ID, requesterId);
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
+        when(reader.getWorldById(any(UUID.class))).thenReturn(Optional.of(expectedDetails));
 
         // When
         WorldDetails result = handler.handle(query);
@@ -73,9 +64,7 @@ public class GetWorldByIdHandlerTest {
     public void updateWorld_whenIdIsNull_thenExceptionIsThrown() {
 
         // Given
-        UUID id = null;
-        String requesterId = "84REAC";
-        GetWorldById command = new GetWorldById(id, requesterId);
+        var command = new GetWorldById(null, "84REAC");
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -86,10 +75,9 @@ public class GetWorldByIdHandlerTest {
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
-        String requesterId = "84REAC";
-        GetWorldById command = new GetWorldById(WorldFixture.PUBLIC_ID, requesterId);
+        var command = new GetWorldById(WorldFixture.PUBLIC_ID, "84REAC");
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
+        when(reader.getWorldById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)

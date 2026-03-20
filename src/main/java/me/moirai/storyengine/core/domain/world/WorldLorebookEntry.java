@@ -33,6 +33,9 @@ public class WorldLorebookEntry extends Asset {
     @Column(name = "regex")
     private String regex;
 
+    @Column(name = "world_id")
+    private Long worldId;
+
     private WorldLorebookEntry(Builder builder) {
 
         super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);

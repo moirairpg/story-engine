@@ -12,5 +12,5 @@ public record UserDetailsResult(
         String nickname,
         String avatarUrl,
         Role role,
-        OffsetDateTime joinDate) {
+        OffsetDateTime creationDate) {
 }

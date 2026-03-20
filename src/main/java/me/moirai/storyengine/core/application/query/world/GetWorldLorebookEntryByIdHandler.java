@@ -3,23 +3,21 @@ package me.moirai.storyengine.core.application.query.world;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.port.outbound.world.WorldLorebookReader;
 
 @QueryHandler
 public class GetWorldLorebookEntryByIdHandler
         extends AbstractQueryHandler<GetWorldLorebookEntryById, WorldLorebookEntryDetails> {
 
-    private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
+    private static final String WORLD_LOREBOOK_ENTRY_NOT_FOUND = "World lorebook entry was not found";
 
-    private final WorldRepository repository;
+    private final WorldLorebookReader reader;
 
-    public GetWorldLorebookEntryByIdHandler(WorldRepository repository) {
+    public GetWorldLorebookEntryByIdHandler(WorldLorebookReader reader) {
 
-        this.repository = repository;
+        this.reader = reader;
     }
 
     @Override
@@ -37,23 +35,7 @@ public class GetWorldLorebookEntryByIdHandler
     @Override
     public WorldLorebookEntryDetails execute(GetWorldLorebookEntryById query) {
 
-        var world = repository.findByPublicId(query.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-
-        var entry = world.getLorebookEntryById(query.entryId());
-
-        return mapResult(world, entry);
-    }
-
-    private WorldLorebookEntryDetails mapResult(World world, WorldLorebookEntry entry) {
-
-        return new WorldLorebookEntryDetails(
-                entry.getPublicId(),
-                world.getPublicId(),
-                entry.getName(),
-                entry.getRegex(),
-                entry.getDescription(),
-                entry.getCreationDate(),
-                entry.getLastUpdateDate());
+        return reader.getWorldLorebookEntryById(query.entryId(), query.worldId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_LOREBOOK_ENTRY_NOT_FOUND));
     }
 }

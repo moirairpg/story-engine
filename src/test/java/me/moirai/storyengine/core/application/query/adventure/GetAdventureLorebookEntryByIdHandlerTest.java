@@ -3,8 +3,6 @@ package me.moirai.storyengine.core.application.query.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -15,22 +13,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureLorebookEntryByIdHandlerTest {
 
     @Mock
-    private AdventureRepository repository;
+    private AdventureLorebookReader reader;
 
     @InjectMocks
     private GetAdventureLorebookEntryByIdHandler handler;
@@ -49,10 +44,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
     public void errorWhenEntryIdIsNull() {
 
         // Given
-        GetAdventureLorebookEntryById query = new GetAdventureLorebookEntryById(
-                null,
-                AdventureFixture.PUBLIC_ID,
-                "1234");
+        var query = new GetAdventureLorebookEntryById(null, AdventureFixture.PUBLIC_ID, "1234");
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -62,53 +54,48 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
     public void errorWhenAdventureIdIsNull() {
 
         // Given
-        GetAdventureLorebookEntryById query = new GetAdventureLorebookEntryById(
-                UUID.randomUUID(),
-                null,
-                "1234");
+        var query = new GetAdventureLorebookEntryById(UUID.randomUUID(), null, "1234");
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
     }
 
     @Test
-    public void getAdventureLorebookEntryById() {
+    public void getAdventureLorebookEntryById_whenNotFound_thenThrowException() {
 
         // Given
-        String requesterId = "4314324";
+        var query = new GetAdventureLorebookEntryById(
+                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID, "1234");
 
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
-        ReflectionTestUtils.setField(entry, "id", AdventureLorebookEntryFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(entry, "publicId", AdventureLorebookEntryFixture.PUBLIC_ID);
+        when(reader.getAdventureLorebookEntryById(any(UUID.class), any(UUID.class))).thenReturn(Optional.empty());
 
-        Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        // Then
+        assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
+    }
 
-        Adventure adventure = spy(baseAdventure);
-        doReturn(entry).when(adventure).getLorebookEntryById(any(UUID.class));
+    @Test
+    public void getAdventureLorebookEntryById_whenFound_thenReturnDetails() {
 
-        GetAdventureLorebookEntryById query = new GetAdventureLorebookEntryById(
-                AdventureLorebookEntryFixture.PUBLIC_ID,
-                AdventureFixture.PUBLIC_ID,
-                requesterId);
+        // Given
+        var expectedDetails = new AdventureLorebookEntryDetails(
+                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID,
+                "White River", "[Ww]hite", "Description", null, false, null, null);
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        var query = new GetAdventureLorebookEntryById(
+                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID, "4314324");
+
+        when(reader.getAdventureLorebookEntryById(any(UUID.class), any(UUID.class)))
+                .thenReturn(Optional.of(expectedDetails));
 
         // When
         AdventureLorebookEntryDetails result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(entry.getPublicId());
-        assertThat(result.name()).isEqualTo(entry.getName());
-        assertThat(result.regex()).isEqualTo(entry.getRegex());
-        assertThat(result.description()).isEqualTo(entry.getDescription());
-        assertThat(result.playerId()).isEqualTo(entry.getPlayerId());
-        assertThat(result.isPlayerCharacter()).isEqualTo(entry.isPlayerCharacter());
-        assertThat(result.creationDate()).isNotNull();
-        assertThat(result.lastUpdateDate()).isNotNull();
+        assertThat(result.id()).isEqualTo(AdventureLorebookEntryFixture.PUBLIC_ID);
+        assertThat(result.name()).isEqualTo(expectedDetails.name());
+        assertThat(result.regex()).isEqualTo(expectedDetails.regex());
+        assertThat(result.description()).isEqualTo(expectedDetails.description());
+        assertThat(result.isPlayerCharacter()).isFalse();
     }
 }
