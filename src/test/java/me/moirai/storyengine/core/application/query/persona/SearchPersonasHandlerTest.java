@@ -4,56 +4,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SearchView;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaSummary;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
-import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaSearchReader;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchPersonasHandlerTest {
 
     @Mock
-    private PersonaRepository repository;
+    private PersonaSearchReader reader;
 
     @InjectMocks
     private SearchPersonasHandler handler;
 
     @Test
-    public void searchPersonas() {
+    public void searchPersonas_whenValidQuery_thenReturnResult() {
 
         // Given
-        SearchPersonas query = new SearchPersonas(
+        var query = new SearchPersonas(
                 "name",
                 null,
+                SearchView.MY_STUFF,
+                null,
+                null,
                 1,
                 2,
-                null,
-                "ASC",
-                null,
-                null,
-                null);
+                "requesterId");
 
-        SearchPersonasResult expectedResult = new SearchPersonasResult(
-                1,
-                2,
-                0,
-                0,
-                null);
+        var expectedResult = PaginatedResult.<PersonaSummary>of(List.of(), 0L, 1, 2);
 
-        when(repository.search(any(SearchPersonas.class)))
-                .thenReturn(expectedResult);
+        when(reader.search(any(SearchPersonas.class))).thenReturn(expectedResult);
 
         // When
-        SearchPersonasResult result = handler.handle(query);
+        var result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.items()).isEqualTo(expectedResult.items());
         assertThat(result.page()).isEqualTo(expectedResult.page());
+        assertThat(result.items()).isEqualTo(expectedResult.items());
     }
 }

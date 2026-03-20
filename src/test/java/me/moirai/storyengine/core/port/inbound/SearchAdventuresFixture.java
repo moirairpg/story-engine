@@ -1,5 +1,6 @@
 package me.moirai.storyengine.core.port.inbound;
 
+import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 
 public class SearchAdventuresFixture {
@@ -11,16 +12,15 @@ public class SearchAdventuresFixture {
                 "1234",
                 "1234",
                 "1234",
-                false,
-                1,
-                10,
+                null,
                 "GPT3_TURBO",
                 "RPG",
                 "PERMISSIVE",
-                "name",
-                "ASC",
-                "PUBLIC",
-                "WRITE",
+                SearchView.MY_STUFF,
+                null,
+                null,
+                1,
+                10,
                 "1234");
     }
 
@@ -31,16 +31,15 @@ public class SearchAdventuresFixture {
                 "1234",
                 "1234",
                 "1234",
-                false,
-                1,
-                10,
+                null,
                 "GPT3_TURBO",
                 "RPG",
                 "PERMISSIVE",
-                "name",
-                "ASC",
-                "PUBLIC",
-                "READ",
+                SearchView.MY_STUFF,
+                null,
+                null,
+                1,
+                10,
                 "1234");
     }
 }

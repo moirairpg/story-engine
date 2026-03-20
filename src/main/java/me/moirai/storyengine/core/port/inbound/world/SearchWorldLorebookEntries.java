@@ -3,14 +3,17 @@ package me.moirai.storyengine.core.port.inbound.world;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.query.Query;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SortDirection;
+import me.moirai.storyengine.core.port.inbound.LorebookEntrySummary;
 
 public record SearchWorldLorebookEntries(
-        String name,
         UUID worldId,
+        String name,
+        WorldLorebookSortField sortingField,
+        SortDirection direction,
         Integer page,
         Integer size,
-        String sortingField,
-        String direction,
         String requesterId)
-        implements Query<SearchWorldLorebookEntriesResult> {
+        implements Query<PaginatedResult<LorebookEntrySummary>> {
 }

@@ -1,22 +1,24 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
 import me.moirai.storyengine.common.cqs.query.Query;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SearchView;
+import me.moirai.storyengine.common.enums.SortDirection;
 
 public record SearchAdventures(
         String name,
         String worldName,
         String personaName,
         String ownerId,
-        boolean isMultiplayer,
-        Integer page,
-        Integer size,
+        Boolean isMultiplayer,
         String model,
         String gameMode,
         String moderation,
-        String sortingField,
-        String direction,
-        String visibility,
-        String operation,
+        SearchView view,
+        AdventureSortField sortingField,
+        SortDirection direction,
+        Integer page,
+        Integer size,
         String requesterId)
-        implements Query<SearchAdventuresResult> {
+        implements Query<PaginatedResult<AdventureSummary>> {
 }

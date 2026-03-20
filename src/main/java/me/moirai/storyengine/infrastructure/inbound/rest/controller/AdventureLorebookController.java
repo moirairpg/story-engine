@@ -1,8 +1,5 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.text.CaseUtils.toCamelCase;
-
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,19 +19,19 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
+import me.moirai.storyengine.core.port.inbound.LorebookEntrySummary;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookSortField;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureLorebookEntryRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.LorebookSearchParameters;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 
 @RestController
 @RequestMapping("/adventure/{adventureId}/lorebook")
@@ -51,23 +49,24 @@ public class AdventureLorebookController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
-    // TODO reform search request
     @GetMapping
-    @ResponseStatus(code = HttpStatus.OK)
-    public SearchAdventureLorebookEntriesResult search(
-            @PathVariable(required = true) UUID adventureId,
-            LorebookSearchParameters searchParameters) {
+    @ResponseStatus(HttpStatus.OK)
+    public PaginatedResult<LorebookEntrySummary> search(
+            @PathVariable UUID adventureId,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "sorting_field", required = false) AdventureLorebookSortField sortingField,
+            @RequestParam(name = "direction", required = false) SortDirection direction,
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size) {
 
-        var query = new SearchAdventureLorebookEntries(
+        return queryRunner.run(new SearchAdventureLorebookEntries(
                 adventureId,
-                searchParameters.getName(),
-                searchParameters.getPage(),
-                searchParameters.getSize(),
-                getSortingField(searchParameters.getSortingField()),
-                getDirection(searchParameters.getDirection()),
-                authenticatedUserId());
-
-        return queryRunner.run(query);
+                name,
+                sortingField,
+                direction,
+                page,
+                size,
+                authenticatedUserId()));
     }
 
     @GetMapping("/{entryId}")
@@ -138,22 +137,4 @@ public class AdventureLorebookController extends SecurityContextAware {
         commandRunner.run(command);
     }
 
-    // TODO remove all of this
-    private String getSortingField(SearchSortingField searchSortingField) {
-
-        if (searchSortingField != null) {
-            return toCamelCase(searchSortingField.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getDirection(SearchDirection searchDirection) {
-
-        if (searchDirection != null) {
-            return toCamelCase(searchDirection.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
 }

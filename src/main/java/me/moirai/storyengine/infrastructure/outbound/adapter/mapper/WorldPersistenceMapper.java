@@ -1,10 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.mapper;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
-import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.domain.world.World;
 
 @Component
@@ -23,18 +21,5 @@ public class WorldPersistenceMapper {
                 world.getUsersAllowedToWrite(),
                 world.getCreationDate(),
                 world.getLastUpdateDate());
-    }
-
-    public SearchWorldsResult mapToResult(Page<World> pagedResult) {
-
-        return new SearchWorldsResult(
-                pagedResult.getNumber() + 1,
-                pagedResult.getNumberOfElements(),
-                pagedResult.getTotalElements(),
-                pagedResult.getTotalPages(),
-                pagedResult.getContent()
-                        .stream()
-                        .map(this::mapToResult)
-                        .toList());
     }
 }

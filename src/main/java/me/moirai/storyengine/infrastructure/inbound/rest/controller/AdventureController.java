@@ -1,8 +1,5 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.text.CaseUtils.toCamelCase;
-
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,25 +19,24 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SearchView;
+import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchGameMode;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModel;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModeration;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
 
 @RestController
 @RequestMapping("/adventure")
@@ -57,29 +54,38 @@ public class AdventureController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
-    // TODO reform search request
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public SearchAdventuresResult search(AdventureSearchParameters searchParameters) {
+    public PaginatedResult<AdventureSummary> search(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "world_name", required = false) String worldName,
+            @RequestParam(name = "persona_name", required = false) String personaName,
+            @RequestParam(name = "owner_id", required = false) String ownerId,
+            @RequestParam(name = "is_multiplayer", required = false) Boolean isMultiplayer,
+            @RequestParam(name = "model", required = false) SearchModel model,
+            @RequestParam(name = "game_mode", required = false) SearchGameMode gameMode,
+            @RequestParam(name = "moderation", required = false) SearchModeration moderation,
+            @RequestParam(name = "view", required = true) SearchView view,
+            @RequestParam(name = "sorting_field", required = false) AdventureSortField sortingField,
+            @RequestParam(name = "direction", required = false) SortDirection direction,
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size) {
 
-        var query = new SearchAdventures(
-                searchParameters.getName(),
-                searchParameters.getWorld(),
-                searchParameters.getPersona(),
-                searchParameters.getOwnerId(),
-                searchParameters.isMultiplayer(),
-                searchParameters.getPage(),
-                searchParameters.getSize(),
-                getModel(searchParameters.getModel()),
-                getGameMode(searchParameters.getGameMode()),
-                getModeration(searchParameters.getModeration()),
-                getSortingField(searchParameters.getSortingField()),
-                getDirection(searchParameters.getDirection()),
-                getVisibility(searchParameters.getVisibility()),
-                getOperation(searchParameters.getOperation()),
-                authenticatedUserId());
-
-        return queryRunner.run(query);
+        return queryRunner.run(new SearchAdventures(
+                name,
+                worldName,
+                personaName,
+                ownerId,
+                isMultiplayer,
+                model != null ? model.name() : null,
+                gameMode != null ? gameMode.name() : null,
+                moderation != null ? moderation.name() : null,
+                view,
+                sortingField,
+                direction,
+                page,
+                size,
+                authenticatedUserId()));
     }
 
     @GetMapping("/{adventureId}")
@@ -178,67 +184,4 @@ public class AdventureController extends SecurityContextAware {
         commandRunner.run(command);
     }
 
-    // TODO remove all of this
-    private String getModel(SearchModel searchModel) {
-
-        if (searchModel != null) {
-            return searchModel.name();
-        }
-
-        return EMPTY;
-    }
-
-    private String getGameMode(SearchGameMode searchGameMode) {
-
-        if (searchGameMode != null) {
-            return searchGameMode.name();
-        }
-
-        return EMPTY;
-    }
-
-    private String getModeration(SearchModeration searchModeration) {
-
-        if (searchModeration != null) {
-            return searchModeration.name();
-        }
-
-        return EMPTY;
-    }
-
-    private String getSortingField(SearchSortingField searchSortingField) {
-
-        if (searchSortingField != null) {
-            return toCamelCase(searchSortingField.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getDirection(SearchDirection searchDirection) {
-
-        if (searchDirection != null) {
-            return toCamelCase(searchDirection.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getVisibility(SearchVisibility searchVisibility) {
-
-        if (searchVisibility != null) {
-            return toCamelCase(searchVisibility.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getOperation(SearchOperation searchOperation) {
-
-        if (searchOperation != null) {
-            return toCamelCase(searchOperation.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
 }

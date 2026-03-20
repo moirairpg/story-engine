@@ -4,16 +4,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntriesResult;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventuresResult;
 
 public interface AdventureRepository {
 
     Adventure save(Adventure adventure);
-
-    void deleteById(Long id);
 
     void deleteByPublicId(UUID publicId);
 
@@ -25,13 +19,7 @@ public interface AdventureRepository {
 
     void updateBumpByChannelId(String bumpContent, int bumpFrequency, String channelId);
 
-    Optional<Adventure> findById(Long id);
-
     Optional<Adventure> findByPublicId(UUID publicId);
-
-    SearchAdventuresResult search(SearchAdventures request);
-
-    SearchAdventureLorebookEntriesResult searchLorebookEntries(SearchAdventureLorebookEntries query);
 
     Optional<Adventure> findByChannelId(String channelId);
 

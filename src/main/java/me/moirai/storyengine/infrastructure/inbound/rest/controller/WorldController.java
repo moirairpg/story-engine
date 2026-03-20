@@ -1,8 +1,6 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import java.util.UUID;
 
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,22 +21,21 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SearchView;
+import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
-import me.moirai.storyengine.core.port.inbound.world.SearchWorldsResult;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
+import me.moirai.storyengine.core.port.inbound.world.WorldSortField;
+import me.moirai.storyengine.core.port.inbound.world.WorldSummary;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateWorldRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.WorldSearchParameters;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchVisibility;
 
 @RestController
 @RequestMapping("/world")
@@ -55,23 +53,26 @@ public class WorldController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
-    // TODO reform search request
     @GetMapping
-    @ResponseStatus(code = HttpStatus.OK)
-    public SearchWorldsResult search(WorldSearchParameters searchParameters) {
+    @ResponseStatus(HttpStatus.OK)
+    public PaginatedResult<WorldSummary> search(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "owner_id", required = false) String ownerId,
+            @RequestParam(name = "view", required = true) SearchView view,
+            @RequestParam(name = "sorting_field", required = false) WorldSortField sortingField,
+            @RequestParam(name = "direction", required = false) SortDirection direction,
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size) {
 
-        var query = new SearchWorlds(
-                searchParameters.getName(),
-                searchParameters.getOwnerId(),
-                searchParameters.getPage(),
-                searchParameters.getSize(),
-                getSortingField(searchParameters.getSortingField()),
-                getDirection(searchParameters.getDirection()),
-                getVisibility(searchParameters.getVisibility()),
-                getOperation(searchParameters.getOperation()),
-                authenticatedUserId());
-
-        return queryRunner.run(query);
+        return queryRunner.run(new SearchWorlds(
+                name,
+                ownerId,
+                view,
+                sortingField,
+                direction,
+                page,
+                size,
+                authenticatedUserId()));
     }
 
     @GetMapping("/{worldId}")
@@ -133,42 +134,5 @@ public class WorldController extends SecurityContextAware {
 
         var command = new DeleteWorld(worldId, authenticatedUserId());
         commandRunner.run(command);
-    }
-
-    // TODO remove all of this
-    private String getSortingField(SearchSortingField searchSortingField) {
-
-        if (searchSortingField != null) {
-            return toCamelCase(searchSortingField.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getDirection(SearchDirection searchDirection) {
-
-        if (searchDirection != null) {
-            return toCamelCase(searchDirection.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getVisibility(SearchVisibility searchVisibility) {
-
-        if (searchVisibility != null) {
-            return toCamelCase(searchVisibility.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getOperation(SearchOperation searchOperation) {
-
-        if (searchOperation != null) {
-            return toCamelCase(searchOperation.name(), false, '_');
-        }
-
-        return EMPTY;
     }
 }

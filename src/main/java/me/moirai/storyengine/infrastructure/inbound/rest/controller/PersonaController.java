@@ -1,8 +1,5 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.text.CaseUtils.toCamelCase;
-
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,21 +19,21 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SearchView;
+import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaSortField;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaSummary;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
-import me.moirai.storyengine.core.port.inbound.persona.SearchPersonasResult;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreatePersonaRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.PersonaSearchParameters;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdatePersonaRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchDirection;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchOperation;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchSortingField;
 
 @RestController
 @RequestMapping("/persona")
@@ -53,24 +51,26 @@ public class PersonaController extends SecurityContextAware {
         this.commandRunner = commandRunner;
     }
 
-    // TODO reform search request
     @GetMapping
-    @ResponseStatus(code = HttpStatus.OK)
-    public SearchPersonasResult search(
-            PersonaSearchParameters searchParameters) {
+    @ResponseStatus(HttpStatus.OK)
+    public PaginatedResult<PersonaSummary> search(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "owner_id", required = false) String ownerId,
+            @RequestParam(name = "view", required = true) SearchView view,
+            @RequestParam(name = "sorting_field", required = false) PersonaSortField sortingField,
+            @RequestParam(name = "direction", required = false) SortDirection direction,
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size) {
 
-        var query = new SearchPersonas(
-                searchParameters.getName(),
-                searchParameters.getOwnerId(),
-                searchParameters.getPage(),
-                searchParameters.getSize(),
-                getSortingField(searchParameters.getSortingField()),
-                getDirection(searchParameters.getDirection()),
-                searchParameters.getVisibility(),
-                getOperation(searchParameters.getOperation()),
-                authenticatedUserId());
-
-        return queryRunner.run(query);
+        return queryRunner.run(new SearchPersonas(
+                name,
+                ownerId,
+                view,
+                sortingField,
+                direction,
+                page,
+                size,
+                authenticatedUserId()));
     }
 
     @GetMapping("/{personaId}")
@@ -128,33 +128,5 @@ public class PersonaController extends SecurityContextAware {
 
         var command = new DeletePersona(personaId, authenticatedUserId());
         commandRunner.run(command);
-    }
-
-    // TODO remove all of this
-    private String getSortingField(SearchSortingField searchSortingField) {
-
-        if (searchSortingField != null) {
-            return toCamelCase(searchSortingField.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getDirection(SearchDirection searchDirection) {
-
-        if (searchDirection != null) {
-            return toCamelCase(searchDirection.name(), false, '_');
-        }
-
-        return EMPTY;
-    }
-
-    private String getOperation(SearchOperation searchOperation) {
-
-        if (searchOperation != null) {
-            return toCamelCase(searchOperation.name(), false, '_');
-        }
-
-        return EMPTY;
     }
 }

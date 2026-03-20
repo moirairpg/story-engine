@@ -1,16 +1,17 @@
 package me.moirai.storyengine.core.port.inbound.persona;
 
 import me.moirai.storyengine.common.cqs.query.Query;
-import me.moirai.storyengine.common.enums.Visibility;
+import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.enums.SearchView;
+import me.moirai.storyengine.common.enums.SortDirection;
 
 public record SearchPersonas(
         String name,
         String ownerId,
+        SearchView view,
+        PersonaSortField sortingField,
+        SortDirection direction,
         Integer page,
         Integer size,
-        String sortingField, // TODO create enum
-        String direction, // TODO create enum
-        Visibility visibility,
-        String operation,
-        String requesterId) implements Query<SearchPersonasResult> {
+        String requesterId) implements Query<PaginatedResult<PersonaSummary>> {
 }
