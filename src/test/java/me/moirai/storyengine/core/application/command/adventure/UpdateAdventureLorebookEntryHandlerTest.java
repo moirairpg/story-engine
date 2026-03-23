@@ -133,6 +133,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.lastUpdateDate()).isNotNull();
+        assertThat(result.name()).isNotNull();
     }
 }

@@ -58,7 +58,8 @@ public class ContextMenuCommandListener extends ListenerAdapter {
                                 : bot.getUser().getName();
 
                         if (!message.getAuthor().getId().equals(bot.getId())) {
-                            discordListenerHelper.sendNotification(event, "It's only possible to edit messages sent by " + botNickname);
+                            discordListenerHelper.sendNotification(event,
+                                    "It's only possible to edit messages sent by " + botNickname);
                             return;
                         }
 
@@ -83,7 +84,8 @@ public class ContextMenuCommandListener extends ListenerAdapter {
                         event.replyModal(modal).complete();
                     }
                     case "(MoirAI) Tokenize content" -> {
-                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event, "Tokenizing input...");
+                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
+                                "Tokenizing input...");
                         String inputToBeTokenized = message.getContentRaw();
 
                         TokenizeResult tokenizationResult = useCaseRunner.run(TokenizeInput.build(inputToBeTokenized))
@@ -107,9 +109,12 @@ public class ContextMenuCommandListener extends ListenerAdapter {
 
     private String mapTokenizationResultToMessage(TokenizeResult tokenizationResult) {
 
-        return String.format(TOKEN_REPLY_MESSAGE, tokenizationResult.getCharacterCount(),
-                tokenizationResult.getTokens(), Arrays.toString(tokenizationResult.getTokenIds()),
-                tokenizationResult.getTokenCount());
+        return String.format(
+                TOKEN_REPLY_MESSAGE,
+                tokenizationResult.characterCount(),
+                tokenizationResult.tokens(),
+                Arrays.toString(tokenizationResult.tokenIds()),
+                tokenizationResult.tokenCount());
     }
 
     private void handleError(MessageContextInteractionEvent event, Throwable error) {

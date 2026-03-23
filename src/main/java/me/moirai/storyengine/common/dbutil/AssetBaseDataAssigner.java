@@ -1,6 +1,6 @@
 package me.moirai.storyengine.common.dbutil;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +25,7 @@ public class AssetBaseDataAssigner {
             asset.setCreatorId(creatorName);
         }
 
-        OffsetDateTime now = OffsetDateTime.now();
+        Instant now = Instant.now();
         if (asset.getCreationDate() == null) {
             asset.setCreationDate(now);
         }

@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record LorebookEntrySummary(
@@ -8,4 +8,4 @@ public record LorebookEntrySummary(
         String name,
         String regex,
         String description,
-        OffsetDateTime creationDate) {}
+        Instant creationDate) {}

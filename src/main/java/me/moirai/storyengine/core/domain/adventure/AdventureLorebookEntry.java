@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.domain.adventure;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -44,12 +43,12 @@ public class AdventureLorebookEntry extends Asset {
 
     private AdventureLorebookEntry(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);
+        super();
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
         this.playerId = builder.playerId;
-        this.isPlayerCharacter = builder.isPlayerCharacter;
+        this.isPlayerCharacter = builder.playerId != null;
     }
 
     protected AdventureLorebookEntry() {
@@ -122,10 +121,6 @@ public class AdventureLorebookEntry extends Asset {
         private String regex;
         private String description;
         private String playerId;
-        private String creatorId;
-        private boolean isPlayerCharacter;
-        private OffsetDateTime creationDate;
-        private OffsetDateTime lastUpdateDate;
 
         private Builder() {
         }
@@ -151,30 +146,6 @@ public class AdventureLorebookEntry extends Asset {
         public Builder playerId(String playerId) {
 
             this.playerId = playerId;
-            return this;
-        }
-
-        public Builder isPlayerCharacter(boolean isPlayerCharacter) {
-
-            this.isPlayerCharacter = isPlayerCharacter;
-            return this;
-        }
-
-        public Builder creatorId(String creatorId) {
-
-            this.creatorId = creatorId;
-            return this;
-        }
-
-        public Builder creationDate(OffsetDateTime creationDate) {
-
-            this.creationDate = creationDate;
-            return this;
-        }
-
-        public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
-
-            this.lastUpdateDate = lastUpdateDate;
             return this;
         }
 

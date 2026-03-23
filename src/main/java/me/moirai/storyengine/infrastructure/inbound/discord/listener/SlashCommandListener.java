@@ -341,9 +341,9 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private String mapTokenizationResultToMessage(TokenizeResult tokenizationResult) {
 
-        return String.format(TOKEN_REPLY_MESSAGE, tokenizationResult.getCharacterCount(),
-                tokenizationResult.getTokens(), Arrays.toString(tokenizationResult.getTokenIds()),
-                tokenizationResult.getTokenCount());
+        return String.format(TOKEN_REPLY_MESSAGE, tokenizationResult.characterCount(),
+                tokenizationResult.tokens(), Arrays.toString(tokenizationResult.tokenIds()),
+                tokenizationResult.tokenCount());
     }
 
     private String getCommandPhrase(List<String> phraseList) {

@@ -4,7 +4,6 @@ import static me.moirai.storyengine.common.enums.Role.ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -129,12 +128,8 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
     public void shouldInsertCorrectlyMapFieldsFromMappedSuperclassParent() {
 
         // Given
-        var now = OffsetDateTime.now();
         var user = UserFixture.player()
                 .discordId("unique-discord-5")
-                .creatorId("creator-abc")
-                .creationDate(now)
-                .lastUpdateDate(now)
                 .build();
 
         // When
@@ -146,7 +141,7 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
                 .query(String.class)
                 .single();
 
-        assertThat(creatorId).isEqualTo("creator-abc");
+        assertThat(creatorId).isEqualTo("SYSTEM");
     }
 
     @Test
@@ -225,9 +220,6 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
         var updated = User.builder()
                 .discordId("unique-discord-7")
                 .role(ADMIN)
-                .creatorId("creator-xyz")
-                .creationDate(OffsetDateTime.now())
-                .lastUpdateDate(OffsetDateTime.now())
                 .build();
 
         org.springframework.test.util.ReflectionTestUtils.setField(updated, "publicId", insertedPublicId);
@@ -267,9 +259,6 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
         var updated = User.builder()
                 .discordId("unique-discord-8a")
                 .role(ADMIN)
-                .creatorId("creator-updated")
-                .creationDate(OffsetDateTime.now())
-                .lastUpdateDate(OffsetDateTime.now())
                 .build();
 
         org.springframework.test.util.ReflectionTestUtils.setField(updated, "publicId", firstPublicId);

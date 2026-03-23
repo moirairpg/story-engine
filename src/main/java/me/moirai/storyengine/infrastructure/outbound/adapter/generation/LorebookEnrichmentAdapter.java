@@ -26,9 +26,9 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
@@ -64,7 +64,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
             UUID adventureId,
             ModelConfigurationRequest modelConfiguration) {
 
-        int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
+        int totalTokens = modelConfiguration.aiModel().hardTokenLimit();
         int reservedTokensForLorebook = (int) Math.floor(totalTokens * 0.30);
 
         List<AdventureLorebookEntry> entriesFound = findLorebookEntries(adventureId, rawMessageHistory);
@@ -88,11 +88,11 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
             UUID adventureId,
             ModelConfigurationRequest modelConfiguration) {
 
-        int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
+        int totalTokens = modelConfiguration.aiModel().hardTokenLimit();
         int reservedTokensForLorebook = (int) Math.floor(totalTokens * 0.30);
 
         List<String> messageHistory = rawMessageHistory.stream()
-                .map(DiscordMessageData::getContent)
+                .map(DiscordMessageData::content)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         String stringifiedStory = stringifyList(messageHistory);
@@ -130,7 +130,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
             List<DiscordMessageData> rawMessageHistory) {
 
         List<String> messageHistory = rawMessageHistory.stream()
-                .map(DiscordMessageData::getContent)
+                .map(DiscordMessageData::content)
                 .toList();
 
         Adventure adventure = adventureRepository.findByPublicId(adventureId)
@@ -144,7 +144,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
             List<DiscordMessageData> rawMessageHistory) {
 
         return rawMessageHistory.stream()
-                .flatMap(message -> message.getMentionedUsers().stream())
+                .flatMap(message -> message.mentionedUsers().stream())
                 .map(user -> findLorebookEntryByPlayerDiscordId(user.getId(), adventureId))
                 .toList();
     }
@@ -156,7 +156,7 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
         return rawMessageHistory.stream()
                 .map(message -> {
                     try {
-                        return findLorebookEntryByPlayerDiscordId(message.getAuthor().getId(), adventureId);
+                        return findLorebookEntryByPlayerDiscordId(message.author().getId(), adventureId);
                     } catch (AssetNotFoundException exception) {
                         return null;
                     }
@@ -196,11 +196,11 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                 .flatMap(message -> {
                     List<DiscordMessageData> messages = new ArrayList<>();
 
-                    if (isEmpty(message.getMentionedUsers())) {
+                    if (isEmpty(message.mentionedUsers())) {
                         messages.add(message);
                     }
 
-                    for (DiscordUserDetails mentionedUser : message.getMentionedUsers()) {
+                    for (DiscordUserDetails mentionedUser : message.mentionedUsers()) {
                         messages.add(lorebook.stream()
                                 .filter(entry -> mentionedUser.getId().equals(entry.getPlayerId()))
                                 .findFirst()
@@ -215,11 +215,12 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
                                     processor.addRule(replaceTemplateWithValueIgnoreCase(
                                             entry.getName(), mentionedUser.getUsername()));
 
-                                    return DiscordMessageData.builder()
-                                            .id(message.getId())
-                                            .author(message.getAuthor())
-                                            .content(processor.process(message.getContent()))
-                                            .build();
+                                    return new DiscordMessageData(
+                                            message.id(),
+                                            null,
+                                            processor.process(message.content()),
+                                            message.author(),
+                                            null);
                                 })
                                 .orElse(message));
                     }
@@ -234,33 +235,34 @@ public class LorebookEnrichmentAdapter implements LorebookEnrichmentPort {
 
         return rawMessageHistory.stream()
                 .map(message -> lorebook.stream()
-                        .filter(entry -> message.getAuthor().getId().equals(entry.getPlayerId()))
+                        .filter(entry -> message.author().getId().equals(entry.getPlayerId()))
                         .findFirst()
                         .map(entry -> {
                             DiscordUserDetails author = DiscordUserDetails.builder()
-                                    .id(message.getAuthor().getId())
-                                    .mention(message.getAuthor().getMention())
-                                    .username(message.getAuthor().getUsername())
+                                    .id(message.author().getId())
+                                    .mention(message.author().getMention())
+                                    .username(message.author().getUsername())
                                     .nickname(entry.getName())
                                     .build();
 
                             StringProcessor processor = new StringProcessor();
                             processor.addRule(replaceTemplateWithValueIgnoreCase(
-                                    entry.getName(), message.getAuthor().getNickname()));
+                                    entry.getName(), message.author().getNickname()));
 
                             processor.addRule(replaceTemplateWithValueIgnoreCase(
-                                    entry.getName(), message.getAuthor().getMention()));
+                                    entry.getName(), message.author().getMention()));
 
                             processor.addRule(replaceTemplateWithValueIgnoreCase(
-                                    entry.getName(), message.getAuthor().getUsername()));
+                                    entry.getName(), message.author().getUsername()));
 
-                            String messageContent = processor.process(message.getContent());
+                            String messageContent = processor.process(message.content());
 
-                            return DiscordMessageData.builder()
-                                    .id(message.getId())
-                                    .author(author)
-                                    .content(formatRpgDirective(entry.getName()).apply(messageContent))
-                                    .build();
+                            return new DiscordMessageData(
+                                    message.id(),
+                                    null,
+                                    formatRpgDirective(entry.getName()).apply(messageContent),
+                                    author,
+                                    null);
                         })
                         .orElse(message))
                 .toList();

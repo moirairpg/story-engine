@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.persona;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,6 +89,6 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
                 rs.getString("name"),
                 rs.getString("personality"),
                 rs.getString("visibility"),
-                rs.getObject("creation_date", OffsetDateTime.class));
+                rs.getTimestamp("creation_date").toInstant());
     }
 }

@@ -91,8 +91,6 @@ public class GetAdventureByChannelIdHandlerTest {
         assertThat(result.moderation()).isEqualTo(adventure.getModeration().name());
         assertThat(result.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(result.isMultiplayer()).isEqualTo(adventure.isMultiplayer());
-        assertThat(result.creationDate()).isNotNull();
-        assertThat(result.lastUpdateDate()).isNotNull();
 
         assertThat(result.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
         assertThat(result.nudge()).isEqualTo(adventure.getContextAttributes().nudge());

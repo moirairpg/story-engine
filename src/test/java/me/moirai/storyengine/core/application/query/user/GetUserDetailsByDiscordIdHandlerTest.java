@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .id(query.discordUserId())
                 .build();
 
-        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, OffsetDateTime.now());
+        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, Instant.now());
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
@@ -68,7 +68,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .nickname(null)
                 .build();
 
-        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, OffsetDateTime.now());
+        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, Instant.now());
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));

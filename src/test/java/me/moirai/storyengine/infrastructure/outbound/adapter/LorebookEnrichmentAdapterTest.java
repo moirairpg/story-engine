@@ -26,9 +26,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
@@ -58,7 +58,7 @@ public class LorebookEnrichmentAdapterTest {
 
         // Given
         UUID worldId = AdventureFixture.PUBLIC_ID;
-        ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
+        ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini();
         List<DiscordMessageData> messageList = getMessageListForTesting();
 
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
@@ -107,7 +107,7 @@ public class LorebookEnrichmentAdapterTest {
 
         // Given
         UUID worldId = AdventureFixture.PUBLIC_ID;
-        ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
+        ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini();
         List<DiscordMessageData> messageList = getMessageListForTesting();
 
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
@@ -173,24 +173,17 @@ public class LorebookEnrichmentAdapterTest {
                 .username("John")
                 .build();
 
-        DiscordMessageData firstMessage = DiscordMessageData.builder()
-                .id("1")
-                .content("Little Marcus says: I pull the Sword of Fire and charge against the Lord of Doom.")
-                .author(marcus)
-                .build();
+        var firstMessage = new DiscordMessageData("1", null,
+                "Little Marcus says: I pull the Sword of Fire and charge against the Lord of Doom.",
+                marcus, List.of());
 
-        DiscordMessageData secondMessage = DiscordMessageData.builder()
-                .id("2")
-                .content("JoeJoe says: I deflect Little Marcus's attack and attack back with my Glove of Armageddon.")
-                .author(john)
-                .mentionedUsers(list(marcus))
-                .build();
+        var secondMessage = new DiscordMessageData("2", null,
+                "JoeJoe says: I deflect Little Marcus's attack and attack back with my Glove of Armageddon.",
+                john, list(marcus));
 
-        DiscordMessageData thirdMessage = DiscordMessageData.builder()
-                .id("3")
-                .content("Little Marcus says: I cast a ball of fire and deal fire damage.")
-                .author(marcus)
-                .build();
+        var thirdMessage = new DiscordMessageData("3", null,
+                "Little Marcus says: I cast a ball of fire and deal fire damage.",
+                marcus, List.of());
 
         return list(firstMessage, secondMessage, thirdMessage);
     }
@@ -202,7 +195,6 @@ public class LorebookEnrichmentAdapterTest {
                 .regex("[Pp]iro[Mm]ancer")
                 .description("The Pyromancer is a fire battlemage")
                 .playerId("1")
-                .isPlayerCharacter(true)
                 .build();
 
         ReflectionTestUtils.setField(entry, "publicId", UUID.fromString("e01b12a5-578e-4eb6-951f-0cc81cafd4fb"));
@@ -219,7 +211,6 @@ public class LorebookEnrichmentAdapterTest {
                 .regex("[Ll]ord [Oo] [Dd]oom")
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerId("2")
-                .isPlayerCharacter(true)
                 .build();
 
         ReflectionTestUtils.setField(lordOfDoom, "id", 3L);
@@ -256,7 +247,6 @@ public class LorebookEnrichmentAdapterTest {
                 .regex("[Ll]ord [Oo] [Dd]oom")
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerId("2")
-                .isPlayerCharacter(true)
                 .build();
 
         ReflectionTestUtils.setField(lordOfDoom, "id", 3L);

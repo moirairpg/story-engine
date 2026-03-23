@@ -1,6 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter;
 
-import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT4_MINI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -27,15 +26,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponse;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseChoice;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.StorySummarizationAdapter;
-import me.moirai.storyengine.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
 import me.moirai.storyengine.infrastructure.outbound.adapter.request.StoryGenerationRequestFixture;
 
 @SuppressWarnings("unchecked")
@@ -67,9 +64,7 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
 
         // Given
         var generatedSummary = "Generated summary";
-        var storyGenerationRequest = StoryGenerationRequestFixture.create()
-                .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini().build())
-                .build();
+        var storyGenerationRequest = StoryGenerationRequestFixture.create();
 
         var context = createContextWithMessageNumber(3);
 
@@ -92,9 +87,7 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
     public void summarizeWith_emptyMessageHistory_thenEmptySummaryReturned() throws JsonProcessingException {
 
         // Given
-        var storyGenerationRequest = StoryGenerationRequestFixture.create()
-                .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini().build())
-                .build();
+        var storyGenerationRequest = StoryGenerationRequestFixture.create();
 
         var context = createContextWithMessageNumber(3);
 
@@ -119,14 +112,7 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
         // Given
         var longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor. Mauris iaculis pharetra leo.";
         var trimmedSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor.";
-        var storyGenerationRequest = StoryGenerationRequestFixture.create()
-                .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
-                        .aiModel(AiModelRequest.build(
-                                GPT4_MINI.toString(),
-                                GPT4_MINI.getOfficialModelName(),
-                                GPT4_MINI.getHardTokenLimit()))
-                        .build())
-                .build();
+        var storyGenerationRequest = StoryGenerationRequestFixture.create();
 
         var context = createContextWithMessageNumber(3);
 
@@ -170,14 +156,7 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
 
         // Given
         var longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-        var storyGenerationRequest = StoryGenerationRequestFixture.create()
-                .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
-                        .aiModel(AiModelRequest.build(
-                                GPT4_MINI.toString(),
-                                GPT4_MINI.getOfficialModelName(),
-                                GPT4_MINI.getHardTokenLimit()))
-                        .build())
-                .build();
+        var storyGenerationRequest = StoryGenerationRequestFixture.create();
 
         var context = createContextWithMessageNumber(3);
 
@@ -221,14 +200,7 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
 
         // Given
         var longSummary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas dignissim velit, ut pellentesque ipsum. Ut auctor ipsum suscipit sapien tristique suscipit. Donec bibendum lectus neque, nec porttitor turpis commodo at. Nulla facilisi. Nulla gravida interdum tempor. Mauris iaculis pharetra leo.";
-        var storyGenerationRequest = StoryGenerationRequestFixture.create()
-                .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
-                        .aiModel(AiModelRequest.build(
-                                GPT4_MINI.toString(),
-                                GPT4_MINI.getOfficialModelName(),
-                                GPT4_MINI.getHardTokenLimit()))
-                        .build())
-                .build();
+        var storyGenerationRequest = StoryGenerationRequestFixture.create();
 
         var context = createContextWithMessageNumber(3);
 
@@ -274,14 +246,15 @@ public class ContextSummarizationAdapterTest extends AbstractWebMockTest {
         var messageDataList = new ArrayList<DiscordMessageData>();
         for (int i = 0; i < items; i++) {
             var messageNumber = i + 1;
-            messageDataList.add(DiscordMessageDataFixture.messageData()
-                    .id(String.valueOf(messageNumber))
-                    .content(String.format("Message %s", messageNumber))
-                    .build());
+            var base = DiscordMessageDataFixture.messageData();
+            messageDataList.add(new DiscordMessageData(
+                    String.valueOf(messageNumber), base.channelId(),
+                    String.format("Message %s", messageNumber),
+                    base.author(), base.mentionedUsers()));
         }
 
         var messageStringList = messageDataList.stream()
-                .map(DiscordMessageData::getContent)
+                .map(DiscordMessageData::content)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         var context = new HashMap<String, Object>();

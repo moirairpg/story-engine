@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.domain.userdetails;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -36,8 +35,6 @@ public class User extends Asset {
 
     public User(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);
-
         this.discordId = builder.discordId;
         this.role = builder.role;
     }
@@ -71,9 +68,6 @@ public class User extends Asset {
 
         private String discordId;
         private Role role;
-        private String creatorId;
-        private OffsetDateTime creationDate;
-        private OffsetDateTime lastUpdateDate;
 
         private Builder() {
         }
@@ -87,24 +81,6 @@ public class User extends Asset {
         public Builder role(Role role) {
 
             this.role = role;
-            return this;
-        }
-
-        public Builder creatorId(String creatorId) {
-
-            this.creatorId = creatorId;
-            return this;
-        }
-
-        public Builder creationDate(OffsetDateTime creationDate) {
-
-            this.creationDate = creationDate;
-            return this;
-        }
-
-        public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
-
-            this.lastUpdateDate = lastUpdateDate;
             return this;
         }
 

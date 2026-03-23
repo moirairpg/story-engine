@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.persona;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record PersonaSummary(
@@ -8,4 +8,4 @@ public record PersonaSummary(
         String name,
         String personality,
         String visibility,
-        OffsetDateTime creationDate) {}
+        Instant creationDate) {}

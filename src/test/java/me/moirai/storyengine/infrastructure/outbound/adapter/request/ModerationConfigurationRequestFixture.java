@@ -1,6 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
@@ -9,26 +8,18 @@ public class ModerationConfigurationRequestFixture {
 
     public static ModerationConfigurationRequest absoluteWithFlags() {
 
-        Map<String, Double> thresholds = new HashMap<>();
-        thresholds.put("sexual", 1.0);
-        thresholds.put("violence", 1.0);
-
-        return ModerationConfigurationRequest.build(true, true, thresholds);
+        return new ModerationConfigurationRequest(true, true,
+                Map.of("sexual", 1.0, "violence", 1.0));
     }
 
     public static ModerationConfigurationRequest withFlags() {
 
-        Map<String, Double> thresholds = new HashMap<>();
-        thresholds.put("sexual", 1.0);
-        thresholds.put("violence", 1.0);
-
-        return ModerationConfigurationRequest.build(true, false, thresholds);
+        return new ModerationConfigurationRequest(true, false,
+                Map.of("sexual", 1.0, "violence", 1.0));
     }
 
     public static ModerationConfigurationRequest disabled() {
 
-        Map<String, Double> thresholds = new HashMap<>();
-
-        return ModerationConfigurationRequest.build(false, false, thresholds);
+        return new ModerationConfigurationRequest(false, false, Map.of());
     }
 }

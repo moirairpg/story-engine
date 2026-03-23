@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,8 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
@@ -69,33 +70,19 @@ public class StoryGenerationAdapterTest {
         var personaId = PersonaFixture.PUBLIC_ID;
         var generatedText = "Once upon a time.";
 
-        var message = DiscordMessageData.builder()
-                .id("msg-1")
-                .channelId(channelId)
-                .content("User said: hello")
-                .build();
+        var message = new DiscordMessageData("msg-1", channelId, "User said: hello", null, List.of());
 
-        var modelConfig = ModelConfigurationRequest.builder()
-                .aiModel(AiModelRequest.build("gpt4", "gpt-4", 8192))
-                .maxTokenLimit(500)
-                .temperature(0.8)
-                .frequencyPenalty(0.0)
-                .presencePenalty(0.0)
-                .build();
+        var modelConfig = new ModelConfigurationRequest(
+                new AiModelRequest("gpt4", "gpt-4", 8192),
+                500, 0.8, 0.0, 0.0, Set.of(), Map.of());
 
-        var moderation = ModerationConfigurationRequest.build(true, true, null);
+        var moderation = new ModerationConfigurationRequest(true, true, Map.of());
 
-        var request = StoryGenerationRequest.builder()
-                .botUsername(botUsername)
-                .botNickname(botNickname)
-                .channelId(channelId)
-                .adventureId(adventureId)
-                .personaId(personaId)
-                .gameMode("Chat")
-                .modelConfiguration(modelConfig)
-                .moderation(moderation)
-                .messageHistory(List.of(message))
-                .build();
+        var request = new StoryGenerationRequest(
+                null, botUsername, botNickname, channelId, null,
+                adventureId, personaId, "Chat",
+                null, null, null, null, 0,
+                modelConfig, moderation, List.of(message));
 
         var lorebookContext = buildEnrichedContext(botUsername);
         var summarizedContext = buildEnrichedContext(botUsername);
@@ -135,26 +122,17 @@ public class StoryGenerationAdapterTest {
         var personaId = PersonaFixture.PUBLIC_ID;
         var generatedText = "You enter the dungeon.";
 
-        var modelConfig = ModelConfigurationRequest.builder()
-                .aiModel(AiModelRequest.build("gpt4", "gpt-4", 8192))
-                .maxTokenLimit(500)
-                .temperature(0.8)
-                .frequencyPenalty(0.0)
-                .presencePenalty(0.0)
-                .build();
+        var modelConfig = new ModelConfigurationRequest(
+                new AiModelRequest("gpt4", "gpt-4", 8192),
+                500, 0.8, 0.0, 0.0, Set.of(), Map.of());
 
-        var moderation = ModerationConfigurationRequest.build(true, true, null);
+        var moderation = new ModerationConfigurationRequest(true, true, Map.of());
 
-        var request = StoryGenerationRequest.builder()
-                .botUsername(botUsername)
-                .botNickname(botNickname)
-                .channelId(channelId)
-                .adventureId(adventureId)
-                .personaId(personaId)
-                .gameMode("RPG")
-                .modelConfiguration(modelConfig)
-                .moderation(moderation)
-                .build();
+        var request = new StoryGenerationRequest(
+                null, botUsername, botNickname, channelId, null,
+                adventureId, personaId, "RPG",
+                null, null, null, null, 0,
+                modelConfig, moderation, List.of());
 
         var lorebookContext = buildEnrichedContext(botUsername);
         var summarizedContext = buildEnrichedContext(botUsername);
@@ -193,26 +171,17 @@ public class StoryGenerationAdapterTest {
         var adventureId = AdventureFixture.PUBLIC_ID;
         var personaId = PersonaFixture.PUBLIC_ID;
 
-        var modelConfig = ModelConfigurationRequest.builder()
-                .aiModel(AiModelRequest.build("gpt4", "gpt-4", 8192))
-                .maxTokenLimit(500)
-                .temperature(0.8)
-                .frequencyPenalty(0.0)
-                .presencePenalty(0.0)
-                .build();
+        var modelConfig = new ModelConfigurationRequest(
+                new AiModelRequest("gpt4", "gpt-4", 8192),
+                500, 0.8, 0.0, 0.0, Set.of(), Map.of());
 
-        var moderation = ModerationConfigurationRequest.build(true, true, null);
+        var moderation = new ModerationConfigurationRequest(true, true, Map.of());
 
-        var request = StoryGenerationRequest.builder()
-                .botUsername(botUsername)
-                .botNickname(botNickname)
-                .channelId(channelId)
-                .adventureId(adventureId)
-                .personaId(personaId)
-                .gameMode("Chat")
-                .modelConfiguration(modelConfig)
-                .moderation(moderation)
-                .build();
+        var request = new StoryGenerationRequest(
+                null, botUsername, botNickname, channelId, null,
+                adventureId, personaId, "Chat",
+                null, null, null, null, 0,
+                modelConfig, moderation, List.of());
 
         var lorebookContext = buildEnrichedContext(botUsername);
         var summarizedContext = buildEnrichedContext(botUsername);

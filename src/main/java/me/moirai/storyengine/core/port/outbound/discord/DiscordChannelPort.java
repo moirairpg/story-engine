@@ -3,8 +3,6 @@ package me.moirai.storyengine.core.port.outbound.discord;
 import java.util.List;
 import java.util.Optional;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-
 public interface DiscordChannelPort {
 
     DiscordMessageData sendTextMessageTo(String channelId, String messageContent);

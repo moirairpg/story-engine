@@ -1,6 +1,6 @@
 package me.moirai.storyengine.common.domain;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -16,48 +16,26 @@ public abstract class Asset {
     protected String creatorId;
 
     @Column(name = "creation_date")
-    protected OffsetDateTime creationDate;
+    protected Instant creationDate;
 
     @Column(name = "last_update_date")
-    protected OffsetDateTime lastUpdateDate;
+    protected Instant lastUpdateDate;
 
     @Version
     private int version;
 
-    protected Asset(String creatorId,
-            OffsetDateTime creationDate,
-            OffsetDateTime lastUpdateDate) {
-
-        this.creatorId = creatorId;
-        this.creationDate = creationDate;
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    // TODO remove this ctor
-    protected Asset(String creatorId,
-            OffsetDateTime creationDate,
-            OffsetDateTime lastUpdateDate,
-            int version) {
-
-        this.creatorId = creatorId;
-        this.creationDate = creationDate;
-        this.lastUpdateDate = lastUpdateDate;
-        this.version = version;
-    }
-
     protected Asset() {
-        super();
     }
 
     public String getCreatorId() {
         return creatorId;
     }
 
-    public OffsetDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public OffsetDateTime getLastUpdateDate() {
+    public Instant getLastUpdateDate() {
         return lastUpdateDate;
     }
 
@@ -69,11 +47,11 @@ public abstract class Asset {
         this.creatorId = creatorId;
     }
 
-    public void setCreationDate(OffsetDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
-    public void setLastUpdateDate(OffsetDateTime lastUpdateDate) {
+    public void setLastUpdateDate(Instant lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

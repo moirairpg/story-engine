@@ -30,8 +30,8 @@ import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.LorebookEnrichmentPort;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort;
@@ -81,17 +81,20 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
     @Override
     public void continueStory(StoryGenerationRequest request) {
 
-        var enrichedContext = enrichContext(request, request.getMessageHistory());
+        var enrichedContext = enrichContext(request, request.messageHistory());
         var aiOutput = generateOutput(request, enrichedContext);
-        var moderatedOutput = moderateOutput(aiOutput, request.getModeration());
+        var moderatedOutput = moderateOutput(aiOutput, request.moderation());
 
-        sendOutputTo(request.getChannelId(), request.getBotUsername(), request.getBotNickname(), moderatedOutput);
+        sendOutputTo(request.channelId(),
+                request.botUsername(),
+                request.botNickname(),
+                moderatedOutput);
     }
 
     private TextGenerationResult generateOutput(StoryGenerationRequest request, Map<String, Object> context) {
 
         var processedContext = processEnrichedContext(context, request);
-        var moderatedContext = moderateInput(processedContext, request.getModeration());
+        var moderatedContext = moderateInput(processedContext, request.moderation());
         return generateAiOutput(request, moderatedContext);
     }
 
@@ -99,23 +102,23 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
             StoryGenerationRequest request,
             List<DiscordMessageData> messageHistory) {
 
-        var contextWithLorebook = enrichWithLorebook(request, request.getMessageHistory());
+        var contextWithLorebook = enrichWithLorebook(request, request.messageHistory());
         var contextWithSummary = summarizationPort.summarizeContextWith(contextWithLorebook, request);
         return personaEnrichmentPort.enrichContextWithPersona(
-                contextWithSummary, request.getPersonaId(), request.getModelConfiguration());
+                contextWithSummary, request.personaId(), request.modelConfiguration());
     }
 
     private Map<String, Object> enrichWithLorebook(
             StoryGenerationRequest request,
             List<DiscordMessageData> messageHistory) {
 
-        if (request.getGameMode().equals(RPG)) {
+        if (request.gameMode().equals(RPG)) {
             return lorebookEnrichmentPort.enrichContextWithLorebookForRpg(messageHistory,
-                    request.getAdventureId(), request.getModelConfiguration());
+                    request.adventureId(), request.modelConfiguration());
         }
 
         return lorebookEnrichmentPort.enrichContextWithLorebook(messageHistory,
-                request.getAdventureId(), request.getModelConfiguration());
+                request.adventureId(), request.modelConfiguration());
     }
 
     private TextGenerationResult generateAiOutput(
@@ -132,16 +135,16 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
             StoryGenerationRequest query,
             List<ChatMessage> processedContext) {
 
-        return TextGenerationRequest.builder()
-                .frequencyPenalty(query.getModelConfiguration().getFrequencyPenalty())
-                .presencePenalty(query.getModelConfiguration().getPresencePenalty())
-                .temperature(query.getModelConfiguration().getTemperature())
-                .model(query.getModelConfiguration().getAiModel().getOfficialModelName())
-                .logitBias(query.getModelConfiguration().getLogitBias())
-                .maxTokens(query.getModelConfiguration().getMaxTokenLimit())
-                .stopSequences(query.getModelConfiguration().getStopSequences())
-                .messages(processedContext)
-                .build();
+        var modelConfig = query.modelConfiguration();
+        return new TextGenerationRequest(
+                modelConfig.aiModel().officialModelName(),
+                processedContext,
+                modelConfig.stopSequences(),
+                modelConfig.maxTokenLimit(),
+                modelConfig.temperature(),
+                modelConfig.presencePenalty(),
+                modelConfig.frequencyPenalty(),
+                modelConfig.logitBias());
     }
 
     private List<ChatMessage> processEnrichedContext(
@@ -156,10 +159,10 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
         String lorebookEntries = (String) unsortedContext.get(LOREBOOK_ENTRIES);
 
         processedContext.add(ChatMessage.asSystem(
-                replacePlaceholders(storySummary, request.getBotUsername(), request.getBotNickname(), personaName)));
+                replacePlaceholders(storySummary, request.botUsername(), request.botNickname(), personaName)));
 
         processedContext.addAll(buildContextForGeneration(unsortedContext,
-                request.getBotUsername(), request.getBotNickname(), personaName));
+                request.botUsername(), request.botNickname(), personaName));
 
         if (isNotBlank(lorebookEntries)) {
             processedContext.add(0, ChatMessage.asSystem(lorebookEntries));
@@ -178,9 +181,9 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
     private void handleBump(StoryGenerationRequest request, List<ChatMessage> processedContext) {
 
         int contextSize = processedContext.size();
-        if (isNotBlank(request.getBump())) {
-            for (int i = contextSize - 1 - request.getBumpFrequency(); i > 0; i = i - request.getBumpFrequency()) {
-                String bump = formatBump().apply(request.getBump());
+        if (isNotBlank(request.bump())) {
+            for (int i = contextSize - 1 - request.bumpFrequency(); i > 0; i = i - request.bumpFrequency()) {
+                String bump = formatBump().apply(request.bump());
                 processedContext.add(i, ChatMessage.asSystem(bump));
             }
         }
@@ -188,24 +191,24 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
 
     private void handleRemember(StoryGenerationRequest request, List<ChatMessage> processedContext) {
 
-        if (isNotBlank(request.getRemember())) {
-            String remember = formatRemember().apply(request.getRemember());
+        if (isNotBlank(request.remember())) {
+            String remember = formatRemember().apply(request.remember());
             processedContext.addFirst(ChatMessage.asSystem(remember));
         }
     }
 
     private void handleAuthorsNote(StoryGenerationRequest request, List<ChatMessage> processedContext) {
 
-        if (isNotBlank(request.getAuthorsNote())) {
-            String authorsNote = formatAuthorsNote().apply(request.getAuthorsNote());
+        if (isNotBlank(request.authorsNote())) {
+            String authorsNote = formatAuthorsNote().apply(request.authorsNote());
             processedContext.add(ChatMessage.asSystem(authorsNote));
         }
     }
 
     private void handleNudge(StoryGenerationRequest request, List<ChatMessage> processedContext) {
 
-        if (isNotBlank(request.getNudge())) {
-            String nudge = formatNudge().apply(request.getNudge());
+        if (isNotBlank(request.nudge())) {
+            String nudge = formatNudge().apply(request.nudge());
             processedContext.add(ChatMessage.asSystem(nudge));
         }
     }
@@ -313,10 +316,10 @@ public class StoryGenerationAdapter implements StoryGenerationPort {
 
     private boolean isTopicFlagged(Entry<String, Double> entry, ModerationConfigurationRequest moderation) {
 
-        if (isEmpty(moderation.getThresholds())) {
+        if (isEmpty(moderation.thresholds())) {
             return false;
         }
 
-        return entry.getValue() > moderation.getThresholds().get(entry.getKey());
+        return entry.getValue() > moderation.thresholds().get(entry.getKey());
     }
 }

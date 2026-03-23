@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class MoiraiUserDetailsServiceTest {
                 nickname,
                 "http://someurl.com/somepic.jpg",
                 null,
-                OffsetDateTime.parse("2024-12-01T14:00:00Z")));
+                Instant.parse("2024-12-01T14:00:00Z")));
 
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(response);
 

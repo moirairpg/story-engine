@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -16,13 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import me.moirai.storyengine.AbstractDiscordTest;
-import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetailsFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -63,11 +64,11 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        var chatMessageData = DiscordMessageDataFixture.messageData()
-                .author(DiscordUserDetailsFixture.create()
+        var chatMessageData = new DiscordMessageData(null, null, "Some message",
+                DiscordUserDetailsFixture.create()
                         .id(botId)
-                        .build())
-                .build();
+                        .build(),
+                List.of());
 
         var generationRequestCaptor = ArgumentCaptor.forClass(StoryGenerationRequest.class);
 
@@ -83,13 +84,12 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
 
         var generationRequest = generationRequestCaptor.getValue();
         assertThat(generationRequest).isNotNull();
-        assertThat(generationRequest.getBotId()).isEqualTo(useCase.getBotId());
-        assertThat(generationRequest.getBotNickname()).isEqualTo(useCase.getBotNickname());
-        assertThat(generationRequest.getBotUsername()).isEqualTo(useCase.getBotUsername());
-        assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
-        assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
-        assertThat(generationRequest.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
+        assertThat(generationRequest.botNickname()).isEqualTo(useCase.getBotNickname());
+        assertThat(generationRequest.botUsername()).isEqualTo(useCase.getBotUsername());
+        assertThat(generationRequest.channelId()).isEqualTo(useCase.getChannelId());
+        assertThat(generationRequest.guildId()).isEqualTo(useCase.getGuildId());
+        assertThat(generationRequest.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(generationRequest.adventureId()).isEqualTo(adventure.getId());
     }
 
     @Test
@@ -108,11 +108,11 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        var chatMessageData = DiscordMessageDataFixture.messageData()
-                .author(DiscordUserDetailsFixture.create()
+        var chatMessageData = new DiscordMessageData(null, null, "Some message",
+                DiscordUserDetailsFixture.create()
                         .id("SMID")
-                        .build())
-                .build();
+                        .build(),
+                List.of());
 
         when(discordChannelPort.getLastMessageIn(anyString())).thenReturn(Optional.of(chatMessageData));
 
@@ -186,11 +186,11 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
                 .guildId("GDID")
                 .build();
 
-        var chatMessageData = DiscordMessageDataFixture.messageData()
-                .author(DiscordUserDetailsFixture.create()
+        var chatMessageData = new DiscordMessageData(null, null, "Some message",
+                DiscordUserDetailsFixture.create()
                         .id(botId)
-                        .build())
-                .build();
+                        .build(),
+                List.of());
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
         when(discordChannelPort.getLastMessageIn(anyString()))

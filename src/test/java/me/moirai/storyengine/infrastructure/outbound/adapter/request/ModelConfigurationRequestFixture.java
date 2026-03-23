@@ -1,7 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.request;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,55 +9,25 @@ import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationReq
 
 public class ModelConfigurationRequestFixture {
 
-    public static ModelConfigurationRequest.Builder gpt4Mini() {
+    public static ModelConfigurationRequest gpt4Mini() {
 
-        ModelConfigurationRequest.Builder modelConfigurationBuilder = ModelConfigurationRequest.builder();
-        modelConfigurationBuilder.frequencyPenalty(0.2);
-        modelConfigurationBuilder.presencePenalty(0.2);
-        modelConfigurationBuilder.maxTokenLimit(100);
-        modelConfigurationBuilder.temperature(1.0);
-
-        ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_MINI;
-        modelConfigurationBuilder.aiModel(AiModelRequest.build(aiModel.toString(),
-                aiModel.getOfficialModelName(),
-                aiModel.getHardTokenLimit()));
-
-        Map<String, Double> logitBias = new HashMap<>();
-        logitBias.put("ABC", 50.0);
-        logitBias.put("DEF", 5.0);
-
-        Set<String> stopSequences = new HashSet<>();
-        stopSequences.add("ABC");
-
-        modelConfigurationBuilder.logitBias(logitBias);
-        modelConfigurationBuilder.stopSequences(stopSequences);
-
-        return modelConfigurationBuilder;
+        var aiModel = ArtificialIntelligenceModel.GPT4_MINI;
+        return new ModelConfigurationRequest(
+                new AiModelRequest(aiModel.toString(), aiModel.getOfficialModelName(),
+                        aiModel.getHardTokenLimit()),
+                100, 1.0, 0.2, 0.2,
+                Set.of("ABC"),
+                Map.of("ABC", 50.0, "DEF", 5.0));
     }
 
-    public static ModelConfigurationRequest.Builder gpt4Omni() {
+    public static ModelConfigurationRequest gpt4Omni() {
 
-        ModelConfigurationRequest.Builder modelConfigurationBuilder = ModelConfigurationRequest.builder();
-        modelConfigurationBuilder.frequencyPenalty(0.2);
-        modelConfigurationBuilder.presencePenalty(0.2);
-        modelConfigurationBuilder.maxTokenLimit(100);
-        modelConfigurationBuilder.temperature(1.0);
-
-        ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
-        modelConfigurationBuilder.aiModel(AiModelRequest.build(aiModel.toString(),
-                aiModel.getOfficialModelName(),
-                aiModel.getHardTokenLimit()));
-
-        Map<String, Double> logitBias = new HashMap<>();
-        logitBias.put("ABC", 50.0);
-        logitBias.put("DEF", 5.0);
-
-        Set<String> stopSequences = new HashSet<>();
-        stopSequences.add("ABC");
-
-        modelConfigurationBuilder.logitBias(logitBias);
-        modelConfigurationBuilder.stopSequences(stopSequences);
-
-        return modelConfigurationBuilder;
+        var aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
+        return new ModelConfigurationRequest(
+                new AiModelRequest(aiModel.toString(), aiModel.getOfficialModelName(),
+                        aiModel.getHardTokenLimit()),
+                100, 1.0, 0.2, 0.2,
+                Set.of("ABC"),
+                Map.of("ABC", 50.0, "DEF", 5.0));
     }
 }

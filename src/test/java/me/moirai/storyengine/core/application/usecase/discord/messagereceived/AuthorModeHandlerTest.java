@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordUserDetailsFixture;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
@@ -26,6 +26,7 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationPort;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -71,25 +72,23 @@ public class AuthorModeHandlerTest {
         var generationRequestCaptor = ArgumentCaptor.forClass(StoryGenerationRequest.class);
 
         var messageHistory = messageList(5);
-        messageHistory.add(DiscordMessageData.builder()
-                .content("TestBot said: Bot message 1")
-                .author(DiscordUserDetailsFixture.create()
+        messageHistory.add(new DiscordMessageData(null, null, "TestBot said: Bot message 1",
+                DiscordUserDetailsFixture.create()
                         .nickname("TestBot")
                         .username("TestBot")
-                        .build())
-                .build());
+                        .build(),
+                List.of()));
 
-        messageHistory.add(DiscordMessageData.builder()
-                .content("TestBot said: Bot message 2")
-                .author(DiscordUserDetailsFixture.create()
+        messageHistory.add(new DiscordMessageData(null, null, "TestBot said: Bot message 2",
+                DiscordUserDetailsFixture.create()
                         .nickname("TestBot")
                         .username("TestBot")
-                        .build())
-                .build());
+                        .build(),
+                List.of()));
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
         when(discordChannelPort.getLastMessageIn(anyString()))
-                .thenReturn(Optional.of(DiscordMessageDataFixture.messageData().build()));
+                .thenReturn(Optional.of(DiscordMessageDataFixture.messageData()));
         when(discordChannelPort.retrieveEntireHistoryBefore(anyString(), anyString()))
                 .thenReturn(messageHistory);
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
@@ -102,17 +101,17 @@ public class AuthorModeHandlerTest {
 
         var generationRequest = generationRequestCaptor.getValue();
         assertThat(generationRequest).isNotNull();
-        assertThat(generationRequest.getBotNickname()).isEqualTo(useCase.getBotNickname());
-        assertThat(generationRequest.getBotUsername()).isEqualTo(useCase.getBotUsername());
-        assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
-        assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
-        assertThat(generationRequest.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
-        assertThat(generationRequest.getMessageHistory())
+        assertThat(generationRequest.botNickname()).isEqualTo(useCase.getBotNickname());
+        assertThat(generationRequest.botUsername()).isEqualTo(useCase.getBotUsername());
+        assertThat(generationRequest.channelId()).isEqualTo(useCase.getChannelId());
+        assertThat(generationRequest.guildId()).isEqualTo(useCase.getGuildId());
+        assertThat(generationRequest.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(generationRequest.adventureId()).isEqualTo(adventure.getId());
+        assertThat(generationRequest.messageHistory())
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(8)
-                .extracting(DiscordMessageData::getContent)
+                .extracting(DiscordMessageData::content)
                 .containsAnyOf("TestBot said: Bot message 1",
                         "natalis said: [ Message 1 ]");
     }

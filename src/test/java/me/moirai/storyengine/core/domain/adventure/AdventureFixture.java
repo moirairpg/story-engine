@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.domain.adventure;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
@@ -12,7 +11,6 @@ import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class AdventureFixture {
 
-    private static final String OWNER_DISCORD_ID = "586678721356875";
     public static final UUID PUBLIC_ID = UUID.fromString("857345aa-2222-0000-0000-000000000000");
     public static final Long NUMERIC_ID = 2L;
 
@@ -29,9 +27,6 @@ public class AdventureFixture {
         builder.visibility(Visibility.fromString("PRIVATE"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
-        builder.creatorId(OWNER_DISCORD_ID);
-        builder.creationDate(OffsetDateTime.now());
-        builder.lastUpdateDate(OffsetDateTime.now());
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(false);
@@ -53,9 +48,6 @@ public class AdventureFixture {
         builder.visibility(Visibility.fromString("PRIVATE"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
-        builder.creatorId(OWNER_DISCORD_ID);
-        builder.creationDate(OffsetDateTime.now());
-        builder.lastUpdateDate(OffsetDateTime.now());
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(true);
@@ -77,9 +69,6 @@ public class AdventureFixture {
         builder.visibility(Visibility.fromString("PUBLIC"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
-        builder.creatorId(OWNER_DISCORD_ID);
-        builder.creationDate(OffsetDateTime.now());
-        builder.lastUpdateDate(OffsetDateTime.now());
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(false);
@@ -101,9 +90,6 @@ public class AdventureFixture {
         builder.visibility(Visibility.fromString("PUBLIC"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
         builder.permissions(PermissionsFixture.samplePermissions().build());
-        builder.creatorId(OWNER_DISCORD_ID);
-        builder.creationDate(OffsetDateTime.now());
-        builder.lastUpdateDate(OffsetDateTime.now());
         builder.channelId("12345");
         builder.gameMode(GameMode.RPG);
         builder.isMultiplayer(true);

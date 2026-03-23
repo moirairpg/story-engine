@@ -69,7 +69,7 @@ public class ChatModeHandlerTest {
 
         when(adventureRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
         when(discordChannelPort.getLastMessageIn(anyString()))
-                .thenReturn(Optional.of(DiscordMessageDataFixture.messageData().build()));
+                .thenReturn(Optional.of(DiscordMessageDataFixture.messageData()));
         when(discordChannelPort.retrieveEntireHistoryBefore(anyString(), anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
@@ -82,11 +82,11 @@ public class ChatModeHandlerTest {
 
         var generationRequest = generationRequestCaptor.getValue();
         assertThat(generationRequest).isNotNull();
-        assertThat(generationRequest.getBotNickname()).isEqualTo(useCase.getBotNickname());
-        assertThat(generationRequest.getBotUsername()).isEqualTo(useCase.getBotUsername());
-        assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
-        assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
-        assertThat(generationRequest.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
+        assertThat(generationRequest.botNickname()).isEqualTo(useCase.getBotNickname());
+        assertThat(generationRequest.botUsername()).isEqualTo(useCase.getBotUsername());
+        assertThat(generationRequest.channelId()).isEqualTo(useCase.getChannelId());
+        assertThat(generationRequest.guildId()).isEqualTo(useCase.getGuildId());
+        assertThat(generationRequest.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(generationRequest.adventureId()).isEqualTo(adventure.getId());
     }
 }

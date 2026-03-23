@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordEmbeddedMessageRequest;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetails;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
@@ -57,18 +57,18 @@ public class DiscordChannelAdapter implements DiscordChannelPort {
                 .retrieveMemberById(messageSent.getAuthor().getId())
                 .complete();
 
-        return DiscordMessageData.builder()
-                .id(messageSent.getId())
-                .channelId(channelId)
-                .content(messageSent.getContentRaw())
-                .author(DiscordUserDetails.builder()
+        var nickname = isNotEmpty(author.getNickname()) ? author.getNickname() : author.getUser().getGlobalName();
+        return new DiscordMessageData(
+                messageSent.getId(),
+                channelId,
+                messageSent.getContentRaw(),
+                DiscordUserDetails.builder()
                         .id(author.getId())
-                        .nickname(isNotEmpty(author.getNickname()) ? author.getNickname()
-                                : author.getUser().getGlobalName())
+                        .nickname(nickname)
                         .username(author.getUser().getName())
                         .mention(author.getAsMention())
-                        .build())
-                .build();
+                        .build(),
+                List.of());
     }
 
     /**
@@ -99,18 +99,18 @@ public class DiscordChannelAdapter implements DiscordChannelPort {
                 .retrieveMemberById(messageSent.getAuthor().getId())
                 .complete();
 
-        return DiscordMessageData.builder()
-                .id(messageSent.getId())
-                .channelId(channelId)
-                .content(messageSent.getEmbeds().get(0).getDescription())
-                .author(DiscordUserDetails.builder()
+        var nickname = isNotEmpty(author.getNickname()) ? author.getNickname() : author.getUser().getGlobalName();
+        return new DiscordMessageData(
+                messageSent.getId(),
+                channelId,
+                messageSent.getEmbeds().get(0).getDescription(),
+                DiscordUserDetails.builder()
                         .id(author.getId())
-                        .nickname(isNotEmpty(author.getNickname()) ? author.getNickname()
-                                : author.getUser().getGlobalName())
+                        .nickname(nickname)
                         .username(author.getUser().getName())
                         .mention(author.getAsMention())
-                        .build())
-                .build();
+                        .build(),
+                List.of());
     }
 
     /**
@@ -181,27 +181,31 @@ public class DiscordChannelAdapter implements DiscordChannelPort {
             String formattedContent = formatMessageWithMentions(message.getMentions().getMembers(), message,
                     authorNickname, author.getUser().getName());
 
-            return Optional.of(DiscordMessageData.builder()
-                    .id(message.getId())
-                    .channelId(channelId)
-                    .content(formattedContent)
-                    .author(DiscordUserDetails.builder()
-                            .id(author.getId())
-                            .nickname(authorNickname)
-                            .username(author.getUser().getName())
-                            .mention(author.getAsMention())
+            var authorDetails = DiscordUserDetails.builder()
+                    .id(author.getId())
+                    .nickname(authorNickname)
+                    .username(author.getUser().getName())
+                    .mention(author.getAsMention())
+                    .build();
+
+            var mentionedUsers = message.getMentions()
+                    .getMembers().stream()
+                    .map(member -> DiscordUserDetails.builder()
+                            .id(member.getId())
+                            .mention(member.getAsMention())
+                            .nickname(isNotEmpty(member.getNickname())
+                                    ? member.getNickname()
+                                    : member.getUser().getGlobalName())
+                            .username(member.getUser().getName())
                             .build())
-                    .mentionedUsers(message.getMentions()
-                            .getMembers().stream()
-                            .map(member -> DiscordUserDetails.builder()
-                                    .id(member.getId())
-                                    .mention(member.getAsMention())
-                                    .nickname(isNotEmpty(member.getNickname()) ? member.getNickname()
-                                            : member.getUser().getGlobalName())
-                                    .username(member.getUser().getName())
-                                    .build())
-                            .toList())
-                    .build());
+                    .toList();
+
+            return Optional.of(new DiscordMessageData(
+                    message.getId(),
+                    channelId,
+                    formattedContent,
+                    authorDetails,
+                    mentionedUsers));
         } catch (Exception e) {
             return Optional.empty();
         }
@@ -228,28 +232,34 @@ public class DiscordChannelAdapter implements DiscordChannelPort {
                 .retrieveMemberById(msgToEdit.getAuthor().getId())
                 .complete();
 
-        return DiscordMessageData.builder()
-                .id(msgToEdit.getId())
-                .channelId(channelId)
-                .content(messageContent)
-                .author(DiscordUserDetails.builder()
-                        .id(author.getId())
-                        .nickname(isNotEmpty(author.getNickname()) ? author.getNickname()
-                                : author.getUser().getGlobalName())
-                        .username(author.getUser().getName())
-                        .mention(author.getAsMention())
-                        .build())
-                .mentionedUsers(msgToEdit.getMentions()
-                        .getMembers().stream()
-                        .map(member -> DiscordUserDetails.builder()
-                                .id(member.getId())
-                                .mention(member.getAsMention())
-                                .nickname(isNotEmpty(member.getNickname()) ? member.getNickname()
-                                        : member.getUser().getGlobalName())
-                                .username(member.getUser().getName())
-                                .build())
-                        .toList())
+        String authorNickname = isNotEmpty(author.getNickname()) ? author.getNickname()
+                : author.getUser().getGlobalName();
+
+        var authorDetails = DiscordUserDetails.builder()
+                .id(author.getId())
+                .nickname(authorNickname)
+                .username(author.getUser().getName())
+                .mention(author.getAsMention())
                 .build();
+
+        var mentionedUsers = msgToEdit.getMentions()
+                .getMembers().stream()
+                .map(member -> DiscordUserDetails.builder()
+                        .id(member.getId())
+                        .mention(member.getAsMention())
+                        .nickname(isNotEmpty(member.getNickname())
+                                ? member.getNickname()
+                                : member.getUser().getGlobalName())
+                        .username(member.getUser().getName())
+                        .build())
+                .toList();
+
+        return new DiscordMessageData(
+                msgToEdit.getId(),
+                channelId,
+                messageContent,
+                authorDetails,
+                mentionedUsers);
     }
 
     /**
@@ -318,26 +328,29 @@ public class DiscordChannelAdapter implements DiscordChannelPort {
         String formattedContent = formatMessageWithMentions(mentionedUsers, message,
                 authorNickname, author.getUser().getName());
 
-        return DiscordMessageData.builder()
-                .id(message.getId())
-                .channelId(channelId)
-                .content(formattedContent)
-                .author(DiscordUserDetails.builder()
-                        .id(author.getId())
-                        .nickname(authorNickname)
-                        .username(author.getUser().getName())
-                        .mention(author.getAsMention())
-                        .build())
-                .mentionedUsers(mentionedUsers.stream()
-                        .map(member -> DiscordUserDetails.builder()
-                                .id(member.getId())
-                                .mention(member.getAsMention())
-                                .nickname(isNotEmpty(member.getNickname()) ? member.getNickname()
-                                        : member.getUser().getGlobalName())
-                                .username(member.getUser().getName())
-                                .build())
-                        .toList())
+        var authorDetails = DiscordUserDetails.builder()
+                .id(author.getId())
+                .nickname(authorNickname)
+                .username(author.getUser().getName())
+                .mention(author.getAsMention())
                 .build();
+
+        var mentionedUsersDetails = mentionedUsers.stream()
+                .map(member -> DiscordUserDetails.builder()
+                        .id(member.getId())
+                        .mention(member.getAsMention())
+                        .nickname(isNotEmpty(member.getNickname()) ? member.getNickname()
+                                : member.getUser().getGlobalName())
+                        .username(member.getUser().getName())
+                        .build())
+                .toList();
+
+        return new DiscordMessageData(
+                message.getId(),
+                channelId,
+                formattedContent,
+                authorDetails,
+                mentionedUsersDetails);
     }
 
     private String formatMessageWithMentions(List<Member> mentionedUsers,

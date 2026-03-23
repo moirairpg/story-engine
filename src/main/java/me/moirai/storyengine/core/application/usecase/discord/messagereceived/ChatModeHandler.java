@@ -10,11 +10,10 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.ChatModeRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
@@ -61,48 +60,48 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Voi
 
     private StoryGenerationRequest buildGenerationRequest(ChatModeRequest useCase, Adventure adventure) {
 
-        Persona persona = personaRepository.findById(adventure.getPersonaId())
+        var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().aiModel().toString(),
-                        adventure.getModelConfiguration().aiModel().getOfficialModelName(),
-                        adventure.getModelConfiguration().aiModel().getHardTokenLimit());
+        var aiModel = new AiModelRequest(
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                adventure.getModelConfiguration().aiModel().getHardTokenLimit());
 
-        ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
-                .logitBias(adventure.getModelConfiguration().logitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().stopSequences())
-                .temperature(adventure.getModelConfiguration().temperature())
-                .aiModel(aiModel)
-                .build();
+        var modelConfigurationRequest = new ModelConfigurationRequest(
+                aiModel,
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().logitBias());
 
-        boolean isModerationEnabled = !adventure.getModeration().equals(DISABLED);
-        ModerationConfigurationRequest moderation = ModerationConfigurationRequest
-                .build(isModerationEnabled, adventure.getModeration().isAbsolute(),
-                        adventure.getModeration().getThresholds());
+        var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
+        var moderation = new ModerationConfigurationRequest(
+                isModerationEnabled,
+                adventure.getModeration().isAbsolute(),
+                adventure.getModeration().getThresholds());
 
-        List<DiscordMessageData> messageHistory = getMessageHistory(useCase.getChannelId());
+        var messageHistory = getMessageHistory(useCase.getChannelId());
 
-        return StoryGenerationRequest.builder()
-                .botNickname(useCase.getBotNickname())
-                .botUsername(useCase.getBotUsername())
-                .channelId(useCase.getChannelId())
-                .guildId(useCase.getGuildId())
-                .moderation(moderation)
-                .modelConfiguration(modelConfigurationRequest)
-                .personaId(persona.getPublicId())
-                .adventureId(adventure.getPublicId())
-                .messageHistory(messageHistory)
-                .gameMode(CHAT.name())
-                .nudge(adventure.getContextAttributes().nudge())
-                .authorsNote(adventure.getContextAttributes().authorsNote())
-                .remember(adventure.getContextAttributes().remember())
-                .bump(adventure.getContextAttributes().bump())
-                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
-                .build();
+        return new StoryGenerationRequest(
+                null,
+                useCase.getBotUsername(),
+                useCase.getBotNickname(),
+                useCase.getChannelId(),
+                useCase.getGuildId(),
+                adventure.getPublicId(),
+                persona.getPublicId(),
+                CHAT.name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                modelConfigurationRequest,
+                moderation,
+                messageHistory);
     }
 
     private List<DiscordMessageData> getMessageHistory(String channelId) {
@@ -111,7 +110,7 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Voi
                 .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
         List<DiscordMessageData> messageHistory = new ArrayList<>(discordChannelPort
-                .retrieveEntireHistoryBefore(lastMessageSent.getId(), channelId));
+                .retrieveEntireHistoryBefore(lastMessageSent.id(), channelId));
 
         messageHistory.addFirst(lastMessageSent);
 

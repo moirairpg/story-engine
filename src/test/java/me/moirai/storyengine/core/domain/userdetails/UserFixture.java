@@ -3,7 +3,6 @@ package me.moirai.storyengine.core.domain.userdetails;
 import static me.moirai.storyengine.common.enums.Role.ADMIN;
 import static me.moirai.storyengine.common.enums.Role.PLAYER;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
@@ -17,20 +16,14 @@ public class UserFixture {
 
         return User.builder()
                 .discordId("12345")
-                .role(PLAYER)
-                .creatorId("12341234")
-                .creationDate(OffsetDateTime.now())
-                .lastUpdateDate(OffsetDateTime.now());
+                .role(PLAYER);
     }
 
     public static User.Builder admin() {
 
         return User.builder()
                 .discordId("12345")
-                .role(ADMIN)
-                .creatorId("12341234")
-                .creationDate(OffsetDateTime.now())
-                .lastUpdateDate(OffsetDateTime.now());
+                .role(ADMIN);
     }
 
     public static User playerWithId() {

@@ -4,6 +4,9 @@ import static java.util.stream.Collectors.joining;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +86,7 @@ public class DbTestHelper {
 
         validateEntity(type);
         applyUuidGeneration(value, type);
+        applyEntityListeners(value, type);
 
         var tableName = resolveTableName(type);
         var idField = resolveIdField(type);
@@ -342,6 +346,8 @@ public class DbTestHelper {
                         fieldValue = converter.convertToDatabaseColumn(fieldValue);
                     } else if (fieldValue instanceof Enum<?> enumValue) {
                         fieldValue = enumValue.name();
+                    } else if (fieldValue instanceof Instant instant) {
+                        fieldValue = OffsetDateTime.ofInstant(instant, ZoneOffset.UTC);
                     }
                     params.put(resolveColumnName(field), fieldValue);
                 }
@@ -355,7 +361,8 @@ public class DbTestHelper {
     private void replaceOneToManyChildren(Object parent, Class<?> parentType, Long parentId) {
         for (var field : collectOneToManyFields(parentType)) {
             var fkColumnName = field.getAnnotation(JoinColumn.class).name();
-            var childType = (Class<?>) ((java.lang.reflect.ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+            var childType = (Class<?>) ((java.lang.reflect.ParameterizedType) field.getGenericType())
+                    .getActualTypeArguments()[0];
             jdbcClient.sql("DELETE FROM " + resolveTableName(childType) + " WHERE " + fkColumnName + " = :parentId")
                     .param("parentId", parentId)
                     .update();

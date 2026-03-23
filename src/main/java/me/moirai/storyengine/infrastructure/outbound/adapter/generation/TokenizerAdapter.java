@@ -64,11 +64,6 @@ public class TokenizerAdapter implements TokenizerPort {
         int tokenCount = tokenIds.length;
         int characterCount = text.length();
 
-        return TokenizeResult.builder()
-                .characterCount(characterCount)
-                .tokenCount(tokenCount)
-                .tokens(tokens)
-                .tokenIds(tokenIds)
-                .build();
+        return new TokenizeResult(tokens, tokenIds, tokenCount, characterCount);
     }
 }

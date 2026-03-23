@@ -13,11 +13,10 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.messagereceived.AuthorModeRequest;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
@@ -64,59 +63,59 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
 
     private StoryGenerationRequest buildGenerationRequest(AuthorModeRequest useCase, Adventure adventure) {
 
-        Persona persona = personaRepository.findById(adventure.getPersonaId())
+        var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().aiModel().toString(),
-                        adventure.getModelConfiguration().aiModel().getOfficialModelName(),
-                        adventure.getModelConfiguration().aiModel().getHardTokenLimit());
+        var aiModel = new AiModelRequest(
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                adventure.getModelConfiguration().aiModel().getHardTokenLimit());
 
-        ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
-                .logitBias(adventure.getModelConfiguration().logitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().stopSequences())
-                .temperature(adventure.getModelConfiguration().temperature())
-                .aiModel(aiModel)
-                .build();
+        var modelConfigurationRequest = new ModelConfigurationRequest(
+                aiModel,
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().logitBias());
 
-        boolean isModerationEnabled = !adventure.getModeration().equals(DISABLED);
-        ModerationConfigurationRequest moderation = ModerationConfigurationRequest
-                .build(isModerationEnabled, adventure.getModeration().isAbsolute(),
-                        adventure.getModeration().getThresholds());
+        var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
+        var moderation = new ModerationConfigurationRequest(
+                isModerationEnabled,
+                adventure.getModeration().isAbsolute(),
+                adventure.getModeration().getThresholds());
 
-        List<DiscordMessageData> messageHistory = getMessageHistory(useCase.getChannelId()).stream()
+        var messageHistory = getMessageHistory(useCase.getChannelId()).stream()
                 .map(message -> formatHistoryForAuthorDirections(useCase, message))
                 .toList();
 
-        return StoryGenerationRequest.builder()
-                .botNickname(useCase.getBotNickname())
-                .botUsername(useCase.getBotUsername())
-                .channelId(useCase.getChannelId())
-                .guildId(useCase.getGuildId())
-                .moderation(moderation)
-                .modelConfiguration(modelConfigurationRequest)
-                .personaId(persona.getPublicId())
-                .adventureId(adventure.getPublicId())
-                .messageHistory(messageHistory)
-                .gameMode(AUTHOR.name())
-                .nudge(adventure.getContextAttributes().nudge())
-                .authorsNote(adventure.getContextAttributes().authorsNote())
-                .remember(adventure.getContextAttributes().remember())
-                .bump(adventure.getContextAttributes().bump())
-                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
-                .build();
+        return new StoryGenerationRequest(
+                null,
+                useCase.getBotUsername(),
+                useCase.getBotNickname(),
+                useCase.getChannelId(),
+                useCase.getGuildId(),
+                adventure.getPublicId(),
+                persona.getPublicId(),
+                AUTHOR.name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                modelConfigurationRequest,
+                moderation,
+                messageHistory);
     }
 
     private List<DiscordMessageData> getMessageHistory(String channelId) {
 
-        DiscordMessageData lastMessageSent = discordChannelPort.getLastMessageIn(channelId)
+        var lastMessageSent = discordChannelPort.getLastMessageIn(channelId)
                 .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
-        List<DiscordMessageData> messageHistory = new ArrayList<>(discordChannelPort
-                .retrieveEntireHistoryBefore(lastMessageSent.getId(), channelId));
+        var messageHistory = new ArrayList<>(discordChannelPort
+                .retrieveEntireHistoryBefore(lastMessageSent.id(), channelId));
 
         messageHistory.addFirst(lastMessageSent);
 
@@ -125,29 +124,28 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
 
     private DiscordMessageData formatHistoryForAuthorDirections(AuthorModeRequest useCase, DiscordMessageData message) {
 
-        String botNickname = useCase.getBotUsername();
-        String authorNickname = getAuthorNickname(message);
+        var botNickname = useCase.getBotUsername();
+        var authorNickname = getAuthorNickname(message);
 
         if (!authorNickname.equals(botNickname)) {
-            String originalMessageContent = substringAfter(message.getContent(),
+            var originalMessageContent = substringAfter(message.content(),
                     String.format("%s said: ", authorNickname));
 
-            String formattedMessageContent = formatAuthorDirective(authorNickname).apply(originalMessageContent);
+            var formattedMessageContent = formatAuthorDirective(authorNickname).apply(originalMessageContent);
 
-            return DiscordMessageData.builder()
-                    .content(formattedMessageContent)
-                    .author(message.getAuthor())
-                    .mentionedUsers(message.getMentionedUsers())
-                    .channelId(message.getChannelId())
-                    .id(message.getId())
-                    .build();
+            return new DiscordMessageData(
+                    message.id(),
+                    message.channelId(),
+                    formattedMessageContent,
+                    message.author(),
+                    message.mentionedUsers());
         }
 
         return message;
     }
 
     private String getAuthorNickname(DiscordMessageData message) {
-        return nonNull(message.getAuthor().getNickname()) ? message.getAuthor().getNickname()
-                : message.getAuthor().getUsername();
+        return nonNull(message.author().getNickname()) ? message.author().getNickname()
+                : message.author().getUsername();
     }
 }

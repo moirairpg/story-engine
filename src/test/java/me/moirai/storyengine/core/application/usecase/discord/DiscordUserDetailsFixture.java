@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.application.usecase.discord;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetails;
 
 public class DiscordUserDetailsFixture {
 

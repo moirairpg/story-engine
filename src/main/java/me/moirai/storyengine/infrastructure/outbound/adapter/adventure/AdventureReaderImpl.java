@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -93,8 +93,8 @@ public class AdventureReaderImpl implements AdventureReader {
                 rs.getDouble("frequency_penalty"),
                 rs.getDouble("presence_penalty"),
                 rs.getBoolean("is_multiplayer"),
-                rs.getObject("creation_date", OffsetDateTime.class),
-                rs.getObject("last_update_date", OffsetDateTime.class),
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getTimestamp("last_update_date").toInstant(),
                 parseLogitBias(rs.getString("logit_bias")),
                 parseStringSet(rs.getString("stop_sequences")),
                 parseStringSet(rs.getString("users_allowed_to_read")),

@@ -33,7 +33,6 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                 .adventureStart(command.adventureStart())
                 .visibility(command.visibility())
                 .permissions(permissions)
-                .creatorId(command.requesterId())
                 .build());
 
         command.lorebookEntries().forEach(entry -> world.addLorebookEntry(

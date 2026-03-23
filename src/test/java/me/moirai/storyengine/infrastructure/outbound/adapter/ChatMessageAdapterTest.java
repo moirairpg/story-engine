@@ -15,8 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.application.usecase.discord.DiscordMessageDataFixture;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.ChatMessageAdapter;
 
@@ -264,13 +264,14 @@ public class ChatMessageAdapterTest {
 
     private Map<String, Object> createContextWithMessageNumber(int items) {
 
-        List<DiscordMessageData> messageDataList = new ArrayList<>();
+        var messageDataList = new ArrayList<DiscordMessageData>();
         for (int i = 0; i < items; i++) {
-            int messageNumber = i + 1;
-            messageDataList.add(DiscordMessageDataFixture.messageData()
-                    .id(String.valueOf(messageNumber))
-                    .content(String.format("Message %s", messageNumber))
-                    .build());
+            var messageNumber = i + 1;
+            var base = DiscordMessageDataFixture.messageData();
+            messageDataList.add(new DiscordMessageData(
+                    String.valueOf(messageNumber), base.channelId(),
+                    String.format("Message %s", messageNumber),
+                    base.author(), base.mentionedUsers()));
         }
 
         Map<String, Object> context = new HashMap<>();

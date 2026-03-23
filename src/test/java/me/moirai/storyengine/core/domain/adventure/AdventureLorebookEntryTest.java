@@ -2,8 +2,6 @@ package me.moirai.storyengine.core.domain.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.OffsetDateTime;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -17,10 +15,6 @@ public class AdventureLorebookEntryTest {
                 .name("White River")
                 .description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.")
                 .regex("[Ww]hite [Rr]iver")
-                .creatorId("CRTID")
-                .creationDate(OffsetDateTime.now())
-                .lastUpdateDate(OffsetDateTime.now())
-                .isPlayerCharacter(true)
                 .playerId("2423423423423");
 
         // When
@@ -30,13 +24,10 @@ public class AdventureLorebookEntryTest {
 
         // Then
         assertThat(entry).isNotNull();
-        assertThat(entry.getCreationDate()).isNotNull();
-        assertThat(entry.getLastUpdateDate()).isNotNull();
         assertThat(entry.getDescription()).isEqualTo("The White River goes through Falkreath, Whiterun and ends in Eastmarch.");
         assertThat(entry.getPublicId()).isEqualTo(AdventureLorebookEntryFixture.PUBLIC_ID);
         assertThat(entry.getName()).isEqualTo("White River");
         assertThat(entry.getPlayerId()).isEqualTo("2423423423423");
-        assertThat(entry.getCreatorId()).isEqualTo("CRTID");
         assertThat(entry.getRegex()).isEqualTo("[Ww]hite [Rr]iver");
         assertThat(entry.isPlayerCharacter()).isTrue();
     }

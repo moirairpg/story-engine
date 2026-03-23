@@ -84,13 +84,12 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
 
         var generationRequest = generationRequestCaptor.getValue();
         assertThat(generationRequest).isNotNull();
-        assertThat(generationRequest.getBotId()).isEqualTo(useCase.getBotId());
-        assertThat(generationRequest.getBotNickname()).isEqualTo(useCase.getBotNickname());
-        assertThat(generationRequest.getBotUsername()).isEqualTo(useCase.getBotUsername());
-        assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
-        assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
-        assertThat(generationRequest.getPersonaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
+        assertThat(generationRequest.botNickname()).isEqualTo(useCase.getBotNickname());
+        assertThat(generationRequest.botUsername()).isEqualTo(useCase.getBotUsername());
+        assertThat(generationRequest.channelId()).isEqualTo(useCase.getChannelId());
+        assertThat(generationRequest.guildId()).isEqualTo(useCase.getGuildId());
+        assertThat(generationRequest.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(generationRequest.adventureId()).isEqualTo(adventure.getId());
     }
 
     @Test

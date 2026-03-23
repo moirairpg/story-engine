@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 
 public interface LorebookEnrichmentPort {
 

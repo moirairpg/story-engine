@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.discord.userdetails;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.enums.Role;
@@ -12,5 +12,5 @@ public record UserDetailsResult(
         String nickname,
         String avatarUrl,
         Role role,
-        OffsetDateTime creationDate) {
+        Instant creationDate) {
 }

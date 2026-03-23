@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.domain.world;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -38,8 +37,7 @@ public class WorldLorebookEntry extends Asset {
 
     private WorldLorebookEntry(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate, builder.lastUpdateDate);
-
+        super();
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
@@ -94,9 +92,6 @@ public class WorldLorebookEntry extends Asset {
         private String name;
         private String regex;
         private String description;
-        private String creatorId;
-        private OffsetDateTime creationDate;
-        private OffsetDateTime lastUpdateDate;
 
         private Builder() {
         }
@@ -116,24 +111,6 @@ public class WorldLorebookEntry extends Asset {
         public Builder regex(String regex) {
 
             this.regex = regex;
-            return this;
-        }
-
-        public Builder creatorId(String creatorId) {
-
-            this.creatorId = creatorId;
-            return this;
-        }
-
-        public Builder creationDate(OffsetDateTime creationDate) {
-
-            this.creationDate = creationDate;
-            return this;
-        }
-
-        public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
-
-            this.lastUpdateDate = lastUpdateDate;
             return this;
         }
 

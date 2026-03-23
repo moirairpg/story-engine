@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -28,10 +28,15 @@ public record AdventureDetails(
         double frequencyPenalty,
         double presencePenalty,
         boolean isMultiplayer,
-        OffsetDateTime creationDate,
-        OffsetDateTime lastUpdateDate,
+        Instant creationDate,
+        Instant lastUpdateDate,
         Map<String, Double> logitBias,
         Set<String> stopSequences,
         Set<String> usersAllowedToRead,
         Set<String> usersAllowedToWrite) {
+
+    public AdventureDetails {
+        usersAllowedToWrite = Set.copyOf(usersAllowedToWrite);
+        usersAllowedToRead = Set.copyOf(usersAllowedToRead);
+    }
 }

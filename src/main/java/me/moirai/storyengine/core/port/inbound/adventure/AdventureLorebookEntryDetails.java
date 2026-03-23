@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record AdventureLorebookEntryDetails(
@@ -11,6 +11,6 @@ public record AdventureLorebookEntryDetails(
         String description,
         String playerId,
         boolean isPlayerCharacter,
-        OffsetDateTime creationDate,
-        OffsetDateTime lastUpdateDate) {
+        Instant creationDate,
+        Instant lastUpdateDate) {
 }

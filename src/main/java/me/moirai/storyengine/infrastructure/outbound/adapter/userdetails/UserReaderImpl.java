@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,6 +45,6 @@ public class UserReaderImpl implements UserReader {
                 UUID.fromString(rs.getString("public_id")),
                 rs.getString("discord_id"),
                 Role.valueOf(rs.getString("role")),
-                rs.getObject("creation_date", OffsetDateTime.class));
+                rs.getTimestamp("creation_date").toInstant());
     }
 }

@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.world;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record WorldSummary(
@@ -8,4 +8,4 @@ public record WorldSummary(
         String name,
         String description,
         String visibility,
-        OffsetDateTime creationDate) {}
+        Instant creationDate) {}

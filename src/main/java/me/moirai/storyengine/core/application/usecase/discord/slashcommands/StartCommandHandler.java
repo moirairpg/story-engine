@@ -2,19 +2,17 @@ package me.moirai.storyengine.core.application.usecase.discord.slashcommands;
 
 import static me.moirai.storyengine.common.enums.Moderation.DISABLED;
 
-import java.util.Collections;
+import java.util.List;
 
 import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.StartCommand;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetails;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
@@ -64,60 +62,61 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Vo
 
     private StoryGenerationRequest buildGenerationRequest(StartCommand useCase, Adventure adventure) {
 
-        World world = worldRepository.findById(adventure.getWorldId())
+        var world = worldRepository.findById(adventure.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException("Adventure has no world linked to it"));
 
-        Persona persona = personaRepository.findById(adventure.getPersonaId())
+        var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException("Adventure has no persona linked to it"));
 
-        ModelConfigurationRequest modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
-                .logitBias(adventure.getModelConfiguration().logitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().stopSequences())
-                .temperature(adventure.getModelConfiguration().temperature())
-                .aiModel(AiModelRequest
-                        .build(adventure.getModelConfiguration().aiModel().toString(),
-                                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
-                                adventure.getModelConfiguration().aiModel().getHardTokenLimit()))
-                .build();
+        var aiModel = new AiModelRequest(
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                adventure.getModelConfiguration().aiModel().getHardTokenLimit());
 
-        boolean isModerationEnabled = !adventure.getModeration().equals(DISABLED);
-        ModerationConfigurationRequest moderation = ModerationConfigurationRequest
-                .build(isModerationEnabled, adventure.getModeration().isAbsolute(),
-                        adventure.getModeration().getThresholds());
+        var modelConfigurationRequest = new ModelConfigurationRequest(
+                aiModel,
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().logitBias());
+
+        var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
+        var moderation = new ModerationConfigurationRequest(
+                isModerationEnabled,
+                adventure.getModeration().isAbsolute(),
+                adventure.getModeration().getThresholds());
 
         discordChannelPort.sendTextMessageTo(useCase.getChannelId(), world.getAdventureStart());
 
-        DiscordMessageData adventureStartMessage = DiscordMessageData.builder()
-                .channelId(useCase.getChannelId())
-                .content(String.format(CHAT_FORMAT, useCase.getBotNickname(), world.getAdventureStart()))
-                .mentionedUsers(Collections.emptyList())
-                .author(DiscordUserDetails.builder()
+        var adventureStartMessage = new DiscordMessageData(
+                null,
+                useCase.getChannelId(),
+                String.format(CHAT_FORMAT, useCase.getBotNickname(), world.getAdventureStart()),
+                DiscordUserDetails.builder()
                         .id(useCase.getBotId())
                         .nickname(useCase.getBotNickname())
                         .username(useCase.getBotUsername())
-                        .build())
-                .build();
+                        .build(),
+                List.of());
 
-        return StoryGenerationRequest.builder()
-                .botId(useCase.getBotId())
-                .botNickname(useCase.getBotNickname())
-                .botUsername(useCase.getBotUsername())
-                .channelId(useCase.getChannelId())
-                .guildId(useCase.getGuildId())
-                .moderation(moderation)
-                .modelConfiguration(modelConfigurationRequest)
-                .personaId(persona.getPublicId())
-                .adventureId(adventure.getPublicId())
-                .messageHistory(Collections.singletonList(adventureStartMessage))
-                .gameMode(adventure.getGameMode().name())
-                .nudge(adventure.getContextAttributes().nudge())
-                .authorsNote(adventure.getContextAttributes().authorsNote())
-                .remember(adventure.getContextAttributes().remember())
-                .bump(adventure.getContextAttributes().bump())
-                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
-                .build();
+        return new StoryGenerationRequest(
+                null,
+                useCase.getBotUsername(),
+                useCase.getBotNickname(),
+                useCase.getChannelId(),
+                useCase.getGuildId(),
+                adventure.getPublicId(),
+                persona.getPublicId(),
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                modelConfigurationRequest,
+                moderation,
+                List.of(adventureStartMessage));
     }
 }

@@ -1,32 +1,30 @@
 package me.moirai.storyengine.core.application.usecase.discord;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordUserDetails;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
+
 public class DiscordMessageDataFixture {
 
-    public static DiscordMessageData.Builder messageData() {
+    public static DiscordMessageData messageData() {
 
-        return DiscordMessageData.builder()
-                .id("2")
-                .channelId("12345")
-                .content("Some message")
-                .author(DiscordUserDetailsFixture.create().build());
+        return new DiscordMessageData("2", "12345", "Some message",
+                DiscordUserDetailsFixture.create().build(), List.of());
     }
 
     public static List<DiscordMessageData> messageList(int amountOfMessages) {
 
-        DiscordUserDetails author = DiscordUserDetailsFixture.create().build();
+        var author = DiscordUserDetailsFixture.create().build();
         return IntStream.range(0, amountOfMessages)
-                .mapToObj(index -> messageData()
-                        .id(String.valueOf(index + 1))
-                        .content(String.format("%s said: Message %s", author.getNickname(), index + 1))
-                        .build())
+                .mapToObj(index -> new DiscordMessageData(
+                        String.valueOf(index + 1),
+                        "12345",
+                        String.format("%s said: Message %s", author.getNickname(), index + 1),
+                        author,
+                        List.of()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 }

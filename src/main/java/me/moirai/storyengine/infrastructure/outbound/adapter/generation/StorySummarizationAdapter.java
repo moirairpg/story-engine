@@ -28,18 +28,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
-import tools.jackson.databind.json.JsonMapper;
-
 import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.exception.OpenAiApiException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
-import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StoryGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 @SuppressWarnings("unchecked")
@@ -103,7 +101,7 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
 
         summary = processor.process(summary);
 
-        var totalTokens = storyGenerationRequest.getModelConfiguration().getAiModel().getHardTokenLimit();
+        var totalTokens = storyGenerationRequest.modelConfiguration().aiModel().hardTokenLimit();
         var reservedTokensForStory = (int) Math.floor(totalTokens * 0.30);
         var rawMessageHistory = (List<DiscordMessageData>) context.get(RETRIEVED_MESSAGES);
 
@@ -141,14 +139,14 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
     private CompletionRequest toRequest(TextGenerationRequest request) {
 
         return CompletionRequest.builder()
-                .frequencyPenalty(request.getFrequencyPenalty())
-                .presencePenalty(request.getPresencePenalty())
-                .temperature(request.getTemperature())
-                .logitBias(request.getLogitBias())
-                .stop(request.getStopSequences())
-                .maxTokens(request.getMaxTokens())
-                .model(request.getModel())
-                .messages(request.getMessages()
+                .frequencyPenalty(request.frequencyPenalty())
+                .presencePenalty(request.presencePenalty())
+                .temperature(request.temperature())
+                .logitBias(request.logitBias())
+                .stop(request.stopSequences())
+                .maxTokens(request.maxTokens())
+                .model(request.model())
+                .messages(request.messages()
                         .stream()
                         .map(message -> new ChatMessage(message.role(), message.content()))
                         .toList())
@@ -179,19 +177,19 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
     private TextGenerationRequest createSummarizationRequest(String lorebook,
             StoryGenerationRequest storyGenerationRequest) {
 
-        ModelConfigurationRequest modelConfiguration = storyGenerationRequest.getModelConfiguration();
+        var modelConfiguration = storyGenerationRequest.modelConfiguration();
         List<ChatMessage> chatMessages = new ArrayList<>();
 
-        storyGenerationRequest.getMessageHistory().stream()
+        storyGenerationRequest.messageHistory().stream()
                 .takeWhile(message -> {
-                    int tokensInMessage = tokenizerPort.getTokenCountFrom(message.getContent());
+                    int tokensInMessage = tokenizerPort.getTokenCountFrom(message.content());
                     int tokensInRequest = tokenizerPort.getTokenCountFrom(stringifyMessageList(chatMessages));
                     int tokensAvailable = tokensInRequest - tokensInMessage;
 
-                    return modelConfiguration.getAiModel()
-                            .getHardTokenLimit() >= tokensAvailable;
+                    return modelConfiguration.aiModel()
+                            .hardTokenLimit() >= tokensAvailable;
                 })
-                .map(messageData -> ChatMessage.asUser(messageData.getContent()))
+                .map(messageData -> ChatMessage.asUser(messageData.content()))
                 .forEach(chatMessages::addFirst);
 
         if (StringUtils.isNotBlank(lorebook)) {
@@ -200,16 +198,15 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
 
         chatMessages.addFirst(ChatMessage.asSystem(summarizationInstriction));
 
-        return TextGenerationRequest.builder()
-                .presencePenalty(modelConfiguration.getPresencePenalty())
-                .frequencyPenalty(modelConfiguration.getFrequencyPenalty())
-                .logitBias(modelConfiguration.getLogitBias())
-                .maxTokens(modelConfiguration.getMaxTokenLimit())
-                .model(modelConfiguration.getAiModel().getOfficialModelName())
-                .stopSequences(modelConfiguration.getStopSequences())
-                .temperature(modelConfiguration.getTemperature())
-                .messages(chatMessages)
-                .build();
+        return new TextGenerationRequest(
+                modelConfiguration.aiModel().officialModelName(),
+                chatMessages,
+                modelConfiguration.stopSequences(),
+                modelConfiguration.maxTokenLimit(),
+                modelConfiguration.temperature(),
+                modelConfiguration.presencePenalty(),
+                modelConfiguration.frequencyPenalty(),
+                modelConfiguration.logitBias());
     }
 
     private String stringifyList(List<String> list) {

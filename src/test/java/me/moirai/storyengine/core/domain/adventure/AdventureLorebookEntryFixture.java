@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.domain.adventure;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
@@ -16,10 +15,6 @@ public class AdventureLorebookEntryFixture {
         builder.name("White River");
         builder.description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.");
         builder.regex("[Ww]hite [Rr]iver");
-        builder.creatorId("CRTID");
-        builder.creationDate(OffsetDateTime.now());
-        builder.lastUpdateDate(OffsetDateTime.now());
-        builder.isPlayerCharacter(false);
 
         return builder;
     }
@@ -31,10 +26,6 @@ public class AdventureLorebookEntryFixture {
         builder.description("Volin Habar is a warrior that fights with a sword.");
         builder.regex("[Vv]olin [Hh]abar|[Vv]oha");
         builder.playerId("2423423423423");
-        builder.creatorId("CRTID");
-        builder.creationDate(OffsetDateTime.now());
-        builder.lastUpdateDate(OffsetDateTime.now());
-        builder.isPlayerCharacter(true);
 
         return builder;
     }

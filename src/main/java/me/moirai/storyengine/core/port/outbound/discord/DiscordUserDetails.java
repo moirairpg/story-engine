@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.port.inbound.discord;
+package me.moirai.storyengine.core.port.outbound.discord;
 
 public final class DiscordUserDetails {
 

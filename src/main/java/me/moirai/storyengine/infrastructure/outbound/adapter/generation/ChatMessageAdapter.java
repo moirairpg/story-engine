@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessagePort;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 
@@ -37,16 +37,16 @@ public class ChatMessageAdapter implements ChatMessagePort {
 
         retrievedMessages.stream()
                 .takeWhile(messageData -> {
-                    int tokensInMessage = tokenizerPort.getTokenCountFrom(messageData.getContent());
+                    int tokensInMessage = tokenizerPort.getTokenCountFrom(messageData.content());
                     int tokensInContext = tokenizerPort.getTokenCountFrom(stringifyList(messageHistory));
                     int tokensLeftInContext = reservedTokens - tokensInContext;
 
                     return tokensInMessage <= tokensLeftInContext;
                 })
-                .map(DiscordMessageData::getContent)
+                .map(DiscordMessageData::content)
                 .forEach(messageHistory::addFirst);
 
-        retrievedMessages.removeIf(messageData -> messageHistory.contains(messageData.getContent()));
+        retrievedMessages.removeIf(messageData -> messageHistory.contains(messageData.content()));
 
         context.put(RETRIEVED_MESSAGES, retrievedMessages);
         context.put(MESSAGE_HISTORY, messageHistory);
@@ -66,16 +66,16 @@ public class ChatMessageAdapter implements ChatMessagePort {
                 .takeWhile(index -> index < amountOfMessage)
                 .mapToObj(retrievedMessages::get)
                 .takeWhile(messageData -> {
-                    int tokensInMessage = tokenizerPort.getTokenCountFrom(messageData.getContent());
+                    int tokensInMessage = tokenizerPort.getTokenCountFrom(messageData.content());
                     int tokensInContext = tokenizerPort.getTokenCountFrom(stringifyList(messageHistory));
                     int tokensLeftInContext = reservedTokens - tokensInContext;
 
                     return tokensInMessage <= tokensLeftInContext;
                 })
-                .map(DiscordMessageData::getContent)
+                .map(DiscordMessageData::content)
                 .forEach(messageHistory::addFirst);
 
-        retrievedMessages.removeIf(messageData -> messageHistory.contains(messageData.getContent()));
+        retrievedMessages.removeIf(messageData -> messageHistory.contains(messageData.content()));
 
         context.put(RETRIEVED_MESSAGES, retrievedMessages);
         context.put(MESSAGE_HISTORY, messageHistory);
@@ -96,7 +96,7 @@ public class ChatMessageAdapter implements ChatMessagePort {
 
         retrievedMessages.stream()
                 .takeWhile(messageData -> {
-                    int tokensInMessage = tokenizerPort.getTokenCountFrom(messageData.getContent());
+                    int tokensInMessage = tokenizerPort.getTokenCountFrom(messageData.content());
                     int tokensInContext = tokenizerPort.getTokenCountFrom(stringifyList(messageHistory))
                             + tokensInAsset;
 
@@ -104,10 +104,10 @@ public class ChatMessageAdapter implements ChatMessagePort {
 
                     return tokensInMessage <= tokensLeftInContext;
                 })
-                .map(DiscordMessageData::getContent)
+                .map(DiscordMessageData::content)
                 .forEach(messageHistory::addFirst);
 
-        retrievedMessages.removeIf(messageData -> messageHistory.contains(messageData.getContent()));
+        retrievedMessages.removeIf(messageData -> messageHistory.contains(messageData.content()));
 
         context.put(MESSAGE_HISTORY, messageHistory);
         context.put(RETRIEVED_MESSAGES, retrievedMessages);

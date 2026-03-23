@@ -2,7 +2,6 @@ package me.moirai.storyengine.common.domain;
 
 import static java.util.Collections.unmodifiableSet;
 
-import java.time.OffsetDateTime;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -22,25 +21,12 @@ public abstract class ShareableAsset extends Asset {
     @Column(name = "visibility")
     private Visibility visibility;
 
-    protected ShareableAsset(String creatorId, OffsetDateTime creationDate,
-            OffsetDateTime lastUpdateDate, Permissions permissions, Visibility visibility) {
-
-        super(creatorId, creationDate, lastUpdateDate);
-        this.permissions = permissions;
+    protected ShareableAsset(Visibility visibility, Permissions permissions) {
         this.visibility = visibility;
-    }
-
-    // TODO remove this ctor
-    protected ShareableAsset(String creatorId, OffsetDateTime creationDate,
-            OffsetDateTime lastUpdateDate, Permissions permissions, Visibility visibility, int version) {
-
-        super(creatorId, creationDate, lastUpdateDate, version);
         this.permissions = permissions;
-        this.visibility = visibility;
     }
 
     protected ShareableAsset() {
-        super();
     }
 
     public boolean isPublic() {

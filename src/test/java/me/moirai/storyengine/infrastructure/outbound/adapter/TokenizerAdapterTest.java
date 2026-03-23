@@ -81,9 +81,9 @@ public class TokenizerAdapterTest {
         TokenizeResult result = tokenizer.tokenize(textToTokenize);
 
         assertThat(result).isNotNull();
-        assertThat(result.getCharacterCount()).isEqualTo(length);
-        assertThat(result.getTokenIds()).isNotNull().isNotEmpty();
-        assertThat(result.getTokens()).isNotNull().isNotEmpty();
-        assertThat(result.getTokenCount()).isEqualTo(expectedTokenCount);
+        assertThat(result.characterCount()).isEqualTo(length);
+        assertThat(result.tokenIds()).isNotNull().isNotEmpty();
+        assertThat(result.tokens()).isNotNull().isNotEmpty();
+        assertThat(result.tokenCount()).isEqualTo(expectedTokenCount);
     }
 }

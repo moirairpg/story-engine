@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,7 +56,7 @@ public class AdventureLorebookReaderImpl implements AdventureLorebookReader {
                 rs.getString("description"),
                 rs.getString("player_id"),
                 rs.getBoolean("is_player_character"),
-                rs.getObject("creation_date", OffsetDateTime.class),
-                rs.getObject("last_update_date", OffsetDateTime.class));
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getTimestamp("last_update_date").toInstant());
     }
 }

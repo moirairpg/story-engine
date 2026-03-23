@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.domain.world;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,8 +50,7 @@ public class World extends ShareableAsset {
 
     private World(Builder builder) {
 
-        super(builder.creatorId, builder.creationDate,
-                builder.lastUpdateDate, builder.permissions, builder.visibility);
+        super(builder.visibility, builder.permissions);
 
         this.name = builder.name;
         this.description = builder.description;
@@ -164,9 +162,6 @@ public class World extends ShareableAsset {
         private String adventureStart;
         private Visibility visibility;
         private Permissions permissions;
-        private String creatorId;
-        private OffsetDateTime creationDate;
-        private OffsetDateTime lastUpdateDate;
 
         private Builder() {
         }
@@ -198,24 +193,6 @@ public class World extends ShareableAsset {
         public Builder permissions(Permissions permissions) {
 
             this.permissions = permissions;
-            return this;
-        }
-
-        public Builder creatorId(String creatorId) {
-
-            this.creatorId = creatorId;
-            return this;
-        }
-
-        public Builder creationDate(OffsetDateTime creationDate) {
-
-            this.creationDate = creationDate;
-            return this;
-        }
-
-        public Builder lastUpdateDate(OffsetDateTime lastUpdateDate) {
-
-            this.lastUpdateDate = lastUpdateDate;
             return this;
         }
 

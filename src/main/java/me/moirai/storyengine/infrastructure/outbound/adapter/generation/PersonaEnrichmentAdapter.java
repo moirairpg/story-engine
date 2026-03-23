@@ -49,7 +49,7 @@ public class PersonaEnrichmentAdapter implements PersonaEnrichmentPort {
             UUID personaId,
             ModelConfigurationRequest modelConfiguration) {
 
-        int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
+        int totalTokens = modelConfiguration.aiModel().hardTokenLimit();
         int reservedTokensForPersona = (int) Math.floor(totalTokens * 0.20);
 
         var persona = personaRepository.findByPublicId(personaId)

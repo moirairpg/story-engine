@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.world;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,7 +52,7 @@ public class WorldLorebookReaderImpl implements WorldLorebookReader {
                 rs.getString("name"),
                 rs.getString("regex"),
                 rs.getString("description"),
-                rs.getObject("creation_date", OffsetDateTime.class),
-                rs.getObject("last_update_date", OffsetDateTime.class));
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getTimestamp("last_update_date").toInstant());
     }
 }

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @see me.moirai.storyengine.common.usecases.AbstractUseCaseHandler
  */
+@Deprecated
 @Service
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

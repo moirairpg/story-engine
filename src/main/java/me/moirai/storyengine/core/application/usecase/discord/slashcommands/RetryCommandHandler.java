@@ -9,10 +9,10 @@ import me.moirai.storyengine.common.annotation.UseCaseHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.port.inbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.inbound.discord.slashcommands.RetryCommand;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
+import me.moirai.storyengine.core.port.outbound.discord.DiscordMessageData;
 import me.moirai.storyengine.core.port.outbound.generation.AiModelRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModelConfigurationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.ModerationConfigurationRequest;
@@ -50,11 +50,11 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Vo
         var lastMessageSent = discordChannelPort.getLastMessageIn(useCase.getChannelId())
                 .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
-        if (!lastMessageSent.getAuthor().getId().equals(useCase.getBotId())) {
+        if (!lastMessageSent.author().getId().equals(useCase.getBotId())) {
             throw new IllegalStateException(COMMAND_ONLY_WHEN_LAST_MESSAGE_BY_BOT);
         }
 
-        discordChannelPort.deleteMessageById(useCase.getChannelId(), lastMessageSent.getId());
+        discordChannelPort.deleteMessageById(useCase.getChannelId(), lastMessageSent.id());
 
         var adventure = adventureRepository.findByChannelId(useCase.getChannelId())
                 .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
@@ -73,44 +73,44 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Vo
         var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
-        var modelConfigurationRequest = ModelConfigurationRequest.builder()
-                .frequencyPenalty(adventure.getModelConfiguration().frequencyPenalty())
-                .presencePenalty(adventure.getModelConfiguration().presencePenalty())
-                .logitBias(adventure.getModelConfiguration().logitBias())
-                .maxTokenLimit(adventure.getModelConfiguration().maxTokenLimit())
-                .stopSequences(adventure.getModelConfiguration().stopSequences())
-                .temperature(adventure.getModelConfiguration().temperature())
-                .aiModel(AiModelRequest
-                        .build(adventure.getModelConfiguration().aiModel().toString(),
-                                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
-                                adventure.getModelConfiguration().aiModel().getHardTokenLimit()))
-                .build();
+        var aiModel = new AiModelRequest(
+                adventure.getModelConfiguration().aiModel().toString(),
+                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
+                adventure.getModelConfiguration().aiModel().getHardTokenLimit());
+
+        var modelConfigurationRequest = new ModelConfigurationRequest(
+                aiModel,
+                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().temperature(),
+                adventure.getModelConfiguration().frequencyPenalty(),
+                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().logitBias());
 
         var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
-        var moderation = ModerationConfigurationRequest
-                .build(isModerationEnabled, adventure.getModeration().isAbsolute(),
-                        adventure.getModeration().getThresholds());
+        var moderation = new ModerationConfigurationRequest(
+                isModerationEnabled,
+                adventure.getModeration().isAbsolute(),
+                adventure.getModeration().getThresholds());
 
         var messageHistory = getMessageHistory(useCase.getChannelId());
-
-        return StoryGenerationRequest.builder()
-                .botId(useCase.getBotId())
-                .botNickname(useCase.getBotNickname())
-                .botUsername(useCase.getBotUsername())
-                .channelId(useCase.getChannelId())
-                .guildId(useCase.getGuildId())
-                .moderation(moderation)
-                .modelConfiguration(modelConfigurationRequest)
-                .personaId(persona.getPublicId())
-                .adventureId(adventure.getPublicId())
-                .messageHistory(messageHistory)
-                .gameMode(adventure.getGameMode().name())
-                .nudge(adventure.getContextAttributes().nudge())
-                .authorsNote(adventure.getContextAttributes().authorsNote())
-                .remember(adventure.getContextAttributes().remember())
-                .bump(adventure.getContextAttributes().bump())
-                .bumpFrequency(adventure.getContextAttributes().bumpFrequency())
-                .build();
+        return new StoryGenerationRequest(
+                null,
+                useCase.getBotUsername(),
+                useCase.getBotNickname(),
+                useCase.getChannelId(),
+                useCase.getGuildId(),
+                adventure.getPublicId(),
+                persona.getPublicId(),
+                adventure.getGameMode().name(),
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency(),
+                modelConfigurationRequest,
+                moderation,
+                messageHistory);
     }
 
     private List<DiscordMessageData> getMessageHistory(String channelId) {
@@ -119,7 +119,7 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Vo
                 .orElseThrow(() -> new IllegalStateException(CHANNEL_HAS_NO_MESSAGES));
 
         var messageHistory = new ArrayList<>(discordChannelPort
-                .retrieveEntireHistoryBefore(lastMessageSent.getId(), channelId));
+                .retrieveEntireHistoryBefore(lastMessageSent.id(), channelId));
 
         messageHistory.addFirst(lastMessageSent);
 

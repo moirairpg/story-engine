@@ -51,7 +51,7 @@ public class PersonaEnrichmentAdapterTest {
         // Given
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-        var modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
+        var modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini();
         var context = contextWithSummaryAndMessages(10);
 
         var expectedPersona = String.format(
@@ -79,7 +79,7 @@ public class PersonaEnrichmentAdapterTest {
         // Given
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-        var modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
+        var modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini();
         var context = contextWithSummaryAndMessages(5);
 
         var expectedPersona = String.format(
@@ -110,7 +110,7 @@ public class PersonaEnrichmentAdapterTest {
         // Given
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-        var modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
+        var modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini();
         var context = contextWithSummaryAndMessages(5);
 
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));

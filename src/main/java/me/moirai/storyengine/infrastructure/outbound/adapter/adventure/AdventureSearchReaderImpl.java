@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,6 +104,6 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 rs.getString("world_name"),
                 rs.getString("persona_name"),
                 rs.getString("visibility"),
-                rs.getObject("creation_date", OffsetDateTime.class));
+                rs.getTimestamp("creation_date").toInstant());
     }
 }

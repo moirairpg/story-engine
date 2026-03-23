@@ -1,6 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.world;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -58,8 +58,8 @@ public class WorldReaderImpl implements WorldReader {
                 rs.getString("owner_id"),
                 parseStringSet(rs.getString("users_allowed_to_read")),
                 parseStringSet(rs.getString("users_allowed_to_write")),
-                rs.getObject("creation_date", OffsetDateTime.class),
-                rs.getObject("last_update_date", OffsetDateTime.class));
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getTimestamp("last_update_date").toInstant());
     }
 
     private Set<String> parseStringSet(String value) {

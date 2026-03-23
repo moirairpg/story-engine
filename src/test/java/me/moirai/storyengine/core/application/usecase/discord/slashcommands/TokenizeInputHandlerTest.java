@@ -33,12 +33,8 @@ public class TokenizeInputHandlerTest {
         int[] tokenIds = { 1212, 318, 617, 2420, 13 };
         int tokenCount = 5;
 
-        TokenizeResult expectedAdapterResult = TokenizeResult.builder()
-                .tokens(tokens)
-                .tokenCount(tokenCount)
-                .tokenIds(tokenIds)
-                .characterCount(textToBeTokenized.length())
-                .build();
+        var expectedAdapterResult = new TokenizeResult(tokens, tokenIds, tokenCount,
+                textToBeTokenized.length());
 
         when(tokenizerPort.tokenize(anyString())).thenReturn(expectedAdapterResult);
 

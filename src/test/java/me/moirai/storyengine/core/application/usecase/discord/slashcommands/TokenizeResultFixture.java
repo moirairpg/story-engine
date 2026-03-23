@@ -4,12 +4,8 @@ import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeRes
 
 public class TokenizeResultFixture {
 
-    public static TokenizeResult.Builder create() {
+    public static TokenizeResult create() {
 
-        return TokenizeResult.builder()
-                .characterCount(10)
-                .tokenCount(10)
-                .tokenIds(new int[] { 1, 2, 3 })
-                .tokens("This is an input.");
+        return new TokenizeResult("This is an input.", new int[] { 1, 2, 3 }, 10, 10);
     }
 }

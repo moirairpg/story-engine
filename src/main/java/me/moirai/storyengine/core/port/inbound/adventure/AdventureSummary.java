@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record AdventureSummary(
@@ -10,5 +10,5 @@ public record AdventureSummary(
         String worldName,
         String personaName,
         String visibility,
-        OffsetDateTime creationDate) {
+        Instant creationDate) {
 }
