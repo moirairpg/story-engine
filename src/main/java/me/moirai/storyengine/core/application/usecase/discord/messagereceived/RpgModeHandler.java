@@ -64,18 +64,18 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Void>
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         var aiModel = new AiModelRequest(
-                adventure.getModelConfiguration().aiModel().toString(),
-                adventure.getModelConfiguration().aiModel().getOfficialModelName(),
-                adventure.getModelConfiguration().aiModel().getHardTokenLimit());
+                adventure.getModelConfiguration().getAiModel().toString(),
+                adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
+                adventure.getModelConfiguration().getAiModel().getHardTokenLimit());
 
         var modelConfigurationRequest = new ModelConfigurationRequest(
                 aiModel,
-                adventure.getModelConfiguration().maxTokenLimit(),
-                adventure.getModelConfiguration().temperature(),
-                adventure.getModelConfiguration().frequencyPenalty(),
-                adventure.getModelConfiguration().presencePenalty(),
-                adventure.getModelConfiguration().stopSequences(),
-                adventure.getModelConfiguration().logitBias());
+                adventure.getModelConfiguration().getMaxTokenLimit(),
+                adventure.getModelConfiguration().getTemperature(),
+                adventure.getModelConfiguration().getFrequencyPenalty(),
+                adventure.getModelConfiguration().getPresencePenalty(),
+                adventure.getModelConfiguration().getStopSequences(),
+                adventure.getModelConfiguration().getLogitBias());
 
         var isModerationEnabled = !adventure.getModeration().equals(DISABLED);
         var moderation = new ModerationConfigurationRequest(

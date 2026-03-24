@@ -68,5 +68,22 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result.get().isMultiplayer()).isTrue();
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
+
+        assertThat(result.get().modelConfiguration()).isNotNull();
+        assertThat(result.get().modelConfiguration().maxTokenLimit()).isEqualTo(100);
+        assertThat(result.get().modelConfiguration().temperature()).isEqualTo(1.0);
+        assertThat(result.get().modelConfiguration().frequencyPenalty()).isEqualTo(0.2);
+        assertThat(result.get().modelConfiguration().presencePenalty()).isEqualTo(0.2);
+        assertThat(result.get().modelConfiguration().stopSequences()).containsExactly("ABC");
+        assertThat(result.get().modelConfiguration().logitBias()).hasSize(2)
+                .containsEntry("ABC", 50.0)
+                .containsEntry("DEF", 5.0);
+
+        assertThat(result.get().contextAttributes()).isNotNull();
+        assertThat(result.get().contextAttributes().nudge()).isEqualTo("Nudge");
+        assertThat(result.get().contextAttributes().authorsNote()).isEqualTo("Author's note");
+        assertThat(result.get().contextAttributes().remember()).isEqualTo("Remember");
+        assertThat(result.get().contextAttributes().bump()).isEqualTo("Bump");
+        assertThat(result.get().contextAttributes().bumpFrequency()).isEqualTo(1);
     }
 }

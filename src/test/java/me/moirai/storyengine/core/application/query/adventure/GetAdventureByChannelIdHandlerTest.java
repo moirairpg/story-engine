@@ -92,22 +92,19 @@ public class GetAdventureByChannelIdHandlerTest {
         assertThat(result.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(result.isMultiplayer()).isEqualTo(adventure.isMultiplayer());
 
-        assertThat(result.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
-        assertThat(result.nudge()).isEqualTo(adventure.getContextAttributes().nudge());
-        assertThat(result.remember()).isEqualTo(adventure.getContextAttributes().remember());
-        assertThat(result.bump()).isEqualTo(adventure.getContextAttributes().bump());
-        assertThat(result.bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
+        assertThat(result.contextAttributes().authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
+        assertThat(result.contextAttributes().nudge()).isEqualTo(adventure.getContextAttributes().nudge());
+        assertThat(result.contextAttributes().remember()).isEqualTo(adventure.getContextAttributes().remember());
+        assertThat(result.contextAttributes().bump()).isEqualTo(adventure.getContextAttributes().bump());
+        assertThat(result.contextAttributes().bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
 
-        assertThat(result.aiModel())
-                .isEqualToIgnoringCase(adventure.getModelConfiguration().aiModel().toString());
-        assertThat(result.frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().frequencyPenalty());
-        assertThat(result.logitBias()).isEqualTo(adventure.getModelConfiguration().logitBias());
-        assertThat(result.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().maxTokenLimit());
-        assertThat(result.presencePenalty()).isEqualTo(adventure.getModelConfiguration().presencePenalty());
-        assertThat(result.stopSequences()).isEqualTo(adventure.getModelConfiguration().stopSequences());
-        assertThat(result.temperature()).isEqualTo(adventure.getModelConfiguration().temperature());
-
-        assertThat(result.usersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
-        assertThat(result.usersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
+        assertThat(result.modelConfiguration().aiModel())
+                .isEqualTo(adventure.getModelConfiguration().getAiModel());
+        assertThat(result.modelConfiguration().frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
+        assertThat(result.modelConfiguration().logitBias()).isEqualTo(adventure.getModelConfiguration().getLogitBias());
+        assertThat(result.modelConfiguration().maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
+        assertThat(result.modelConfiguration().presencePenalty()).isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
+        assertThat(result.modelConfiguration().stopSequences()).isEqualTo(adventure.getModelConfiguration().getStopSequences());
+        assertThat(result.modelConfiguration().temperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
     }
 }

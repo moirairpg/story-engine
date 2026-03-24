@@ -10,6 +10,8 @@ import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -132,6 +134,22 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
 
     private AdventureDetails mapResult(Adventure savedAdventure, UUID personaPublicId, UUID worldPublicId) {
 
+        var modelConfiguration = new ModelConfigurationDto(
+                savedAdventure.getModelConfiguration().getAiModel(),
+                savedAdventure.getModelConfiguration().getMaxTokenLimit(),
+                savedAdventure.getModelConfiguration().getTemperature(),
+                savedAdventure.getModelConfiguration().getFrequencyPenalty(),
+                savedAdventure.getModelConfiguration().getPresencePenalty(),
+                savedAdventure.getModelConfiguration().getStopSequences(),
+                savedAdventure.getModelConfiguration().getLogitBias());
+
+        var contextAttributes = new ContextAttributesDto(
+                savedAdventure.getContextAttributes().nudge(),
+                savedAdventure.getContextAttributes().authorsNote(),
+                savedAdventure.getContextAttributes().remember(),
+                savedAdventure.getContextAttributes().bump(),
+                savedAdventure.getContextAttributes().bumpFrequency());
+
         return new AdventureDetails(
                 savedAdventure.getPublicId(),
                 savedAdventure.getName(),
@@ -141,24 +159,14 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 personaPublicId,
                 savedAdventure.getChannelId(),
                 savedAdventure.getVisibility().name(),
-                savedAdventure.getModelConfiguration().aiModel().toString(),
                 savedAdventure.getModeration().name(),
                 savedAdventure.getGameMode().name(),
                 savedAdventure.getOwnerId(),
-                savedAdventure.getContextAttributes().nudge(),
-                savedAdventure.getContextAttributes().remember(),
-                savedAdventure.getContextAttributes().authorsNote(),
-                savedAdventure.getContextAttributes().bump(),
-                savedAdventure.getContextAttributes().bumpFrequency(),
-                savedAdventure.getModelConfiguration().maxTokenLimit(),
-                savedAdventure.getModelConfiguration().temperature(),
-                savedAdventure.getModelConfiguration().frequencyPenalty(),
-                savedAdventure.getModelConfiguration().presencePenalty(),
                 savedAdventure.isMultiplayer(),
                 savedAdventure.getCreationDate(),
                 savedAdventure.getLastUpdateDate(),
-                savedAdventure.getModelConfiguration().logitBias(),
-                savedAdventure.getModelConfiguration().stopSequences(),
+                modelConfiguration,
+                contextAttributes,
                 savedAdventure.getUsersAllowedToRead(),
                 savedAdventure.getUsersAllowedToWrite());
     }

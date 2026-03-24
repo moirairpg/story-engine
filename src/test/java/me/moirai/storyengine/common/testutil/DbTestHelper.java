@@ -21,9 +21,11 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.uuid.Generators;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +33,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -73,6 +76,7 @@ public class DbTestHelper {
 
         updateWithGeneratedId(value, idField, generatedId);
         insertOneToManyChildren(value, type, generatedId);
+        insertElementCollections(value, type, generatedId);
 
         return (T) value;
     }
@@ -109,6 +113,7 @@ public class DbTestHelper {
                 .update();
 
         replaceOneToManyChildren(value, type, primaryKeyValue);
+        replaceElementCollections(value, type, primaryKeyValue);
     }
 
     public <T> void clear(Class<T> type) {
@@ -171,6 +176,9 @@ public class DbTestHelper {
 
                     if (field.isAnnotationPresent(ManyToMany.class))
                         continue;
+
+                    if (field.isAnnotationPresent(ElementCollection.class))
+                        continue;
                     result.add(field);
                 }
             }
@@ -195,6 +203,9 @@ public class DbTestHelper {
                 continue;
 
             if (field.isAnnotationPresent(Formula.class))
+                continue;
+
+            if (field.isAnnotationPresent(ElementCollection.class))
                 continue;
 
             result.add(field);
@@ -356,6 +367,114 @@ public class DbTestHelper {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private void insertElementCollections(Object entity, Class<?> entityType, Long parentId) {
+        try {
+            var current = entityType;
+            while (current != null && current != Object.class) {
+                if (current == entityType || current.isAnnotationPresent(MappedSuperclass.class)) {
+                    for (var field : current.getDeclaredFields()) {
+                        field.setAccessible(true);
+                        if (field.isAnnotationPresent(ElementCollection.class)) {
+                            insertElementCollection(field, field.get(entity), parentId);
+                        } else if (field.getType().isAnnotationPresent(Embeddable.class)) {
+                            var embeddedValue = field.get(entity);
+                            if (embeddedValue != null) {
+                                for (var embeddedField : field.getType().getDeclaredFields()) {
+                                    embeddedField.setAccessible(true);
+                                    if (embeddedField.isAnnotationPresent(ElementCollection.class)) {
+                                        insertElementCollection(embeddedField, embeddedField.get(embeddedValue), parentId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                current = current.getSuperclass();
+            }
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private void insertElementCollection(Field field, Object collectionValue, Long parentId) {
+        if (collectionValue == null)
+            return;
+
+        var collectionTable = field.getAnnotation(CollectionTable.class);
+        if (collectionTable == null)
+            return;
+
+        var tableName = collectionTable.name();
+        var fkColumnName = collectionTable.joinColumns()[0].name();
+        var valueColumn = field.getAnnotation(Column.class);
+        var valueColumnName = (valueColumn != null && !valueColumn.name().isBlank()) ? valueColumn.name() : "value";
+
+        if (collectionValue instanceof Map<?, ?> map) {
+            var mapKeyColumn = field.getAnnotation(MapKeyColumn.class);
+            var keyColumnName = (mapKeyColumn != null && !mapKeyColumn.name().isBlank()) ? mapKeyColumn.name() : "key";
+            for (var entry : map.entrySet()) {
+                jdbcClient
+                        .sql("INSERT INTO " + tableName + " (" + fkColumnName + ", " + keyColumnName + ", "
+                                + valueColumnName + ") VALUES (:fk, :key, :val)")
+                        .param("fk", parentId)
+                        .param("key", entry.getKey())
+                        .param("val", entry.getValue())
+                        .update();
+            }
+        } else if (collectionValue instanceof Iterable<?> iterable) {
+            for (var element : iterable) {
+                jdbcClient
+                        .sql("INSERT INTO " + tableName + " (" + fkColumnName + ", " + valueColumnName
+                                + ") VALUES (:fk, :val)")
+                        .param("fk", parentId)
+                        .param("val", element)
+                        .update();
+            }
+        }
+    }
+
+    private void replaceElementCollections(Object entity, Class<?> entityType, Long parentId) {
+        try {
+            var current = entityType;
+            while (current != null && current != Object.class) {
+                if (current == entityType || current.isAnnotationPresent(MappedSuperclass.class)) {
+                    for (var field : current.getDeclaredFields()) {
+                        field.setAccessible(true);
+                        if (field.isAnnotationPresent(ElementCollection.class)) {
+                            deleteElementCollection(field, parentId);
+                            insertElementCollection(field, field.get(entity), parentId);
+                        } else if (field.getType().isAnnotationPresent(Embeddable.class)) {
+                            var embeddedValue = field.get(entity);
+                            for (var embeddedField : field.getType().getDeclaredFields()) {
+                                embeddedField.setAccessible(true);
+                                if (embeddedField.isAnnotationPresent(ElementCollection.class)) {
+                                    deleteElementCollection(embeddedField, parentId);
+                                    insertElementCollection(embeddedField,
+                                            embeddedValue != null ? embeddedField.get(embeddedValue) : null, parentId);
+                                }
+                            }
+                        }
+                    }
+                }
+                current = current.getSuperclass();
+            }
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private void deleteElementCollection(Field field, Long parentId) {
+        var collectionTable = field.getAnnotation(CollectionTable.class);
+        if (collectionTable == null)
+            return;
+
+        var tableName = collectionTable.name();
+        var fkColumnName = collectionTable.joinColumns()[0].name();
+        jdbcClient.sql("DELETE FROM " + tableName + " WHERE " + fkColumnName + " = :parentId")
+                .param("parentId", parentId)
+                .update();
     }
 
     private void replaceOneToManyChildren(Object parent, Class<?> parentType, Long parentId) {

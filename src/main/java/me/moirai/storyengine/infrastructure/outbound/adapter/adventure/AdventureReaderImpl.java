@@ -1,7 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
-import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -12,7 +12,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
 
 @Repository
@@ -20,7 +23,8 @@ public class AdventureReaderImpl implements AdventureReader {
 
     //@formatter:off
     private static final String SELECT_BY_ID = """
-            SELECT  a.public_id,
+            SELECT  a.id,
+                    a.public_id,
                     a.name,
                     a.description,
                     a.adventure_start,
@@ -42,8 +46,6 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.frequency_penalty,
                     a.presence_penalty,
                     a.is_multiplayer,
-                    a.logit_bias,
-                    a.stop_sequences,
                     a.users_allowed_to_read,
                     a.users_allowed_to_write,
                     a.creation_date,
@@ -52,6 +54,14 @@ public class AdventureReaderImpl implements AdventureReader {
                JOIN world   w ON a.world_id   = w.id
                JOIN persona p ON a.persona_id = p.id
               WHERE a.public_id = :publicId
+            """;
+
+    private static final String SELECT_STOP_SEQUENCES = """
+            SELECT value FROM adventure_stop_sequences WHERE adventure_id = :adventureId
+            """;
+
+    private static final String SELECT_LOGIT_BIAS = """
+            SELECT token_id, bias FROM adventure_logit_bias WHERE adventure_id = :adventureId
             """;
     //@formatter:on
 
@@ -70,42 +80,57 @@ public class AdventureReaderImpl implements AdventureReader {
     }
 
     private RowMapper<AdventureDetails> toAdventureDetails() {
-        return (rs, _) -> new AdventureDetails(
-                UUID.fromString(rs.getString("public_id")),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getString("adventure_start"),
-                UUID.fromString(rs.getString("world_public_id")),
-                UUID.fromString(rs.getString("persona_public_id")),
-                rs.getString("channel_id"),
-                rs.getString("visibility"),
-                rs.getString("ai_model"),
-                rs.getString("moderation"),
-                rs.getString("game_mode"),
-                rs.getString("owner_id"),
-                rs.getString("nudge"),
-                rs.getString("remember"),
-                rs.getString("authors_note"),
-                rs.getString("bump"),
-                rs.getInt("bump_frequency"),
-                rs.getInt("max_token_limit"),
-                rs.getDouble("temperature"),
-                rs.getDouble("frequency_penalty"),
-                rs.getDouble("presence_penalty"),
-                rs.getBoolean("is_multiplayer"),
-                rs.getTimestamp("creation_date").toInstant(),
-                rs.getTimestamp("last_update_date").toInstant(),
-                parseLogitBias(rs.getString("logit_bias")),
-                parseStringSet(rs.getString("stop_sequences")),
-                parseStringSet(rs.getString("users_allowed_to_read")),
-                parseStringSet(rs.getString("users_allowed_to_write")));
-    }
+        return (rs, _) -> {
+            var adventureId = rs.getLong("id");
 
-    private Map<String, Double> parseLogitBias(String value) {
-        if (value == null || value.isBlank()) return Map.of();
-        return Arrays.stream(value.split(","))
-                .map(s -> s.split("="))
-                .collect(Collectors.toMap(s -> s[0], s -> Double.valueOf(s[1])));
+            var stopSequences = new HashSet<>(jdbcClient.sql(SELECT_STOP_SEQUENCES)
+                    .param("adventureId", adventureId)
+                    .query((r, __) -> r.getString("value"))
+                    .list());
+
+            var logitBias = jdbcClient.sql(SELECT_LOGIT_BIAS)
+                    .param("adventureId", adventureId)
+                    .query((r, __) -> Map.entry(r.getString("token_id"), r.getDouble("bias")))
+                    .list()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            var modelConfiguration = new ModelConfigurationDto(
+                    ArtificialIntelligenceModel.fromString(rs.getString("ai_model")),
+                    rs.getInt("max_token_limit"),
+                    rs.getDouble("temperature"),
+                    rs.getDouble("frequency_penalty"),
+                    rs.getDouble("presence_penalty"),
+                    stopSequences,
+                    logitBias);
+
+            var contextAttributes = new ContextAttributesDto(
+                    rs.getString("nudge"),
+                    rs.getString("authors_note"),
+                    rs.getString("remember"),
+                    rs.getString("bump"),
+                    rs.getObject("bump_frequency", Integer.class));
+
+            return new AdventureDetails(
+                    UUID.fromString(rs.getString("public_id")),
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getString("adventure_start"),
+                    UUID.fromString(rs.getString("world_public_id")),
+                    UUID.fromString(rs.getString("persona_public_id")),
+                    rs.getString("channel_id"),
+                    rs.getString("visibility"),
+                    rs.getString("moderation"),
+                    rs.getString("game_mode"),
+                    rs.getString("owner_id"),
+                    rs.getBoolean("is_multiplayer"),
+                    rs.getTimestamp("creation_date").toInstant(),
+                    rs.getTimestamp("last_update_date").toInstant(),
+                    modelConfiguration,
+                    contextAttributes,
+                    parseStringSet(rs.getString("users_allowed_to_read")),
+                    parseStringSet(rs.getString("users_allowed_to_write")));
+        };
     }
 
     private Set<String> parseStringSet(String value) {

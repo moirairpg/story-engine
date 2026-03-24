@@ -43,4 +43,8 @@
   <include file="db/changelog/migrations/1773598459_alter_table_world_lorebook_update_entity_references.sql" />
   <include file="db/changelog/migrations/1773602205_alter_table_adventure_lorebook_add_fk_and_index.sql" />
   <include file="db/changelog/migrations/1773602209_alter_table_world_lorebook_add_fk_and_index.sql" />
+  <include file="db/changelog/migrations/1774315883_create_table_adventure_stop_sequences.sql" />
+  <include file="db/changelog/migrations/1774315884_create_table_adventure_logit_bias.sql" />
+  <include file="db/changelog/migrations/1774315885_migrate_adventure_stop_sequences_and_logit_bias.sql" />
+  <include file="db/changelog/migrations/1774315886_alter_table_adventure_drop_stop_sequences_and_logit_bias.sql" />
 </databaseChangeLog>

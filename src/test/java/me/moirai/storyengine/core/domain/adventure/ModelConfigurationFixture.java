@@ -18,14 +18,15 @@ public class ModelConfigurationFixture {
         Set<String> stopSequences = new HashSet<>();
         stopSequences.add("ABC");
 
-        return new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT35_TURBO,
-                100,
-                1.0,
-                0.2,
-                0.2,
-                stopSequences,
-                logitBias);
+        return ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT35_TURBO)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(stopSequences)
+                .logitBias(logitBias)
+                .build();
     }
 
     public static ModelConfiguration gpt4Mini() {
@@ -37,14 +38,15 @@ public class ModelConfigurationFixture {
         Set<String> stopSequences = new HashSet<>();
         stopSequences.add("ABC");
 
-        return new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI,
-                100,
-                1.0,
-                0.2,
-                0.2,
-                stopSequences,
-                logitBias);
+        return ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(stopSequences)
+                .logitBias(logitBias)
+                .build();
     }
 
     public static ModelConfiguration gpt4Omni() {
@@ -56,13 +58,14 @@ public class ModelConfigurationFixture {
         Set<String> stopSequences = new HashSet<>();
         stopSequences.add("ABC");
 
-        return new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_OMNI,
-                100,
-                1.0,
-                0.2,
-                0.2,
-                stopSequences,
-                logitBias);
+        return ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_OMNI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(stopSequences)
+                .logitBias(logitBias)
+                .build();
     }
 }

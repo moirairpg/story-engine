@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.adventure;
 
 import java.time.Instant;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,29 +13,19 @@ public record AdventureDetails(
         UUID personaId,
         String channelId,
         String visibility,
-        String aiModel,
         String moderation,
         String gameMode,
         String ownerId,
-        String nudge,
-        String remember,
-        String authorsNote,
-        String bump,
-        int bumpFrequency,
-        int maxTokenLimit,
-        double temperature,
-        double frequencyPenalty,
-        double presencePenalty,
         boolean isMultiplayer,
         Instant creationDate,
         Instant lastUpdateDate,
-        Map<String, Double> logitBias,
-        Set<String> stopSequences,
+        ModelConfigurationDto modelConfiguration,
+        ContextAttributesDto contextAttributes,
         Set<String> usersAllowedToRead,
         Set<String> usersAllowedToWrite) {
 
     public AdventureDetails {
-        usersAllowedToWrite = Set.copyOf(usersAllowedToWrite);
         usersAllowedToRead = Set.copyOf(usersAllowedToRead);
+        usersAllowedToWrite = Set.copyOf(usersAllowedToWrite);
     }
 }

@@ -30,7 +30,7 @@ public class CreateAdventureTest {
                 PersonaFixture.PUBLIC_ID,
                 adventure.getChannelId(),
                 adventure.getVisibility(),
-                adventure.getModelConfiguration().aiModel(),
+                adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
                 adventure.getOwnerId(),
                 adventure.getGameMode(),
@@ -39,12 +39,12 @@ public class CreateAdventureTest {
                 adventure.getContextAttributes().authorsNote(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().maxTokenLimit(),
+                adventure.getModelConfiguration().getMaxTokenLimit(),
                 1.7,
-                adventure.getModelConfiguration().frequencyPenalty(),
-                adventure.getModelConfiguration().presencePenalty(),
+                adventure.getModelConfiguration().getFrequencyPenalty(),
+                adventure.getModelConfiguration().getPresencePenalty(),
                 Maps.newHashMap("TKNID", 99D),
-                adventure.getModelConfiguration().stopSequences(),
+                adventure.getModelConfiguration().getStopSequences(),
                 Collections.singleton("USRID"),
                 Collections.singleton("USRID"),
                 adventure.isMultiplayer());
@@ -57,16 +57,16 @@ public class CreateAdventureTest {
         assertThat(updateAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(updateAdventure.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(updateAdventure.visibility()).isEqualTo(adventure.getVisibility());
-        assertThat(updateAdventure.presencePenalty()).isEqualTo(adventure.getModelConfiguration().presencePenalty());
-        assertThat(updateAdventure.frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().frequencyPenalty());
+        assertThat(updateAdventure.presencePenalty()).isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
+        assertThat(updateAdventure.frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
         assertThat(updateAdventure.temperature()).isEqualTo(1.7);
-        assertThat(updateAdventure.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().maxTokenLimit());
+        assertThat(updateAdventure.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
         assertThat(updateAdventure.remember()).isEqualTo(adventure.getContextAttributes().remember());
         assertThat(updateAdventure.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
         assertThat(updateAdventure.nudge()).isEqualTo(adventure.getContextAttributes().nudge());
         assertThat(updateAdventure.bump()).isEqualTo(adventure.getContextAttributes().bump());
         assertThat(updateAdventure.bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
-        assertThat(updateAdventure.aiModel()).isEqualTo(adventure.getModelConfiguration().aiModel());
+        assertThat(updateAdventure.aiModel()).isEqualTo(adventure.getModelConfiguration().getAiModel());
     }
 
     @Test

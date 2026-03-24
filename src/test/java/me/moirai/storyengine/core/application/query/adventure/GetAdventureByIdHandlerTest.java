@@ -16,12 +16,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,12 +72,18 @@ public class GetAdventureByIdHandlerTest {
     public void getAdventureById_whenFound_thenReturnDetails() {
 
         // Given
+        var modelConfiguration = new ModelConfigurationDto(
+                ArtificialIntelligenceModel.GPT4_MINI, 2048, 1.0, 0.0, 0.0, Set.of(), Map.of());
+
+        var contextAttributes = new ContextAttributesDto(null, null, null, null, 0);
+
         var expectedDetails = new AdventureDetails(
                 AdventureFixture.PUBLIC_ID, "Name", "desc", "start",
                 WorldFixture.PUBLIC_ID, PersonaFixture.PUBLIC_ID,
-                "CHNLID", "PRIVATE", "gpt-4o-mini", "STRICT", "RPG",
-                "owner1", null, null, null, null, 0, 2048, 1.0, 0.0, 0.0,
-                true, null, null, Map.of(), Set.of(), Set.of(), Set.of());
+                "CHNLID", "PRIVATE", "STRICT", "RPG", "owner1",
+                true, null, null,
+                modelConfiguration, contextAttributes,
+                Set.of(), Set.of());
 
         var query = new GetAdventureById(AdventureFixture.PUBLIC_ID, "RQSTRID");
 

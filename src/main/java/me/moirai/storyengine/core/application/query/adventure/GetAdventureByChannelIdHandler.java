@@ -7,7 +7,9 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.usecases.AbstractUseCaseHandler;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
@@ -51,6 +53,22 @@ public class GetAdventureByChannelIdHandler
 
     private AdventureDetails toResult(Adventure adventure, UUID personaPublicId, UUID worldPublicId) {
 
+        var modelConfiguration = new ModelConfigurationDto(
+                adventure.getModelConfiguration().getAiModel(),
+                adventure.getModelConfiguration().getMaxTokenLimit(),
+                adventure.getModelConfiguration().getTemperature(),
+                adventure.getModelConfiguration().getFrequencyPenalty(),
+                adventure.getModelConfiguration().getPresencePenalty(),
+                adventure.getModelConfiguration().getStopSequences(),
+                adventure.getModelConfiguration().getLogitBias());
+
+        var contextAttributes = new ContextAttributesDto(
+                adventure.getContextAttributes().nudge(),
+                adventure.getContextAttributes().authorsNote(),
+                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().bump(),
+                adventure.getContextAttributes().bumpFrequency());
+
         return new AdventureDetails(
                 adventure.getPublicId(),
                 adventure.getName(),
@@ -60,24 +78,14 @@ public class GetAdventureByChannelIdHandler
                 personaPublicId,
                 adventure.getChannelId(),
                 adventure.getVisibility().name(),
-                adventure.getModelConfiguration().aiModel().toString(),
                 adventure.getModeration().name(),
                 adventure.getGameMode().name(),
                 adventure.getOwnerId(),
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().remember(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().maxTokenLimit(),
-                adventure.getModelConfiguration().temperature(),
-                adventure.getModelConfiguration().frequencyPenalty(),
-                adventure.getModelConfiguration().presencePenalty(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
-                adventure.getModelConfiguration().logitBias(),
-                adventure.getModelConfiguration().stopSequences(),
+                modelConfiguration,
+                contextAttributes,
                 adventure.getUsersAllowedToRead(),
                 adventure.getUsersAllowedToWrite());
     }

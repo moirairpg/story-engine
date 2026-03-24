@@ -161,7 +161,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 .setPlaceholder("Reminders inserted between messages to keep AI's act on track")
                 .setMinLength(1)
                 .setMaxLength(50)
-                .setValue(result.bump())
+                .setValue(result.contextAttributes().bump())
                 .build();
 
         TextInput bumpFrequency = TextInput
@@ -169,7 +169,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 .setPlaceholder("3")
                 .setMinLength(1)
                 .setMaxLength(2)
-                .setValue(String.valueOf(result.bumpFrequency()))
+                .setValue(String.valueOf(result.contextAttributes().bumpFrequency()))
                 .build();
 
         Modal modal = Modal.create(BUMP_COMMAND, "Context modifier: bump")
@@ -189,7 +189,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 .setPlaceholder("Instructions from the author on how the story should be told")
                 .setMinLength(1)
                 .setMaxLength(50)
-                .setValue(result.authorsNote())
+                .setValue(result.contextAttributes().authorsNote())
                 .build();
 
         Modal modal = Modal.create("authorsNote", "Context modifier: author's note")
@@ -208,7 +208,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 .setPlaceholder("General instructions for the AI to follow")
                 .setMinLength(1)
                 .setMaxLength(50)
-                .setValue(result.nudge())
+                .setValue(result.contextAttributes().nudge())
                 .build();
 
         Modal modal = Modal.create(NUDGE_COMMAND, "Context modifier: nudge")
@@ -228,7 +228,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 .setPlaceholder("Important piece of information the AI has to remember about")
                 .setMinLength(1)
                 .setMaxLength(50)
-                .setValue(result.remember())
+                .setValue(result.contextAttributes().remember())
                 .build();
 
         Modal modal = Modal.create(REMEMBER_COMMAND, "Context modifier: remember")

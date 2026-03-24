@@ -28,22 +28,23 @@ public class ModelConfigurationTest {
         stopSequences.add("ABC");
 
         // When
-        ModelConfiguration modelConfiguration = new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI,
-                100,
-                1.0,
-                0.2,
-                0.2,
-                stopSequences,
-                logitBias);
+        var modelConfiguration = ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(stopSequences)
+                .logitBias(logitBias)
+                .build();
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.aiModel()).isEqualTo(ArtificialIntelligenceModel.GPT4_MINI);
-        assertThat(modelConfiguration.frequencyPenalty()).isEqualTo(0.2);
-        assertThat(modelConfiguration.presencePenalty()).isEqualTo(0.2);
-        assertThat(modelConfiguration.maxTokenLimit()).isEqualTo(100);
-        assertThat(modelConfiguration.temperature()).isEqualTo(1.0);
+        assertThat(modelConfiguration.getAiModel()).isEqualTo(ArtificialIntelligenceModel.GPT4_MINI);
+        assertThat(modelConfiguration.getFrequencyPenalty()).isEqualTo(0.2);
+        assertThat(modelConfiguration.getPresencePenalty()).isEqualTo(0.2);
+        assertThat(modelConfiguration.getMaxTokenLimit()).isEqualTo(100);
+        assertThat(modelConfiguration.getTemperature()).isEqualTo(1.0);
     }
 
     @Test
@@ -55,18 +56,19 @@ public class ModelConfigurationTest {
         logitBias.put("DEF", 5.0);
 
         // When
-        ModelConfiguration modelConfiguration = new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI,
-                100,
-                1.0,
-                0.2,
-                0.2,
-                null,
-                logitBias);
+        var modelConfiguration = ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(null)
+                .logitBias(logitBias)
+                .build();
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.stopSequences()).isEmpty();
+        assertThat(modelConfiguration.getStopSequences()).isEmpty();
     }
 
     @Test
@@ -80,7 +82,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updateAiModel(newModel);
 
         // Then
-        assertThat(newModelConfiguration.aiModel()).isEqualTo(newModel);
+        assertThat(newModelConfiguration.getAiModel()).isEqualTo(newModel);
     }
 
     @Test
@@ -94,7 +96,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updateMaxTokenLimit(newTokenLimit);
 
         // Then
-        assertThat(newModelConfiguration.maxTokenLimit()).isEqualTo(newTokenLimit);
+        assertThat(newModelConfiguration.getMaxTokenLimit()).isEqualTo(newTokenLimit);
     }
 
     @Test
@@ -108,7 +110,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updateTemperature(newTemperature);
 
         // Then
-        assertThat(newModelConfiguration.temperature()).isEqualTo(newTemperature);
+        assertThat(newModelConfiguration.getTemperature()).isEqualTo(newTemperature);
     }
 
     @Test
@@ -122,7 +124,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updateFrequencyPenalty(newFrequencyPenalty);
 
         // Then
-        assertThat(newModelConfiguration.frequencyPenalty()).isEqualTo(newFrequencyPenalty);
+        assertThat(newModelConfiguration.getFrequencyPenalty()).isEqualTo(newFrequencyPenalty);
     }
 
     @Test
@@ -136,7 +138,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updateFrequencyPenalty(null);
 
         // Then
-        assertThat(newModelConfiguration.frequencyPenalty()).isEqualTo(defaultFrequencyPenalty);
+        assertThat(newModelConfiguration.getFrequencyPenalty()).isEqualTo(defaultFrequencyPenalty);
     }
 
     @Test
@@ -150,7 +152,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updatePresencePenalty(newPresencePenalty);
 
         // Then
-        assertThat(newModelConfiguration.presencePenalty()).isEqualTo(newPresencePenalty);
+        assertThat(newModelConfiguration.getPresencePenalty()).isEqualTo(newPresencePenalty);
     }
 
     @Test
@@ -164,7 +166,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.updatePresencePenalty(null);
 
         // Then
-        assertThat(newModelConfiguration.presencePenalty()).isEqualTo(defaultPresencePenalty);
+        assertThat(newModelConfiguration.getPresencePenalty()).isEqualTo(defaultPresencePenalty);
     }
 
     @Test
@@ -179,7 +181,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.addLogitBias(newToken, bias);
 
         // Then
-        assertThat(newModelConfiguration.logitBias()).containsKey(newToken);
+        assertThat(newModelConfiguration.getLogitBias()).containsKey(newToken);
     }
 
     @Test
@@ -195,7 +197,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.removeLogitBias(newToken);
 
         // Then
-        assertThat(newModelConfiguration.logitBias()).doesNotContainKey(newToken);
+        assertThat(newModelConfiguration.getLogitBias()).doesNotContainKey(newToken);
     }
 
     @Test
@@ -209,7 +211,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.addStopSequence(newToken);
 
         // Then
-        assertThat(newModelConfiguration.stopSequences()).contains(newToken);
+        assertThat(newModelConfiguration.getStopSequences()).contains(newToken);
     }
 
     @Test
@@ -224,7 +226,7 @@ public class ModelConfigurationTest {
         ModelConfiguration newModelConfiguration = modelConfiguration.removeStopSequence(newToken);
 
         // Then
-        assertThat(newModelConfiguration.stopSequences())
+        assertThat(newModelConfiguration.getStopSequences())
                 .isNotNull()
                 .isNotEmpty()
                 .doesNotContain(newToken);
@@ -237,9 +239,15 @@ public class ModelConfigurationTest {
         double temperature = 3.0;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, temperature, 0.2, 0.2,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(temperature)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -249,9 +257,15 @@ public class ModelConfigurationTest {
         double temperature = -3.0;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, temperature, 0.2, 0.2,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(temperature)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -261,9 +275,15 @@ public class ModelConfigurationTest {
         int maxTokenLimit = 5;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, maxTokenLimit, 1.0, 0.2, 0.2,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(maxTokenLimit)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -274,12 +294,24 @@ public class ModelConfigurationTest {
         int gpt4OmniMaxTokenLimit = 500000;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, gpt4MiniMaxTokenLimit, 1.0, 0.2, 0.2,
-                new HashSet<>(), new HashMap<>()));
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_OMNI, gpt4OmniMaxTokenLimit, 1.0, 0.2, 0.2,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(gpt4MiniMaxTokenLimit)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_OMNI)
+                .maxTokenLimit(gpt4OmniMaxTokenLimit)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -290,9 +322,15 @@ public class ModelConfigurationTest {
         logitBias.put("ABC", -200.0);
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, 0.2,
-                new HashSet<>(), logitBias));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(logitBias)
+                .build());
     }
 
     @Test
@@ -303,9 +341,15 @@ public class ModelConfigurationTest {
         logitBias.put("ABC", 200.0);
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, 0.2,
-                new HashSet<>(), logitBias));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(logitBias)
+                .build());
     }
 
     @Test
@@ -315,13 +359,19 @@ public class ModelConfigurationTest {
         Map<String, Double> logitBias = Collections.emptyMap();
 
         // When
-        ModelConfiguration modelConfiguration = new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, 0.2,
-                new HashSet<>(), logitBias);
+        var modelConfiguration = ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(logitBias)
+                .build();
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.logitBias()).isNotNull().isEmpty();
+        assertThat(modelConfiguration.getLogitBias()).isNotNull().isEmpty();
     }
 
     @Test
@@ -331,13 +381,19 @@ public class ModelConfigurationTest {
         Map<String, Double> logitBias = null;
 
         // When
-        ModelConfiguration modelConfiguration = new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, 0.2,
-                new HashSet<>(), logitBias);
+        var modelConfiguration = ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(logitBias)
+                .build();
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.logitBias()).isNotNull().isEmpty();
+        assertThat(modelConfiguration.getLogitBias()).isNotNull().isEmpty();
     }
 
     @Test
@@ -347,13 +403,19 @@ public class ModelConfigurationTest {
         Double expectedFrequencyPenalty = 0.0;
 
         // When
-        ModelConfiguration modelConfiguration = new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, null, 0.2,
-                new HashSet<>(), new HashMap<>());
+        var modelConfiguration = ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(null)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build();
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.frequencyPenalty()).isNotNull().isEqualTo(expectedFrequencyPenalty);
+        assertThat(modelConfiguration.getFrequencyPenalty()).isNotNull().isEqualTo(expectedFrequencyPenalty);
     }
 
     @Test
@@ -363,13 +425,19 @@ public class ModelConfigurationTest {
         Double expectedPresencePenalty = 0.0;
 
         // When
-        ModelConfiguration modelConfiguration = new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, null,
-                new HashSet<>(), new HashMap<>());
+        var modelConfiguration = ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(null)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build();
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.presencePenalty()).isNotNull().isEqualTo(expectedPresencePenalty);
+        assertThat(modelConfiguration.getPresencePenalty()).isNotNull().isEqualTo(expectedPresencePenalty);
     }
 
     @Test
@@ -379,9 +447,15 @@ public class ModelConfigurationTest {
         double frequencyPenalty = 3.0;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, frequencyPenalty, 0.2,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(frequencyPenalty)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -391,9 +465,15 @@ public class ModelConfigurationTest {
         double frequencyPenalty = -3.0;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, frequencyPenalty, 0.2,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(frequencyPenalty)
+                .presencePenalty(0.2)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -403,9 +483,15 @@ public class ModelConfigurationTest {
         double presencePenalty = 3.0;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, presencePenalty,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(presencePenalty)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 
     @Test
@@ -415,8 +501,14 @@ public class ModelConfigurationTest {
         double presencePenalty = -3.0;
 
         // Then
-        assertThrows(BusinessRuleViolationException.class, () -> new ModelConfiguration(
-                ArtificialIntelligenceModel.GPT4_MINI, 100, 1.0, 0.2, presencePenalty,
-                new HashSet<>(), new HashMap<>()));
+        assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
+                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .maxTokenLimit(100)
+                .temperature(1.0)
+                .frequencyPenalty(0.2)
+                .presencePenalty(presencePenalty)
+                .stopSequences(new HashSet<>())
+                .logitBias(new HashMap<>())
+                .build());
     }
 }
