@@ -1,11 +1,9 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 
@@ -13,8 +11,7 @@ public class GetAdventureResultFixture {
 
     public static AdventureDetails privateMultiplayerAdventure() {
 
-        // given
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        var adventure = AdventureFixture.privateMultiplayerAdventureWithIdAndPermissions();
 
         var modelConfiguration = new ModelConfigurationDto(
                 adventure.getModelConfiguration().getAiModel(),
@@ -43,20 +40,17 @@ public class GetAdventureResultFixture {
                 adventure.getVisibility().name(),
                 adventure.getModeration().name(),
                 adventure.getGameMode().name(),
-                adventure.getOwnerId(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                adventure.getUsersAllowedToRead(),
-                adventure.getUsersAllowedToWrite());
+                adventure.getPermissions());
     }
 
     public static AdventureDetails publicMultiplayerAdventure() {
 
-        // given
-        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
+        var adventure = AdventureFixture.publicMultiplayerAdventureWithIdAndPermissions();
 
         var modelConfiguration = new ModelConfigurationDto(
                 adventure.getModelConfiguration().getAiModel(),
@@ -85,13 +79,11 @@ public class GetAdventureResultFixture {
                 adventure.getVisibility().name(),
                 adventure.getModeration().name(),
                 adventure.getGameMode().name(),
-                adventure.getOwnerId(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                adventure.getUsersAllowedToRead(),
-                adventure.getUsersAllowedToWrite());
+                adventure.getPermissions());
     }
 }

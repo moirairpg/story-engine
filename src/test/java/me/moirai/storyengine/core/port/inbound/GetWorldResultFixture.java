@@ -1,42 +1,35 @@
 package me.moirai.storyengine.core.port.inbound;
 
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 public class GetWorldResultFixture {
 
     public static WorldDetails publicWorld() {
 
-        World world = WorldFixture.publicWorld().build();
-
+        var world = WorldFixture.publicWorldWithIdAndPermissions();
         return new WorldDetails(
                 world.getPublicId(),
                 world.getName(),
                 world.getDescription(),
                 world.getAdventureStart(),
                 world.getVisibility().name(),
-                world.getOwnerId(),
-                world.getUsersAllowedToRead(),
-                world.getUsersAllowedToWrite(),
+                world.getPermissions(),
                 world.getCreationDate(),
-                null);
+                world.getLastUpdateDate());
     }
 
     public static WorldDetails privateWorld() {
 
-        World world = WorldFixture.privateWorld().build();
-
+        var world = WorldFixture.privateWorldWithIdAndPermissions();
         return new WorldDetails(
                 world.getPublicId(),
                 world.getName(),
                 world.getDescription(),
                 world.getAdventureStart(),
                 world.getVisibility().name(),
-                world.getOwnerId(),
-                world.getUsersAllowedToRead(),
-                world.getUsersAllowedToWrite(),
+                world.getPermissions(),
                 world.getCreationDate(),
-                null);
+                world.getLastUpdateDate());
     }
 }

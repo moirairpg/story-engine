@@ -28,6 +28,6 @@ public class UpdatePersonaAuthorizer implements OperationAuthorizer {
         var persona = personaRepository.findByPublicId(personaId)
                 .orElseThrow(() -> new AssetNotFoundException("Persona not found"));
 
-        return persona.canUserWrite(principal.discordId());
+        return persona.isOwner(principal.id()) || persona.canWrite(principal.id());
     }
 }

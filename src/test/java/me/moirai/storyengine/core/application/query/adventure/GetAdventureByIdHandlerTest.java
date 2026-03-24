@@ -80,10 +80,10 @@ public class GetAdventureByIdHandlerTest {
         var expectedDetails = new AdventureDetails(
                 AdventureFixture.PUBLIC_ID, "Name", "desc", "start",
                 WorldFixture.PUBLIC_ID, PersonaFixture.PUBLIC_ID,
-                "CHNLID", "PRIVATE", "STRICT", "RPG", "owner1",
+                "CHNLID", "PRIVATE", "STRICT", "RPG",
                 true, null, null,
                 modelConfiguration, contextAttributes,
-                Set.of(), Set.of());
+                Set.of());
 
         var query = new GetAdventureById(AdventureFixture.PUBLIC_ID, "RQSTRID");
 

@@ -55,7 +55,6 @@ public class PersonaController extends SecurityContextAware {
     @ResponseStatus(HttpStatus.OK)
     public PaginatedResult<PersonaSummary> search(
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "owner_id", required = false) String ownerId,
             @RequestParam(name = "view", required = true) SearchView view,
             @RequestParam(name = "sorting_field", required = false) PersonaSortField sortingField,
             @RequestParam(name = "direction", required = false) SortDirection direction,
@@ -64,13 +63,12 @@ public class PersonaController extends SecurityContextAware {
 
         return queryRunner.run(new SearchPersonas(
                 name,
-                ownerId,
                 view,
                 sortingField,
                 direction,
                 page,
                 size,
-                authenticatedUserId()));
+                getAuthenticatedUser().id()));
     }
 
     @GetMapping("/{personaId}")

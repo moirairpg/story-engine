@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
+import me.moirai.storyengine.common.domain.Permission;
+
 public record AdventureDetails(
         UUID id,
         String name,
@@ -15,17 +17,14 @@ public record AdventureDetails(
         String visibility,
         String moderation,
         String gameMode,
-        String ownerId,
         boolean isMultiplayer,
         Instant creationDate,
         Instant lastUpdateDate,
         ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes,
-        Set<String> usersAllowedToRead,
-        Set<String> usersAllowedToWrite) {
+        Set<Permission> permissions) {
 
     public AdventureDetails {
-        usersAllowedToRead = Set.copyOf(usersAllowedToRead);
-        usersAllowedToWrite = Set.copyOf(usersAllowedToWrite);
+        permissions = Set.copyOf(permissions);
     }
 }

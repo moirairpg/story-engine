@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import me.moirai.storyengine.common.domain.Asset;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 
 public class AssetBaseDataAssigner {
@@ -16,18 +18,28 @@ public class AssetBaseDataAssigner {
     @PrePersist
     public void setBaseData(Asset asset) {
 
-        MoiraiPrincipal authenticatedUser = getAuthenticatedUser();
+        var authenticatedUser = getAuthenticatedUser();
         if (asset.getCreatorId() == null) {
-            String creatorName = Optional.ofNullable(authenticatedUser)
+            var creatorName = Optional.ofNullable(authenticatedUser)
                     .map(MoiraiPrincipal::discordId)
                     .orElse("SYSTEM");
 
             asset.setCreatorId(creatorName);
         }
 
-        Instant now = Instant.now();
+        var now = Instant.now();
         if (asset.getCreationDate() == null) {
             asset.setCreationDate(now);
+        }
+
+        if (asset instanceof ShareableAsset shareableAsset && authenticatedUser != null) {
+            if (shareableAsset.getPermissions().stream()
+                    .noneMatch(p -> p.level() == me.moirai.storyengine.common.enums.PermissionLevel.OWNER)) {
+
+                shareableAsset.grant(
+                        new Permission(authenticatedUser.id(),
+                                me.moirai.storyengine.common.enums.PermissionLevel.OWNER));
+            }
         }
 
         asset.setLastUpdateDate(now);

@@ -13,7 +13,7 @@ public record CreateWorldRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String description,
         @Moderated @NotEmpty(message = "cannot be empty") String adventureStart,
         @NotNull(message = "cannot be null") Visibility visibility,
-        Set<String> usersAllowedToWrite,
-        Set<String> usersAllowedToRead,
+        Set<Long> usersAllowedToWrite,
+        Set<Long> usersAllowedToRead,
         List<WorldLorebookEntryRequest> lorebook) {
 }

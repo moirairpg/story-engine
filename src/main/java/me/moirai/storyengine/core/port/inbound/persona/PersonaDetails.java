@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
+import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.Visibility;
 
 public record PersonaDetails(
@@ -11,14 +12,11 @@ public record PersonaDetails(
         String name,
         String personality,
         Visibility visibility,
-        String ownerId,
-        Set<String> usersAllowedToWrite,
-        Set<String> usersAllowedToRead,
+        Set<Permission> permissions,
         Instant creationDate,
         Instant lastUpdateDate) {
 
     public PersonaDetails {
-        usersAllowedToWrite = Set.copyOf(usersAllowedToWrite);
-        usersAllowedToRead = Set.copyOf(usersAllowedToRead);
+        permissions = Set.copyOf(permissions);
     }
 }

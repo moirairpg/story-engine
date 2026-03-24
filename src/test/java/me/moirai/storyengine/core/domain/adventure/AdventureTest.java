@@ -7,26 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class AdventureTest {
 
     @Test
     public void createAdventure_whenValidData_thenCreateAdventure() {
 
-        // Given
-        Adventure.Builder adventureBuilder = Adventure.builder();
+        // given
+        var adventureBuilder = Adventure.builder();
         adventureBuilder.name("Name");
         adventureBuilder.worldId(1L);
         adventureBuilder.personaId(1L);
@@ -34,13 +33,12 @@ public class AdventureTest {
         adventureBuilder.moderation(Moderation.STRICT);
         adventureBuilder.visibility(Visibility.fromString("PRIVATE"));
         adventureBuilder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
-        adventureBuilder.permissions(PermissionsFixture.samplePermissions().build());
         adventureBuilder.gameMode(GameMode.RPG);
 
-        // When
-        Adventure adventure = adventureBuilder.build();
+        // when
+        var adventure = adventureBuilder.build();
 
-        // Then
+        // then
         assertThat(adventure).isNotNull();
         assertThat(adventure.getName()).isEqualTo("Name");
         assertThat(adventure.getWorldId()).isEqualTo(1L);
@@ -52,267 +50,227 @@ public class AdventureTest {
     @Test
     public void createAdventure_whenNameIsNull_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().name(null);
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().name(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
     public void createAdventure_whenNameIsEmpty_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().name(StringUtils.EMPTY);
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().name(StringUtils.EMPTY);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
     public void createAdventure_whenModelConfigurationIsNull_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().modelConfiguration(null);
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().modelConfiguration(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
     public void createAdventure_whenModerationIsNull_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().moderation(null);
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().moderation(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
     public void createAdventure_whenVisibilityIsNull_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().visibility(null);
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().visibility(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
-    public void createAdventure_whenPermissionsIsNull_thenThrowException() {
+    public void grantWritePermission_thenUserCanWriteAndRead() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().permissions(null);
+        // given
+        var userId = 1234567890L;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
 
-        // Then
-        assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
+        // when
+        adventure.grant(new Permission(userId, PermissionLevel.WRITE));
+
+        // then
+        assertThat(adventure.canWrite(userId)).isTrue();
+        assertThat(adventure.canRead(userId)).isTrue();
     }
 
     @Test
-    public void updateAdventure_whenAddNewWriter_thenTheyShouldHaveReadAndWritePermission() {
+    public void grantReadPermission_thenUserCanOnlyRead() {
 
-        // Given
-        String userId = "1234567890";
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(new HashSet<>()).build();
+        // given
+        var userId = 1234567890L;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
 
-        adventureBuilder.permissions(permissions);
+        // when
+        adventure.grant(new Permission(userId, PermissionLevel.READ));
 
-        Adventure adventure = adventureBuilder.build();
-
-        // When
-        adventure.addWriterUser(userId);
-
-        // Then
-        assertThat(adventure.getUsersAllowedToWrite()).contains(userId);
-        assertThat(adventure.canUserWrite(userId)).isTrue();
-        assertThat(adventure.canUserRead(userId)).isTrue();
+        // then
+        assertThat(adventure.canWrite(userId)).isFalse();
+        assertThat(adventure.canRead(userId)).isTrue();
     }
 
     @Test
-    public void updateAdventure_whenAddNewReader_thenTheyShouldHaveOnlyReadPermission() {
+    public void revokeReadPermission_thenUserCannotRead() {
 
-        // Given
-        String userId = "1234567890";
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(new HashSet<>()).build();
+        // given
+        var userId = 1234567890L;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        adventure.grant(new Permission(userId, PermissionLevel.READ));
 
-        adventureBuilder.permissions(permissions);
+        // when
+        adventure.revoke(userId);
 
-        Adventure adventure = adventureBuilder.build();
-
-        // When
-        adventure.addReaderUser(userId);
-
-        // Then
-        assertThat(adventure.getUsersAllowedToRead()).contains(userId);
-        assertThat(adventure.canUserWrite(userId)).isFalse();
-        assertThat(adventure.canUserRead(userId)).isTrue();
+        // then
+        assertThat(adventure.canWrite(userId)).isFalse();
+        assertThat(adventure.canRead(userId)).isFalse();
     }
 
     @Test
-    public void updateAdventure_whenRemoveReader_thenReadPermissionShouldBeRevoked() {
+    public void revokeWritePermission_thenUserCannotWrite() {
 
-        // Given
-        String userId = "1234567890";
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
+        // given
+        var userId = 1234567890L;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        adventure.grant(new Permission(userId, PermissionLevel.WRITE));
 
-        Set<String> usersAllowedToRead = new HashSet<>();
-        usersAllowedToRead.add(userId);
+        // when
+        adventure.revoke(userId);
 
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(usersAllowedToRead).build();
-
-        adventureBuilder.permissions(permissions);
-
-        Adventure adventure = adventureBuilder.build();
-
-        // When
-        adventure.removeReaderUser(userId);
-
-        // Then
-        assertThat(adventure.getUsersAllowedToRead()).doesNotContain(userId);
-        assertThat(adventure.canUserWrite(userId)).isFalse();
-        assertThat(adventure.canUserRead(userId)).isFalse();
-    }
-
-    @Test
-    public void updateAdventure_whenRemoveWriter_thenReadAndWritePermissionShouldBeRevoked() {
-
-        // Given
-        String userId = "1234567890";
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
-
-        Set<String> usersAllowedToWrite = new HashSet<>();
-        usersAllowedToWrite.add(userId);
-
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(usersAllowedToWrite).build();
-
-        adventureBuilder.permissions(permissions);
-
-        Adventure adventure = adventureBuilder.build();
-
-        // When
-        adventure.removeWriterUser(userId);
-
-        // Then
-        assertThat(adventure.getUsersAllowedToWrite()).doesNotContain(userId);
-        assertThat(adventure.canUserWrite(userId)).isFalse();
-        assertThat(adventure.canUserRead(userId)).isFalse();
+        // then
+        assertThat(adventure.canWrite(userId)).isFalse();
+        assertThat(adventure.canRead(userId)).isFalse();
     }
 
     @Test
     public void updateAdventure_whenTurningPrivateIntoPublic_thenPermissionShouldBeChangedToPublic() {
 
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.makePublic();
 
-        // Then
+        // then
         assertThat(adventure.isPublic()).isTrue();
     }
 
     @Test
     public void updateAdventure_whenTurningPublicIntoPrivate_thenPermissionShouldBeChangedToPrivate() {
 
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.makePrivate();
 
-        // Then
+        // then
         assertThat(adventure.isPublic()).isFalse();
     }
 
     @Test
     public void updateAdventure_whenNewNameProvided_thenNameShouldBeUpdated() {
 
-        // Given
-        String name = "New Name";
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var name = "New Name";
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateName(name);
 
-        // Then
+        // then
         assertThat(adventure.getName()).isEqualTo(name);
     }
 
     @Test
     public void updateAdventure_whenNewPersonaIdProvided_thenPersonaIdShouldBeUpdated() {
 
-        // Given
-        Long personaId = 42L;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var personaId = 42L;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updatePersona(personaId);
 
-        // Then
+        // then
         assertThat(adventure.getPersonaId()).isEqualTo(personaId);
     }
 
     @Test
     public void updateAdventure_whenNewModerationProvided_thenModerationShouldBeUpdated() {
 
-        // Given
-        Moderation moderation = Moderation.DISABLED;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var moderation = Moderation.DISABLED;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateModeration(moderation);
 
-        // Then
+        // then
         assertThat(adventure.getModeration()).isEqualTo(moderation);
     }
 
     @Test
     public void updateAdventure_whenNewAiModelIsProvided_thenAiModelShouldBeUpdated() {
 
-        // Given
-        ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateAiModel(aiModel);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getAiModel()).isEqualTo(aiModel);
     }
 
     @Test
     public void updateAdventure_whenNewMaxTokenLimit_thenMaxTokenLimitShouldBeUpdated() {
 
-        // Given
-        int maxTokenLimit = 100;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        // given
+        var maxTokenLimit = 100;
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .build();
 
-        // When
+        // when
         adventure.updateMaxTokenLimit(maxTokenLimit);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getMaxTokenLimit()).isEqualTo(maxTokenLimit);
     }
 
     @Test
     public void updateAdventure_whenNewMaxTokenLimitGreaterThanAllowed_thenThrowException() {
 
-        // Given
-        int maxTokenLimit = 500000;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        // given
+        var maxTokenLimit = 500000;
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updateMaxTokenLimit(maxTokenLimit));
     }
@@ -320,13 +278,13 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewMaxTokenLimitLesserThanAllowed_thenThrowException() {
 
-        // Given
-        int maxTokenLimit = 10;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        // given
+        var maxTokenLimit = 10;
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(ModelConfigurationFixture.gpt4Mini())
                 .build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updateMaxTokenLimit(maxTokenLimit));
     }
@@ -334,25 +292,25 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewTemperature_thenTemperatureShouldBeUpdated() {
 
-        // Given
-        double temperature = 1.3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var temperature = 1.3;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateTemperature(temperature);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getTemperature()).isEqualTo(temperature);
     }
 
     @Test
     public void updateAdventure_whenNewTemperatureGreaterThanAllowed_thenThrowException() {
 
-        // Given
-        double temperature = 3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var temperature = 3.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updateTemperature(temperature));
     }
@@ -360,11 +318,11 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewTemperatureLesserThanAllowed_thenThrowException() {
 
-        // Given
-        double temperature = 0;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var temperature = 0.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updateTemperature(temperature));
     }
@@ -372,25 +330,25 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewPresencePenalty_thenPresencePenaltyIsUpdated() {
 
-        // Given
-        double presencePenalty = 1.3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var presencePenalty = 1.3;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updatePresencePenalty(presencePenalty);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getPresencePenalty()).isEqualTo(presencePenalty);
     }
 
     @Test
     public void updateAdventure_whenPresencePenaltyGreaterThanAllowed_thenThrowException() {
 
-        // Given
-        double presencePenalty = 3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var presencePenalty = 3.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updatePresencePenalty(presencePenalty));
     }
@@ -398,11 +356,11 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenPresencePenaltyLesserThanAllowed_thenThrowException() {
 
-        // Given
-        double presencePenalty = -3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var presencePenalty = -3.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updatePresencePenalty(presencePenalty));
     }
@@ -410,25 +368,25 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewFrequencyPenalty_thenFrequencyPenaltyIsUpdated() {
 
-        // Given
-        double frequencyPenalty = 1.3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var frequencyPenalty = 1.3;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateFrequencyPenalty(frequencyPenalty);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getFrequencyPenalty()).isEqualTo(frequencyPenalty);
     }
 
     @Test
     public void updateAdventure_whenFrequencyPenaltyGreaterThanAllowed_thenThrowException() {
 
-        // Given
-        double frequencyPenalty = 3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var frequencyPenalty = 3.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updateFrequencyPenalty(frequencyPenalty));
     }
@@ -436,11 +394,11 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenPresenceFrequencyLesserThanAllowed_thenThrowException() {
 
-        // Given
-        double frequencyPenalty = -3;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var frequencyPenalty = -3.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.updateFrequencyPenalty(frequencyPenalty));
     }
@@ -448,9 +406,9 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewLogitBias_thenLogitBiasShouldBeUpdated() {
 
-        // Given
-        String token = "TOKEN";
-        double bias = 1.3;
+        // given
+        var token = "TOKEN";
+        var bias = 1.3;
         var modelConfiguration = ModelConfiguration.builder()
                 .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
                 .maxTokenLimit(100)
@@ -461,26 +419,26 @@ public class AdventureTest {
                 .logitBias(new HashMap<>())
                 .build();
 
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
                 .build();
 
-        // When
+        // when
         adventure.addLogitBias(token, bias);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getLogitBias()).containsEntry(token, bias);
     }
 
     @Test
     public void updateAdventure_whenLogitBiasGreaterThanAllowed_thenThrowException() {
 
-        // Given
-        String token = "TOKEN";
-        double bias = 200;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var token = "TOKEN";
+        var bias = 200.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.addLogitBias(token, bias));
     }
@@ -488,12 +446,12 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenLogitBiasLesserThanAllowed_thenThrowException() {
 
-        // Given
-        String token = "TOKEN";
-        double bias = -200;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var token = "TOKEN";
+        var bias = -200.0;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class,
                 () -> adventure.addLogitBias(token, bias));
     }
@@ -501,8 +459,8 @@ public class AdventureTest {
     @Test
     public void updateAdventure_whenNewStopSequence_thenStopSequenceShouldBeAdded() {
 
-        // Given
-        String token = "TOKEN";
+        // given
+        var token = "TOKEN";
         var modelConfiguration = ModelConfiguration.builder()
                 .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
                 .maxTokenLimit(100)
@@ -513,22 +471,22 @@ public class AdventureTest {
                 .logitBias(new HashMap<>())
                 .build();
 
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
                 .build();
 
-        // When
+        // when
         adventure.addStopSequence(token);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getStopSequences()).containsExactly(token);
     }
 
     @Test
     public void updateAdventure_whenRemovedStopSequence_thenStopSequenceShouldBeRemoved() {
 
-        // Given
-        String token = "TOKEN";
+        // given
+        var token = "TOKEN";
         var modelConfiguration = ModelConfiguration.builder()
                 .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
                 .maxTokenLimit(100)
@@ -539,23 +497,23 @@ public class AdventureTest {
                 .logitBias(new HashMap<>())
                 .build();
 
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
                 .build();
 
-        // When
+        // when
         adventure.removeStopSequence(token);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getStopSequences()).doesNotContain(token);
     }
 
     @Test
     public void updateAdventure_whenRemovedLogitBias_thenLogitBiasShouldBeRemoved() {
 
-        // Given
-        String token = "TOKEN";
-        double bias = 1.3;
+        // given
+        var token = "TOKEN";
+        var bias = 1.3;
         var modelConfiguration = ModelConfiguration.builder()
                 .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
                 .maxTokenLimit(100)
@@ -566,144 +524,144 @@ public class AdventureTest {
                 .logitBias(new HashMap<>(Collections.singletonMap(token, bias)))
                 .build();
 
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
                 .modelConfiguration(modelConfiguration)
                 .build();
 
-        // When
+        // when
         adventure.removeLogitBias(token);
 
-        // Then
+        // then
         assertThat(adventure.getModelConfiguration().getLogitBias()).doesNotContainKey(token);
     }
 
     @Test
     public void createAdventure_whenDiscordChannelIdIsNull_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure()
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure()
                 .channelId(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
     public void createPersona_whenNullGameMode_thenThrowException() {
 
-        // Given
-        Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure().gameMode(null);
+        // given
+        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().gameMode(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
     }
 
     @Test
     public void updateWorldDescription() {
 
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateDescription("New Description");
 
-        // Then
+        // then
         assertThat(adventure.getDescription()).isEqualTo("New Description");
     }
 
     @Test
     public void updateWorldInitialPrompt() {
 
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateAdventureStart("New Prompt");
 
-        // Then
+        // then
         assertThat(adventure.getAdventureStart()).isEqualTo("New Prompt");
     }
 
     @Test
     public void adventure_whenUpdateWorldId_thenWorldIdIsUpdated() {
 
-        // Given
-        Long newWorldId = 12345L;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var newWorldId = 12345L;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateWorld(newWorldId);
 
-        // Then
+        // then
         assertThat(adventure.getWorldId()).isEqualTo(newWorldId);
     }
 
     @Test
     public void adventure_whenUpdateDiscordChannelId_thenDiscordChannelIdIsUpdated() {
 
-        // Given
-        String newDiscordChannelId = "12345";
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var newDiscordChannelId = "12345";
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateChannel(newDiscordChannelId);
 
-        // Then
+        // then
         assertThat(adventure.getChannelId()).isEqualTo(newDiscordChannelId);
     }
 
     @Test
     public void adventure_whenUpdateGameMode_thenGameModeIsUpdated() {
 
-        // Given
-        GameMode newGameMode = GameMode.AUTHOR;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var newGameMode = GameMode.AUTHOR;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.updateGameMode(newGameMode);
 
-        // Then
+        // then
         assertThat(adventure.getGameMode()).isEqualTo(newGameMode);
     }
 
     @Test
     public void adventure_whenMultiplayerAdventure_thenChangeToSingleplayer() {
 
-        // Given
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        // given
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
-        // When
+        // when
         adventure.makeSinglePlayer();
 
-        // Then
+        // then
         assertThat(adventure.isMultiplayer()).isFalse();
     }
 
     @Test
     public void adventure_whenSingleplayerAdventure_thenChangeToMultiplayer() {
 
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
-        // When
+        // when
         adventure.makeMultiplayer();
 
-        // Then
+        // then
         assertThat(adventure.isMultiplayer()).isTrue();
     }
 
     @Test
     public void adventure_whenUpdateNudge_thenNudgeIsUpdated() {
 
-        // Given
-        String newNudge = "This is the new value";
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ContextAttributes originalContextAttributes = adventure.getContextAttributes();
+        // given
+        var newNudge = "This is the new value";
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var originalContextAttributes = adventure.getContextAttributes();
 
-        // When
+        // when
         adventure.updateNudge(newNudge);
 
-        // Then
+        // then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
         assertThat(adventure.getContextAttributes().nudge()).isEqualTo(newNudge);
     }
@@ -711,15 +669,15 @@ public class AdventureTest {
     @Test
     public void adventure_whenUpdateRemember_thenRememberIsUpdated() {
 
-        // Given
-        String newRemember = "This is the new value";
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ContextAttributes originalContextAttributes = adventure.getContextAttributes();
+        // given
+        var newRemember = "This is the new value";
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var originalContextAttributes = adventure.getContextAttributes();
 
-        // When
+        // when
         adventure.updateRemember(newRemember);
 
-        // Then
+        // then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
         assertThat(adventure.getContextAttributes().remember()).isEqualTo(newRemember);
     }
@@ -727,15 +685,15 @@ public class AdventureTest {
     @Test
     public void adventure_whenUpdateBump_thenBumpIsUpdated() {
 
-        // Given
-        String newBump = "This is the new value";
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ContextAttributes originalContextAttributes = adventure.getContextAttributes();
+        // given
+        var newBump = "This is the new value";
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var originalContextAttributes = adventure.getContextAttributes();
 
-        // When
+        // when
         adventure.updateBump(newBump);
 
-        // Then
+        // then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
         assertThat(adventure.getContextAttributes().bump()).isEqualTo(newBump);
     }
@@ -743,15 +701,15 @@ public class AdventureTest {
     @Test
     public void adventure_whenUpdateBumpFrequency_thenBumpFrequencyIsUpdated() {
 
-        // Given
-        int newBumpFrequency = 5;
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ContextAttributes originalContextAttributes = adventure.getContextAttributes();
+        // given
+        var newBumpFrequency = 5;
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var originalContextAttributes = adventure.getContextAttributes();
 
-        // When
+        // when
         adventure.updateBumpFrequency(newBumpFrequency);
 
-        // Then
+        // then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
         assertThat(adventure.getContextAttributes().bumpFrequency()).isEqualTo(newBumpFrequency);
     }
@@ -759,15 +717,15 @@ public class AdventureTest {
     @Test
     public void adventure_whenUpdateAuthorsNote_thenAuthorsNoteIsUpdated() {
 
-        // Given
-        String newAuthorsNote = "This is the new value";
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ContextAttributes originalContextAttributes = adventure.getContextAttributes();
+        // given
+        var newAuthorsNote = "This is the new value";
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var originalContextAttributes = adventure.getContextAttributes();
 
-        // When
+        // when
         adventure.updateAuthorsNote(newAuthorsNote);
 
-        // Then
+        // then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
         assertThat(adventure.getContextAttributes().authorsNote()).isEqualTo(newAuthorsNote);
     }

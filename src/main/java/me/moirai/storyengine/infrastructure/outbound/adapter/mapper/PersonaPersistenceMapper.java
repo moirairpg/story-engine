@@ -15,9 +15,7 @@ public class PersonaPersistenceMapper {
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getOwnerId(),
-                persona.getUsersAllowedToWrite(),
-                persona.getUsersAllowedToRead(),
+                persona.getPermissions(),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }

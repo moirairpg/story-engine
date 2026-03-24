@@ -33,13 +33,12 @@ public class SearchPersonasHandlerTest {
         // Given
         var query = new SearchPersonas(
                 "name",
-                null,
                 SearchView.MY_STUFF,
                 null,
                 null,
                 1,
                 2,
-                "requesterId");
+                1L);
 
         var expectedResult = PaginatedResult.<PersonaSummary>of(List.of(), 0L, 1, 2);
 

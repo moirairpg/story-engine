@@ -17,8 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
@@ -36,13 +34,13 @@ public class DeleteAdventureLorebookEntryHandlerTest {
     @Test
     public void errorWhenEntryIdIsNull() {
 
-        // Given
-        DeleteAdventureLorebookEntry command = new DeleteAdventureLorebookEntry(
+        // given
+        var command = new DeleteAdventureLorebookEntry(
                 null,
                 AdventureFixture.PUBLIC_ID,
                 "RQSTRID");
 
-        // Then
+        // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -50,13 +48,13 @@ public class DeleteAdventureLorebookEntryHandlerTest {
     @Test
     public void errorWhenAdventureIdIsNull() {
 
-        // Given
-        DeleteAdventureLorebookEntry command = new DeleteAdventureLorebookEntry(
+        // given
+        var command = new DeleteAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 null,
                 "RQSTRID");
 
-        // Then
+        // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -64,30 +62,26 @@ public class DeleteAdventureLorebookEntryHandlerTest {
     @Test
     public void deleteAdventure() {
 
-        // Given
-        String requesterId = "4234324";
+        // given
+        var requesterId = "4234324";
 
-        DeleteAdventureLorebookEntry command = new DeleteAdventureLorebookEntry(
+        var command = new DeleteAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 requesterId);
 
-        Adventure baseAdventure = AdventureFixture.publicMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var baseAdventure = AdventureFixture.publicMultiplayerAdventure().build();
 
-        Adventure adventure = spy(baseAdventure);
+        var adventure = spy(baseAdventure);
         doNothing().when(adventure).removeLorebookEntry(any(UUID.class));
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(any())).thenReturn(adventure);
 
-        // When
+        // when
         handler.handle(command);
 
-        // Then
+        // then
         verify(repository, times(1)).save(any());
     }
 }

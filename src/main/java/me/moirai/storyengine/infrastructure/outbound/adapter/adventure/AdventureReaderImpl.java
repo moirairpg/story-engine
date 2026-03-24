@@ -1,10 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -12,7 +10,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
@@ -35,7 +35,6 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.ai_model,
                     a.moderation,
                     a.game_mode,
-                    a.owner_id,
                     a.nudge,
                     a.remember,
                     a.authors_note,
@@ -46,8 +45,6 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.frequency_penalty,
                     a.presence_penalty,
                     a.is_multiplayer,
-                    a.users_allowed_to_read,
-                    a.users_allowed_to_write,
                     a.creation_date,
                     a.last_update_date
                FROM adventure a
@@ -62,6 +59,10 @@ public class AdventureReaderImpl implements AdventureReader {
 
     private static final String SELECT_LOGIT_BIAS = """
             SELECT token_id, bias FROM adventure_logit_bias WHERE adventure_id = :adventureId
+            """;
+
+    private static final String SELECT_PERMISSIONS = """
+            SELECT ap.user_id, ap.permission FROM adventure_permissions ap WHERE ap.adventure_id = :adventureId
             """;
     //@formatter:on
 
@@ -95,6 +96,11 @@ public class AdventureReaderImpl implements AdventureReader {
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
+            var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
+                    .param("adventureId", adventureId)
+                    .query((r, __) -> new Permission(r.getLong("user_id"), PermissionLevel.valueOf(r.getString("permission"))))
+                    .list());
+
             var modelConfiguration = new ModelConfigurationDto(
                     ArtificialIntelligenceModel.fromString(rs.getString("ai_model")),
                     rs.getInt("max_token_limit"),
@@ -122,19 +128,12 @@ public class AdventureReaderImpl implements AdventureReader {
                     rs.getString("visibility"),
                     rs.getString("moderation"),
                     rs.getString("game_mode"),
-                    rs.getString("owner_id"),
                     rs.getBoolean("is_multiplayer"),
                     rs.getTimestamp("creation_date").toInstant(),
                     rs.getTimestamp("last_update_date").toInstant(),
                     modelConfiguration,
                     contextAttributes,
-                    parseStringSet(rs.getString("users_allowed_to_read")),
-                    parseStringSet(rs.getString("users_allowed_to_write")));
+                    permissions);
         };
-    }
-
-    private Set<String> parseStringSet(String value) {
-        if (value == null || value.isBlank()) return Set.of();
-        return Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
     }
 }

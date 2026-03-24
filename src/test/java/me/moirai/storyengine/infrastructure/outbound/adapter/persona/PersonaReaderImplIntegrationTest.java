@@ -51,7 +51,6 @@ public class PersonaReaderImplIntegrationTest extends AbstractIntegrationTest {
         assertThat(result.get().id()).isEqualTo(persona.getPublicId());
         assertThat(result.get().name()).isEqualTo(persona.getName());
         assertThat(result.get().personality()).isEqualTo(persona.getPersonality());
-        assertThat(result.get().ownerId()).isEqualTo(persona.getOwnerId());
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
     }

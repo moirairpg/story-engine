@@ -17,6 +17,7 @@ public class UserReaderImpl implements UserReader {
     //@formatter:off
     private static final String SELECT_BY_DISCORD_ID = """
             SELECT u.public_id,
+                   u.id,
                    u.discord_id,
                    u.role,
                    u.creation_date
@@ -42,6 +43,7 @@ public class UserReaderImpl implements UserReader {
     private RowMapper<UserData> toUserData() {
         return (rs, _) -> new UserData(
                 UUID.fromString(rs.getString("public_id")),
+                rs.getLong("id"),
                 rs.getString("discord_id"),
                 Role.valueOf(rs.getString("role")),
                 rs.getTimestamp("creation_date").toInstant());

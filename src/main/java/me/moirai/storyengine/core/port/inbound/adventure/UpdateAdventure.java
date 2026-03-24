@@ -36,10 +36,10 @@ public record UpdateAdventure(
         Set<String> stopSequencesToAdd,
         Set<String> stopSequencesToRemove,
         Set<String> logitBiasToRemove,
-        Set<String> usersAllowedToWriteToAdd,
-        Set<String> usersAllowedToWriteToRemove,
-        Set<String> usersAllowedToReadToAdd,
-        Set<String> usersAllowedToReadToRemove,
+        Set<Long> usersAllowedToWriteToAdd,
+        Set<Long> usersAllowedToWriteToRemove,
+        Set<Long> usersAllowedToReadToAdd,
+        Set<Long> usersAllowedToReadToRemove,
         boolean isMultiplayer)
         implements Command<AdventureDetails> {
 }

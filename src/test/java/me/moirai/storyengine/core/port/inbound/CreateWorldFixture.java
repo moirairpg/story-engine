@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.port.inbound;
 
 import java.util.Collections;
+import java.util.Set;
 
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.domain.world.World;
@@ -17,8 +18,8 @@ public class CreateWorldFixture {
                 world.getAdventureStart(),
                 world.getVisibility(),
                 Collections.emptyList(),
-                world.getUsersAllowedToWrite(),
-                world.getUsersAllowedToRead(),
-                world.getOwnerId());
+                Set.of(),
+                Set.of(),
+                "RQSTRID");
     }
 }

@@ -1,16 +1,21 @@
 package me.moirai.storyengine.core.domain.persona;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.RandomUuid;
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
@@ -33,12 +38,22 @@ public class Persona extends ShareableAsset {
     @Column(name = "personality")
     private String personality;
 
+    @ElementCollection
+    @CollectionTable(name = "persona_permissions", joinColumns = @JoinColumn(name = "persona_id"))
+    Set<Permission> permissions = new HashSet<>();
+
+    @Override
+    protected Set<Permission> permissions() {
+        return permissions;
+    }
+
     private Persona(Builder builder) {
 
-        super(builder.visibility, builder.permissions);
+        super(builder.visibility);
 
         this.name = builder.name;
         this.personality = builder.personality;
+        this.permissions.addAll(builder.permissions);
     }
 
     protected Persona() {
@@ -81,7 +96,7 @@ public class Persona extends ShareableAsset {
         private String name;
         private String personality;
         private Visibility visibility;
-        private Permissions permissions;
+        private Set<Permission> permissions = new HashSet<>();
 
         private Builder() {
         }
@@ -104,9 +119,9 @@ public class Persona extends ShareableAsset {
             return this;
         }
 
-        public Builder permissions(Permissions permissions) {
+        public Builder permissions(Permission... permissions) {
 
-            this.permissions = permissions;
+            this.permissions.addAll(Set.of(permissions));
             return this;
         }
 
@@ -122,10 +137,6 @@ public class Persona extends ShareableAsset {
 
             if (visibility == null) {
                 throw new BusinessRuleViolationException("Visibility cannot be null");
-            }
-
-            if (permissions == null) {
-                throw new BusinessRuleViolationException("Permissions cannot be null");
             }
 
             return new Persona(this);

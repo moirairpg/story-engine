@@ -10,6 +10,6 @@ public record CreatePersona(
         String personality,
         Visibility visibility,
         String requesterId,
-        Set<String> usersAllowedToWrite,
-        Set<String> usersAllowedToRead) implements Command<PersonaDetails> {
+        Set<Long> usersAllowedToWrite,
+        Set<Long> usersAllowedToRead) implements Command<PersonaDetails> {
 }

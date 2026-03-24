@@ -16,9 +16,7 @@ public class WorldPersistenceMapper {
                 world.getDescription(),
                 world.getAdventureStart(),
                 world.getVisibility().name(),
-                world.getOwnerId(),
-                world.getUsersAllowedToRead(),
-                world.getUsersAllowedToWrite(),
+                world.getPermissions(),
                 world.getCreationDate(),
                 world.getLastUpdateDate());
     }

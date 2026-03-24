@@ -7,6 +7,7 @@ import me.moirai.storyengine.common.enums.Role;
 
 public record UserDetailsResult(
         UUID publicId,
+        Long id,
         String discordId,
         String username,
         String nickname,

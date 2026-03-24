@@ -16,8 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -34,12 +32,12 @@ public class DeletePersonaHandlerTest {
     @Test
     public void deletePersona_whenIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         UUID id = null;
         String requesterId = "RQSTRID";
-        DeletePersona command = new DeletePersona(id, requesterId);
+        var command = new DeletePersona(id, requesterId);
 
-        // Then
+        // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -47,14 +45,14 @@ public class DeletePersonaHandlerTest {
     @Test
     public void deletePersona_whenPersonaNotFound_thenThrowException() {
 
-        // Given
-        UUID id = PersonaFixture.PUBLIC_ID;
-        String requesterId = "RQSTRID";
-        DeletePersona command = new DeletePersona(id, requesterId);
+        // given
+        var id = PersonaFixture.PUBLIC_ID;
+        var requesterId = "RQSTRID";
+        var command = new DeletePersona(id, requesterId);
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
-        // Then
+        // then
         assertThatExceptionOfType(AssetNotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -62,24 +60,19 @@ public class DeletePersonaHandlerTest {
     @Test
     public void deletePersona_whenProperIdAndPermission_thenPersonaIsDeleted() {
 
-        // Given
-        UUID id = PersonaFixture.PUBLIC_ID;
-        String requesterId = "RQSTRID";
-        DeletePersona command = new DeletePersona(id, requesterId);
+        // given
+        var id = PersonaFixture.PUBLIC_ID;
+        var requesterId = "RQSTRID";
+        var command = new DeletePersona(id, requesterId);
 
-        Persona persona = PersonaFixture.privatePersona()
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var persona = PersonaFixture.privatePersona().name("New name").build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
 
-        // When
+        // when
         handler.handle(command);
 
-        // Then
+        // then
         verify(repository, times(1)).deleteByPublicId(any(UUID.class));
     }
 }

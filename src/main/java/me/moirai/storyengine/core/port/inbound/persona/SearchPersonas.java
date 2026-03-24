@@ -7,11 +7,10 @@ import me.moirai.storyengine.common.enums.SortDirection;
 
 public record SearchPersonas(
         String name,
-        String ownerId,
         SearchView view,
         PersonaSortField sortingField,
         SortDirection direction,
         Integer page,
         Integer size,
-        String requesterId) implements Query<PaginatedResult<PersonaSummary>> {
+        Long requesterId) implements Query<PaginatedResult<PersonaSummary>> {
 }

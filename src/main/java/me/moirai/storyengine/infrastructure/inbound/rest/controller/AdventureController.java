@@ -60,7 +60,6 @@ public class AdventureController extends SecurityContextAware {
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "world_name", required = false) String worldName,
             @RequestParam(name = "persona_name", required = false) String personaName,
-            @RequestParam(name = "owner_id", required = false) String ownerId,
             @RequestParam(name = "is_multiplayer", required = false) Boolean isMultiplayer,
             @RequestParam(name = "model", required = false) SearchModel model,
             @RequestParam(name = "game_mode", required = false) SearchGameMode gameMode,
@@ -75,7 +74,6 @@ public class AdventureController extends SecurityContextAware {
                 name,
                 worldName,
                 personaName,
-                ownerId,
                 isMultiplayer,
                 model != null ? model.name() : null,
                 gameMode != null ? gameMode.name() : null,
@@ -85,7 +83,7 @@ public class AdventureController extends SecurityContextAware {
                 direction,
                 page,
                 size,
-                authenticatedUserId()));
+                getAuthenticatedUser().id()));
     }
 
     @GetMapping("/{adventureId}")

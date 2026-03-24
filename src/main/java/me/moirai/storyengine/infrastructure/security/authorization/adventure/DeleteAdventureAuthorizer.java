@@ -28,6 +28,6 @@ public class DeleteAdventureAuthorizer implements OperationAuthorizer {
         var adventure = adventureRepository.findByPublicId(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
 
-        return adventure.canUserWrite(principal.discordId());
+        return adventure.isOwner(principal.id()) || adventure.canWrite(principal.id());
     }
 }

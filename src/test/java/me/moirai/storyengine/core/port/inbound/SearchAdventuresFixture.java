@@ -11,7 +11,6 @@ public class SearchAdventuresFixture {
                 "Adventure",
                 "1234",
                 "1234",
-                "1234",
                 null,
                 "GPT3_TURBO",
                 "RPG",
@@ -21,7 +20,7 @@ public class SearchAdventuresFixture {
                 null,
                 1,
                 10,
-                "1234");
+                1234L);
     }
 
     public static SearchAdventures readAccess() {
@@ -30,7 +29,6 @@ public class SearchAdventuresFixture {
                 "Adventure",
                 "1234",
                 "1234",
-                "1234",
                 null,
                 "GPT3_TURBO",
                 "RPG",
@@ -40,6 +38,6 @@ public class SearchAdventuresFixture {
                 null,
                 1,
                 10,
-                "1234");
+                1234L);
     }
 }

@@ -39,13 +39,12 @@ public class SearchAdventuresHandlerTest {
                 null,
                 null,
                 null,
-                null,
                 SearchView.MY_STUFF,
                 null,
                 null,
                 1,
                 2,
-                "requesterId");
+                1L);
 
         var expectedResult = PaginatedResult.<AdventureSummary>of(List.of(), 0L, 1, 2);
 

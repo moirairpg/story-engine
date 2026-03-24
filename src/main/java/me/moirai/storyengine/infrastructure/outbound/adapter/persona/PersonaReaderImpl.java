@@ -1,15 +1,15 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.persona;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaReader;
@@ -23,13 +23,17 @@ public class PersonaReaderImpl implements PersonaReader {
                    p.name,
                    p.personality,
                    p.visibility,
-                   p.owner_id,
-                   p.users_allowed_to_read,
-                   p.users_allowed_to_write,
+                   p.id AS numeric_id,
                    p.creation_date,
                    p.last_update_date
               FROM persona p
              WHERE p.public_id = :publicId
+            """;
+
+    private static final String SELECT_PERMISSIONS = """
+            SELECT pp.user_id, pp.permission
+              FROM persona_permissions pp
+             WHERE pp.persona_id = :personaId
             """;
     //@formatter:on
 
@@ -48,20 +52,20 @@ public class PersonaReaderImpl implements PersonaReader {
     }
 
     private RowMapper<PersonaDetails> toPersonaDetails() {
-        return (rs, _) -> new PersonaDetails(
-                UUID.fromString(rs.getString("public_id")),
-                rs.getString("name"),
-                rs.getString("personality"),
-                Visibility.valueOf(rs.getString("visibility")),
-                rs.getString("owner_id"),
-                parseStringSet(rs.getString("users_allowed_to_write")),
-                parseStringSet(rs.getString("users_allowed_to_read")),
-                rs.getTimestamp("creation_date").toInstant(),
-                rs.getTimestamp("last_update_date").toInstant());
-    }
-
-    private Set<String> parseStringSet(String value) {
-        if (value == null || value.isBlank()) return Set.of();
-        return Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
+        return (rs, _) -> {
+            var numericId = rs.getLong("numeric_id");
+            var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
+                    .param("personaId", numericId)
+                    .query((r, __) -> new Permission(r.getLong("user_id"), PermissionLevel.valueOf(r.getString("permission"))))
+                    .list());
+            return new PersonaDetails(
+                    UUID.fromString(rs.getString("public_id")),
+                    rs.getString("name"),
+                    rs.getString("personality"),
+                    Visibility.valueOf(rs.getString("visibility")),
+                    permissions,
+                    rs.getTimestamp("creation_date").toInstant(),
+                    rs.getTimestamp("last_update_date").toInstant());
+        };
     }
 }

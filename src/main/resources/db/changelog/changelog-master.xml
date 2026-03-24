@@ -47,4 +47,16 @@
   <include file="db/changelog/migrations/1774315884_create_table_adventure_logit_bias.sql" />
   <include file="db/changelog/migrations/1774315885_migrate_adventure_stop_sequences_and_logit_bias.sql" />
   <include file="db/changelog/migrations/1774315886_alter_table_adventure_drop_stop_sequences_and_logit_bias.sql" />
+  <include file="db/changelog/migrations/1774366608_create_table_persona_permissions.sql" />
+  <include file="db/changelog/migrations/1774366618_create_table_world_permissions.sql" />
+  <include file="db/changelog/migrations/1774366619_create_table_adventure_permissions.sql" />
+  <include file="db/changelog/migrations/1774366620_create_table_persona_permissions_backup.sql" />
+  <include file="db/changelog/migrations/1774366621_create_table_world_permissions_backup.sql" />
+  <include file="db/changelog/migrations/1774366622_create_table_adventure_permissions_backup.sql" />
+  <include file="db/changelog/migrations/1774366622_update_table_persona_migrate_permissions.sql" />
+  <include file="db/changelog/migrations/1774366623_update_table_world_migrate_permissions.sql" />
+  <include file="db/changelog/migrations/1774366624_update_table_adventure_migrate_permissions.sql" />
+  <include file="db/changelog/migrations/1774366625_alter_table_persona_drop_permission_columns.sql" />
+  <include file="db/changelog/migrations/1774366625_alter_table_world_drop_permission_columns.sql" />
+  <include file="db/changelog/migrations/1774366626_alter_table_adventure_drop_permission_columns.sql" />
 </databaseChangeLog>

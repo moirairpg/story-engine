@@ -15,7 +15,7 @@ import me.moirai.storyengine.core.port.outbound.persona.PersonaSearchReader;
 
 public class PersonaSearchReaderImplIntegrationTest extends AbstractIntegrationTest {
 
-    private static final String OWNER_ID = "586678721356875";
+    private static final Long OWNER_ID = 586678721356875L;
 
     @Autowired
     private PersonaSearchReader reader;
@@ -29,9 +29,10 @@ public class PersonaSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void search_whenMyStuffAndOwnerExists_thenReturnResults() {
 
         // Given
-        insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var persona = PersonaFixture.publicPersona().build();
+        insert(persona, Persona.class);
 
-        var query = new SearchPersonas(null, null, SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
+        var query = new SearchPersonas(null, SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);
@@ -48,7 +49,7 @@ public class PersonaSearchReaderImplIntegrationTest extends AbstractIntegrationT
         // Given
         insert(PersonaFixture.publicPersona().build(), Persona.class);
 
-        var query = new SearchPersonas(null, null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+        var query = new SearchPersonas(null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);
@@ -63,7 +64,7 @@ public class PersonaSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void search_whenNoResults_thenReturnEmpty() {
 
         // Given
-        var query = new SearchPersonas(null, null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+        var query = new SearchPersonas(null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);
@@ -78,9 +79,10 @@ public class PersonaSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void search_whenFilterByName_thenReturnMatchingResults() {
 
         // Given
-        insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var persona = PersonaFixture.publicPersona().build();
+        insert(persona, Persona.class);
 
-        var query = new SearchPersonas("MoirAI", null, SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
+        var query = new SearchPersonas("MoirAI", SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);

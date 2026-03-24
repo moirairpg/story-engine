@@ -1,15 +1,15 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.world;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
@@ -23,13 +23,17 @@ public class WorldReaderImpl implements WorldReader {
                    w.description,
                    w.adventure_start,
                    w.visibility,
-                   w.owner_id,
-                   w.users_allowed_to_read,
-                   w.users_allowed_to_write,
+                   w.id AS numeric_id,
                    w.creation_date,
                    w.last_update_date
               FROM world w
              WHERE w.public_id = :publicId
+            """;
+
+    private static final String SELECT_PERMISSIONS = """
+            SELECT wp.user_id, wp.permission
+              FROM world_permissions wp
+             WHERE wp.world_id = :worldId
             """;
     //@formatter:on
 
@@ -48,21 +52,21 @@ public class WorldReaderImpl implements WorldReader {
     }
 
     private RowMapper<WorldDetails> toWorldDetails() {
-        return (rs, _) -> new WorldDetails(
-                UUID.fromString(rs.getString("public_id")),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getString("adventure_start"),
-                rs.getString("visibility"),
-                rs.getString("owner_id"),
-                parseStringSet(rs.getString("users_allowed_to_read")),
-                parseStringSet(rs.getString("users_allowed_to_write")),
-                rs.getTimestamp("creation_date").toInstant(),
-                rs.getTimestamp("last_update_date").toInstant());
-    }
-
-    private Set<String> parseStringSet(String value) {
-        if (value == null || value.isBlank()) return Set.of();
-        return Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
+        return (rs, _) -> {
+            var numericId = rs.getLong("numeric_id");
+            var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
+                    .param("worldId", numericId)
+                    .query((r, __) -> new Permission(r.getLong("user_id"), PermissionLevel.valueOf(r.getString("permission"))))
+                    .list());
+            return new WorldDetails(
+                    UUID.fromString(rs.getString("public_id")),
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getString("adventure_start"),
+                    rs.getString("visibility"),
+                    permissions,
+                    rs.getTimestamp("creation_date").toInstant(),
+                    rs.getTimestamp("last_update_date").toInstant());
+        };
     }
 }

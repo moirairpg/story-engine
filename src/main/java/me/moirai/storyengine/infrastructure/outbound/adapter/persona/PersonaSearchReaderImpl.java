@@ -44,7 +44,6 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
                 .select(SELECT_SQL)
                 .filter(Optional.of(resolveView(query.view(), query.requesterId())))
                 .filter(Filters.containsIgnoreCase("p.name", "name", query.name()))
-                .filter(Filters.equals("p.owner_id", "ownerId", query.ownerId()))
                 .sortBy(resolveSortingField(query.sortingField()), query.direction())
                 .page(query.page(), query.size())
                 .build();
@@ -62,13 +61,13 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
         return PaginatedResult.of(data, totalItems, pq.page(), pq.size());
     }
 
-    private Filter resolveView(SearchView view, String requesterId) {
+    private Filter resolveView(SearchView view, Long requesterId) {
         return switch (view) {
             case MY_STUFF -> new Filter(
-                    "(p.owner_id = :requesterId OR p.users_allowed_to_write LIKE '%' || :requesterId || '%')",
+                    "EXISTS (SELECT 1 FROM persona_permissions pp WHERE pp.persona_id = p.id AND pp.user_id = :requesterId)",
                     "requesterId", requesterId);
             case SHARED_WITH_ME -> new Filter(
-                    "p.owner_id != :requesterId AND (p.users_allowed_to_read LIKE '%' || :requesterId || '%' OR p.users_allowed_to_write LIKE '%' || :requesterId || '%')",
+                    "NOT EXISTS (SELECT 1 FROM persona_permissions pp WHERE pp.persona_id = p.id AND pp.user_id = :requesterId AND pp.permission = 'OWNER') AND EXISTS (SELECT 1 FROM persona_permissions pp WHERE pp.persona_id = p.id AND pp.user_id = :requesterId)",
                     "requesterId", requesterId);
             case EXPLORE -> new Filter("p.visibility = 'PUBLIC'", null, null);
         };

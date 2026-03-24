@@ -28,6 +28,6 @@ public class ViewPersonaAuthorizer implements OperationAuthorizer {
         var persona = personaRepository.findByPublicId(personaId)
                 .orElseThrow(() -> new AssetNotFoundException("Persona not found"));
 
-        return persona.canUserRead(principal.discordId());
+        return persona.isPublic() || persona.isOwner(principal.id()) || persona.canRead(principal.id());
     }
 }

@@ -1,7 +1,8 @@
 package me.moirai.storyengine.core.port.inbound;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Sets.set;
+
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,10 +22,10 @@ public class UpdateWorldTest {
                 "SomeStart",
                 Visibility.PUBLIC,
                 null,
-                set("123123"),
-                set("123123"),
-                set("123123"),
-                set("123123"));
+                Set.of(123123L),
+                Set.of(123123L),
+                Set.of(123123L),
+                Set.of(123123L));
 
         // Then
         assertThat(result).isNotNull();

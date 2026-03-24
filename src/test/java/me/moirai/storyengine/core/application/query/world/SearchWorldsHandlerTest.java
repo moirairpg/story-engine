@@ -33,13 +33,12 @@ public class SearchWorldsHandlerTest {
         // Given
         var query = new SearchWorlds(
                 null,
-                null,
                 SearchView.MY_STUFF,
                 null,
                 null,
                 1,
                 2,
-                "requesterId");
+                1L);
 
         var expectedResult = PaginatedResult.<WorldSummary>of(List.of(), 0L, 1, 2);
 

@@ -4,7 +4,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
+import java.util.Set;
 
 import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class CreateAdventureTest {
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getOwnerId(),
+                "RQSTRID",
                 adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
                 adventure.getContextAttributes().remember(),
@@ -45,8 +45,8 @@ public class CreateAdventureTest {
                 adventure.getModelConfiguration().getPresencePenalty(),
                 Maps.newHashMap("TKNID", 99D),
                 adventure.getModelConfiguration().getStopSequences(),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
+                Set.of(12345L),
+                Set.of(12345L),
                 adventure.isMultiplayer());
 
         // Then

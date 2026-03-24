@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchReader;
 
 public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegrationTest {
 
-    private static final String OWNER_ID = "586678721356875";
+    private static final Long OWNER_ID = 586678721356875L;
 
     @Autowired
     private AdventureSearchReader reader;
@@ -39,9 +39,10 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
                 .worldId(world.getId())
                 .personaId(persona.getId())
                 .build();
+
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures(null, null, null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null, null, null,
                 SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
@@ -65,7 +66,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
                 .build();
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures(null, null, null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null, null, null,
                 SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
@@ -81,7 +82,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
     public void search_whenNoResults_thenReturnEmpty() {
 
         // Given
-        var query = new SearchAdventures(null, null, null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null, null, null,
                 SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
@@ -103,9 +104,10 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
                 .worldId(world.getId())
                 .personaId(persona.getId())
                 .build();
+
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures("Name", null, null, null, null, null, null, null,
+        var query = new SearchAdventures("Name", null, null, null, null, null, null,
                 SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When

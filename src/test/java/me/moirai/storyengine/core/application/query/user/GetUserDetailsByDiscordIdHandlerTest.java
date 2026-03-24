@@ -43,7 +43,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .id(query.discordUserId())
                 .build();
 
-        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, Instant.now());
+        var userData = new UserData(UUID.randomUUID(), 12345L, query.discordUserId(), Role.PLAYER, Instant.now());
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
@@ -68,7 +68,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .nickname(null)
                 .build();
 
-        var userData = new UserData(UUID.randomUUID(), query.discordUserId(), Role.PLAYER, Instant.now());
+        var userData = new UserData(UUID.randomUUID(), 12345L, query.discordUserId(), Role.PLAYER, Instant.now());
 
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));

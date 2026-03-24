@@ -53,7 +53,6 @@ public class WorldReaderImplIntegrationTest extends AbstractIntegrationTest {
         assertThat(result.get().name()).isEqualTo(world.getName());
         assertThat(result.get().description()).isEqualTo(world.getDescription());
         assertThat(result.get().adventureStart()).isEqualTo(world.getAdventureStart());
-        assertThat(result.get().ownerId()).isEqualTo(world.getOwnerId());
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
     }

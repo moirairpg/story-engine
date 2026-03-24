@@ -15,7 +15,7 @@ import me.moirai.storyengine.core.port.outbound.world.WorldSearchReader;
 
 public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTest {
 
-    private static final String OWNER_ID = "586678721356875";
+    private static final Long OWNER_ID = 586678721356875L;
 
     @Autowired
     private WorldSearchReader reader;
@@ -29,9 +29,10 @@ public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTes
     public void search_whenMyStuffAndOwnerExists_thenReturnResults() {
 
         // Given
-        insert(WorldFixture.publicWorld().build(), World.class);
+        var world = WorldFixture.publicWorld().build();
+        insert(world, World.class);
 
-        var query = new SearchWorlds(null, null, SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
+        var query = new SearchWorlds(null, SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);
@@ -48,7 +49,7 @@ public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTes
         // Given
         insert(WorldFixture.publicWorld().build(), World.class);
 
-        var query = new SearchWorlds(null, null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+        var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);
@@ -63,7 +64,7 @@ public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTes
     public void search_whenNoResults_thenReturnEmpty() {
 
         // Given
-        var query = new SearchWorlds(null, null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+        var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);
@@ -78,9 +79,10 @@ public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTes
     public void search_whenFilterByName_thenReturnMatchingResults() {
 
         // Given
-        insert(WorldFixture.publicWorld().build(), World.class);
+        var world = WorldFixture.publicWorld().build();
+        insert(world, World.class);
 
-        var query = new SearchWorlds("MoirAI", null, SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
+        var query = new SearchWorlds("MoirAI", SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
         var result = reader.search(query);

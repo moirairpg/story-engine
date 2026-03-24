@@ -13,9 +13,9 @@ public record UpdateWorldRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String description,
         @Moderated @NotEmpty(message = "cannot be empty") String adventureStart,
         @NotNull(message = "cannot be null") Visibility visibility,
-        Set<String> usersAllowedToWriteToAdd,
-        Set<String> usersAllowedToWriteToRemove,
-        Set<String> usersAllowedToReadToAdd,
-        Set<String> usersAllowedToReadToRemove,
+        Set<Long> usersAllowedToWriteToAdd,
+        Set<Long> usersAllowedToWriteToRemove,
+        Set<Long> usersAllowedToReadToAdd,
+        Set<Long> usersAllowedToReadToRemove,
         List<AdventureLorebookEntryRequest> lorebook) {
 }

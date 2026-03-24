@@ -8,30 +8,36 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.CreateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateAdventureHandlerTest {
+
+    private static final Long AUTHENTICATED_USER_ID = 99999L;
 
     @Mock
     private WorldRepository worldRepository;
@@ -45,107 +51,103 @@ public class CreateAdventureHandlerTest {
     @InjectMocks
     private CreateAdventureHandler handler;
 
+    @BeforeEach
+    void setupSecurityContext() {
+
+        var principal = new MoiraiPrincipal(UUID.randomUUID(), AUTHENTICATED_USER_ID, "discordId",
+                "user", "user@test.com", "token", "refresh", null, null);
+        var authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
     public void createAdventure_whenWorldNotFound_thenThrowException() {
 
-        // Given
-        CreateAdventure command = CreateAdventureFixture.sample();
-
+        // given
+        var command = CreateAdventureFixture.sample();
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
-        // Then
+        // then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createAdventure_whenNoWorldPermission_thenThrowException() {
 
-        // Given
-        String userId = "someUserId";
-        CreateAdventure command = CreateAdventureFixture.sampleWithRequesterId(userId);
-
-        World world = WorldFixture.privateWorld().build();
+        // given
+        var command = CreateAdventureFixture.sample();
+        var world = WorldFixture.privateWorld().build();
 
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
 
-        // Then
+        // then
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createAdventure_whenPersonaNotFound_thenThrowException() {
 
-        // Given
-        String userId = "someUserId";
-        CreateAdventure command = CreateAdventureFixture.sampleWithRequesterId(userId);
-
-        World world = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(userId)
-                        .build())
-                .build();
+        // given
+        var command = CreateAdventureFixture.sample();
+        var world = WorldFixture.privateWorld().build();
+        world.grant(new Permission(AUTHENTICATED_USER_ID, PermissionLevel.READ));
 
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
-        // Then
+        // then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createAdventure_whenNoPersonaPermission_thenThrowException() {
 
-        // Given
-        String userId = "someUserId";
-        CreateAdventure command = CreateAdventureFixture.sampleWithRequesterId(userId);
+        // given
+        var command = CreateAdventureFixture.sample();
+        var world = WorldFixture.privateWorld().build();
+        var persona = PersonaFixture.privatePersona().build();
 
-        World world = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(userId)
-                        .build())
-                .build();
+        world.grant(new Permission(AUTHENTICATED_USER_ID, PermissionLevel.READ));
 
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(PersonaFixture.privatePersona().build()));
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
 
-        // Then
+        // then
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createAdventure_whenValidDate_thenAdventureIsCreated() {
 
-        // Given
-        CreateAdventure command = CreateAdventureFixture.sample();
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(command.requesterId())
-                        .build())
-                .build();
+        // given
+        var command = CreateAdventureFixture.sample();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        World world = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(command.requesterId())
-                        .build())
-                .build();
+        var world = WorldFixture.privateWorld().build();
         ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
+        world.grant(new Permission(AUTHENTICATED_USER_ID, PermissionLevel.READ));
+
+        var persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
+        persona.grant(new Permission(AUTHENTICATED_USER_ID, PermissionLevel.READ));
 
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(
-                PersonaFixture.privatePersona()
-                        .permissions(PermissionsFixture.samplePermissions()
-                                .ownerId(command.requesterId())
-                                .build())
-                        .build()));
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
 
-        // When
+        // when
         AdventureDetails result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(AdventureFixture.PUBLIC_ID);
     }

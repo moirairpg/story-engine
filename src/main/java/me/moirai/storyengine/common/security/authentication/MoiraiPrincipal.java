@@ -11,6 +11,7 @@ import me.moirai.storyengine.common.enums.Role;
 
 public record MoiraiPrincipal(
     UUID publicId,
+    Long id,
     String discordId,
     String username,
     String email,

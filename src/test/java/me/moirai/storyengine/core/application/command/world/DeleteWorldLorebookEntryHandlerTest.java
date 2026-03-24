@@ -17,8 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
@@ -36,13 +34,13 @@ public class DeleteWorldLorebookEntryHandlerTest {
     @Test
     public void errorWhenEntryIdIsNull() {
 
-        // Given
-        DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+        // given
+        var command = new DeleteWorldLorebookEntry(
                 null,
                 WorldFixture.PUBLIC_ID,
                 "RQSTRID");
 
-        // Then
+        // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -50,13 +48,13 @@ public class DeleteWorldLorebookEntryHandlerTest {
     @Test
     public void errorWhenWorldIdIsNull() {
 
-        // Given
-        DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+        // given
+        var command = new DeleteWorldLorebookEntry(
                 WorldLorebookEntryFixture.PUBLIC_ID,
                 null,
                 "RQSTRID");
 
-        // Then
+        // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -64,30 +62,26 @@ public class DeleteWorldLorebookEntryHandlerTest {
     @Test
     public void deleteWorld() {
 
-        // Given
-        String requesterId = "4234324";
+        // given
+        var requesterId = "4234324";
 
-        DeleteWorldLorebookEntry command = new DeleteWorldLorebookEntry(
+        var command = new DeleteWorldLorebookEntry(
                 WorldLorebookEntryFixture.PUBLIC_ID,
                 WorldFixture.PUBLIC_ID,
                 requesterId);
 
-        World baseWorld = WorldFixture.publicWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var baseWorld = WorldFixture.publicWorld().build();
 
-        World world = spy(baseWorld);
+        var world = spy(baseWorld);
         doNothing().when(world).removeLorebookEntry(any(UUID.class));
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
-        // When
+        // when
         handler.handle(command);
 
-        // Then
+        // then
         verify(repository, times(1)).save(any());
     }
 }

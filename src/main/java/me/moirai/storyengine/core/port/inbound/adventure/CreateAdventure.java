@@ -32,8 +32,8 @@ public record CreateAdventure(
         Double presencePenalty,
         Map<String, Double> logitBias,
         Set<String> stopSequences,
-        Set<String> usersAllowedToWrite,
-        Set<String> usersAllowedToRead,
+        Set<Long> usersAllowedToWrite,
+        Set<Long> usersAllowedToRead,
         boolean isMultiplayer)
         implements Command<AdventureDetails> {
 }

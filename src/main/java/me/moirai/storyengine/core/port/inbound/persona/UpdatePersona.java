@@ -12,9 +12,9 @@ public record UpdatePersona(
         String personality,
         Visibility visibility,
         String requesterId,
-        Set<String> usersAllowedToWriteToAdd,
-        Set<String> usersAllowedToWriteToRemove,
-        Set<String> usersAllowedToReadToAdd,
-        Set<String> usersAllowedToReadToRemove)
+        Set<Long> usersAllowedToWriteToAdd,
+        Set<Long> usersAllowedToWriteToRemove,
+        Set<Long> usersAllowedToReadToAdd,
+        Set<Long> usersAllowedToReadToRemove)
         implements Command<PersonaDetails> {
 }

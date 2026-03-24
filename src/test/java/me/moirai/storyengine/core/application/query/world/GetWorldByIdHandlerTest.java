@@ -46,7 +46,7 @@ public class GetWorldByIdHandlerTest {
         // Given
         var expectedDetails = new WorldDetails(
                 WorldFixture.PUBLIC_ID, "MoirAI", "desc", "start", "PUBLIC",
-                "owner1", java.util.Set.of(), java.util.Set.of(), null, null);
+                java.util.Set.of(), null, null);
 
         var query = new GetWorldById(WorldFixture.PUBLIC_ID, "84REAC");
 

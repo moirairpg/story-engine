@@ -4,6 +4,8 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
@@ -49,17 +51,10 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd())
-                .forEach(world::addReaderUser);
-
-        emptyIfNull(command.usersAllowedToWriteToAdd())
-                .forEach(world::addWriterUser);
-
-        emptyIfNull(command.usersAllowedToReadToRemove())
-                .forEach(world::removeReaderUser);
-
-        emptyIfNull(command.usersAllowedToWriteToRemove())
-                .forEach(world::removeWriterUser);
+        emptyIfNull(command.usersAllowedToReadToAdd()).forEach(id -> world.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWriteToAdd()).forEach(id -> world.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToReadToRemove()).forEach(world::revoke);
+        emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(world::revoke);
 
         return mapResult(repository.save(world));
     }
@@ -72,9 +67,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
                 world.getDescription(),
                 world.getAdventureStart(),
                 world.getVisibility().name(),
-                world.getOwnerId(),
-                world.getUsersAllowedToRead(),
-                world.getUsersAllowedToWrite(),
+                world.getPermissions(),
                 world.getCreationDate(),
                 world.getLastUpdateDate());
     }

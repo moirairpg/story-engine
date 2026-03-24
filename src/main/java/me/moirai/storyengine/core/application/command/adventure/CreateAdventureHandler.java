@@ -1,12 +1,18 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import java.util.UUID;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributes;
 import me.moirai.storyengine.core.domain.adventure.ModelConfiguration;
@@ -49,12 +55,10 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var persona = getPersonaToBeLinked(command);
 
         var modelConfiguration = buildModelConfiguration(command);
-        var permissions = buildPermissions(command);
         var contextAttributes = buildContextAttributes(command);
 
         var adventure = repository.save(Adventure.builder()
                 .modelConfiguration(modelConfiguration)
-                .permissions(permissions)
                 .name(command.name())
                 .personaId(persona.getId())
                 .worldId(world.getId())
@@ -67,6 +71,9 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 .contextAttributes(contextAttributes)
                 .description(command.description())
                 .build());
+
+        emptyIfNull(command.usersAllowedToRead()).forEach(id -> adventure.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWrite()).forEach(id -> adventure.grant(new Permission(id, PermissionLevel.WRITE)));
 
         world.getLorebook().forEach(worldEntry -> adventure.addLorebookEntry(
                 worldEntry.getName(),
@@ -108,14 +115,12 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 adventure.getVisibility().name(),
                 adventure.getModeration().name(),
                 adventure.getGameMode().name(),
-                adventure.getOwnerId(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                adventure.getUsersAllowedToRead(),
-                adventure.getUsersAllowedToWrite());
+                adventure.getPermissions());
     }
 
     private Persona getPersonaToBeLinked(CreateAdventure command) {
@@ -123,7 +128,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var persona = personaRepository.findByPublicId(command.personaId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_DOES_NOT_EXIST));
 
-        if (!persona.canUserRead(command.requesterId())) {
+        if (!persona.isPublic() && !persona.canRead(getAuthenticatedUserId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
@@ -135,11 +140,15 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var world = worldRepository.findByPublicId(command.worldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_DOES_NOT_EXIST));
 
-        if (!world.canUserRead(command.requesterId())) {
+        if (!world.isPublic() && !world.canRead(getAuthenticatedUserId())) {
             throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_WORLD);
         }
 
         return world;
+    }
+
+    private Long getAuthenticatedUserId() {
+        return ((MoiraiPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).id();
     }
 
     private ContextAttributes buildContextAttributes(CreateAdventure command) {
@@ -150,15 +159,6 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 command.remember(),
                 command.bump(),
                 command.bumpFrequency());
-    }
-
-    private Permissions buildPermissions(CreateAdventure command) {
-
-        return Permissions.builder()
-                .ownerId(command.requesterId())
-                .usersAllowedToRead(command.usersAllowedToRead())
-                .usersAllowedToWrite(command.usersAllowedToWrite())
-                .build();
     }
 
     private ModelConfiguration buildModelConfiguration(CreateAdventure command) {

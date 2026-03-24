@@ -4,346 +4,241 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class WorldTest {
 
     @Test
     public void makeWorldPublic() {
 
-        // Given
-        World world = WorldFixture.privateWorld().build();
+        // given
+        var world = WorldFixture.privateWorld().build();
 
-        // When
+        // when
         world.makePublic();
 
-        // Then
+        // then
         assertThat(world.isPublic()).isTrue();
     }
 
     @Test
     public void makeWorldPrivate() {
 
-        // Given
-        World world = WorldFixture.publicWorld().build();
+        // given
+        var world = WorldFixture.publicWorld().build();
 
-        // When
+        // when
         world.makePrivate();
 
-        // Then
+        // then
         assertThat(world.isPublic()).isFalse();
     }
 
     @Test
     public void updateWorldName() {
 
-        // Given
-        World world = WorldFixture.publicWorld().build();
+        // given
+        var world = WorldFixture.publicWorld().build();
 
-        // When
+        // when
         world.updateName("New Name");
 
-        // Then
+        // then
         assertThat(world.getName()).isEqualTo("New Name");
     }
 
     @Test
     public void updateWorldDescription() {
 
-        // Given
-        World world = WorldFixture.publicWorld().build();
+        // given
+        var world = WorldFixture.publicWorld().build();
 
-        // When
+        // when
         world.updateDescription("New Description");
 
-        // Then
+        // then
         assertThat(world.getDescription()).isEqualTo("New Description");
     }
 
     @Test
     public void updateWorldInitialPrompt() {
 
-        // Given
-        World world = WorldFixture.publicWorld().build();
+        // given
+        var world = WorldFixture.publicWorld().build();
 
-        // When
+        // when
         world.updateAdventureStart("New Prompt");
 
-        // Then
+        // then
         assertThat(world.getAdventureStart()).isEqualTo("New Prompt");
     }
 
     @Test
     public void errorWhenCreatingWorldWithNullName() {
 
-        // Given
-        World.Builder worldBuilder = WorldFixture.publicWorld().name(null);
+        // given
+        var worldBuilder = WorldFixture.publicWorld().name(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, worldBuilder::build);
     }
 
     @Test
     public void errorWhenCreatingWorldWithEmptyName() {
 
-        // Given
-        World.Builder worldBuilder = WorldFixture.publicWorld().name(EMPTY);
+        // given
+        var worldBuilder = WorldFixture.publicWorld().name(EMPTY);
 
-        // Then
-        assertThrows(BusinessRuleViolationException.class, worldBuilder::build);
-    }
-
-    @Test
-    public void errorWhenCreatingWorldWithNullPermissions() {
-
-        // Given
-        World.Builder worldBuilder = WorldFixture.publicWorld().permissions(null);
-
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, worldBuilder::build);
     }
 
     @Test
     public void errorWhenCreatingWorldWithNullVisibility() {
 
-        // Given
-        World.Builder worldBuilder = WorldFixture.publicWorld().visibility(null);
+        // given
+        var worldBuilder = WorldFixture.publicWorld().visibility(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, worldBuilder::build);
     }
 
     @Test
-    public void addWriterToList() {
+    public void grantWritePermission_thenUserCanWrite() {
 
-        // Given
-        String userId = "1234567890";
-        World.Builder worldBuilder = WorldFixture.publicWorld();
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(new HashSet<>()).build();
+        // given
+        var userId = 1234567890L;
+        var world = WorldFixture.publicWorld().build();
+        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
 
-        worldBuilder.permissions(permissions);
+        // when
+        world.grant(new Permission(userId, PermissionLevel.WRITE));
 
-        World world = worldBuilder.build();
-
-        // When
-        world.addWriterUser(userId);
-
-        // Then
-        assertThat(world.getUsersAllowedToWrite()).contains(userId);
+        // then
+        assertThat(world.canWrite(userId)).isTrue();
     }
 
     @Test
-    public void addReaderToList() {
+    public void grantReadPermission_thenUserCanRead() {
 
-        // Given
-        String userId = "1234567890";
-        World.Builder worldBuilder = WorldFixture.publicWorld();
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(new HashSet<>()).build();
+        // given
+        var userId = 1234567890L;
+        var world = WorldFixture.publicWorld().build();
+        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
 
-        worldBuilder.permissions(permissions);
+        // when
+        world.grant(new Permission(userId, PermissionLevel.READ));
 
-        World world = worldBuilder.build();
-
-        // When
-        world.addReaderUser(userId);
-
-        // Then
-        assertThat(world.getUsersAllowedToRead()).contains(userId);
+        // then
+        assertThat(world.canRead(userId)).isTrue();
     }
 
     @Test
-    public void removeReaderFromList() {
+    public void revokePermission_thenUserCannotRead() {
 
-        // Given
-        String userId = "1234567890";
-        World.Builder worldBuilder = WorldFixture.publicWorld();
+        // given
+        var userId = 1234567890L;
+        var world = WorldFixture.publicWorld().build();
+        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        world.grant(new Permission(userId, PermissionLevel.READ));
 
-        Set<String> usersAllowedToRead = new HashSet<>();
-        usersAllowedToRead.add(userId);
+        // when
+        world.revoke(userId);
 
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(usersAllowedToRead).build();
-
-        worldBuilder.permissions(permissions);
-
-        World world = worldBuilder.build();
-
-        // When
-        world.removeReaderUser(userId);
-
-        // Then
-        assertThat(world.getUsersAllowedToRead()).doesNotContain(userId);
+        // then
+        assertThat(world.canRead(userId)).isFalse();
     }
 
     @Test
-    public void removeWriterFromList() {
+    public void revokePermission_thenUserCannotWrite() {
 
-        // Given
-        String userId = "1234567890";
-        World.Builder worldBuilder = WorldFixture.publicWorld();
+        // given
+        var userId = 1234567890L;
+        var world = WorldFixture.publicWorld().build();
+        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        world.grant(new Permission(userId, PermissionLevel.WRITE));
 
-        Set<String> usersAllowedToWrite = new HashSet<>();
-        usersAllowedToWrite.add(userId);
+        // when
+        world.revoke(userId);
 
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(usersAllowedToWrite).build();
-
-        worldBuilder.permissions(permissions);
-
-        World world = worldBuilder.build();
-
-        // When
-        world.removeWriterUser(userId);
-
-        // Then
-        assertThat(world.getUsersAllowedToWrite()).doesNotContain(userId);
+        // then
+        assertThat(world.canWrite(userId)).isFalse();
     }
 
     @Test
-    public void userIsOwner() {
+    public void isOwner_whenUserIsOwner_thenReturnTrue() {
 
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .ownerId(testedUserId)
-                .build();
+        // given
+        var ownerId = 1234567890L;
+        var world = WorldFixture.privateWorld().build();
+        world.permissions.add(new Permission(ownerId, PermissionLevel.OWNER));
 
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
+        // when
+        var isOwner = world.isOwner(ownerId);
 
-        // When
-        boolean isUserOwner = world.isOwner(testedUserId);
-
-        // Then
-        assertThat(isUserOwner).isTrue();
+        // then
+        assertThat(isOwner).isTrue();
     }
 
     @Test
-    public void userCanWriteisWriter() {
+    public void canWrite_whenUserIsOwner_thenReturnTrue() {
 
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(Collections.singleton(testedUserId))
-                .build();
+        // given
+        var ownerId = 1234567890L;
+        var world = WorldFixture.privateWorld().build();
+        world.permissions.add(new Permission(ownerId, PermissionLevel.OWNER));
 
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
+        // when
+        var canWrite = world.canWrite(ownerId);
 
-        // When
-        boolean isUserWriter = world.canUserWrite(testedUserId);
-
-        // Then
-        assertThat(isUserWriter).isTrue();
+        // then
+        assertThat(canWrite).isTrue();
     }
 
     @Test
-    public void userCanWriteIsOwner() {
+    public void canRead_whenUserIsOwner_thenReturnTrue() {
 
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .ownerId(testedUserId)
-                .build();
+        // given
+        var ownerId = 1234567890L;
+        var world = WorldFixture.privateWorld().build();
+        world.permissions.add(new Permission(ownerId, PermissionLevel.OWNER));
 
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
+        // when
+        var canRead = world.canRead(ownerId);
 
-        // When
-        boolean isUserWriter = world.canUserWrite(testedUserId);
-
-        // Then
-        assertThat(isUserWriter).isTrue();
+        // then
+        assertThat(canRead).isTrue();
     }
 
     @Test
-    public void userCanReadisWriter() {
+    public void canWrite_whenUserHasNoPermission_thenReturnFalse() {
 
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(Collections.singleton(testedUserId))
-                .build();
+        // given
+        var userId = 1234567890L;
+        var world = WorldFixture.privateWorld().build();
 
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
+        // when
+        var canWrite = world.canWrite(userId);
 
-        // When
-        boolean isUserReader = world.canUserRead(testedUserId);
-
-        // Then
-        assertThat(isUserReader).isTrue();
+        // then
+        assertThat(canWrite).isFalse();
     }
 
     @Test
-    public void userCanReadisReader() {
+    public void canRead_whenUserHasNoPermission_thenReturnFalse() {
 
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(Collections.singleton(testedUserId))
-                .build();
+        // given
+        var userId = 1234567890L;
+        var world = WorldFixture.privateWorld().build();
 
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
+        // when
+        var canRead = world.canRead(userId);
 
-        // When
-        boolean isUserReader = world.canUserRead(testedUserId);
-
-        // Then
-        assertThat(isUserReader).isTrue();
-    }
-
-    @Test
-    public void userCanReadIsOwner() {
-
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .ownerId(testedUserId)
-                .build();
-
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
-
-        // When
-        boolean isUserReader = world.canUserRead(testedUserId);
-
-        // Then
-        assertThat(isUserReader).isTrue();
-    }
-
-    @Test
-    public void userCannotWrite() {
-
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions().build();
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
-
-        // When
-        boolean isUserWriter = world.canUserWrite(testedUserId);
-
-        // Then
-        assertThat(isUserWriter).isFalse();
-    }
-
-    @Test
-    public void userCannotRead() {
-
-        // Given
-        String testedUserId = "1234567890";
-        Permissions permissions = PermissionsFixture.samplePermissions().build();
-        World world = WorldFixture.privateWorld().permissions(permissions).build();
-
-        // When
-        boolean isUserReader = world.canUserRead(testedUserId);
-
-        // Then
-        assertThat(isUserReader).isFalse();
+        // then
+        assertThat(canRead).isFalse();
     }
 }

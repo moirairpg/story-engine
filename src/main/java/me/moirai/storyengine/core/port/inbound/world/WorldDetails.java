@@ -4,20 +4,19 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
+import me.moirai.storyengine.common.domain.Permission;
+
 public record WorldDetails(
         UUID id,
         String name,
         String description,
         String adventureStart,
         String visibility,
-        String ownerId,
-        Set<String> usersAllowedToRead,
-        Set<String> usersAllowedToWrite,
+        Set<Permission> permissions,
         Instant creationDate,
         Instant lastUpdateDate) {
 
     public WorldDetails {
-        usersAllowedToWrite = Set.copyOf(usersAllowedToWrite);
-        usersAllowedToRead = Set.copyOf(usersAllowedToRead);
+        permissions = Set.copyOf(permissions);
     }
 }

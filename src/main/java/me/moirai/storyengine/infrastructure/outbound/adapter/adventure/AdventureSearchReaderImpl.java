@@ -50,7 +50,6 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 .filter(Filters.containsIgnoreCase("a.name", "name", query.name()))
                 .filter(Filters.containsIgnoreCase("w.name", "worldName", query.worldName()))
                 .filter(Filters.containsIgnoreCase("p.name", "personaName", query.personaName()))
-                .filter(Filters.equals("a.owner_id", "ownerId", query.ownerId()))
                 .filter(Filters.equals("a.ai_model", "model", query.model()))
                 .filter(Filters.equals("a.game_mode", "gameMode", query.gameMode()))
                 .filter(Filters.equals("a.moderation", "moderation", query.moderation()))
@@ -72,13 +71,13 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
         return PaginatedResult.of(data, totalItems, pq.page(), pq.size());
     }
 
-    private Filter resolveView(SearchView view, String requesterId) {
+    private Filter resolveView(SearchView view, Long requesterId) {
         return switch (view) {
             case MY_STUFF -> new Filter(
-                    "(a.owner_id = :requesterId OR a.users_allowed_to_write LIKE '%' || :requesterId || '%')",
+                    "EXISTS (SELECT 1 FROM adventure_permissions ap WHERE ap.adventure_id = a.id AND ap.user_id = :requesterId)",
                     "requesterId", requesterId);
             case SHARED_WITH_ME -> new Filter(
-                    "a.owner_id != :requesterId AND (a.users_allowed_to_read LIKE '%' || :requesterId || '%' OR a.users_allowed_to_write LIKE '%' || :requesterId || '%')",
+                    "NOT EXISTS (SELECT 1 FROM adventure_permissions ap WHERE ap.adventure_id = a.id AND ap.user_id = :requesterId AND ap.permission = 'OWNER') AND EXISTS (SELECT 1 FROM adventure_permissions ap WHERE ap.adventure_id = a.id AND ap.user_id = :requesterId)",
                     "requesterId", requesterId);
             case EXPLORE -> new Filter("a.visibility = 'PUBLIC'", null, null);
         };

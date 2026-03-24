@@ -9,7 +9,6 @@ public record SearchAdventures(
         String name,
         String worldName,
         String personaName,
-        String ownerId,
         Boolean isMultiplayer,
         String model,
         String gameMode,
@@ -19,6 +18,6 @@ public record SearchAdventures(
         SortDirection direction,
         Integer page,
         Integer size,
-        String requesterId)
+        Long requesterId)
         implements Query<PaginatedResult<AdventureSummary>> {
 }

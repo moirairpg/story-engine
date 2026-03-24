@@ -2,12 +2,16 @@ package me.moirai.storyengine.core.domain.world;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +21,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.RandomUuid;
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
@@ -44,17 +48,27 @@ public class World extends ShareableAsset {
     @Column(name = "adventure_start")
     private String adventureStart;
 
+    @ElementCollection
+    @CollectionTable(name = "world_permissions", joinColumns = @JoinColumn(name = "world_id"))
+    Set<Permission> permissions = new HashSet<>();
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "world_id")
     private List<WorldLorebookEntry> lorebook = new ArrayList<>();
 
+    @Override
+    protected Set<Permission> permissions() {
+        return permissions;
+    }
+
     private World(Builder builder) {
 
-        super(builder.visibility, builder.permissions);
+        super(builder.visibility);
 
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
+        this.permissions.addAll(builder.permissions);
     }
 
     protected World() {
@@ -161,7 +175,7 @@ public class World extends ShareableAsset {
         private String description;
         private String adventureStart;
         private Visibility visibility;
-        private Permissions permissions;
+        private Set<Permission> permissions = new HashSet<>();
 
         private Builder() {
         }
@@ -190,9 +204,9 @@ public class World extends ShareableAsset {
             return this;
         }
 
-        public Builder permissions(Permissions permissions) {
+        public Builder permissions(Permission... permissions) {
 
-            this.permissions = permissions;
+            this.permissions.addAll(Set.of(permissions));
             return this;
         }
 
@@ -204,10 +218,6 @@ public class World extends ShareableAsset {
 
             if (visibility == null) {
                 throw new BusinessRuleViolationException("Visibility cannot be null");
-            }
-
-            if (permissions == null) {
-                throw new BusinessRuleViolationException("Permissions cannot be null");
             }
 
             return new World(this);

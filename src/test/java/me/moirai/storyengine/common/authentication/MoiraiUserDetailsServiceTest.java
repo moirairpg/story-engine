@@ -52,6 +52,7 @@ public class MoiraiUserDetailsServiceTest {
 
         when(queryRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(new UserDetailsResult(
                 UUID.randomUUID(),
+                1L,
                 "12345",
                 username,
                 nickname,

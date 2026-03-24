@@ -28,6 +28,6 @@ public class DeleteWorldAuthorizer implements OperationAuthorizer {
         var world = worldRepository.findByPublicId(worldId)
                 .orElseThrow(() -> new AssetNotFoundException("World not found"));
 
-        return world.canUserWrite(principal.discordId());
+        return world.isOwner(principal.id()) || world.canWrite(principal.id());
     }
 }

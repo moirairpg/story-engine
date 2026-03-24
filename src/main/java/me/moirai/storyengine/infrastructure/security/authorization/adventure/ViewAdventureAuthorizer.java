@@ -28,6 +28,6 @@ public class ViewAdventureAuthorizer implements OperationAuthorizer {
         var adventure = adventureRepository.findByPublicId(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
 
-        return adventure.canUserRead(principal.discordId());
+        return adventure.isPublic() || adventure.isOwner(principal.id()) || adventure.canRead(principal.id());
     }
 }

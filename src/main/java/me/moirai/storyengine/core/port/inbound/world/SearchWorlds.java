@@ -7,12 +7,11 @@ import me.moirai.storyengine.common.enums.SortDirection;
 
 public record SearchWorlds(
         String name,
-        String ownerId,
         SearchView view,
         WorldSortField sortingField,
         SortDirection direction,
         Integer page,
         Integer size,
-        String requesterId)
+        Long requesterId)
         implements Query<PaginatedResult<WorldSummary>> {
 }

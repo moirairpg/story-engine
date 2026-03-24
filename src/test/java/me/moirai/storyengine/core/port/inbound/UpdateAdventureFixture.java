@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class UpdateAdventureFixture {
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getOwnerId(),
+                "RQSTRID",
                 adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
                 adventure.getContextAttributes().remember(),
@@ -47,11 +46,11 @@ public class UpdateAdventureFixture {
                 Maps.newHashMap("TKNID", 99D),
                 adventure.getModelConfiguration().getStopSequences(),
                 adventure.getModelConfiguration().getStopSequences(),
-                Collections.singleton("TKN"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
+                Set.of("TKN"),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
                 adventure.isMultiplayer());
     }
 
@@ -83,11 +82,11 @@ public class UpdateAdventureFixture {
                 Maps.newHashMap("TKNID", 99D),
                 adventure.getModelConfiguration().getStopSequences(),
                 adventure.getModelConfiguration().getStopSequences(),
-                Collections.singleton("TKN"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
+                Set.of("TKN"),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
                 adventure.isMultiplayer());
     }
 
@@ -119,11 +118,11 @@ public class UpdateAdventureFixture {
                 Maps.newHashMap("TKNID", 99D),
                 adventure.getModelConfiguration().getStopSequences(),
                 adventure.getModelConfiguration().getStopSequences(),
-                Collections.singleton("TKN"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
+                Set.of("TKN"),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
                 adventure.isMultiplayer());
     }
 
@@ -155,11 +154,11 @@ public class UpdateAdventureFixture {
                 Maps.newHashMap("TKNID", 99D),
                 adventure.getModelConfiguration().getStopSequences(),
                 adventure.getModelConfiguration().getStopSequences(),
-                Collections.singleton("TKN"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
-                Collections.singleton("USRID"),
+                Set.of("TKN"),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
+                Set.of(12345L),
                 isMultiplayer);
     }
 
@@ -182,10 +181,10 @@ public class UpdateAdventureFixture {
             Set<String> logitBiasToRemove,
             Set<String> stopSequencesToAdd,
             Set<String> stopSequencesToRemove,
-            Set<String> usersAllowedToWriteToAdd,
-            Set<String> usersAllowedToWriteToRemove,
-            Set<String> usersAllowedToReadToAdd,
-            Set<String> usersAllowedToReadToRemove,
+            Set<Long> usersAllowedToWriteToAdd,
+            Set<Long> usersAllowedToWriteToRemove,
+            Set<Long> usersAllowedToReadToAdd,
+            Set<Long> usersAllowedToReadToRemove,
             String adventureStart,
             String description,
             String gameModeFull,

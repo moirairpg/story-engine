@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
@@ -35,7 +34,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     @Test
     public void createEntry_whenEntryIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new UpdateAdventureLorebookEntry(
                 null,
                 AdventureFixture.PUBLIC_ID,
@@ -45,14 +44,14 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenAdventureIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 null,
@@ -62,14 +61,14 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenNameIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
@@ -79,14 +78,14 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenDescriptionIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
@@ -96,14 +95,14 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenTriggered_thenCallService() {
 
-        // Given
+        // given
         var requesterId = "1234";
         var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
@@ -116,11 +115,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
 
         var existingEntry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
 
-        var baseAdventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var baseAdventure = AdventureFixture.privateMultiplayerAdventure().build();
 
         var adventure = spy(baseAdventure);
         doReturn(existingEntry).when(adventure).updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString(), anyString());
@@ -128,10 +123,10 @@ public class UpdateAdventureLorebookEntryHandlerTest {
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(any())).thenReturn(adventure);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.name()).isNotNull();
     }

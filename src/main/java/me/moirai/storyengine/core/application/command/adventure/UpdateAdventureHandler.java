@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -98,17 +100,10 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd())
-                .forEach(adventure::addReaderUser);
-
-        emptyIfNull(command.usersAllowedToWriteToAdd())
-                .forEach(adventure::addWriterUser);
-
-        emptyIfNull(command.usersAllowedToReadToRemove())
-                .forEach(adventure::removeReaderUser);
-
-        emptyIfNull(command.usersAllowedToWriteToRemove())
-                .forEach(adventure::removeWriterUser);
+        emptyIfNull(command.usersAllowedToReadToAdd()).forEach(id -> adventure.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWriteToAdd()).forEach(id -> adventure.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToReadToRemove()).forEach(adventure::revoke);
+        emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(adventure::revoke);
     }
 
     private void updateLogitBias(UpdateAdventure command, Adventure adventure) {
@@ -161,13 +156,11 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 savedAdventure.getVisibility().name(),
                 savedAdventure.getModeration().name(),
                 savedAdventure.getGameMode().name(),
-                savedAdventure.getOwnerId(),
                 savedAdventure.isMultiplayer(),
                 savedAdventure.getCreationDate(),
                 savedAdventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                savedAdventure.getUsersAllowedToRead(),
-                savedAdventure.getUsersAllowedToWrite());
+                savedAdventure.getPermissions());
     }
 }

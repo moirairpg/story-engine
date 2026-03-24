@@ -4,6 +4,8 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
@@ -48,17 +50,10 @@ public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, 
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd())
-                .forEach(persona::addReaderUser);
-
-        emptyIfNull(command.usersAllowedToWriteToAdd())
-                .forEach(persona::addWriterUser);
-
-        emptyIfNull(command.usersAllowedToReadToRemove())
-                .forEach(persona::removeReaderUser);
-
-        emptyIfNull(command.usersAllowedToWriteToRemove())
-                .forEach(persona::removeWriterUser);
+        emptyIfNull(command.usersAllowedToReadToAdd()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWriteToAdd()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToReadToRemove()).forEach(persona::revoke);
+        emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(persona::revoke);
 
         var updatedPersona = repository.save(persona);
 
@@ -72,9 +67,7 @@ public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, 
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getOwnerId(),
-                persona.getUsersAllowedToRead(),
-                persona.getUsersAllowedToWrite(),
+                persona.getPermissions(),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }

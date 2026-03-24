@@ -154,12 +154,12 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
         insert(persona, Persona.class);
 
         // Then
-        var ownerId = jdbcClient.sql("SELECT owner_id FROM persona WHERE name = :name")
+        var name = jdbcClient.sql("SELECT name FROM persona WHERE name = :name")
                 .param("name", "TestPersona")
                 .query(String.class)
                 .single();
 
-        assertThat(ownerId).isNotNull().isNotBlank();
+        assertThat(name).isNotNull().isNotBlank();
     }
 
     @Test

@@ -4,224 +4,181 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 
 public class PersonaTest {
 
     @Test
     public void updateVisibility_whenPrivate_thenMakePublic() {
 
-        // Given
-        Persona persona = PersonaFixture.privatePersona().build();
+        // given
+        var persona = PersonaFixture.privatePersona().build();
 
-        // When
+        // when
         persona.makePublic();
 
-        // Then
+        // then
         assertThat(persona.isPublic()).isTrue();
     }
 
     @Test
     public void updateVisibility_whenPublic_thenMakePrivate() {
 
-        // Given
-        Persona persona = PersonaFixture.publicPersona().build();
+        // given
+        var persona = PersonaFixture.publicPersona().build();
 
-        // When
+        // when
         persona.makePrivate();
 
-        // Then
+        // then
         assertThat(persona.isPublic()).isFalse();
     }
 
     @Test
     public void updatePersona_whenNewNameProvided_thenUpdatePersona() {
 
-        // Given
-        String name = "New Name";
-        Persona persona = PersonaFixture.publicPersona().build();
+        // given
+        var name = "New Name";
+        var persona = PersonaFixture.publicPersona().build();
 
-        // When
+        // when
         persona.updateName(name);
 
-        // Then
+        // then
         assertThat(persona.getName()).isEqualTo(name);
     }
 
     @Test
     public void updatePersona_whenNewPersonality_thenUpdatePersona() {
 
-        // Given
-        String personality = "New Personality";
-        Persona persona = PersonaFixture.publicPersona().build();
+        // given
+        var personality = "New Personality";
+        var persona = PersonaFixture.publicPersona().build();
 
-        // When
+        // when
         persona.updatePersonality(personality);
 
-        // Then
+        // then
         assertThat(persona.getPersonality()).isEqualTo(personality);
     }
 
     @Test
     public void createPersona_whenNullName_thenThrowException() {
 
-        // Given
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona().name(null);
+        // given
+        var personaBuilder = PersonaFixture.publicPersona().name(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, personaBuilder::build);
     }
 
     @Test
     public void createPersona_whenEmptyName_thenThrowException() {
 
-        // Given
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona().name(EMPTY);
+        // given
+        var personaBuilder = PersonaFixture.publicPersona().name(EMPTY);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, personaBuilder::build);
     }
 
     @Test
     public void createPersona_whenNullPersonality_thenThrowException() {
 
-        // Given
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona().personality(null);
+        // given
+        var personaBuilder = PersonaFixture.publicPersona().personality(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, personaBuilder::build);
     }
 
     @Test
     public void createPersona_whenEmptyPersonality_thenThrowException() {
 
-        // Given
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona().personality(EMPTY);
+        // given
+        var personaBuilder = PersonaFixture.publicPersona().personality(EMPTY);
 
-        // Then
-        assertThrows(BusinessRuleViolationException.class, personaBuilder::build);
-    }
-
-    @Test
-    public void createPersona_whenNullPermissions_thenThrowException() {
-
-        // Given
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona().permissions(null);
-
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, personaBuilder::build);
     }
 
     @Test
     public void createPersona_whenEmptyVisibility_thenThrowException() {
 
-        // Given
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona().visibility(null);
+        // given
+        var personaBuilder = PersonaFixture.publicPersona().visibility(null);
 
-        // Then
+        // then
         assertThrows(BusinessRuleViolationException.class, personaBuilder::build);
     }
 
     @Test
-    public void updatePersona_whenNewWriterUserAdded_thenTheyShouldHaveReadAndWritePermission() {
+    public void grantWritePermission_thenUserCanWriteAndRead() {
 
-        // Given
-        String userId = "1234567890";
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona();
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(new HashSet<>()).build();
+        // given
+        var userId = 1234567890L;
+        var persona = PersonaFixture.publicPersona().build();
+        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
 
-        personaBuilder.permissions(permissions);
+        // when
+        persona.grant(new Permission(userId, PermissionLevel.WRITE));
 
-        Persona persona = personaBuilder.build();
-
-        // When
-        persona.addWriterUser(userId);
-
-        // Then
-        assertThat(persona.getUsersAllowedToWrite()).contains(userId);
-        assertThat(persona.canUserWrite(userId)).isTrue();
-        assertThat(persona.canUserRead(userId)).isTrue();
+        // then
+        assertThat(persona.canWrite(userId)).isTrue();
+        assertThat(persona.canRead(userId)).isTrue();
     }
 
     @Test
-    public void updatePersona_whenNewReaderUserAdded_thenTheyShouldHaveOnlyReadPermission() {
+    public void grantReadPermission_thenUserCanOnlyRead() {
 
-        // Given
-        String userId = "1234567890";
-        Persona.Builder personaBuilder = PersonaFixture.publicPersona();
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(new HashSet<>()).build();
+        // given
+        var userId = 1234567890L;
+        var persona = PersonaFixture.publicPersona().build();
+        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
 
-        personaBuilder.permissions(permissions);
+        // when
+        persona.grant(new Permission(userId, PermissionLevel.READ));
 
-        Persona persona = personaBuilder.build();
-
-        // When
-        persona.addReaderUser(userId);
-
-        // Then
-        assertThat(persona.getUsersAllowedToRead()).contains(userId);
-        assertThat(persona.canUserWrite(userId)).isFalse();
-        assertThat(persona.canUserRead(userId)).isTrue();
+        // then
+        assertThat(persona.canWrite(userId)).isFalse();
+        assertThat(persona.canRead(userId)).isTrue();
     }
 
     @Test
-    public void updatePersona_whenReaderUserRemoved_thenReadPermissionShouldBeRevoked() {
+    public void revokeReadPermission_thenUserCannotRead() {
 
-        // Given
-        String userId = "1234567890";
-        Persona.Builder personaBuilder = PersonaFixture.privatePersona();
+        // given
+        var userId = 1234567890L;
+        var persona = PersonaFixture.privatePersona().build();
+        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        persona.grant(new Permission(userId, PermissionLevel.READ));
 
-        Set<String> usersAllowedToRead = new HashSet<>();
-        usersAllowedToRead.add(userId);
+        // when
+        persona.revoke(userId);
 
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(usersAllowedToRead).build();
-
-        personaBuilder.permissions(permissions);
-
-        Persona persona = personaBuilder.build();
-
-        // When
-        persona.removeReaderUser(userId);
-
-        // Then
-        assertThat(persona.getUsersAllowedToRead()).doesNotContain(userId);
-        assertThat(persona.canUserWrite(userId)).isFalse();
-        assertThat(persona.canUserRead(userId)).isFalse();
+        // then
+        assertThat(persona.canRead(userId)).isFalse();
+        assertThat(persona.canWrite(userId)).isFalse();
     }
 
     @Test
-    public void updatePersona_whenWriterUserRemoved_thenReadAndWritePermissionShouldBeRevoked() {
+    public void revokeWritePermission_thenUserCannotWrite() {
 
-        // Given
-        String userId = "1234567890";
-        Persona.Builder personaBuilder = PersonaFixture.privatePersona();
+        // given
+        var userId = 1234567890L;
+        var persona = PersonaFixture.privatePersona().build();
+        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        persona.grant(new Permission(userId, PermissionLevel.WRITE));
 
-        Set<String> usersAllowedToWrite = new HashSet<>();
-        usersAllowedToWrite.add(userId);
+        // when
+        persona.revoke(userId);
 
-        Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(usersAllowedToWrite).build();
-
-        personaBuilder.permissions(permissions);
-
-        Persona persona = personaBuilder.build();
-
-        // When
-        persona.removeWriterUser(userId);
-
-        // Then
-        assertThat(persona.getUsersAllowedToWrite()).doesNotContain(userId);
-        assertThat(persona.canUserWrite(userId)).isFalse();
-        assertThat(persona.canUserRead(userId)).isFalse();
+        // then
+        assertThat(persona.canWrite(userId)).isFalse();
+        assertThat(persona.canRead(userId)).isFalse();
     }
 }

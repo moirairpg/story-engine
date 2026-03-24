@@ -16,13 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,10 +33,10 @@ public class UpdateWorldLorebookEntryHandlerTest {
     @Test
     public void updateWorld() {
 
-        // Given
-        String requesterId = "OWNER123";
+        // given
+        var requesterId = "OWNER123";
 
-        UpdateWorldLorebookEntry command = new UpdateWorldLorebookEntry(
+        var command = new UpdateWorldLorebookEntry(
                 WorldLorebookEntryFixture.PUBLIC_ID,
                 WorldFixture.PUBLIC_ID,
                 "MoirAI",
@@ -48,25 +44,21 @@ public class UpdateWorldLorebookEntryHandlerTest {
                 "This is an RPG world",
                 requesterId);
 
-        WorldLorebookEntry expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+        var expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
 
-        World baseWorld = WorldFixture.publicWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var baseWorld = WorldFixture.publicWorld().build();
 
-        World world = spy(baseWorld);
+        var world = spy(baseWorld);
         doReturn(expectedUpdatedEntry).when(world)
                 .updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString());
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
-        // When
-        WorldLorebookEntryDetails result = handler.handle(command);
+        // when
+        var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.lastUpdateDate()).isEqualTo(expectedUpdatedEntry.getLastUpdateDate());
     }

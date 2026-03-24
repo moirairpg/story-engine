@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
@@ -34,7 +33,7 @@ public class UpdateWorldHandlerTest {
     @Test
     public void updateWorld_whenFieldsAreProvided_thenUpdateWorld() {
 
-        // Given
+        // given
         var id = WorldFixture.PUBLIC_ID;
         var requesterId = "RQSTRID";
         var newName = "NEW NAME";
@@ -50,26 +49,16 @@ public class UpdateWorldHandlerTest {
                 null,
                 null);
 
-        var expectedUpdatedWorld = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
-
-        var unchangedWorld = WorldFixture.privateWorld()
-                .name(newName)
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var expectedUpdatedWorld = WorldFixture.privateWorld().build();
+        var unchangedWorld = WorldFixture.privateWorld().name(newName).build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedUpdatedWorld);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.lastUpdateDate()).isEqualTo(expectedUpdatedWorld.getLastUpdateDate());
     }
@@ -77,7 +66,7 @@ public class UpdateWorldHandlerTest {
     @Test
     public void updateWorld_whenValidData_thenWorldIsUpdated() {
 
-        // Given
+        // given
         var id = WorldFixture.PUBLIC_ID;
         var requesterId = "RQSTRID";
         var command = new UpdateWorld(
@@ -92,36 +81,28 @@ public class UpdateWorldHandlerTest {
                 null,
                 null);
 
-        var unchangedWorld = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
-
+        var unchangedWorld = WorldFixture.privateWorld().build();
         var expectedUpdatedWorld = WorldFixture.privateWorld()
                 .name("MoirAI")
                 .description("This is an RPG world")
                 .adventureStart("As you enter the city, people around you start looking at you.")
                 .visibility(Visibility.PUBLIC)
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
                 .build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedUpdatedWorld);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
     }
 
     @Test
     public void updateWorld_whenEmptyUpdateFields_thenWorldIsNotChanged() {
 
-        // Given
+        // given
         var id = WorldFixture.PUBLIC_ID;
         var requesterId = "RQSTRID";
         var command = new UpdateWorld(
@@ -136,26 +117,22 @@ public class UpdateWorldHandlerTest {
                 null,
                 null);
 
-        var unchangedWorld = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var unchangedWorld = WorldFixture.privateWorld().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
     }
 
     @Test
     public void updateWorld_whenPublicToBeMadePrivate_thenWorldIsMadePrivate() {
 
-        // Given
+        // given
         var id = WorldFixture.PUBLIC_ID;
         var requesterId = "RQSTRID";
         var command = new UpdateWorld(
@@ -170,32 +147,23 @@ public class UpdateWorldHandlerTest {
                 null,
                 null);
 
-        var unchangedWorld = WorldFixture.publicWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
-
-        var expectedWorld = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var unchangedWorld = WorldFixture.publicWorld().build();
+        var expectedWorld = WorldFixture.privateWorld().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedWorld);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
     }
 
     @Test
     public void updateWorld_whenInvalidVisibility_thenNothingIsChanged() {
 
-        // Given
+        // given
         var id = WorldFixture.PUBLIC_ID;
         var requesterId = "RQSTRID";
         var command = new UpdateWorld(
@@ -210,26 +178,22 @@ public class UpdateWorldHandlerTest {
                 null,
                 null);
 
-        var unchangedWorld = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var unchangedWorld = WorldFixture.privateWorld().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
     }
 
     @Test
     public void updateWorld_whenIdIsNull_thenExceptionIsThrown() {
 
-        // Given
+        // given
         var command = new UpdateWorld(
                 null,
                 null,
@@ -242,7 +206,7 @@ public class UpdateWorldHandlerTest {
                 null,
                 null);
 
-        // Then
+        // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
@@ -250,7 +214,7 @@ public class UpdateWorldHandlerTest {
     @Test
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
-        // Given
+        // given
         var command = new UpdateWorld(
                 WorldFixture.PUBLIC_ID,
                 "SomeNewName",
@@ -265,7 +229,7 @@ public class UpdateWorldHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
-        // Then
+        // then
         assertThatExceptionOfType(AssetNotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
     }

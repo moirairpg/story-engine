@@ -424,13 +424,39 @@ public class DbTestHelper {
                         .update();
             }
         } else if (collectionValue instanceof Iterable<?> iterable) {
-            for (var element : iterable) {
-                jdbcClient
-                        .sql("INSERT INTO " + tableName + " (" + fkColumnName + ", " + valueColumnName
-                                + ") VALUES (:fk, :val)")
-                        .param("fk", parentId)
-                        .param("val", element)
-                        .update();
+            try {
+                for (var element : iterable) {
+                    if (element != null && element.getClass().isAnnotationPresent(Embeddable.class)) {
+                        var embeddableParams = new HashMap<String, Object>();
+                        embeddableParams.put(fkColumnName, parentId);
+                        for (var embeddedField : element.getClass().getDeclaredFields()) {
+                            if (Modifier.isStatic(embeddedField.getModifiers()))
+                                continue;
+                            embeddedField.setAccessible(true);
+                            var embeddedValue = embeddedField.get(element);
+                            if (embeddedValue instanceof Enum<?> enumValue) {
+                                embeddedValue = enumValue.name();
+                            }
+                            embeddableParams.put(resolveColumnName(embeddedField), embeddedValue);
+                        }
+                        var embeddableColumns = String.join(", ", embeddableParams.keySet());
+                        var embeddablePlaceholders = embeddableParams.keySet().stream()
+                                .map(k -> ":" + k).collect(joining(", "));
+                        jdbcClient.sql("INSERT INTO " + tableName + " (" + embeddableColumns + ") VALUES ("
+                                + embeddablePlaceholders + ")")
+                                .params(embeddableParams)
+                                .update();
+                    } else {
+                        jdbcClient
+                                .sql("INSERT INTO " + tableName + " (" + fkColumnName + ", " + valueColumnName
+                                        + ") VALUES (:fk, :val)")
+                                .param("fk", parentId)
+                                .param("val", element)
+                                .update();
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
             }
         }
     }

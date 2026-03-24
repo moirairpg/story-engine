@@ -98,6 +98,7 @@ class ManageUserAuthorizerTest {
     private MoiraiPrincipal principalWithDiscordId(String discordId) {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
+                1L,
                 discordId,
                 "user",
                 "user@test.com",

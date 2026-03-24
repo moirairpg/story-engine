@@ -1,117 +1,101 @@
 package me.moirai.storyengine.common.domain;
 
-import static java.util.Collections.unmodifiableSet;
-
+import java.util.Collections;
 import java.util.Set;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
+import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @MappedSuperclass
 public abstract class ShareableAsset extends Asset {
 
-    @Embedded
-    private Permissions permissions;
+    protected abstract Set<Permission> permissions();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "visibility")
     private Visibility visibility;
 
-    protected ShareableAsset(Visibility visibility, Permissions permissions) {
+    protected ShareableAsset(Visibility visibility) {
+        super();
         this.visibility = visibility;
-        this.permissions = permissions;
     }
 
     protected ShareableAsset() {
+        super();
+    }
+
+    public boolean isOwner(Long userId) {
+        return permissions().stream()
+                .anyMatch(p -> p.userId().equals(userId) && p.level() == PermissionLevel.OWNER);
+    }
+
+    public void grant(Permission permission) {
+        if (permissions().stream()
+                .anyMatch(p -> p.userId().equals(permission.userId()) && p.level() == PermissionLevel.OWNER)) {
+            throw new BusinessRuleViolationException("Owner permission cannot be overwritten");
+        }
+
+        permissions().removeIf(p -> p.userId().equals(permission.userId()));
+        permissions().add(permission);
+    }
+
+    public void revoke(Long userId) {
+        if (permissions().stream().anyMatch(p -> p.userId().equals(userId) && p.level() == PermissionLevel.OWNER)) {
+            throw new BusinessRuleViolationException("Owner permission cannot be revoked");
+        }
+
+        permissions().removeIf(p -> p.userId().equals(userId));
+    }
+
+    public void updatePermissions(Set<Permission> newPermissions) {
+        var owner = permissions().stream()
+                .filter(p -> p.level() == PermissionLevel.OWNER)
+                .findFirst()
+                .orElseThrow();
+
+        permissions().clear();
+        permissions().add(owner);
+
+        newPermissions.stream()
+                .filter(p -> p.level() != PermissionLevel.OWNER)
+                .forEach(permissions()::add);
+    }
+
+    public boolean canWrite(Long userId) {
+        return permissions().stream()
+                .anyMatch(p -> p.userId().equals(userId)
+                        && (p.level() == PermissionLevel.WRITE || p.level() == PermissionLevel.OWNER));
+    }
+
+    public boolean canRead(Long userId) {
+        return permissions().stream()
+                .anyMatch(p -> p.userId().equals(userId)
+                        && (p.level() == PermissionLevel.READ || p.level() == PermissionLevel.WRITE
+                                || p.level() == PermissionLevel.OWNER));
+    }
+
+    public Set<Permission> getPermissions() {
+        return Collections.unmodifiableSet(permissions());
     }
 
     public boolean isPublic() {
-
-        return this.visibility.equals(Visibility.PUBLIC);
+        return visibility.equals(Visibility.PUBLIC);
     }
 
     public void makePublic() {
-
         this.visibility = Visibility.PUBLIC;
     }
 
     public void makePrivate() {
-
         this.visibility = Visibility.PRIVATE;
     }
 
     public Visibility getVisibility() {
-
         return visibility;
-    }
-
-    public boolean isOwner(String discordUserId) {
-
-        return permissions.getOwnerId().equals(discordUserId);
-    }
-
-    public boolean canUserWrite(String discordUserId) {
-
-        boolean isWriter = permissions.getUsersAllowedToWrite().contains(discordUserId);
-
-        return isOwner(discordUserId) || isWriter;
-    }
-
-    public boolean canUserRead(String discordUserId) {
-
-        boolean isReader = permissions.getUsersAllowedToRead().contains(discordUserId);
-
-        return canUserWrite(discordUserId) || isReader || isPublic();
-    }
-
-    public void addWriterUser(String discordUserId) {
-
-        Permissions newPermissions = this.permissions
-                .allowUserToWrite(discordUserId, this.permissions.getOwnerId());
-
-        this.permissions = newPermissions;
-    }
-
-    public void addReaderUser(String discordUserId) {
-
-        Permissions newPermissions = this.permissions
-                .allowUserToRead(discordUserId, this.permissions.getOwnerId());
-
-        this.permissions = newPermissions;
-    }
-
-    public void removeWriterUser(String discordUserId) {
-
-        Permissions newPermissions = this.permissions
-                .disallowUserToWrite(discordUserId, this.permissions.getOwnerId());
-
-        this.permissions = newPermissions;
-    }
-
-    public void removeReaderUser(String discordUserId) {
-
-        Permissions newPermissions = this.permissions
-                .disallowUserToRead(discordUserId, this.permissions.getOwnerId());
-
-        this.permissions = newPermissions;
-    }
-
-    public Set<String> getUsersAllowedToWrite() {
-
-        return unmodifiableSet(this.permissions.getUsersAllowedToWrite());
-    }
-
-    public Set<String> getUsersAllowedToRead() {
-
-        return unmodifiableSet(this.permissions.getUsersAllowedToRead());
-    }
-
-    public String getOwnerId() {
-
-        return this.permissions.getOwnerId();
     }
 }

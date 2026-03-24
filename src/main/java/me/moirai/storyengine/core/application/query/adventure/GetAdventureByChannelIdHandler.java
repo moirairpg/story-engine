@@ -80,13 +80,11 @@ public class GetAdventureByChannelIdHandler
                 adventure.getVisibility().name(),
                 adventure.getModeration().name(),
                 adventure.getGameMode().name(),
-                adventure.getOwnerId(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                adventure.getUsersAllowedToRead(),
-                adventure.getUsersAllowedToWrite());
+                adventure.getPermissions());
     }
 }

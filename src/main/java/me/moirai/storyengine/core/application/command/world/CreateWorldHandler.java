@@ -1,8 +1,11 @@
 package me.moirai.storyengine.core.application.command.world;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -21,26 +24,20 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
     @Override
     public WorldDetails execute(CreateWorld command) {
 
-        var permissions = Permissions.builder()
-                .ownerId(command.requesterId())
-                .usersAllowedToRead(command.usersAllowedToRead())
-                .usersAllowedToWrite(command.usersAllowedToWrite())
-                .build();
-
         var world = repository.save(World.builder()
                 .name(command.name())
                 .description(command.description())
                 .adventureStart(command.adventureStart())
                 .visibility(command.visibility())
-                .permissions(permissions)
                 .build());
+
+        emptyIfNull(command.usersAllowedToRead()).forEach(id -> world.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWrite()).forEach(id -> world.grant(new Permission(id, PermissionLevel.WRITE)));
 
         command.lorebookEntries().forEach(entry -> world.addLorebookEntry(
                 entry.name(),
                 entry.regex(),
                 entry.description()));
-
-        repository.save(world);
 
         return mapResult(repository.save(world));
     }
@@ -53,9 +50,7 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                 world.getDescription(),
                 world.getAdventureStart(),
                 world.getVisibility().name(),
-                world.getOwnerId(),
-                world.getUsersAllowedToRead(),
-                world.getUsersAllowedToWrite(),
+                world.getPermissions(),
                 world.getCreationDate(),
                 world.getLastUpdateDate());
     }

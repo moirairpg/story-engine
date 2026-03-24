@@ -18,6 +18,7 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.core.domain.PermissionFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.infrastructure.security.authorization.persona.ViewPersonaAuthorizer;
@@ -40,84 +41,95 @@ class ViewPersonaAuthorizerTest {
     @Test
     void shouldAuthorizeWhenRequesterIsOwner() {
 
+        // given
         var personaId = PersonaFixture.PUBLIC_ID;
-        var ownerId = "586678721356875";
-        var persona = PersonaFixture.publicPersonaWithId();
-        var principal = principalWithDiscordId(ownerId);
+        var persona = PersonaFixture.privatePersonaWithIdAndPermissions();
+        var principal = principalWithId(PermissionFixture.OWNER_ID);
         var context = contextWith(personaId, principal);
 
         when(personaRepository.findByPublicId(personaId)).thenReturn(Optional.of(persona));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldAuthorizeWhenRequesterIsAllowedToRead() {
 
+        // given
         var personaId = PersonaFixture.PUBLIC_ID;
-        var readerId = "613226587696519";
-        var persona = PersonaFixture.publicPersonaWithId();
-        var principal = principalWithDiscordId(readerId);
+        var persona = PersonaFixture.privatePersonaWithIdAndPermissions();
+        var principal = principalWithId(PermissionFixture.READER_ID);
         var context = contextWith(personaId, principal);
 
         when(personaRepository.findByPublicId(personaId)).thenReturn(Optional.of(persona));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldAuthorizeWhenPersonaIsPublic() {
 
+        // given
         var personaId = PersonaFixture.PUBLIC_ID;
-        var strangerId = "999999999999999";
         var persona = PersonaFixture.publicPersonaWithId();
-        var principal = principalWithDiscordId(strangerId);
+        var principal = principalWithId(9999L);
         var context = contextWith(personaId, principal);
 
         when(personaRepository.findByPublicId(personaId)).thenReturn(Optional.of(persona));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldDenyWhenPersonaIsPrivateAndRequesterHasNoReadAccess() {
 
+        // given
         var personaId = PersonaFixture.PUBLIC_ID;
-        var strangerId = "999999999999999";
         var persona = PersonaFixture.privatePersonaWithId();
-        var principal = principalWithDiscordId(strangerId);
+        var principal = principalWithId(9999L);
         var context = contextWith(personaId, principal);
 
         when(personaRepository.findByPublicId(personaId)).thenReturn(Optional.of(persona));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isFalse();
     }
 
     @Test
     void shouldThrowExceptionWhenPersonaNotFound() {
 
+        // given
         var personaId = UUID.randomUUID();
-        var principal = principalWithDiscordId("586678721356875");
+        var principal = principalWithId(1L);
         var context = contextWith(personaId, principal);
 
         when(personaRepository.findByPublicId(personaId)).thenReturn(Optional.empty());
 
+        // then
         assertThatThrownBy(() -> authorizer.authorize(context))
                 .isInstanceOf(AssetNotFoundException.class);
     }
 
-    private MoiraiPrincipal principalWithDiscordId(String discordId) {
+    private MoiraiPrincipal principalWithId(Long id) {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
-                discordId,
+                id,
+                "discordId",
                 "user",
                 "user@test.com",
                 "token",

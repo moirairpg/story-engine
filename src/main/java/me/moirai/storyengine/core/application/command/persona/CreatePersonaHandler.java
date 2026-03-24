@@ -1,8 +1,11 @@
 package me.moirai.storyengine.core.application.command.persona;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
@@ -20,20 +23,17 @@ public class CreatePersonaHandler extends AbstractCommandHandler<CreatePersona, 
     @Override
     public PersonaDetails execute(CreatePersona command) {
 
-        var permissions = Permissions.builder()
-                .ownerId(command.requesterId())
-                .usersAllowedToRead(command.usersAllowedToRead())
-                .usersAllowedToWrite(command.usersAllowedToWrite())
-                .build();
-
         var persona = repository.save(Persona.builder()
                 .name(command.name())
                 .personality(command.personality())
                 .visibility(command.visibility())
-                .permissions(permissions)
                 .build());
 
-        return mapResult(persona);
+        emptyIfNull(command.usersAllowedToRead()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWrite()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
+
+        var savedPersona = repository.save(persona);
+        return mapResult(savedPersona);
     }
 
     private PersonaDetails mapResult(Persona persona) {
@@ -43,9 +43,7 @@ public class CreatePersonaHandler extends AbstractCommandHandler<CreatePersona, 
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getOwnerId(),
-                persona.getUsersAllowedToRead(),
-                persona.getUsersAllowedToWrite(),
+                persona.getPermissions(),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }

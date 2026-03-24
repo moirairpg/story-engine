@@ -54,6 +54,7 @@ public class GetUserDetailsByDiscordIdHandler
 
         return new UserDetailsResult(
                 dbData.publicId(),
+                dbData.id(),
                 dbData.discordId(),
                 discordDetails.getUsername(),
                 nickname,

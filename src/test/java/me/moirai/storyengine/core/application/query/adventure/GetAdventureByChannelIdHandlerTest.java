@@ -15,12 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureByChannelId;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -44,14 +41,14 @@ public class GetAdventureByChannelIdHandlerTest {
     @Test
     public void getAdventure_whenAdventureNotFound_thenThrowException() {
 
-        // Given
-        String adventureId = "123123";
-        String requesterId = "123123";
-        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
+        // given
+        var adventureId = "123123";
+        var requesterId = "123123";
+        var command = GetAdventureByChannelId.build(adventureId, requesterId);
 
         when(queryRepository.findByChannelId(anyString())).thenReturn(Optional.empty());
 
-        // Then
+        // then
         assertThatThrownBy(() -> handler.execute(command))
                 .isInstanceOf(AssetNotFoundException.class)
                 .hasMessage("No adventures exist for this channel");
@@ -60,24 +57,20 @@ public class GetAdventureByChannelIdHandlerTest {
     @Test
     public void getAdventure_whenAdventureIsFound_thenReturnResult() {
 
-        // Given
-        String adventureId = "123123";
-        String requesterId = "123123";
-        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        // given
+        var adventureId = "123123";
+        var requesterId = "123123";
+        var command = GetAdventureByChannelId.build(adventureId, requesterId);
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
         when(queryRepository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(worldRepository.findById(anyLong())).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
 
-        // When
-        AdventureDetails result = handler.execute(command);
+        // when
+        var result = handler.execute(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(adventure.getPublicId());
         assertThat(result.adventureStart()).isEqualTo(adventure.getAdventureStart());
@@ -85,7 +78,6 @@ public class GetAdventureByChannelIdHandlerTest {
         assertThat(result.channelId()).isEqualTo(adventure.getChannelId());
         assertThat(result.gameMode()).isEqualTo(adventure.getGameMode().name());
         assertThat(result.name()).isEqualTo(adventure.getName());
-        assertThat(result.ownerId()).isEqualTo(adventure.getOwnerId());
         assertThat(result.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(result.visibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.moderation()).isEqualTo(adventure.getModeration().name());

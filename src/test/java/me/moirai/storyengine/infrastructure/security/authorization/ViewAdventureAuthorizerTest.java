@@ -18,6 +18,7 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.core.domain.PermissionFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.infrastructure.security.authorization.adventure.ViewAdventureAuthorizer;
@@ -40,84 +41,95 @@ class ViewAdventureAuthorizerTest {
     @Test
     void shouldAuthorizeWhenRequesterIsOwner() {
 
+        // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var ownerId = "586678721356875";
-        var adventure = AdventureFixture.publicMultiplayerAdventureWithId();
-        var principal = principalWithDiscordId(ownerId);
+        var adventure = AdventureFixture.privateMultiplayerAdventureWithIdAndPermissions();
+        var principal = principalWithId(PermissionFixture.OWNER_ID);
         var context = contextWith(adventureId, principal);
 
         when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldAuthorizeWhenRequesterIsAllowedToRead() {
 
+        // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var readerId = "613226587696519";
-        var adventure = AdventureFixture.privateMultiplayerAdventureWithId();
-        var principal = principalWithDiscordId(readerId);
+        var adventure = AdventureFixture.privateMultiplayerAdventureWithIdAndPermissions();
+        var principal = principalWithId(PermissionFixture.READER_ID);
         var context = contextWith(adventureId, principal);
 
         when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldAuthorizeWhenAdventureIsPublic() {
 
+        // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var strangerId = "999999999999999";
         var adventure = AdventureFixture.publicMultiplayerAdventureWithId();
-        var principal = principalWithDiscordId(strangerId);
+        var principal = principalWithId(9999L);
         var context = contextWith(adventureId, principal);
 
         when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldDenyWhenAdventureIsPrivateAndRequesterHasNoReadAccess() {
 
+        // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var strangerId = "999999999999999";
         var adventure = AdventureFixture.privateMultiplayerAdventureWithId();
-        var principal = principalWithDiscordId(strangerId);
+        var principal = principalWithId(9999L);
         var context = contextWith(adventureId, principal);
 
         when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
 
+        // when
         var result = authorizer.authorize(context);
 
+        // then
         assertThat(result).isFalse();
     }
 
     @Test
     void shouldThrowExceptionWhenAdventureNotFound() {
 
+        // given
         var adventureId = UUID.randomUUID();
-        var principal = principalWithDiscordId("586678721356875");
+        var principal = principalWithId(1L);
         var context = contextWith(adventureId, principal);
 
         when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.empty());
 
+        // then
         assertThatThrownBy(() -> authorizer.authorize(context))
                 .isInstanceOf(AssetNotFoundException.class);
     }
 
-    private MoiraiPrincipal principalWithDiscordId(String discordId) {
+    private MoiraiPrincipal principalWithId(Long id) {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
-                discordId,
+                id,
+                "discordId",
                 "user",
                 "user@test.com",
                 "token",

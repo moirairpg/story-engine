@@ -56,8 +56,8 @@ public class GetPersonaByIdHandlerTest {
 
         // Given
         var expectedDetails = new PersonaDetails(
-                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a bot", null, "owner1",
-                java.util.Set.of(), java.util.Set.of(),
+                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a bot", null,
+                java.util.Set.of(),
                 null, null);
 
         var query = new GetPersonaById(PersonaFixture.PUBLIC_ID, "RQSTRID");

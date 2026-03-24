@@ -12,8 +12,8 @@ public record CreateWorld(
         String adventureStart,
         Visibility visibility,
         List<LorebookEntry> lorebookEntries,
-        Set<String> usersAllowedToWrite,
-        Set<String> usersAllowedToRead,
+        Set<Long> usersAllowedToWrite,
+        Set<Long> usersAllowedToRead,
         String requesterId)
         implements Command<WorldDetails> {
 

@@ -28,6 +28,6 @@ public class ViewWorldAuthorizer implements OperationAuthorizer {
         var world = worldRepository.findByPublicId(worldId)
                 .orElseThrow(() -> new AssetNotFoundException("World not found"));
 
-        return world.canUserRead(principal.discordId());
+        return world.isPublic() || world.isOwner(principal.id()) || world.canRead(principal.id());
     }
 }

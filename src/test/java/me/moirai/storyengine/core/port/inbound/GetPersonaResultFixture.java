@@ -1,38 +1,32 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
-
-import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 
 public class GetPersonaResultFixture {
 
     public static PersonaDetails privatePersona() {
 
-        Persona persona = PersonaFixture.privatePersona().build();
+        var persona = PersonaFixture.privatePersonaWithIdAndPermissions();
         return new PersonaDetails(
                 persona.getPublicId(),
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getOwnerId(),
-                persona.getUsersAllowedToWrite(),
-                persona.getUsersAllowedToRead(),
+                persona.getPermissions(),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }
 
     public static PersonaDetails publicPersona() {
 
-        Persona persona = PersonaFixture.publicPersona().build();
+        var persona = PersonaFixture.publicPersonaWithIdAndPermissions();
         return new PersonaDetails(
                 persona.getPublicId(),
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getOwnerId(),
-                persona.getUsersAllowedToWrite(),
-                persona.getUsersAllowedToRead(),
+                persona.getPermissions(),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }

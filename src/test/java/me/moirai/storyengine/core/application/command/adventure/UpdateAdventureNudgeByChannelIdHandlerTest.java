@@ -1,6 +1,5 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -15,10 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureNudgeByChannelId;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
@@ -35,9 +31,9 @@ public class UpdateAdventureNudgeByChannelIdHandlerTest {
     @Test
     public void updateNudge_whenAdventureNotFound_thenThrowException() {
 
-        // Given
-        String requesterId = "123123";
-        UpdateAdventureNudgeByChannelId command = UpdateAdventureNudgeByChannelId.builder()
+        // given
+        var requesterId = "123123";
+        var command = UpdateAdventureNudgeByChannelId.builder()
                 .nudge("Nudge")
                 .requesterId(requesterId)
                 .channelId("1234123")
@@ -45,56 +41,29 @@ public class UpdateAdventureNudgeByChannelIdHandlerTest {
 
         when(repository.findByChannelId(anyString())).thenReturn(Optional.empty());
 
-        // Then
+        // then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void updateNudge_whenNoAdventurePermission_thenThrowException() {
-
-        // Given
-        String requesterId = "123123";
-        UpdateAdventureNudgeByChannelId command = UpdateAdventureNudgeByChannelId.builder()
-                .nudge("Nudge")
-                .requesterId(requesterId)
-                .channelId("1234123")
-                .build();
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .build();
-
-        when(repository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThatThrownBy(() -> handler.execute(command))
-                .isInstanceOf(AssetAccessDeniedException.class)
-                .hasMessage("User does not have permission to update adventure");
     }
 
     @Test
     public void updateNudge_whenCalled_thenUpdateAdventureNudge() {
 
-        // Given
-        String requesterId = "4245345";
-        UpdateAdventureNudgeByChannelId command = UpdateAdventureNudgeByChannelId.builder()
+        // given
+        var requesterId = "4245345";
+        var command = UpdateAdventureNudgeByChannelId.builder()
                 .nudge("Nudge")
                 .channelId("1234123")
                 .requesterId(requesterId)
-                .channelId("1234123")
                 .build();
 
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
         when(repository.findByChannelId(anyString())).thenReturn(Optional.of(adventure));
 
-        // When
+        // when
         handler.execute(command);
 
-        // Then
+        // then
         verify(repository, times(1))
                 .updateNudgeByChannelId(anyString(), anyString());
     }

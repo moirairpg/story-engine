@@ -47,6 +47,7 @@ public class MoiraiUserDetailsService implements UserDetailsService {
 
             return new MoiraiPrincipal(
                     moiraiUser.publicId(),
+                    moiraiUser.id(),
                     moiraiUser.discordId(),
                     moiraiUser.username(),
                     discordUser.email(),

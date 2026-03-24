@@ -4,11 +4,15 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +25,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.RandomUuid;
-import me.moirai.storyengine.common.domain.Permissions;
+import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.GameMode;
@@ -77,13 +81,22 @@ public class Adventure extends ShareableAsset {
     @Embedded
     private ModelConfiguration modelConfiguration;
 
+    @ElementCollection
+    @CollectionTable(name = "adventure_permissions", joinColumns = @JoinColumn(name = "adventure_id"))
+    Set<Permission> permissions = new HashSet<>();
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "adventure_id")
     private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
 
+    @Override
+    protected Set<Permission> permissions() {
+        return permissions;
+    }
+
     private Adventure(Builder builder) {
 
-        super(builder.visibility, builder.permissions);
+        super(builder.visibility);
 
         this.name = builder.name;
         this.description = builder.description;
@@ -96,6 +109,7 @@ public class Adventure extends ShareableAsset {
         this.moderation = builder.moderation;
         this.gameMode = builder.gameMode;
         this.isMultiplayer = builder.isMultiplayer;
+        this.permissions.addAll(builder.permissions);
     }
 
     protected Adventure() {
@@ -371,7 +385,7 @@ public class Adventure extends ShareableAsset {
         private ModelConfiguration modelConfiguration;
         private Moderation moderation;
         private Visibility visibility;
-        private Permissions permissions;
+        private Set<Permission> permissions = new HashSet<>();
 
         private Builder() {
         }
@@ -448,9 +462,9 @@ public class Adventure extends ShareableAsset {
             return this;
         }
 
-        public Builder permissions(Permissions permissions) {
+        public Builder permissions(Permission... permissions) {
 
-            this.permissions = permissions;
+            this.permissions.addAll(Set.of(permissions));
             return this;
         }
 
@@ -474,10 +488,6 @@ public class Adventure extends ShareableAsset {
 
             if (visibility == null) {
                 throw new BusinessRuleViolationException("Visibility cannot be null");
-            }
-
-            if (permissions == null) {
-                throw new BusinessRuleViolationException("Permissions cannot be null");
             }
 
             if (gameMode == null) {

@@ -44,7 +44,6 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
                 .select(SELECT_SQL)
                 .filter(Optional.of(resolveView(query.view(), query.requesterId())))
                 .filter(Filters.containsIgnoreCase("w.name", "name", query.name()))
-                .filter(Filters.equals("w.owner_id", "ownerId", query.ownerId()))
                 .sortBy(resolveSortingField(query.sortingField()), query.direction())
                 .page(query.page(), query.size())
                 .build();
@@ -62,13 +61,13 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
         return PaginatedResult.of(data, totalItems, pq.page(), pq.size());
     }
 
-    private Filter resolveView(SearchView view, String requesterId) {
+    private Filter resolveView(SearchView view, Long requesterId) {
         return switch (view) {
             case MY_STUFF -> new Filter(
-                    "(w.owner_id = :requesterId OR w.users_allowed_to_write LIKE '%' || :requesterId || '%')",
+                    "EXISTS (SELECT 1 FROM world_permissions wp WHERE wp.world_id = w.id AND wp.user_id = :requesterId)",
                     "requesterId", requesterId);
             case SHARED_WITH_ME -> new Filter(
-                    "w.owner_id != :requesterId AND (w.users_allowed_to_read LIKE '%' || :requesterId || '%' OR w.users_allowed_to_write LIKE '%' || :requesterId || '%')",
+                    "NOT EXISTS (SELECT 1 FROM world_permissions wp WHERE wp.world_id = w.id AND wp.user_id = :requesterId AND wp.permission = 'OWNER') AND EXISTS (SELECT 1 FROM world_permissions wp WHERE wp.world_id = w.id AND wp.user_id = :requesterId)",
                     "requesterId", requesterId);
             case EXPLORE -> new Filter("w.visibility = 'PUBLIC'", null, null);
         };

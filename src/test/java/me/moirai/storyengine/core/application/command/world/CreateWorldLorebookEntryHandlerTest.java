@@ -14,11 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
-import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,83 +30,79 @@ public class CreateWorldLorebookEntryHandlerTest {
     @Test
     public void errorWhenCommandIsNull() {
 
-        // Given
+        // given
         CreateWorldLorebookEntry command = null;
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void errorWhenWorldIdIsNull() {
 
-        // Given
-        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+        // given
+        var command = new CreateWorldLorebookEntry(
                 null,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 null);
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void errorWhenNameIsNull() {
 
-        // Given
-        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+        // given
+        var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 null,
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 null);
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void errorWhenDescriptionIsNull() {
 
-        // Given
-        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+        // given
+        var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 null,
                 null);
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createWorldLorebookEntry() {
 
-        // Given
-        String requesterId = "OWNER123";
-        CreateWorldLorebookEntry command = new CreateWorldLorebookEntry(
+        // given
+        var requesterId = "OWNER123";
+        var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 requesterId);
 
-        World world = WorldFixture.privateWorld()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var world = WorldFixture.privateWorld().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);
 
-        // When
-        WorldLorebookEntryDetails result = handler.handle(command);
+        // when
+        var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo(command.name());
     }

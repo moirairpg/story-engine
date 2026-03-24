@@ -27,7 +27,10 @@ jobs:
             echo "CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
       - name: Unit tests
         if: github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master'
-        run: mvn test -e
+        run: mvn test -e -DskipIntegrationTests
+      - name: Integration tests
+        if: github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/master'
+        run: mvn test -e -DskipUnitTests
       - name: Test container build image
         if: github.ref != 'refs/heads/develop'
         run: docker build -t ${{ vars.DOCKER_REPO_ADDR }}/${{ vars.DOCKER_REPO }}/${{ vars.DOCKER_IMAGE_NAME }}:bleeding-edge .

@@ -29,27 +29,30 @@ class CreatePersonaHandlerTest {
     @Test
     void shouldThrowExceptionWhenCommandIsNull() {
 
+        // given
         CreatePersona command = null;
 
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     void shouldCreatePersona() {
 
+        // given
         var persona = PersonaFixture.privatePersonaWithId();
         var command = CreatePersonaFixture.createPrivatePersona();
 
         when(repository.save(any(Persona.class))).thenReturn(persona);
 
+        // when
         var result = handler.handle(command);
 
+        // then
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo(persona.getName());
         assertThat(result.personality()).isEqualTo(persona.getPersonality());
         assertThat(result.visibility()).isEqualTo(persona.getVisibility());
-        assertThat(result.ownerId()).isEqualTo(persona.getOwnerId());
-        assertThat(result.usersAllowedToRead()).isEqualTo(persona.getUsersAllowedToRead());
-        assertThat(result.usersAllowedToWrite()).isEqualTo(persona.getUsersAllowedToWrite());
+        assertThat(result.permissions()).isEqualTo(persona.getPermissions());
     }
 }

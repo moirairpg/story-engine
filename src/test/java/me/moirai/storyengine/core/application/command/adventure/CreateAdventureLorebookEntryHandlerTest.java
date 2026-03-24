@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.domain.PermissionsFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.CreateAdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
@@ -32,7 +31,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
     @Test
     public void createEntry_whenAdventureIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new CreateAdventureLorebookEntry(
                 null,
                 "Volin Habar",
@@ -41,14 +40,14 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenNameIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 null,
@@ -57,14 +56,14 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenDescriptionIdIsNull_thenThrowException() {
 
-        // Given
+        // given
         var command = new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
@@ -73,30 +72,25 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null,
                 "1234");
 
-        // Then
+        // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 
     @Test
     public void createEntry_whenTriggered_thenCallService() {
 
-        // Given
-        var requesterId = "1234";
+        // given
         var command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry();
 
-        var adventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerId(requesterId)
-                        .build())
-                .build();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(any())).thenReturn(adventure);
 
-        // When
+        // when
         var result = handler.handle(command);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo(command.name());
     }

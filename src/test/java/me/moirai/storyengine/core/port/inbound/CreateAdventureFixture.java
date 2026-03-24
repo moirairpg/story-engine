@@ -1,20 +1,20 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
-
 import static me.moirai.storyengine.common.enums.Moderation.STRICT;
 import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
 
-import me.moirai.storyengine.core.domain.adventure.Adventure;
+import java.util.Set;
+
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 
 public class CreateAdventureFixture {
 
     public static CreateAdventure sample() {
 
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new CreateAdventure(
                 adventure.getName(),
                 adventure.getDescription(),
@@ -37,14 +37,14 @@ public class CreateAdventureFixture {
                 adventure.getModelConfiguration().getPresencePenalty(),
                 adventure.getModelConfiguration().getLogitBias(),
                 adventure.getModelConfiguration().getStopSequences(),
-                adventure.getUsersAllowedToWrite(),
-                adventure.getUsersAllowedToRead(),
+                Set.of(),
+                Set.of(),
                 adventure.isMultiplayer());
     }
 
     public static CreateAdventure sampleWithRequesterId(String requesterId) {
 
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new CreateAdventure(
                 adventure.getName(),
                 adventure.getDescription(),
@@ -67,8 +67,8 @@ public class CreateAdventureFixture {
                 adventure.getModelConfiguration().getPresencePenalty(),
                 adventure.getModelConfiguration().getLogitBias(),
                 adventure.getModelConfiguration().getStopSequences(),
-                adventure.getUsersAllowedToWrite(),
-                adventure.getUsersAllowedToRead(),
+                Set.of(),
+                Set.of(),
                 adventure.isMultiplayer());
     }
 }
