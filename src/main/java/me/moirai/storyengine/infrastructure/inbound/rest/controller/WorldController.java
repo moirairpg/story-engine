@@ -98,8 +98,7 @@ public class WorldController extends SecurityContextAware {
                                 entry.description()))
                         .toList(),
                 request.usersAllowedToWrite(),
-                request.usersAllowedToRead(),
-                authenticatedUserId());
+                request.usersAllowedToRead());
 
         return commandRunner.run(command);
     }
@@ -116,7 +115,6 @@ public class WorldController extends SecurityContextAware {
                 request.description(),
                 request.adventureStart(),
                 request.visibility(),
-                authenticatedUserId(),
                 request.usersAllowedToWriteToAdd(),
                 request.usersAllowedToWriteToRemove(),
                 request.usersAllowedToReadToAdd(),

@@ -11,7 +11,6 @@ public record UpdatePersona(
         String name,
         String personality,
         Visibility visibility,
-        String requesterId,
         Set<Long> usersAllowedToWriteToAdd,
         Set<Long> usersAllowedToWriteToRemove,
         Set<Long> usersAllowedToReadToAdd,

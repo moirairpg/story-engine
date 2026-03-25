@@ -21,7 +21,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.PermissionLevel;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -77,19 +76,6 @@ public class CreateAdventureHandlerTest {
     }
 
     @Test
-    public void createAdventure_whenNoWorldPermission_thenThrowException() {
-
-        // given
-        var command = CreateAdventureFixture.sample();
-        var world = WorldFixture.privateWorld().build();
-
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
-
-        // then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
-    }
-
-    @Test
     public void createAdventure_whenPersonaNotFound_thenThrowException() {
 
         // given
@@ -102,23 +88,6 @@ public class CreateAdventureHandlerTest {
 
         // then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void createAdventure_whenNoPersonaPermission_thenThrowException() {
-
-        // given
-        var command = CreateAdventureFixture.sample();
-        var world = WorldFixture.privateWorld().build();
-        var persona = PersonaFixture.privatePersona().build();
-
-        world.grant(new Permission(AUTHENTICATED_USER_ID, PermissionLevel.READ));
-
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
-
-        // then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 
     @Test

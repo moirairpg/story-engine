@@ -47,7 +47,7 @@ class UpdatePersonaHandlerTest {
 
         // given
         var command = new UpdatePersona(
-                null, null, null, null, null,
+                null, null, null, null,
                 null, null, null, null);
 
         // then
@@ -61,7 +61,7 @@ class UpdatePersonaHandlerTest {
         var personaId = PersonaFixture.PUBLIC_ID;
         var command = new UpdatePersona(
                 personaId, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC, null,
+                Visibility.PUBLIC,
                 Set.of(123456L), Set.of(123456L),
                 Set.of(123456L), Set.of(123456L));
 
@@ -77,10 +77,9 @@ class UpdatePersonaHandlerTest {
     void shouldUpdatePersonaWhenValidData() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC, requesterId,
+                Visibility.PUBLIC,
                 Set.of(123456L), Set.of(123456L),
                 Set.of(123456L), Set.of(123456L));
 
@@ -101,10 +100,9 @@ class UpdatePersonaHandlerTest {
     void shouldUpdatePersonaWhenNoWriterUsersAreAdded() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC, requesterId,
+                Visibility.PUBLIC,
                 null, Set.of(4567L),
                 Set.of(123456L), Set.of(4567L));
 
@@ -125,10 +123,9 @@ class UpdatePersonaHandlerTest {
     void shouldUpdatePersonaWhenNoReaderUsersAreAdded() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC, requesterId,
+                Visibility.PUBLIC,
                 Set.of(123456L), Set.of(4567L),
                 null, Set.of(4567L));
 
@@ -149,10 +146,9 @@ class UpdatePersonaHandlerTest {
     void shouldUpdatePersonaWhenNoReaderUsersAreRemoved() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC, requesterId,
+                Visibility.PUBLIC,
                 Set.of(123456L), Set.of(123456L),
                 Set.of(123456L), null);
 
@@ -173,10 +169,9 @@ class UpdatePersonaHandlerTest {
     void shouldUpdatePersonaWhenNoWriterUsersAreRemoved() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC, requesterId,
+                Visibility.PUBLIC,
                 Set.of(123456L), null,
                 Set.of(123456L), Set.of(4567L));
 
@@ -197,10 +192,9 @@ class UpdatePersonaHandlerTest {
     void shouldMakePersonaPrivateWhenVisibilityChangedToPrivate() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, null, null,
-                Visibility.PRIVATE, requesterId,
+                Visibility.PRIVATE,
                 null, null, null, null);
 
         var unchangedPersona = PersonaFixture.publicPersona().build();
@@ -220,10 +214,9 @@ class UpdatePersonaHandlerTest {
     void shouldNotChangePersonaWhenNullVisibility() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, null, null,
-                null, requesterId,
+                null,
                 null, null, null, null);
 
         var unchangedPersona = PersonaFixture.privatePersona().build();
@@ -243,10 +236,9 @@ class UpdatePersonaHandlerTest {
     void shouldNotChangePersonaWhenAllFieldsAreNull() {
 
         // given
-        var requesterId = "RQSTRID";
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, null, null,
-                null, requesterId,
+                null,
                 null, null, null, null);
 
         var unchangedPersona = PersonaFixture.privatePersona().build();

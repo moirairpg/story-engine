@@ -12,7 +12,6 @@ public record UpdateWorld(
         String description,
         String adventureStart,
         Visibility visibility,
-        String requesterId,
         Set<Long> usersAllowedToWriteToAdd,
         Set<Long> usersAllowedToWriteToRemove,
         Set<Long> usersAllowedToReadToAdd,

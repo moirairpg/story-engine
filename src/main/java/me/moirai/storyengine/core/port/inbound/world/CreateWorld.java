@@ -13,8 +13,7 @@ public record CreateWorld(
         Visibility visibility,
         List<LorebookEntry> lorebookEntries,
         Set<Long> usersAllowedToWrite,
-        Set<Long> usersAllowedToRead,
-        String requesterId)
+        Set<Long> usersAllowedToRead)
         implements Command<WorldDetails> {
 
     public record LorebookEntry(

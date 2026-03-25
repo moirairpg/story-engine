@@ -35,7 +35,6 @@ public class UpdateWorldHandlerTest {
 
         // given
         var id = WorldFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
         var newName = "NEW NAME";
         var command = new UpdateWorld(
                 id,
@@ -43,7 +42,6 @@ public class UpdateWorldHandlerTest {
                 "This is an RPG world",
                 "As you enter the city, people around you start looking at you.",
                 Visibility.PUBLIC,
-                requesterId,
                 null,
                 null,
                 null,
@@ -68,14 +66,12 @@ public class UpdateWorldHandlerTest {
 
         // given
         var id = WorldFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
         var command = new UpdateWorld(
                 id,
                 "MoirAI",
                 "This is an RPG world",
                 "As you enter the city, people around you start looking at you.",
                 Visibility.PUBLIC,
-                requesterId,
                 null,
                 null,
                 null,
@@ -104,14 +100,12 @@ public class UpdateWorldHandlerTest {
 
         // given
         var id = WorldFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
         var command = new UpdateWorld(
                 id,
                 null,
                 null,
                 null,
                 null,
-                requesterId,
                 null,
                 null,
                 null,
@@ -134,14 +128,12 @@ public class UpdateWorldHandlerTest {
 
         // given
         var id = WorldFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
         var command = new UpdateWorld(
                 id,
                 null,
                 null,
                 null,
                 Visibility.PRIVATE,
-                requesterId,
                 null,
                 null,
                 null,
@@ -165,14 +157,12 @@ public class UpdateWorldHandlerTest {
 
         // given
         var id = WorldFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
         var command = new UpdateWorld(
                 id,
                 null,
                 null,
                 null,
                 null,
-                requesterId,
                 null,
                 null,
                 null,
@@ -203,7 +193,6 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
-                null,
                 null);
 
         // then
@@ -218,7 +207,6 @@ public class UpdateWorldHandlerTest {
         var command = new UpdateWorld(
                 WorldFixture.PUBLIC_ID,
                 "SomeNewName",
-                null,
                 null,
                 null,
                 null,

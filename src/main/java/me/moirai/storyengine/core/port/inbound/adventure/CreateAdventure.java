@@ -19,7 +19,6 @@ public record CreateAdventure(
         Visibility visibility,
         ArtificialIntelligenceModel aiModel,
         Moderation moderation,
-        String requesterId,
         GameMode gameMode,
         String nudge,
         String remember,

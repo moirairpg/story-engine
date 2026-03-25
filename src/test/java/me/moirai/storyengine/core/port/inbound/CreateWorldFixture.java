@@ -19,7 +19,6 @@ public class CreateWorldFixture {
                 world.getVisibility(),
                 Collections.emptyList(),
                 Set.of(),
-                Set.of(),
-                "RQSTRID");
+                Set.of());
     }
 }

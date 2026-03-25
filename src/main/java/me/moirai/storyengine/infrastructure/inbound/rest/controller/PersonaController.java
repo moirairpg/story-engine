@@ -90,7 +90,6 @@ public class PersonaController extends SecurityContextAware {
                 request.name(),
                 request.personality(),
                 request.visibility(),
-                authenticatedUserId(),
                 request.usersAllowedToRead(),
                 request.usersAllowedToWrite());
 
@@ -109,7 +108,6 @@ public class PersonaController extends SecurityContextAware {
                 request.name(),
                 request.personality(),
                 request.visibility(),
-                authenticatedUserId(),
                 request.usersAllowedToWriteToAdd(),
                 request.usersAllowedToReadToAdd(),
                 request.usersAllowedToWriteToRemove(),

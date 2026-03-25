@@ -96,6 +96,7 @@ public class AdventureController extends SecurityContextAware {
         return queryRunner.run(query);
     }
 
+    // TODO create authorizer that validates world and persona permission
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public AdventureDetails createAdventure(
@@ -110,7 +111,6 @@ public class AdventureController extends SecurityContextAware {
                 request.visibility(),
                 request.aiModel(),
                 request.moderation(),
-                authenticatedUserId(),
                 request.gameMode(),
                 request.nudge(),
                 request.remember(),
@@ -148,7 +148,6 @@ public class AdventureController extends SecurityContextAware {
                 request.visibility(),
                 request.aiModel(),
                 request.moderation(),
-                authenticatedUserId(),
                 request.gameMode(),
                 request.nudge(),
                 request.remember(),

@@ -1,7 +1,5 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
@@ -13,6 +11,7 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 
 public class CreateAdventureTest {
 
@@ -32,7 +31,6 @@ public class CreateAdventureTest {
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                "RQSTRID",
                 adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
                 adventure.getContextAttributes().remember(),
@@ -85,7 +83,6 @@ public class CreateAdventureTest {
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.requesterId(),
                 sample.gameMode(),
                 sample.nudge(),
                 sample.remember(),
@@ -122,7 +119,6 @@ public class CreateAdventureTest {
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.requesterId(),
                 sample.gameMode(),
                 sample.nudge(),
                 sample.remember(),
@@ -159,7 +155,6 @@ public class CreateAdventureTest {
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.requesterId(),
                 sample.gameMode(),
                 sample.nudge(),
                 sample.remember(),
@@ -196,7 +191,6 @@ public class CreateAdventureTest {
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.requesterId(),
                 sample.gameMode(),
                 sample.nudge(),
                 sample.remember(),

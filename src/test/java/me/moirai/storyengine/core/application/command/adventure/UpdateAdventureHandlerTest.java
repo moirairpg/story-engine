@@ -50,7 +50,6 @@ public class UpdateAdventureHandlerTest {
         var command = new UpdateAdventure(
                 null,
                 null, null, null, null, null, null, null, null, null,
-                "RQSTRID",
                 null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, false);
 
