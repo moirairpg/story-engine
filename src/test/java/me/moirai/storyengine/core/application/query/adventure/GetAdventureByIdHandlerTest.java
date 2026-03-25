@@ -40,7 +40,7 @@ public class GetAdventureByIdHandlerTest {
     public void errorWhenIdIsNull() {
 
         // Given
-        var query = new GetAdventureById(null, "123123");
+        var query = new GetAdventureById(null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -60,7 +60,7 @@ public class GetAdventureByIdHandlerTest {
     public void findAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        var query = new GetAdventureById(AdventureFixture.PUBLIC_ID, "123123");
+        var query = new GetAdventureById(AdventureFixture.PUBLIC_ID);
 
         when(reader.getAdventureById(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -85,7 +85,7 @@ public class GetAdventureByIdHandlerTest {
                 modelConfiguration, contextAttributes,
                 Set.of());
 
-        var query = new GetAdventureById(AdventureFixture.PUBLIC_ID, "RQSTRID");
+        var query = new GetAdventureById(AdventureFixture.PUBLIC_ID);
 
         when(reader.getAdventureById(any(UUID.class))).thenReturn(Optional.of(expectedDetails));
 

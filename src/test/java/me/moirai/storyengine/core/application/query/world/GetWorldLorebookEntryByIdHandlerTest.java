@@ -44,7 +44,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void errorWhenEntryIdIsNull() {
 
         // Given
-        var query = new GetWorldLorebookEntryById(null, WorldFixture.PUBLIC_ID, null);
+        var query = new GetWorldLorebookEntryById(null, WorldFixture.PUBLIC_ID);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -54,7 +54,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
     public void errorWhenWorldIdIsNull() {
 
         // Given
-        var query = new GetWorldLorebookEntryById(WorldLorebookEntryFixture.PUBLIC_ID, null, null);
+        var query = new GetWorldLorebookEntryById(WorldLorebookEntryFixture.PUBLIC_ID, null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -65,7 +65,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
 
         // Given
         var query = new GetWorldLorebookEntryById(
-                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID, "4314324");
+                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID);
 
         when(reader.getWorldLorebookEntryById(any(UUID.class), any(UUID.class))).thenReturn(Optional.empty());
 
@@ -82,7 +82,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
                 "White River", "[Ww]hite", "Description", null, null);
 
         var query = new GetWorldLorebookEntryById(
-                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID, "4314324");
+                WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID);
 
         when(reader.getWorldLorebookEntryById(any(UUID.class), any(UUID.class)))
                 .thenReturn(Optional.of(expectedDetails));

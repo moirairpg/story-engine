@@ -5,25 +5,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 @Service
 public class MoiraiUserDetailsService implements UserDetailsService {
 
     private final DiscordAuthenticationPort discordAuthenticationPort;
-    private final QueryRunner queryRunner;
+    private final UserReader userReader;
 
     public MoiraiUserDetailsService(
             DiscordAuthenticationPort discordAuthenticationPort,
-            QueryRunner queryRunner) {
+            UserReader userReader) {
 
         this.discordAuthenticationPort = discordAuthenticationPort;
-        this.queryRunner = queryRunner;
+        this.userReader = userReader;
     }
 
     @Override
@@ -42,14 +41,14 @@ public class MoiraiUserDetailsService implements UserDetailsService {
             String refreshToken) {
 
         try {
-            var query = new GetUserDetailsByDiscordId(discordUser.id());
-            var moiraiUser = queryRunner.run(query);
+            var moiraiUser = userReader.getUserByDiscordId(discordUser.id())
+                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
 
             return new MoiraiPrincipal(
                     moiraiUser.publicId(),
                     moiraiUser.id(),
                     moiraiUser.discordId(),
-                    moiraiUser.username(),
+                    discordUser.username(),
                     discordUser.email(),
                     authorizationToken,
                     refreshToken,

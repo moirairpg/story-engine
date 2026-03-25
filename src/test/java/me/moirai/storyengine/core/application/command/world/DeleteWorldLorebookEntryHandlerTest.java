@@ -37,8 +37,7 @@ public class DeleteWorldLorebookEntryHandlerTest {
         // given
         var command = new DeleteWorldLorebookEntry(
                 null,
-                WorldFixture.PUBLIC_ID,
-                "RQSTRID");
+                WorldFixture.PUBLIC_ID);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -51,8 +50,7 @@ public class DeleteWorldLorebookEntryHandlerTest {
         // given
         var command = new DeleteWorldLorebookEntry(
                 WorldLorebookEntryFixture.PUBLIC_ID,
-                null,
-                "RQSTRID");
+                null);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -63,12 +61,9 @@ public class DeleteWorldLorebookEntryHandlerTest {
     public void deleteWorld() {
 
         // given
-        var requesterId = "4234324";
-
         var command = new DeleteWorldLorebookEntry(
                 WorldLorebookEntryFixture.PUBLIC_ID,
-                WorldFixture.PUBLIC_ID,
-                requesterId);
+                WorldFixture.PUBLIC_ID);
 
         var baseWorld = WorldFixture.publicWorld().build();
 

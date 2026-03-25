@@ -78,7 +78,7 @@ public class WorldController extends SecurityContextAware {
     @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "#worldId")
     public WorldDetails getWorldById(@PathVariable(required = true) UUID worldId) {
 
-        var query = new GetWorldById(worldId, authenticatedUserId());
+        var query = new GetWorldById(worldId);
         return queryRunner.run(query);
     }
 
@@ -128,7 +128,7 @@ public class WorldController extends SecurityContextAware {
     @Authorize(operation = AuthorizationOperation.DELETE_WORLD, fields = "#worldId")
     public void deleteWorld(@PathVariable(required = true) UUID worldId) {
 
-        var command = new DeleteWorld(worldId, authenticatedUserId());
+        var command = new DeleteWorld(worldId);
         commandRunner.run(command);
     }
 }

@@ -14,4 +14,6 @@ public enum AuthorizationOperation {
     VIEW_ADVENTURE,
 
     MANAGE_USER,
+    UPDATE_USER_USERNAME,
+    UPDATE_USER_ROLE,
 }

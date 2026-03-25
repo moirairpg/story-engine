@@ -37,8 +37,7 @@ public class SearchWorldLorebookEntriesHandlerTest {
                 null,
                 null,
                 1,
-                2,
-                "requesterId");
+                2);
 
         var expectedResult = PaginatedResult.<LorebookEntrySummary>of(List.of(), 0L, 1, 2);
 

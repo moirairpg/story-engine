@@ -34,8 +34,7 @@ public class DeletePersonaHandlerTest {
 
         // given
         UUID id = null;
-        String requesterId = "RQSTRID";
-        var command = new DeletePersona(id, requesterId);
+        var command = new DeletePersona(id);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -47,8 +46,7 @@ public class DeletePersonaHandlerTest {
 
         // given
         var id = PersonaFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
-        var command = new DeletePersona(id, requesterId);
+        var command = new DeletePersona(id);
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -62,8 +60,7 @@ public class DeletePersonaHandlerTest {
 
         // given
         var id = PersonaFixture.PUBLIC_ID;
-        var requesterId = "RQSTRID";
-        var command = new DeletePersona(id, requesterId);
+        var command = new DeletePersona(id);
 
         var persona = PersonaFixture.privatePersona().name("New name").build();
 

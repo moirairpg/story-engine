@@ -37,8 +37,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -53,8 +52,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null,
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -69,8 +67,7 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 null,
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));

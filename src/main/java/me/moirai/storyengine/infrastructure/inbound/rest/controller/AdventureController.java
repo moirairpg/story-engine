@@ -92,7 +92,7 @@ public class AdventureController extends SecurityContextAware {
     public AdventureDetails getAdventureById(
             @PathVariable(required = true) UUID adventureId) {
 
-        var query = new GetAdventureById(adventureId, authenticatedUserId());
+        var query = new GetAdventureById(adventureId);
         return queryRunner.run(query);
     }
 
@@ -177,7 +177,7 @@ public class AdventureController extends SecurityContextAware {
     public void deleteAdventure(
             @PathVariable(required = true) UUID adventureId) {
 
-        var command = new DeleteAdventure(adventureId, authenticatedUserId());
+        var command = new DeleteAdventure(adventureId);
         commandRunner.run(command);
     }
 

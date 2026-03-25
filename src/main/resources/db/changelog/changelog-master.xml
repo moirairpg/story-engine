@@ -59,4 +59,17 @@
   <include file="db/changelog/migrations/1774366625_alter_table_persona_drop_permission_columns.sql" />
   <include file="db/changelog/migrations/1774366625_alter_table_world_drop_permission_columns.sql" />
   <include file="db/changelog/migrations/1774366626_alter_table_adventure_drop_permission_columns.sql" />
+  <include file="db/changelog/migrations/1774400001_alter_table_moirai_user_add_username.sql" />
+  <include file="db/changelog/migrations/1774400002_update_table_world_migrate_creator_id_to_username.sql" />
+  <include file="db/changelog/migrations/1774400003_update_table_persona_migrate_creator_id_to_username.sql" />
+  <include file="db/changelog/migrations/1774400004_update_table_adventure_migrate_creator_id_to_username.sql" />
+  <include file="db/changelog/migrations/1774400005_update_table_world_lorebook_migrate_creator_id_to_username.sql" />
+  <include file="db/changelog/migrations/1774400006_update_table_adventure_lorebook_migrate_creator_id_to_username.sql" />
+  <include file="db/changelog/migrations/1774400007_update_table_moirai_user_migrate_creator_id_to_username.sql" />
+  <include file="db/changelog/migrations/1774400008_alter_table_world_rename_creator_id.sql" />
+  <include file="db/changelog/migrations/1774400009_alter_table_persona_rename_creator_id.sql" />
+  <include file="db/changelog/migrations/1774400010_alter_table_adventure_rename_creator_id.sql" />
+  <include file="db/changelog/migrations/1774400011_alter_table_world_lorebook_rename_creator_id.sql" />
+  <include file="db/changelog/migrations/1774400012_alter_table_adventure_lorebook_rename_creator_id.sql" />
+  <include file="db/changelog/migrations/1774400013_alter_table_moirai_user_rename_creator_id.sql" />
 </databaseChangeLog>

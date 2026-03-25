@@ -19,12 +19,12 @@ public class AssetBaseDataAssigner {
     public void setBaseData(Asset asset) {
 
         var authenticatedUser = getAuthenticatedUser();
-        if (asset.getCreatorId() == null) {
-            var creatorName = Optional.ofNullable(authenticatedUser)
-                    .map(MoiraiPrincipal::discordId)
+        if (asset.getCreatedBy() == null) {
+            var createdBy = Optional.ofNullable(authenticatedUser)
+                    .map(MoiraiPrincipal::username)
                     .orElse("SYSTEM");
 
-            asset.setCreatorId(creatorName);
+            asset.setCreatedBy(createdBy);
         }
 
         var now = Instant.now();

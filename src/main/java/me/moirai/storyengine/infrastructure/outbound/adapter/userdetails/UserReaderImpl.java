@@ -24,6 +24,16 @@ public class UserReaderImpl implements UserReader {
               FROM moirai_user u
              WHERE u.discord_id = :discordId
             """;
+
+    private static final String SELECT_BY_PUBLIC_ID = """
+            SELECT u.public_id,
+                   u.id,
+                   u.discord_id,
+                   u.role,
+                   u.creation_date
+              FROM moirai_user u
+             WHERE u.public_id = :publicId
+            """;
     //@formatter:on
 
     private final JdbcClient jdbcClient;
@@ -36,6 +46,14 @@ public class UserReaderImpl implements UserReader {
     public Optional<UserData> getUserByDiscordId(String discordId) {
         return jdbcClient.sql(SELECT_BY_DISCORD_ID)
                 .param("discordId", discordId)
+                .query(toUserData())
+                .optional();
+    }
+
+    @Override
+    public Optional<UserData> getUserById(UUID id) {
+        return jdbcClient.sql(SELECT_BY_PUBLIC_ID)
+                .param("publicId", id)
                 .query(toUserData())
                 .optional();
     }

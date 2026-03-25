@@ -6,7 +6,6 @@ import me.moirai.storyengine.common.cqs.command.Command;
 
 public record DeleteAdventureLorebookEntry(
         UUID entryId,
-        UUID adventureId,
-        String requesterId)
+        UUID adventureId)
         implements Command<Void> {
 }

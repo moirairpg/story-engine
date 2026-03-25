@@ -13,7 +13,6 @@ public record SearchAdventureLorebookEntries(
         AdventureLorebookSortField sortingField,
         SortDirection direction,
         Integer page,
-        Integer size,
-        String requesterId)
+        Integer size)
         implements Query<PaginatedResult<LorebookEntrySummary>> {
 }

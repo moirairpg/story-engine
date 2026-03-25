@@ -45,8 +45,7 @@ public class CreateWorldLorebookEntryHandlerTest {
                 null,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
-                "Volin Habar is a warrior that fights with a sword.",
-                null);
+                "Volin Habar is a warrior that fights with a sword.");
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -60,8 +59,7 @@ public class CreateWorldLorebookEntryHandlerTest {
                 WorldFixture.PUBLIC_ID,
                 null,
                 "[Vv]olin [Hh]abar|[Vv]oha",
-                "Volin Habar is a warrior that fights with a sword.",
-                null);
+                "Volin Habar is a warrior that fights with a sword.");
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -75,7 +73,6 @@ public class CreateWorldLorebookEntryHandlerTest {
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
-                null,
                 null);
 
         // then
@@ -86,13 +83,11 @@ public class CreateWorldLorebookEntryHandlerTest {
     public void createWorldLorebookEntry() {
 
         // given
-        var requesterId = "OWNER123";
         var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
-                "Volin Habar is a warrior that fights with a sword.",
-                requesterId);
+                "Volin Habar is a warrior that fights with a sword.");
 
         var world = WorldFixture.privateWorld().build();
 

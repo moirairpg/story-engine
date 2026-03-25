@@ -31,8 +31,7 @@ public class DeleteAdventureHandlerTest {
     public void errorWhenIdIsNull() {
 
         // Given
-        String requesterId = "RQSTRID";
-        DeleteAdventure command = new DeleteAdventure(null, requesterId);
+        DeleteAdventure command = new DeleteAdventure(null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -42,8 +41,7 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        String requesterId = "RQSTRID";
-        DeleteAdventure command = new DeleteAdventure(AdventureFixture.PUBLIC_ID, requesterId);
+        DeleteAdventure command = new DeleteAdventure(AdventureFixture.PUBLIC_ID);
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 

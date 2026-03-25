@@ -77,7 +77,7 @@ public class PersonaController extends SecurityContextAware {
     public PersonaDetails getPersonaById(
             @PathVariable(required = true) UUID personaId) {
 
-        var query = new GetPersonaById(personaId, authenticatedUserId());
+        var query = new GetPersonaById(personaId);
         return queryRunner.run(query);
     }
 
@@ -122,7 +122,7 @@ public class PersonaController extends SecurityContextAware {
     public void deletePersona(
             @PathVariable(required = true) UUID personaId) {
 
-        var command = new DeletePersona(personaId, authenticatedUserId());
+        var command = new DeletePersona(personaId);
         commandRunner.run(command);
     }
 }

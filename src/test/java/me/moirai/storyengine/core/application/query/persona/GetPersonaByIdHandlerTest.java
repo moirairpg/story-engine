@@ -33,7 +33,7 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenIdIsNull_thenThrowException() {
 
         // Given
-        var query = new GetPersonaById(null, "RQSTRID");
+        var query = new GetPersonaById(null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -43,7 +43,7 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenPersonaNotFound_thenThrowException() {
 
         // Given
-        var query = new GetPersonaById(PersonaFixture.PUBLIC_ID, "RQSTRID");
+        var query = new GetPersonaById(PersonaFixture.PUBLIC_ID);
 
         when(reader.getPersonaById(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -60,7 +60,7 @@ public class GetPersonaByIdHandlerTest {
                 java.util.Set.of(),
                 null, null);
 
-        var query = new GetPersonaById(PersonaFixture.PUBLIC_ID, "RQSTRID");
+        var query = new GetPersonaById(PersonaFixture.PUBLIC_ID);
 
         when(reader.getPersonaById(any(UUID.class))).thenReturn(Optional.of(expectedDetails));
 

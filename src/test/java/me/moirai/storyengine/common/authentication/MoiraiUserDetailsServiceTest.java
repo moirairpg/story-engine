@@ -1,11 +1,11 @@
 package me.moirai.storyengine.common.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 @ExtendWith(MockitoExtension.class)
 public class MoiraiUserDetailsServiceTest {
@@ -29,7 +29,7 @@ public class MoiraiUserDetailsServiceTest {
     private DiscordAuthenticationPort discordAuthenticationPort;
 
     @Mock
-    private QueryRunner queryRunner;
+    private UserReader userReader;
 
     @InjectMocks
     private MoiraiUserDetailsService service;
@@ -41,26 +41,20 @@ public class MoiraiUserDetailsServiceTest {
         var token = "AUTH_TOKEN / REFRESH_TOKEN";
         var username = "john.doe";
         var nickname = "JohnDoe";
+        var publicId = UUID.randomUUID();
 
         var response = new DiscordUserDataResponse(
-                null,
+                "12345",
                 username,
                 nickname,
                 null,
                 "email@email.com",
                 null);
 
-        when(queryRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(new UserDetailsResult(
-                UUID.randomUUID(),
-                1L,
-                "12345",
-                username,
-                nickname,
-                "http://someurl.com/somepic.jpg",
-                null,
-                Instant.parse("2024-12-01T14:00:00Z")));
+        var userData = new UserData(publicId, 1L, "12345", Role.PLAYER, Instant.now());
 
         when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(response);
+        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
 
         // When
         var userDetails = service.loadUserByUsername(token);

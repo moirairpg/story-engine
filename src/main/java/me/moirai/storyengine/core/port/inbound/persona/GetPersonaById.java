@@ -5,6 +5,5 @@ import java.util.UUID;
 import me.moirai.storyengine.common.cqs.query.Query;
 
 public record GetPersonaById(
-        UUID personaId,
-        String requesterId) implements Query<PersonaDetails> {
+        UUID personaId) implements Query<PersonaDetails> {
 }

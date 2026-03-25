@@ -30,7 +30,7 @@ public class WorldLorebookSearchReaderImplIntegrationTest extends AbstractIntegr
         world.addLorebookEntry("White River", "[Ww]hite [Rr]iver", "A famous river");
         insert(world, World.class);
 
-        var query = new SearchWorldLorebookEntries(world.getPublicId(), null, null, null, null, null, "requesterId");
+        var query = new SearchWorldLorebookEntries(world.getPublicId(), null, null, null, null, null);
 
         // When
         var result = reader.search(query);
@@ -48,7 +48,7 @@ public class WorldLorebookSearchReaderImplIntegrationTest extends AbstractIntegr
         var world = WorldFixture.publicWorld().build();
         insert(world, World.class);
 
-        var query = new SearchWorldLorebookEntries(world.getPublicId(), null, null, null, null, null, "requesterId");
+        var query = new SearchWorldLorebookEntries(world.getPublicId(), null, null, null, null, null);
 
         // When
         var result = reader.search(query);
@@ -68,7 +68,7 @@ public class WorldLorebookSearchReaderImplIntegrationTest extends AbstractIntegr
         world.addLorebookEntry("Volin Habar", "[Vv]olin", "A warrior");
         insert(world, World.class);
 
-        var query = new SearchWorldLorebookEntries(world.getPublicId(), "White", null, null, null, null, "requesterId");
+        var query = new SearchWorldLorebookEntries(world.getPublicId(), "White", null, null, null, null);
 
         // When
         var result = reader.search(query);

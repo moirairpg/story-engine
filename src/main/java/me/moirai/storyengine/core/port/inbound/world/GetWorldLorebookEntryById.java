@@ -6,7 +6,6 @@ import me.moirai.storyengine.common.cqs.query.Query;
 
 public record GetWorldLorebookEntryById(
         UUID entryId,
-        UUID worldId,
-        String requesterId)
+        UUID worldId)
         implements Query<WorldLorebookEntryDetails> {
 }

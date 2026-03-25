@@ -44,7 +44,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
     public void errorWhenEntryIdIsNull() {
 
         // Given
-        var query = new GetAdventureLorebookEntryById(null, AdventureFixture.PUBLIC_ID, "1234");
+        var query = new GetAdventureLorebookEntryById(null, AdventureFixture.PUBLIC_ID);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -54,7 +54,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
     public void errorWhenAdventureIdIsNull() {
 
         // Given
-        var query = new GetAdventureLorebookEntryById(UUID.randomUUID(), null, "1234");
+        var query = new GetAdventureLorebookEntryById(UUID.randomUUID(), null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -65,7 +65,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
 
         // Given
         var query = new GetAdventureLorebookEntryById(
-                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID, "1234");
+                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID);
 
         when(reader.getAdventureLorebookEntryById(any(UUID.class), any(UUID.class))).thenReturn(Optional.empty());
 
@@ -82,7 +82,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
                 "White River", "[Ww]hite", "Description", null, false, null, null);
 
         var query = new GetAdventureLorebookEntryById(
-                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID, "4314324");
+                AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID);
 
         when(reader.getAdventureLorebookEntryById(any(UUID.class), any(UUID.class)))
                 .thenReturn(Optional.of(expectedDetails));

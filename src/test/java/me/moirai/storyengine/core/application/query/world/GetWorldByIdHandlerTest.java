@@ -48,7 +48,7 @@ public class GetWorldByIdHandlerTest {
                 WorldFixture.PUBLIC_ID, "MoirAI", "desc", "start", "PUBLIC",
                 java.util.Set.of(), null, null);
 
-        var query = new GetWorldById(WorldFixture.PUBLIC_ID, "84REAC");
+        var query = new GetWorldById(WorldFixture.PUBLIC_ID);
 
         when(reader.getWorldById(any(UUID.class))).thenReturn(Optional.of(expectedDetails));
 
@@ -64,7 +64,7 @@ public class GetWorldByIdHandlerTest {
     public void updateWorld_whenIdIsNull_thenExceptionIsThrown() {
 
         // Given
-        var command = new GetWorldById(null, "84REAC");
+        var command = new GetWorldById(null);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -75,7 +75,7 @@ public class GetWorldByIdHandlerTest {
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
-        var command = new GetWorldById(WorldFixture.PUBLIC_ID, "84REAC");
+        var command = new GetWorldById(WorldFixture.PUBLIC_ID);
 
         when(reader.getWorldById(any(UUID.class))).thenReturn(Optional.empty());
 

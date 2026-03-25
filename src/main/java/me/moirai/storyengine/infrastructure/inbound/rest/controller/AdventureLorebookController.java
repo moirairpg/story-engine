@@ -65,8 +65,7 @@ public class AdventureLorebookController extends SecurityContextAware {
                 sortingField,
                 direction,
                 page,
-                size,
-                authenticatedUserId()));
+                size));
     }
 
     @GetMapping("/{entryId}")
@@ -78,8 +77,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         var query = new GetAdventureLorebookEntryById(
                 entryId,
-                adventureId,
-                authenticatedUserId());
+                adventureId);
 
         return queryRunner.run(query);
     }
@@ -96,8 +94,7 @@ public class AdventureLorebookController extends SecurityContextAware {
                 request.name(),
                 request.regex(),
                 request.description(),
-                request.playerId(),
-                authenticatedUserId());
+                request.playerId());
 
         return commandRunner.run(command);
     }
@@ -116,8 +113,7 @@ public class AdventureLorebookController extends SecurityContextAware {
                 request.name(),
                 request.regex(),
                 request.description(),
-                request.playerId(),
-                authenticatedUserId());
+                request.playerId());
 
         return commandRunner.run(command);
     }
@@ -131,8 +127,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
         var command = new DeleteAdventureLorebookEntry(
                 entryId,
-                adventureId,
-                authenticatedUserId());
+                adventureId);
 
         commandRunner.run(command);
     }

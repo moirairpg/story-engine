@@ -8,7 +8,6 @@ public record CreateWorldLorebookEntry(
         UUID worldId,
         String name,
         String regex,
-        String description,
-        String requesterId)
+        String description)
         implements Command<WorldLorebookEntryDetails> {
 }

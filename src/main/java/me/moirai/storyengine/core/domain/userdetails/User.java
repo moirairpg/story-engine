@@ -29,6 +29,9 @@ public class User extends Asset {
     @Column(name = "discord_id")
     private String discordId;
 
+    @Column(name = "username")
+    private String username;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
@@ -36,6 +39,7 @@ public class User extends Asset {
     public User(Builder builder) {
 
         this.discordId = builder.discordId;
+        this.username = builder.username;
         this.role = builder.role;
     }
 
@@ -60,13 +64,26 @@ public class User extends Asset {
         return discordId;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public Role getRole() {
         return role;
+    }
+
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
     }
 
     public static final class Builder {
 
         private String discordId;
+        private String username;
         private Role role;
 
         private Builder() {
@@ -75,6 +92,12 @@ public class User extends Asset {
         public Builder discordId(String discordId) {
 
             this.discordId = discordId;
+            return this;
+        }
+
+        public Builder username(String username) {
+
+            this.username = username;
             return this;
         }
 

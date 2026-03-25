@@ -65,8 +65,7 @@ public class WorldLorebookController extends SecurityContextAware {
                 sortingField,
                 direction,
                 page,
-                size,
-                authenticatedUserId()));
+                size));
     }
 
     @GetMapping("/{entryId}")
@@ -78,8 +77,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
         var query = new GetWorldLorebookEntryById(
                 entryId,
-                worldId,
-                authenticatedUserId());
+                worldId);
 
         return queryRunner.run(query);
     }
@@ -95,8 +93,7 @@ public class WorldLorebookController extends SecurityContextAware {
                 worldId,
                 request.name(),
                 request.regex(),
-                request.description(),
-                authenticatedUserId());
+                request.description());
 
         return commandRunner.run(command);
     }
@@ -114,8 +111,7 @@ public class WorldLorebookController extends SecurityContextAware {
                 worldId,
                 request.name(),
                 request.regex(),
-                request.description(),
-                authenticatedUserId());
+                request.description());
 
         return commandRunner.run(command);
     }
@@ -129,8 +125,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
         var command = new DeleteWorldLorebookEntry(
                 entryId,
-                worldId,
-                authenticatedUserId());
+                worldId);
 
         commandRunner.run(command);
     }

@@ -18,8 +18,7 @@ public class CreateAdventureLorebookEntryTest {
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                "2423423423423",
-                "1234");
+                "2423423423423");
 
         // Then
         assertThat(command).isNotNull();
@@ -28,6 +27,5 @@ public class CreateAdventureLorebookEntryTest {
         assertThat(command.description()).isEqualTo("Volin Habar is a warrior that fights with a sword.");
         assertThat(command.regex()).isEqualTo("[Vv]olin [Hh]abar|[Vv]oha");
         assertThat(command.playerId()).isEqualTo("2423423423423");
-        assertThat(command.requesterId()).isEqualTo("1234");
     }
 }

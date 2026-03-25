@@ -55,4 +55,8 @@ public record MoiraiPrincipal(
     public String getUsername() {
         return username;
     }
+
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
+    }
 }

@@ -41,74 +41,85 @@ class ManageUserAuthorizerTest {
     @Test
     void shouldAuthorizeWhenUserIsAdmin() {
 
-        var userId = "12345";
+        // Given
+        var userId = UUID.randomUUID();
         var userData = adminUserData(userId);
-        var principal = principalWithDiscordId("999999999999999");
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(userId, principal);
 
-        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.of(userData));
+        when(reader.getUserById(userId)).thenReturn(Optional.of(userData));
 
+        // When
         var result = authorizer.authorize(context);
 
+        // Then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldAuthorizeWhenRequesterManagesTheirOwnAccount() {
 
-        var userId = "12345";
+        // Given
+        var userId = UUID.randomUUID();
         var userData = playerUserData(userId);
-        var principal = principalWithDiscordId(userId);
+        var principal = principalWithPublicId(userId);
         var context = contextWith(userId, principal);
 
-        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.of(userData));
+        when(reader.getUserById(userId)).thenReturn(Optional.of(userData));
 
+        // When
         var result = authorizer.authorize(context);
 
+        // Then
         assertThat(result).isTrue();
     }
 
     @Test
     void shouldDenyWhenUserIsPlayerAndRequesterIsNotSelf() {
 
-        var userId = "12345";
+        // Given
+        var userId = UUID.randomUUID();
         var userData = playerUserData(userId);
-        var principal = principalWithDiscordId("999999999999999");
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(userId, principal);
 
-        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.of(userData));
+        when(reader.getUserById(userId)).thenReturn(Optional.of(userData));
 
+        // When
         var result = authorizer.authorize(context);
 
+        // Then
         assertThat(result).isFalse();
     }
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
 
-        var userId = "nonexistent";
-        var principal = principalWithDiscordId("586678721356875");
+        // Given
+        var userId = UUID.randomUUID();
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(userId, principal);
 
-        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.empty());
+        when(reader.getUserById(userId)).thenReturn(Optional.empty());
 
+        // Then
         assertThatThrownBy(() -> authorizer.authorize(context))
                 .isInstanceOf(AssetNotFoundException.class);
     }
 
-    private UserData adminUserData(String discordId) {
-        return new UserData(UUID.randomUUID(), 1L, discordId, Role.ADMIN, null);
+    private UserData adminUserData(UUID publicId) {
+        return new UserData(publicId, 1L, "12345", Role.ADMIN, null);
     }
 
-    private UserData playerUserData(String discordId) {
-        return new UserData(UUID.randomUUID(), 1L, discordId, Role.PLAYER, null);
+    private UserData playerUserData(UUID publicId) {
+        return new UserData(publicId, 1L, "12345", Role.PLAYER, null);
     }
 
-    private MoiraiPrincipal principalWithDiscordId(String discordId) {
+    private MoiraiPrincipal principalWithPublicId(UUID publicId) {
         return new MoiraiPrincipal(
-                UUID.randomUUID(),
+                publicId,
                 1L,
-                discordId,
+                "12345",
                 "user",
                 "user@test.com",
                 "token",
@@ -117,7 +128,7 @@ class ManageUserAuthorizerTest {
                 null);
     }
 
-    private AuthorizationContext contextWith(String userId, MoiraiPrincipal principal) {
-        return new AuthorizationContext(principal, Map.of("discordUserId", userId));
+    private AuthorizationContext contextWith(UUID userId, MoiraiPrincipal principal) {
+        return new AuthorizationContext(principal, Map.of("userId", userId));
     }
 }

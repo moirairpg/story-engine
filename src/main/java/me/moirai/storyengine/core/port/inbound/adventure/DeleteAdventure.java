@@ -5,7 +5,6 @@ import java.util.UUID;
 import me.moirai.storyengine.common.cqs.command.Command;
 
 public record DeleteAdventure(
-        UUID adventureId,
-        String requesterId)
+        UUID adventureId)
         implements Command<Void> {
 }

@@ -12,8 +12,8 @@ import me.moirai.storyengine.common.dbutil.AssetBaseDataAssigner;
 @EntityListeners(AssetBaseDataAssigner.class)
 public abstract class Asset {
 
-    @Column(name = "creator_id")
-    protected String creatorId;
+    @Column(name = "created_by")
+    protected String createdBy;
 
     @Column(name = "creation_date")
     protected Instant creationDate;
@@ -27,8 +27,8 @@ public abstract class Asset {
     protected Asset() {
     }
 
-    public String getCreatorId() {
-        return creatorId;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
     public Instant getCreationDate() {
@@ -43,8 +43,8 @@ public abstract class Asset {
         return version;
     }
 
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public void setCreationDate(Instant creationDate) {

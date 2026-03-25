@@ -9,7 +9,6 @@ public record CreateAdventureLorebookEntry(
         String name,
         String regex,
         String description,
-        String playerId,
-        String requesterId)
+        String playerId)
         implements Command<AdventureLorebookEntryDetails> {
 }

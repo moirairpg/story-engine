@@ -37,8 +37,7 @@ public class DeleteAdventureLorebookEntryHandlerTest {
         // given
         var command = new DeleteAdventureLorebookEntry(
                 null,
-                AdventureFixture.PUBLIC_ID,
-                "RQSTRID");
+                AdventureFixture.PUBLIC_ID);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -51,8 +50,7 @@ public class DeleteAdventureLorebookEntryHandlerTest {
         // given
         var command = new DeleteAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
-                null,
-                "RQSTRID");
+                null);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -63,12 +61,9 @@ public class DeleteAdventureLorebookEntryHandlerTest {
     public void deleteAdventure() {
 
         // given
-        var requesterId = "4234324";
-
         var command = new DeleteAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
-                AdventureFixture.PUBLIC_ID,
-                requesterId);
+                AdventureFixture.PUBLIC_ID);
 
         var baseAdventure = AdventureFixture.publicMultiplayerAdventure().build();
 

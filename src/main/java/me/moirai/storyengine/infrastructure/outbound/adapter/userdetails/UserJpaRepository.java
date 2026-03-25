@@ -1,6 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,6 +12,8 @@ public interface UserJpaRepository
                 extends JpaRepository<User, Long>, PaginationRepository<User, Long> {
 
         Optional<User> findByDiscordId(String discordId);
+
+        Optional<User> findByPublicId(UUID publicId);
 
         void deleteByDiscordId(String discordId);
 }

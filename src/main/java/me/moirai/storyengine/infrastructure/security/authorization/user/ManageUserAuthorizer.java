@@ -26,12 +26,12 @@ public class ManageUserAuthorizer implements OperationAuthorizer {
     @Override
     public boolean authorize(AuthorizationContext context) {
 
-        var userId = context.getFieldAsString("discordUserId");
+        var userId = context.getFieldAsUuid("userId");
         var principal = context.getPrincipal();
 
-        var user = reader.getUserByDiscordId(userId)
+        var user = reader.getUserById(userId)
                 .orElseThrow(() -> new AssetNotFoundException("User not found"));
 
-        return user.role().equals(Role.ADMIN) || user.discordId().equals(principal.discordId());
+        return user.role().equals(Role.ADMIN) || user.publicId().equals(principal.publicId());
     }
 }

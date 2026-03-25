@@ -41,8 +41,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -58,8 +57,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -75,8 +73,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 null,
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -92,8 +89,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 null,
-                null,
-                "1234");
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -103,15 +99,13 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     public void createEntry_whenTriggered_thenCallService() {
 
         // given
-        var requesterId = "1234";
         var command = new UpdateAdventureLorebookEntry(
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
                 "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
-                "2423423423423",
-                requesterId);
+                "2423423423423");
 
         var existingEntry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
 

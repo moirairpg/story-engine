@@ -5,6 +5,5 @@ import java.util.UUID;
 import me.moirai.storyengine.common.cqs.command.Command;
 
 public record DeletePersona(
-        UUID personaId,
-        String requesterId) implements Command<Void> {
+        UUID personaId) implements Command<Void> {
 }

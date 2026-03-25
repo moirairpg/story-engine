@@ -136,12 +136,12 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
         insert(user, User.class);
 
         // Then
-        var creatorId = jdbcClient.sql("SELECT creator_id FROM moirai_user WHERE discord_id = :discordId")
+        var createdBy = jdbcClient.sql("SELECT created_by FROM moirai_user WHERE discord_id = :discordId")
                 .param("discordId", "unique-discord-5")
                 .query(String.class)
                 .single();
 
-        assertThat(creatorId).isEqualTo("SYSTEM");
+        assertThat(createdBy).isEqualTo("SYSTEM");
     }
 
     @Test
@@ -219,6 +219,7 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
 
         var updated = User.builder()
                 .discordId("unique-discord-7")
+                .username("john.doe")
                 .role(ADMIN)
                 .build();
 
@@ -258,6 +259,7 @@ public class DbTestHelperTest extends AbstractIntegrationTest {
 
         var updated = User.builder()
                 .discordId("unique-discord-8a")
+                .username("john.doe")
                 .role(ADMIN)
                 .build();
 

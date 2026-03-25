@@ -5,7 +5,6 @@ import java.util.UUID;
 import me.moirai.storyengine.common.cqs.command.Command;
 
 public record DeleteWorld(
-        UUID worldId,
-        String requesterId)
+        UUID worldId)
         implements Command<Void> {
 }

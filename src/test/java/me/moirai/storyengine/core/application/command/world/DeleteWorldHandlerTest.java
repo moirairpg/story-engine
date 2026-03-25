@@ -35,8 +35,7 @@ public class DeleteWorldHandlerTest {
     public void errorWhenIdIsNull() {
 
         // given
-        var requesterId = "84REAC";
-        var config = new DeleteWorld(null, requesterId);
+        var config = new DeleteWorld(null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(config));
@@ -46,10 +45,9 @@ public class DeleteWorldHandlerTest {
     public void deleteWorld() {
 
         // given
-        var requesterId = "84REAC";
         var world = WorldFixture.publicWorld().build();
 
-        var command = new DeleteWorld(WorldFixture.PUBLIC_ID, requesterId);
+        var command = new DeleteWorld(WorldFixture.PUBLIC_ID);
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         doNothing().when(repository).deleteByPublicId(any(UUID.class));
@@ -65,8 +63,7 @@ public class DeleteWorldHandlerTest {
     public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // given
-        var requesterId = "84REAC";
-        var command = new DeleteWorld(WorldFixture.PUBLIC_ID, requesterId);
+        var command = new DeleteWorld(WorldFixture.PUBLIC_ID);
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 

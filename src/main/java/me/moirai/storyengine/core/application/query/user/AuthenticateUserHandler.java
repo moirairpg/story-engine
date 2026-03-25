@@ -84,6 +84,7 @@ public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUs
 
         return repository.save(User.builder()
                 .discordId(discordUserDetails.id())
+                .username(discordUserDetails.username())
                 .role(PLAYER)
                 .build());
     }

@@ -1,6 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,11 @@ public class UserDomainRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByDiscordId(String discordUserId) {
         return jpaRepository.findByDiscordId(discordUserId);
+    }
+
+    @Override
+    public Optional<User> findByPublicId(UUID publicId) {
+        return jpaRepository.findByPublicId(publicId);
     }
 
     @Override

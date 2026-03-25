@@ -24,7 +24,7 @@ import me.moirai.storyengine.common.security.authentication.MoiraiCookie;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsByDiscordId;
+import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsById;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
@@ -108,7 +108,7 @@ public class AuthenticationController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.OK)
     public UserDetailsResult getAuthenticatedUserDetails() {
 
-        var query = new GetUserDetailsByDiscordId(authenticatedUserId());
+        var query = new GetUserDetailsById(getAuthenticatedUser().publicId());
         return queryRunner.run(query);
     }
 

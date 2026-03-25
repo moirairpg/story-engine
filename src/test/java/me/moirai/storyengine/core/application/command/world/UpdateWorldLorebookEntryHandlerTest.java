@@ -34,15 +34,12 @@ public class UpdateWorldLorebookEntryHandlerTest {
     public void updateWorld() {
 
         // given
-        var requesterId = "OWNER123";
-
         var command = new UpdateWorldLorebookEntry(
                 WorldLorebookEntryFixture.PUBLIC_ID,
                 WorldFixture.PUBLIC_ID,
                 "MoirAI",
                 "MoirAI",
-                "This is an RPG world",
-                requesterId);
+                "This is an RPG world");
 
         var expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
 
