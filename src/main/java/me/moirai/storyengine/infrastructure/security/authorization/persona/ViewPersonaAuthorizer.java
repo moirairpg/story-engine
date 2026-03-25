@@ -1,17 +1,25 @@
 package me.moirai.storyengine.infrastructure.security.authorization.persona;
 
+import static me.moirai.storyengine.common.enums.Role.ADMIN;
+import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
+
+import org.springframework.stereotype.Component;
+
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.inbound.AssetPermissionsData;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaAuthorizationReader;
 
+@Component
 public class ViewPersonaAuthorizer implements OperationAuthorizer {
 
-    private final PersonaRepository personaRepository;
+    private final PersonaAuthorizationReader reader;
 
-    public ViewPersonaAuthorizer(PersonaRepository personaRepository) {
-        this.personaRepository = personaRepository;
+    public ViewPersonaAuthorizer(PersonaAuthorizationReader reader) {
+        this.reader = reader;
     }
 
     @Override
@@ -25,9 +33,17 @@ public class ViewPersonaAuthorizer implements OperationAuthorizer {
         var personaId = context.getFieldAsUuid("personaId");
         var principal = context.getPrincipal();
 
-        var persona = personaRepository.findByPublicId(personaId)
+        var authData = reader.getAuthorizationData(personaId)
                 .orElseThrow(() -> new AssetNotFoundException("Persona not found"));
 
-        return persona.isPublic() || persona.isOwner(principal.id()) || persona.canRead(principal.id());
+        return canRead(authData, principal);
+    }
+
+    private boolean canRead(AssetPermissionsData authData, MoiraiPrincipal principal) {
+        return authData.visibility() == PUBLIC
+                || authData.ownerId().equals(principal.publicId())
+                || authData.readers().contains(principal.publicId())
+                || authData.writers().contains(principal.publicId())
+                || principal.role() == ADMIN;
     }
 }

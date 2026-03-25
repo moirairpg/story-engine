@@ -1,17 +1,25 @@
 package me.moirai.storyengine.infrastructure.security.authorization.adventure;
 
+import static me.moirai.storyengine.common.enums.Role.ADMIN;
+import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
+
+import org.springframework.stereotype.Component;
+
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.inbound.AssetPermissionsData;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureAuthorizationReader;
 
+@Component
 public class ViewAdventureAuthorizer implements OperationAuthorizer {
 
-    private final AdventureRepository adventureRepository;
+    private final AdventureAuthorizationReader reader;
 
-    public ViewAdventureAuthorizer(AdventureRepository adventureRepository) {
-        this.adventureRepository = adventureRepository;
+    public ViewAdventureAuthorizer(AdventureAuthorizationReader reader) {
+        this.reader = reader;
     }
 
     @Override
@@ -25,9 +33,17 @@ public class ViewAdventureAuthorizer implements OperationAuthorizer {
         var adventureId = context.getFieldAsUuid("adventureId");
         var principal = context.getPrincipal();
 
-        var adventure = adventureRepository.findByPublicId(adventureId)
+        var authData = reader.getAuthorizationData(adventureId)
                 .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
 
-        return adventure.isPublic() || adventure.isOwner(principal.id()) || adventure.canRead(principal.id());
+        return canRead(authData, principal);
+    }
+
+    private boolean canRead(AssetPermissionsData authData, MoiraiPrincipal principal) {
+        return authData.visibility() == PUBLIC
+                || authData.ownerId().equals(principal.publicId())
+                || authData.readers().contains(principal.publicId())
+                || authData.writers().contains(principal.publicId())
+                || principal.role() == ADMIN;
     }
 }
