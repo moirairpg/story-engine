@@ -32,7 +32,7 @@ public class UpdateWorldLorebookEntryHandler
                 command.entryId(),
                 command.name(),
                 command.regex(),
-                command.requesterId());
+                command.description());
 
         repository.save(world);
         return mapResult(world, lorebookEntry);
