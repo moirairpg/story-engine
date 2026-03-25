@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,20 +15,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.core.domain.PermissionFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.inbound.AssetPermissionsData;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureAuthorizationReader;
 import me.moirai.storyengine.infrastructure.security.authorization.adventure.DeleteAdventureAuthorizer;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteAdventureAuthorizerTest {
 
+    private static final UUID OWNER_UUID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID WRITER_UUID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+
     @Mock
-    private AdventureRepository adventureRepository;
+    private AdventureAuthorizationReader reader;
 
     @InjectMocks
     private DeleteAdventureAuthorizer authorizer;
@@ -43,11 +48,11 @@ class DeleteAdventureAuthorizerTest {
 
         // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var adventure = AdventureFixture.publicMultiplayerAdventureWithIdAndPermissions();
-        var principal = principalWithId(PermissionFixture.OWNER_ID);
+        var authData = adventureWithPermissions();
+        var principal = principalWithPublicId(OWNER_UUID);
         var context = contextWith(adventureId, principal);
 
-        when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
+        when(reader.getAuthorizationData(adventureId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -61,11 +66,11 @@ class DeleteAdventureAuthorizerTest {
 
         // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var adventure = AdventureFixture.publicMultiplayerAdventureWithIdAndPermissions();
-        var principal = principalWithId(PermissionFixture.WRITER_ID);
+        var authData = adventureWithPermissions();
+        var principal = principalWithPublicId(WRITER_UUID);
         var context = contextWith(adventureId, principal);
 
-        when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
+        when(reader.getAuthorizationData(adventureId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -79,11 +84,11 @@ class DeleteAdventureAuthorizerTest {
 
         // given
         var adventureId = AdventureFixture.PUBLIC_ID;
-        var adventure = AdventureFixture.privateMultiplayerAdventureWithId();
-        var principal = principalWithId(9999L);
+        var authData = adventureNoPermissions();
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(adventureId, principal);
 
-        when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.of(adventure));
+        when(reader.getAuthorizationData(adventureId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -97,20 +102,28 @@ class DeleteAdventureAuthorizerTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var principal = principalWithId(1L);
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(adventureId, principal);
 
-        when(adventureRepository.findByPublicId(adventureId)).thenReturn(Optional.empty());
+        when(reader.getAuthorizationData(adventureId)).thenReturn(Optional.empty());
 
         // then
         assertThatThrownBy(() -> authorizer.authorize(context))
                 .isInstanceOf(AssetNotFoundException.class);
     }
 
-    private MoiraiPrincipal principalWithId(Long id) {
+    private AssetPermissionsData adventureWithPermissions() {
+        return new AssetPermissionsData(OWNER_UUID, List.of(WRITER_UUID), List.of(), Visibility.PUBLIC);
+    }
+
+    private AssetPermissionsData adventureNoPermissions() {
+        return new AssetPermissionsData(OWNER_UUID, List.of(), List.of(), Visibility.PRIVATE);
+    }
+
+    private MoiraiPrincipal principalWithPublicId(UUID publicId) {
         return new MoiraiPrincipal(
-                UUID.randomUUID(),
-                id,
+                publicId,
+                1L,
                 "discordId",
                 "user",
                 "user@test.com",

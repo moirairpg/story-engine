@@ -14,19 +14,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 import me.moirai.storyengine.infrastructure.security.authorization.user.ManageUserAuthorizer;
 
 @ExtendWith(MockitoExtension.class)
 class ManageUserAuthorizerTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserReader reader;
 
     @InjectMocks
     private ManageUserAuthorizer authorizer;
@@ -41,11 +42,11 @@ class ManageUserAuthorizerTest {
     void shouldAuthorizeWhenUserIsAdmin() {
 
         var userId = "12345";
-        var user = UserFixture.adminWithId();
+        var userData = adminUserData(userId);
         var principal = principalWithDiscordId("999999999999999");
         var context = contextWith(userId, principal);
 
-        when(userRepository.findByDiscordId(userId)).thenReturn(Optional.of(user));
+        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.of(userData));
 
         var result = authorizer.authorize(context);
 
@@ -56,11 +57,11 @@ class ManageUserAuthorizerTest {
     void shouldAuthorizeWhenRequesterManagesTheirOwnAccount() {
 
         var userId = "12345";
-        var user = UserFixture.playerWithId();
+        var userData = playerUserData(userId);
         var principal = principalWithDiscordId(userId);
         var context = contextWith(userId, principal);
 
-        when(userRepository.findByDiscordId(userId)).thenReturn(Optional.of(user));
+        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.of(userData));
 
         var result = authorizer.authorize(context);
 
@@ -71,11 +72,11 @@ class ManageUserAuthorizerTest {
     void shouldDenyWhenUserIsPlayerAndRequesterIsNotSelf() {
 
         var userId = "12345";
-        var user = UserFixture.playerWithId();
+        var userData = playerUserData(userId);
         var principal = principalWithDiscordId("999999999999999");
         var context = contextWith(userId, principal);
 
-        when(userRepository.findByDiscordId(userId)).thenReturn(Optional.of(user));
+        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.of(userData));
 
         var result = authorizer.authorize(context);
 
@@ -89,10 +90,18 @@ class ManageUserAuthorizerTest {
         var principal = principalWithDiscordId("586678721356875");
         var context = contextWith(userId, principal);
 
-        when(userRepository.findByDiscordId(userId)).thenReturn(Optional.empty());
+        when(reader.getUserByDiscordId(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authorizer.authorize(context))
                 .isInstanceOf(AssetNotFoundException.class);
+    }
+
+    private UserData adminUserData(String discordId) {
+        return new UserData(UUID.randomUUID(), 1L, discordId, Role.ADMIN, null);
+    }
+
+    private UserData playerUserData(String discordId) {
+        return new UserData(UUID.randomUUID(), 1L, discordId, Role.PLAYER, null);
     }
 
     private MoiraiPrincipal principalWithDiscordId(String discordId) {

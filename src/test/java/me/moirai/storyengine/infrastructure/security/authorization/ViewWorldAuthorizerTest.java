@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,20 +15,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.core.domain.PermissionFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.port.inbound.AssetPermissionsData;
+import me.moirai.storyengine.core.port.outbound.world.WorldAuthorizationReader;
 import me.moirai.storyengine.infrastructure.security.authorization.world.ViewWorldAuthorizer;
 
 @ExtendWith(MockitoExtension.class)
 class ViewWorldAuthorizerTest {
 
+    private static final UUID OWNER_UUID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID WRITER_UUID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    private static final UUID READER_UUID = UUID.fromString("00000000-0000-0000-0000-000000000003");
+
     @Mock
-    private WorldRepository worldRepository;
+    private WorldAuthorizationReader reader;
 
     @InjectMocks
     private ViewWorldAuthorizer authorizer;
@@ -43,11 +49,11 @@ class ViewWorldAuthorizerTest {
 
         // given
         var worldId = WorldFixture.PUBLIC_ID;
-        var world = WorldFixture.privateWorldWithIdAndPermissions();
-        var principal = principalWithId(PermissionFixture.OWNER_ID);
+        var authData = privateWorldWithPermissions();
+        var principal = principalWithPublicId(OWNER_UUID);
         var context = contextWith(worldId, principal);
 
-        when(worldRepository.findByPublicId(worldId)).thenReturn(Optional.of(world));
+        when(reader.getAuthorizationData(worldId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -61,11 +67,11 @@ class ViewWorldAuthorizerTest {
 
         // given
         var worldId = WorldFixture.PUBLIC_ID;
-        var world = WorldFixture.privateWorldWithIdAndPermissions();
-        var principal = principalWithId(PermissionFixture.READER_ID);
+        var authData = privateWorldWithPermissions();
+        var principal = principalWithPublicId(READER_UUID);
         var context = contextWith(worldId, principal);
 
-        when(worldRepository.findByPublicId(worldId)).thenReturn(Optional.of(world));
+        when(reader.getAuthorizationData(worldId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -79,11 +85,11 @@ class ViewWorldAuthorizerTest {
 
         // given
         var worldId = WorldFixture.PUBLIC_ID;
-        var world = WorldFixture.publicWorldWithId();
-        var principal = principalWithId(9999L);
+        var authData = publicWorldWithPermissions();
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(worldId, principal);
 
-        when(worldRepository.findByPublicId(worldId)).thenReturn(Optional.of(world));
+        when(reader.getAuthorizationData(worldId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -97,11 +103,11 @@ class ViewWorldAuthorizerTest {
 
         // given
         var worldId = WorldFixture.PUBLIC_ID;
-        var world = WorldFixture.privateWorldWithId();
-        var principal = principalWithId(9999L);
+        var authData = privateWorldNoPermissions();
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(worldId, principal);
 
-        when(worldRepository.findByPublicId(worldId)).thenReturn(Optional.of(world));
+        when(reader.getAuthorizationData(worldId)).thenReturn(Optional.of(authData));
 
         // when
         var result = authorizer.authorize(context);
@@ -115,20 +121,32 @@ class ViewWorldAuthorizerTest {
 
         // given
         var worldId = UUID.randomUUID();
-        var principal = principalWithId(1L);
+        var principal = principalWithPublicId(UUID.randomUUID());
         var context = contextWith(worldId, principal);
 
-        when(worldRepository.findByPublicId(worldId)).thenReturn(Optional.empty());
+        when(reader.getAuthorizationData(worldId)).thenReturn(Optional.empty());
 
         // then
         assertThatThrownBy(() -> authorizer.authorize(context))
                 .isInstanceOf(AssetNotFoundException.class);
     }
 
-    private MoiraiPrincipal principalWithId(Long id) {
+    private AssetPermissionsData privateWorldWithPermissions() {
+        return new AssetPermissionsData(OWNER_UUID, List.of(WRITER_UUID), List.of(READER_UUID), Visibility.PRIVATE);
+    }
+
+    private AssetPermissionsData publicWorldWithPermissions() {
+        return new AssetPermissionsData(OWNER_UUID, List.of(WRITER_UUID), List.of(READER_UUID), Visibility.PUBLIC);
+    }
+
+    private AssetPermissionsData privateWorldNoPermissions() {
+        return new AssetPermissionsData(OWNER_UUID, List.of(), List.of(), Visibility.PRIVATE);
+    }
+
+    private MoiraiPrincipal principalWithPublicId(UUID publicId) {
         return new MoiraiPrincipal(
-                UUID.randomUUID(),
-                id,
+                publicId,
+                1L,
                 "discordId",
                 "user",
                 "user@test.com",
