@@ -25,7 +25,7 @@ public class GetAdventureResultFixture {
         var contextAttributes = new ContextAttributesDto(
                 adventure.getContextAttributes().nudge(),
                 adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency());
 
@@ -36,10 +36,8 @@ public class GetAdventureResultFixture {
                 adventure.getAdventureStart(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
-                adventure.getVisibility().name(),
-                adventure.getModeration().name(),
-                adventure.getGameMode().name(),
+                adventure.getVisibility(),
+                adventure.getModeration(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
@@ -64,7 +62,7 @@ public class GetAdventureResultFixture {
         var contextAttributes = new ContextAttributesDto(
                 adventure.getContextAttributes().nudge(),
                 adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency());
 
@@ -75,10 +73,8 @@ public class GetAdventureResultFixture {
                 adventure.getAdventureStart(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
-                adventure.getVisibility().name(),
-                adventure.getModeration().name(),
-                adventure.getGameMode().name(),
+                adventure.getVisibility(),
+                adventure.getModeration(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),

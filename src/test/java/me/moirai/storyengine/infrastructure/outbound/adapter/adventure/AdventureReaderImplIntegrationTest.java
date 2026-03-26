@@ -82,7 +82,7 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result.get().contextAttributes()).isNotNull();
         assertThat(result.get().contextAttributes().nudge()).isEqualTo("Nudge");
         assertThat(result.get().contextAttributes().authorsNote()).isEqualTo("Author's note");
-        assertThat(result.get().contextAttributes().remember()).isEqualTo("Remember");
+        assertThat(result.get().contextAttributes().scene()).isEqualTo("Scene");
         assertThat(result.get().contextAttributes().bump()).isEqualTo("Bump");
         assertThat(result.get().contextAttributes().bumpFrequency()).isEqualTo(1);
     }

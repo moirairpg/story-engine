@@ -12,15 +12,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import me.moirai.storyengine.common.testutil.DbTestHelper;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordChannelPort;
-import me.moirai.storyengine.core.port.outbound.generation.PersonaEnrichmentPort;
-import me.moirai.storyengine.core.port.outbound.generation.StorySummarizationPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.infrastructure.config.DiscordApiConfig;
-import me.moirai.storyengine.infrastructure.config.JdaConfig;
 import me.moirai.storyengine.infrastructure.config.OpenAiApiConfig;
-import net.dv8tion.jda.api.JDA;
 
 @ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
@@ -31,18 +26,6 @@ public abstract class AbstractIntegrationTest {
 
     @Mock
     private DiscordAuthenticationPort discordAuthenticationPort;
-
-    @MockitoBean
-    private DiscordChannelPort discordChannelOperationsPort;
-
-    @MockitoBean
-    private PersonaEnrichmentPort inputEnrichmentService;
-
-    @MockitoBean
-    private StorySummarizationPort contextSummarizationService;
-
-    @MockitoBean
-    private JDA jda;
 
     @MockitoBean
     private TextCompletionPort textCompletionPort;
@@ -61,9 +44,6 @@ public abstract class AbstractIntegrationTest {
 
     @MockitoBean
     private RestClient openAiClient;
-
-    @MockitoBean
-    private JdaConfig jdaConfig;
 
     private static final String POSTGRES_IMAGE_NAME = "postgres:18-alpine";
 

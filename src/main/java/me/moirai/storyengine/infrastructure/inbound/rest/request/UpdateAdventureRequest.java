@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
@@ -20,7 +19,6 @@ public record UpdateAdventureRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
         @NotNull(message = "cannot be null") UUID worldId,
         @NotNull(message = "cannot be null") UUID personaId,
-        @NotEmpty(message = "cannot be empty") String channelId,
         @NotEmpty(message = "cannot be empty") Visibility visibility,
         @NotEmpty(message = "cannot be empty") ArtificialIntelligenceModel aiModel,
         @NotEmpty(message = "cannot be empty") Moderation moderation,
@@ -28,7 +26,6 @@ public record UpdateAdventureRequest(
         @NotNull(message = "cannot be null") @DecimalMin(value = "0.1", message = "cannot be less than 0.1") @DecimalMax(value = "2", message = "cannot be greater than 2") Double temperature,
         @DecimalMin(value = "-2", message = "cannot be less than -2") @DecimalMax(value = "2", message = "cannot be greater than 2") Double frequencyPenalty,
         @DecimalMin(value = "-2", message = "cannot be less than -2") @DecimalMax(value = "2", message = "cannot be greater than 2") Double presencePenalty,
-        GameMode gameMode,
         boolean isMultiplayer,
         Set<String> stopSequencesToAdd,
         Set<String> stopSequencesToRemove,
@@ -41,7 +38,7 @@ public record UpdateAdventureRequest(
         @Moderated String adventureStart,
         @Moderated String nudge,
         @Moderated String authorsNote,
-        @Moderated String remember,
+        @Moderated String scene,
         @Moderated String bump,
         Integer bumpFrequency) {
 }

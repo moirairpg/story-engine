@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
+import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.PermissionLevel;
+import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
@@ -30,13 +32,11 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.adventure_start,
                     w.public_id AS world_public_id,
                     p.public_id AS persona_public_id,
-                    a.channel_id,
                     a.visibility,
                     a.ai_model,
                     a.moderation,
-                    a.game_mode,
                     a.nudge,
-                    a.remember,
+                    a.scene,
                     a.authors_note,
                     a.bump,
                     a.bump_frequency,
@@ -113,7 +113,7 @@ public class AdventureReaderImpl implements AdventureReader {
             var contextAttributes = new ContextAttributesDto(
                     rs.getString("nudge"),
                     rs.getString("authors_note"),
-                    rs.getString("remember"),
+                    rs.getString("scene"),
                     rs.getString("bump"),
                     rs.getObject("bump_frequency", Integer.class));
 
@@ -124,10 +124,8 @@ public class AdventureReaderImpl implements AdventureReader {
                     rs.getString("adventure_start"),
                     UUID.fromString(rs.getString("world_public_id")),
                     UUID.fromString(rs.getString("persona_public_id")),
-                    rs.getString("channel_id"),
-                    rs.getString("visibility"),
-                    rs.getString("moderation"),
-                    rs.getString("game_mode"),
+                    Visibility.valueOf(rs.getString("visibility")),
+                    Moderation.valueOf(rs.getString("moderation")),
                     rs.getBoolean("is_multiplayer"),
                     rs.getTimestamp("creation_date").toInstant(),
                     rs.getTimestamp("last_update_date").toInstant(),

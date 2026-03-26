@@ -3,24 +3,6 @@ moirai:
     alphabet: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
     characters-amount: 10
   discord:
-    bot:
-      status: Writing stories, inspiring adventures.
-      commands:
-        go:
-          before-running:
-            - "The loom spins again — let us continue the tale's weave."
-          after-running:
-            - "The tapestry grows richer — your story continues to unfold."
-        retry:
-          before-running:
-            - "The loom rewinds, ready to spin a better thread."
-          after-running:
-            - "The thread is re-spun; a new path emerges."
-        start:
-          before-running:
-            - "The loom hums to life — your adventure begins here."
-          after-running:
-            - "The spindle spins; your adventure begins now."
     oauth:
       client-id: dummy_value
       client-secret: dummy_value

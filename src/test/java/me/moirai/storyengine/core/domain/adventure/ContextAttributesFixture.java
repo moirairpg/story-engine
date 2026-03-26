@@ -7,7 +7,7 @@ public class ContextAttributesFixture {
         return new ContextAttributes(
                 "Nudge",
                 "Author's note",
-                "Remember",
+                "Scene",
                 "Bump",
                 1);
     }

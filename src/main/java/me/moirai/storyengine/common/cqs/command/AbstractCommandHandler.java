@@ -2,9 +2,9 @@ package me.moirai.storyengine.common.cqs.command;
 
 import static java.util.Objects.isNull;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
 
-@UseCaseHandler
+@CommandHandler
 public abstract class AbstractCommandHandler<A extends Command<T>, T> {
 
     public abstract T execute(A request);

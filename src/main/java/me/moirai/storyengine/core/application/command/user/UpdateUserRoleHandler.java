@@ -3,7 +3,7 @@ package me.moirai.storyengine.core.application.command.user;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UpdateUserRole;
+import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserRole;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler

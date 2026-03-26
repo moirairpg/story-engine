@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.outbound.discord;
 
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
 
 public interface DiscordAuthenticationPort {
 

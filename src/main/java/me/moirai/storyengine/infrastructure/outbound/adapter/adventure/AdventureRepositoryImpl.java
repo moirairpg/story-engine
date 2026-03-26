@@ -30,44 +30,32 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     }
 
     @Override
-    public void updateRememberByChannelId(String remember, String channelId) {
+    public void updateSceneByPublicId(String scene, UUID publicId) {
 
-        jpaRepository.updateRememberByChannelId(remember, channelId);
+        jpaRepository.updateSceneByPublicId(scene, publicId);
     }
 
     @Override
-    public void updateAuthorsNoteByChannelId(String authorsNote, String channelId) {
+    public void updateAuthorsNoteByPublicId(String authorsNote, UUID publicId) {
 
-        jpaRepository.updateAuthorsNoteByChannelId(authorsNote, channelId);
+        jpaRepository.updateAuthorsNoteByPublicId(authorsNote, publicId);
     }
 
     @Override
-    public void updateNudgeByChannelId(String nudge, String channelId) {
+    public void updateNudgeByPublicId(String nudge, UUID publicId) {
 
-        jpaRepository.updateNudgeByChannelId(nudge, channelId);
+        jpaRepository.updateNudgeByPublicId(nudge, publicId);
     }
 
     @Override
-    public void updateBumpByChannelId(String bumpContent, int bumpFrequency, String channelId) {
+    public void updateBumpByPublicId(String bumpContent, int bumpFrequency, UUID publicId) {
 
-        jpaRepository.updateBumpByChannelId(bumpContent, bumpFrequency, channelId);
+        jpaRepository.updateBumpByPublicId(bumpContent, bumpFrequency, publicId);
     }
 
     @Override
     public Optional<Adventure> findByPublicId(UUID publicId) {
 
         return jpaRepository.findByPublicId(publicId);
-    }
-
-    @Override
-    public Optional<Adventure> findByChannelId(String channelId) {
-
-        return jpaRepository.findByChannelId(channelId);
-    }
-
-    @Override
-    public String getGameModeByChannelId(String channelId) {
-
-        return jpaRepository.getGameModeByChannelId(channelId);
     }
 }

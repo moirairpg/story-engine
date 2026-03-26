@@ -28,7 +28,6 @@ import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
@@ -55,9 +54,6 @@ public class Adventure extends ShareableAsset {
     @Column(name = "persona_id")
     private Long personaId;
 
-    @Column(name = "channel_id")
-    private String channelId;
-
     @Column(name = "description")
     private String description;
 
@@ -66,10 +62,6 @@ public class Adventure extends ShareableAsset {
 
     @Column(name = "is_multiplayer")
     private boolean isMultiplayer;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "game_mode")
-    private GameMode gameMode;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "moderation")
@@ -103,11 +95,9 @@ public class Adventure extends ShareableAsset {
         this.adventureStart = builder.adventureStart;
         this.worldId = builder.worldId;
         this.personaId = builder.personaId;
-        this.channelId = builder.channelId;
         this.contextAttributes = builder.contextAttributes;
         this.modelConfiguration = builder.modelConfiguration;
         this.moderation = builder.moderation;
-        this.gameMode = builder.gameMode;
         this.isMultiplayer = builder.isMultiplayer;
         this.permissions.addAll(builder.permissions);
     }
@@ -144,10 +134,6 @@ public class Adventure extends ShareableAsset {
         return personaId;
     }
 
-    public String getChannelId() {
-        return channelId;
-    }
-
     public ModelConfiguration getModelConfiguration() {
         return modelConfiguration;
     }
@@ -158,10 +144,6 @@ public class Adventure extends ShareableAsset {
 
     public ContextAttributes getContextAttributes() {
         return contextAttributes;
-    }
-
-    public GameMode getGameMode() {
-        return gameMode;
     }
 
     public boolean isMultiplayer() {
@@ -202,19 +184,9 @@ public class Adventure extends ShareableAsset {
         this.worldId = worldId;
     }
 
-    public void updateChannel(String channelId) {
-
-        this.channelId = channelId;
-    }
-
     public void updateModeration(Moderation moderation) {
 
         this.moderation = moderation;
-    }
-
-    public void updateGameMode(GameMode gameMode) {
-
-        this.gameMode = gameMode;
     }
 
     public void updateAiModel(ArtificialIntelligenceModel aiModel) {
@@ -303,9 +275,9 @@ public class Adventure extends ShareableAsset {
         this.contextAttributes = newContextAttributes;
     }
 
-    public void updateRemember(String remember) {
+    public void updateScene(String scene) {
 
-        ContextAttributes newContextAttributes = this.contextAttributes.updateRemember(remember);
+        var newContextAttributes = this.contextAttributes.updateScene(scene);
         this.contextAttributes = newContextAttributes;
     }
 
@@ -378,9 +350,7 @@ public class Adventure extends ShareableAsset {
         private String adventureStart;
         private Long worldId;
         private Long personaId;
-        private String channelId;
         private boolean isMultiplayer;
-        private GameMode gameMode;
         private ContextAttributes contextAttributes;
         private ModelConfiguration modelConfiguration;
         private Moderation moderation;
@@ -420,21 +390,9 @@ public class Adventure extends ShareableAsset {
             return this;
         }
 
-        public Builder gameMode(GameMode gameMode) {
-
-            this.gameMode = gameMode;
-            return this;
-        }
-
         public Builder isMultiplayer(boolean isMultiplayer) {
 
             this.isMultiplayer = isMultiplayer;
-            return this;
-        }
-
-        public Builder channelId(String channelId) {
-
-            this.channelId = channelId;
             return this;
         }
 
@@ -474,10 +432,6 @@ public class Adventure extends ShareableAsset {
                 throw new BusinessRuleViolationException("Adventure name cannot be null or empty");
             }
 
-            if (isBlank(channelId)) {
-                throw new BusinessRuleViolationException("Channel ID cannot be null or empty");
-            }
-
             if (modelConfiguration == null) {
                 throw new BusinessRuleViolationException("Model configuration cannot be null");
             }
@@ -488,10 +442,6 @@ public class Adventure extends ShareableAsset {
 
             if (visibility == null) {
                 throw new BusinessRuleViolationException("Visibility cannot be null");
-            }
-
-            if (gameMode == null) {
-                throw new BusinessRuleViolationException("Game Mode cannot be null");
             }
 
             return new Adventure(this);

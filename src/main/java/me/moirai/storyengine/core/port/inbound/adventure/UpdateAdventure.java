@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 
@@ -17,13 +16,11 @@ public record UpdateAdventure(
         String name,
         UUID worldId,
         UUID personaId,
-        String channelId,
         Visibility visibility,
         ArtificialIntelligenceModel aiModel,
         Moderation moderation,
-        GameMode gameMode,
         String nudge,
-        String remember,
+        String scene,
         String authorsNote,
         String bump,
         Integer bumpFrequency,

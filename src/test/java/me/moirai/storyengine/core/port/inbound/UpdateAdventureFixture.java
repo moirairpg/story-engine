@@ -1,14 +1,9 @@
 package me.moirai.storyengine.core.port.inbound;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.assertj.core.util.Maps;
 
-import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.enums.GameMode;
-import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -28,13 +23,11 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().authorsNote(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency(),
@@ -63,13 +56,11 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().authorsNote(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency(),
@@ -98,13 +89,11 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
                 visibility,
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().authorsNote(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency(),
@@ -133,13 +122,11 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().authorsNote(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency(),
@@ -156,68 +143,5 @@ public class UpdateAdventureFixture {
                 Set.of(12345L),
                 Set.of(12345L),
                 isMultiplayer);
-    }
-
-    public static UpdateAdventure sampleWithNullFields(
-            UUID adventureId,
-            String requesterId,
-            String name,
-            UUID worldId,
-            UUID personaId,
-            String channelId,
-            Visibility visibility,
-            ArtificialIntelligenceModel aiModel,
-            Moderation moderation,
-            GameMode gameMode,
-            Integer maxTokenLimit,
-            Double temperature,
-            Double frequencyPenalty,
-            Double presencePenalty,
-            Map<String, Double> logitBiasToAdd,
-            Set<String> logitBiasToRemove,
-            Set<String> stopSequencesToAdd,
-            Set<String> stopSequencesToRemove,
-            Set<Long> usersAllowedToWriteToAdd,
-            Set<Long> usersAllowedToWriteToRemove,
-            Set<Long> usersAllowedToReadToAdd,
-            Set<Long> usersAllowedToReadToRemove,
-            String adventureStart,
-            String description,
-            String gameModeFull,
-            String authorsNote,
-            String nudge,
-            String remember,
-            String bump) {
-
-        return new UpdateAdventure(
-                adventureId,
-                description,
-                adventureStart,
-                name,
-                worldId,
-                personaId,
-                channelId,
-                visibility,
-                aiModel,
-                moderation,
-                gameMode,
-                nudge,
-                remember,
-                authorsNote,
-                bump,
-                null,
-                maxTokenLimit,
-                temperature,
-                frequencyPenalty,
-                presencePenalty,
-                logitBiasToAdd,
-                stopSequencesToAdd,
-                stopSequencesToRemove,
-                logitBiasToRemove,
-                usersAllowedToWriteToAdd,
-                usersAllowedToWriteToRemove,
-                usersAllowedToReadToAdd,
-                usersAllowedToReadToRemove,
-                false);
     }
 }

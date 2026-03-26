@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserById;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @ExtendWith(MockitoExtension.class)

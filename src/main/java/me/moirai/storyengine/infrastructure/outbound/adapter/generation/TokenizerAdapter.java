@@ -9,7 +9,7 @@ import com.knuddels.jtokkit.api.EncodingRegistry;
 import com.knuddels.jtokkit.api.IntArrayList;
 import com.knuddels.jtokkit.api.ModelType;
 
-import me.moirai.storyengine.core.port.inbound.discord.slashcommands.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeResult;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 
 @Component

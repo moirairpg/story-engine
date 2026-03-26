@@ -13,28 +13,23 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 public interface AdventureJpaRepository
         extends JpaRepository<Adventure, Long>, PaginationRepository<Adventure, Long> {
 
-    Optional<Adventure> findByChannelId(String channelId);
-
     Optional<Adventure> findByPublicId(UUID publicId);
 
     void deleteByPublicId(UUID publicId);
 
-    @Query("SELECT cc.gameMode FROM Adventure cc WHERE cc.channelId = :channelId")
-    String getGameModeByChannelId(String channelId);
+    @Modifying
+    @Query("UPDATE Adventure a SET a.contextAttributes.scene = :scene WHERE a.publicId = :publicId")
+    void updateSceneByPublicId(String scene, UUID publicId);
 
     @Modifying
-    @Query("UPDATE Adventure a SET a.contextAttributes.remember = :remember WHERE a.channelId = :channelId")
-    void updateRememberByChannelId(String remember, String channelId);
+    @Query("UPDATE Adventure a SET a.contextAttributes.authorsNote = :authorsNote WHERE a.publicId = :publicId")
+    void updateAuthorsNoteByPublicId(String authorsNote, UUID publicId);
 
     @Modifying
-    @Query("UPDATE Adventure a SET a.contextAttributes.authorsNote = :authorsNote WHERE a.channelId = :channelId")
-    void updateAuthorsNoteByChannelId(String authorsNote, String channelId);
+    @Query("UPDATE Adventure a SET a.contextAttributes.nudge = :nudge WHERE a.publicId = :publicId")
+    void updateNudgeByPublicId(String nudge, UUID publicId);
 
     @Modifying
-    @Query("UPDATE Adventure a SET a.contextAttributes.nudge = :nudge WHERE a.channelId = :channelId")
-    void updateNudgeByChannelId(String nudge, String channelId);
-
-    @Modifying
-    @Query("UPDATE Adventure a SET a.contextAttributes.bump = :bump, a.contextAttributes.bumpFrequency = :bumpFrequency WHERE a.channelId = :channelId")
-    void updateBumpByChannelId(String bump, int bumpFrequency, String channelId);
+    @Query("UPDATE Adventure a SET a.contextAttributes.bump = :bump, a.contextAttributes.bumpFrequency = :bumpFrequency WHERE a.publicId = :publicId")
+    void updateBumpByPublicId(String bump, int bumpFrequency, UUID publicId);
 }

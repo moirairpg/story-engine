@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;

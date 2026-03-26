@@ -5,7 +5,7 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UpdateUserUsername;
+import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserUsername;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler

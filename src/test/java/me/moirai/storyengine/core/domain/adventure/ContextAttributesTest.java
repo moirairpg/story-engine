@@ -12,7 +12,7 @@ public class ContextAttributesTest {
         // Given
         String nudge = "Nudge";
         String authorsNote = "Author's note";
-        String remember = "Remember";
+        String scene = "Scene";
         String bump = "Bump";
         int bumpFrequency = 1;
 
@@ -20,7 +20,7 @@ public class ContextAttributesTest {
         ContextAttributes contextAttributes = new ContextAttributes(
                 nudge,
                 authorsNote,
-                remember,
+                scene,
                 bump,
                 bumpFrequency);
 
@@ -29,7 +29,7 @@ public class ContextAttributesTest {
         assertThat(contextAttributes.authorsNote()).isEqualTo("Author's note");
         assertThat(contextAttributes.bump()).isEqualTo("Bump");
         assertThat(contextAttributes.nudge()).isEqualTo("Nudge");
-        assertThat(contextAttributes.remember()).isEqualTo("Remember");
+        assertThat(contextAttributes.scene()).isEqualTo("Scene");
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ContextAttributesTest {
         ContextAttributes contextAttributes = new ContextAttributes(
                 "Nudge",
                 "Author's note",
-                "Remember",
+                "Scene",
                 "Bump",
                 1);
 
@@ -53,7 +53,7 @@ public class ContextAttributesTest {
         assertThat(updatedContextAttributes.bumpFrequency()).isEqualTo(1);
         assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
         assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.scene()).isEqualTo("Scene");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ContextAttributesTest {
         ContextAttributes contextAttributes = new ContextAttributes(
                 "Nudge",
                 "Author's note",
-                "Remember",
+                "Scene",
                 "Bump",
                 1);
 
@@ -77,7 +77,7 @@ public class ContextAttributesTest {
         assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
         assertThat(updatedContextAttributes.bump()).isEqualTo(newBump);
         assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.scene()).isEqualTo("Scene");
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ContextAttributesTest {
         ContextAttributes contextAttributes = new ContextAttributes(
                 "Nudge",
                 "Author's note",
-                "Remember",
+                "Scene",
                 "Bump",
                 1);
 
@@ -101,7 +101,7 @@ public class ContextAttributesTest {
         assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
         assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
         assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.scene()).isEqualTo("Scene");
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ContextAttributesTest {
         ContextAttributes contextAttributes = new ContextAttributes(
                 "Nudge",
                 "Author's note",
-                "Remember",
+                "Scene",
                 "Bump",
                 1);
 
@@ -125,23 +125,23 @@ public class ContextAttributesTest {
         assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
         assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
         assertThat(updatedContextAttributes.nudge()).isEqualTo(newNudge);
-        assertThat(updatedContextAttributes.remember()).isEqualTo("Remember");
+        assertThat(updatedContextAttributes.scene()).isEqualTo("Scene");
     }
 
     @Test
-    public void contextAttributes_whenUpdateRemember_thenNewInstanceIsCreated() {
+    public void contextAttributes_whenUpdateScene_thenNewInstanceIsCreated() {
 
         // Given
-        String newRemember = "New value";
+        String newScene = "New value";
         ContextAttributes contextAttributes = new ContextAttributes(
                 "Nudge",
                 "Author's note",
-                "Remember",
+                "Scene",
                 "Bump",
                 1);
 
         // When
-        ContextAttributes updatedContextAttributes = contextAttributes.updateRemember(newRemember);
+        ContextAttributes updatedContextAttributes = contextAttributes.updateScene(newScene);
 
         // Then
         assertThat(updatedContextAttributes).isNotNull().isNotEqualTo(contextAttributes);
@@ -149,6 +149,6 @@ public class ContextAttributesTest {
         assertThat(updatedContextAttributes.authorsNote()).isEqualTo("Author's note");
         assertThat(updatedContextAttributes.bump()).isEqualTo("Bump");
         assertThat(updatedContextAttributes.nudge()).isEqualTo("Nudge");
-        assertThat(updatedContextAttributes.remember()).isEqualTo(newRemember);
+        assertThat(updatedContextAttributes.scene()).isEqualTo(newScene);
     }
 }

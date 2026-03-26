@@ -28,7 +28,6 @@
         <apache.commons.lang.version>3.20.0</apache.commons.lang.version>
         <apache.commons.collections.version>4.5.0</apache.commons.collections.version>
         <wiremock.version>3.9.1</wiremock.version>
-        <jda.version>5.1.2</jda.version>
         <jacoco.version>0.8.14</jacoco.version>
         <skipUnitTests>false</skipUnitTests>
         <skipIntegrationTests>false</skipIntegrationTests>
@@ -119,16 +118,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Application core -->
+        <!-- Third Party -->
         <dependency>
             <groupId>com.knuddels</groupId>
             <artifactId>jtokkit</artifactId>
             <version>${tokenizer.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.dv8tion</groupId>
-            <artifactId>JDA</artifactId>
-            <version>${jda.version}</version>
         </dependency>
 
         <!-- Libraries -->

@@ -57,8 +57,6 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 .name(command.name())
                 .personaId(persona.getId())
                 .worldId(world.getId())
-                .channelId(command.channelId())
-                .gameMode(command.gameMode())
                 .visibility(command.visibility())
                 .moderation(command.moderation())
                 .isMultiplayer(command.isMultiplayer())
@@ -97,7 +95,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var contextAttributes = new ContextAttributesDto(
                 adventure.getContextAttributes().nudge(),
                 adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency());
 
@@ -108,10 +106,8 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 adventure.getAdventureStart(),
                 worldPublicId,
                 personaPublicId,
-                adventure.getChannelId(),
-                adventure.getVisibility().name(),
-                adventure.getModeration().name(),
-                adventure.getGameMode().name(),
+                adventure.getVisibility(),
+                adventure.getModeration(),
                 adventure.isMultiplayer(),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
@@ -125,7 +121,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         return new ContextAttributes(
                 command.nudge(),
                 command.authorsNote(),
-                command.remember(),
+                command.scene(),
                 command.bump(),
                 command.bumpFrequency());
     }

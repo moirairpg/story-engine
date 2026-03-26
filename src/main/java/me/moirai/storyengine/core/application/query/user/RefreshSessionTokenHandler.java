@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 

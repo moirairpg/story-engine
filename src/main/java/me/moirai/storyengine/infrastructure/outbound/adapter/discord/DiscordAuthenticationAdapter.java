@@ -22,17 +22,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.json.JsonMapper;
-
 import me.moirai.storyengine.common.exception.OpenAiApiException;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordTokenRevocationRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
@@ -58,7 +57,6 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     private final RestClient discordClient;
 
     public DiscordAuthenticationAdapter(
-            @Value("${moirai.discord.api.base-url}") String discordBaseUrl,
             @Value("${moirai.discord.api.users-uri}") String usersUri,
             @Value("${moirai.discord.api.token-uri}") String tokenUri,
             @Value("${moirai.discord.api.token-revoke-uri}") String tokenRevokeUri,

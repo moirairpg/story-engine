@@ -49,7 +49,7 @@ public class UpdateAdventureHandlerTest {
         // given
         var command = new UpdateAdventure(
                 null,
-                null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, false);
 

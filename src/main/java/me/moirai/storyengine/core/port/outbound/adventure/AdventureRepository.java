@@ -11,17 +11,13 @@ public interface AdventureRepository {
 
     void deleteByPublicId(UUID publicId);
 
-    void updateRememberByChannelId(String remember, String channelId);
+    void updateSceneByPublicId(String scene, UUID publicId);
 
-    void updateAuthorsNoteByChannelId(String authorsNote, String channelId);
+    void updateAuthorsNoteByPublicId(String authorsNote, UUID publicId);
 
-    void updateNudgeByChannelId(String nudge, String channelId);
+    void updateNudgeByPublicId(String nudge, UUID publicId);
 
-    void updateBumpByChannelId(String bumpContent, int bumpFrequency, String channelId);
+    void updateBumpByPublicId(String bumpContent, int bumpFrequency, UUID publicId);
 
     Optional<Adventure> findByPublicId(UUID publicId);
-
-    Optional<Adventure> findByChannelId(String channelId);
-
-    String getGameModeByChannelId(String channelId);
 }

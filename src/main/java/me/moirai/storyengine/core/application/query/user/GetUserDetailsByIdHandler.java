@@ -8,8 +8,8 @@ import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.common.exception.DiscordApiException;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsById;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
@@ -41,23 +41,23 @@ public class GetUserDetailsByIdHandler extends AbstractQueryHandler<GetUserDetai
     @Override
     public UserDetailsResult execute(GetUserDetailsById useCase) {
 
-        var dbData = userReader.getUserById(useCase.userId())
+        var moiraiUserDetails = userReader.getUserById(useCase.userId())
                 .orElseThrow(() -> new AssetNotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
-        var discordDetails = discordUserDetailsPort.getUserById(dbData.discordId())
+        var discordUserDetails = discordUserDetailsPort.getUserById(moiraiUserDetails.discordId(), useCase.discordToken())
                 .orElseThrow(() -> new DiscordApiException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
 
-        var nickname = Optional.ofNullable(discordDetails.getNickname())
-                .orElse(discordDetails.getUsername());
+        var nickname = Optional.ofNullable(discordUserDetails.globalNickname())
+                .orElse(discordUserDetails.username());
 
         return new UserDetailsResult(
-                dbData.publicId(),
-                dbData.id(),
-                dbData.discordId(),
-                discordDetails.getUsername(),
+                moiraiUserDetails.publicId(),
+                moiraiUserDetails.id(),
+                moiraiUserDetails.discordId(),
+                discordUserDetails.username(),
                 nickname,
-                discordDetails.getAvatarUrl(),
-                dbData.role(),
-                dbData.creationDate());
+                discordUserDetails.avatar(),
+                moiraiUserDetails.role(),
+                moiraiUserDetails.creationDate());
     }
 }

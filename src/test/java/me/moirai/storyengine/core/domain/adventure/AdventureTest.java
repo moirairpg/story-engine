@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.enums.GameMode;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
@@ -29,11 +28,9 @@ public class AdventureTest {
         adventureBuilder.name("Name");
         adventureBuilder.worldId(1L);
         adventureBuilder.personaId(1L);
-        adventureBuilder.channelId("CHNLID");
         adventureBuilder.moderation(Moderation.STRICT);
         adventureBuilder.visibility(Visibility.fromString("PRIVATE"));
         adventureBuilder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
-        adventureBuilder.gameMode(GameMode.RPG);
 
         // when
         var adventure = adventureBuilder.build();
@@ -536,27 +533,6 @@ public class AdventureTest {
     }
 
     @Test
-    public void createAdventure_whenDiscordChannelIdIsNull_thenThrowException() {
-
-        // given
-        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure()
-                .channelId(null);
-
-        // then
-        assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
-    }
-
-    @Test
-    public void createPersona_whenNullGameMode_thenThrowException() {
-
-        // given
-        var adventureBuilder = AdventureFixture.privateSingleplayerAdventure().gameMode(null);
-
-        // then
-        assertThrows(BusinessRuleViolationException.class, adventureBuilder::build);
-    }
-
-    @Test
     public void updateWorldDescription() {
 
         // given
@@ -594,34 +570,6 @@ public class AdventureTest {
 
         // then
         assertThat(adventure.getWorldId()).isEqualTo(newWorldId);
-    }
-
-    @Test
-    public void adventure_whenUpdateDiscordChannelId_thenDiscordChannelIdIsUpdated() {
-
-        // given
-        var newDiscordChannelId = "12345";
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-
-        // when
-        adventure.updateChannel(newDiscordChannelId);
-
-        // then
-        assertThat(adventure.getChannelId()).isEqualTo(newDiscordChannelId);
-    }
-
-    @Test
-    public void adventure_whenUpdateGameMode_thenGameModeIsUpdated() {
-
-        // given
-        var newGameMode = GameMode.AUTHOR;
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-
-        // when
-        adventure.updateGameMode(newGameMode);
-
-        // then
-        assertThat(adventure.getGameMode()).isEqualTo(newGameMode);
     }
 
     @Test
@@ -667,19 +615,19 @@ public class AdventureTest {
     }
 
     @Test
-    public void adventure_whenUpdateRemember_thenRememberIsUpdated() {
+    public void adventure_whenUpdateScene_thenSceneIsUpdated() {
 
         // given
-        var newRemember = "This is the new value";
+        var newScene = "This is the new value";
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         var originalContextAttributes = adventure.getContextAttributes();
 
         // when
-        adventure.updateRemember(newRemember);
+        adventure.updateScene(newScene);
 
         // then
         assertThat(adventure.getContextAttributes()).isNotEqualTo(originalContextAttributes);
-        assertThat(adventure.getContextAttributes().remember()).isEqualTo(newRemember);
+        assertThat(adventure.getContextAttributes().scene()).isEqualTo(newScene);
     }
 
     @Test

@@ -2,9 +2,9 @@ package me.moirai.storyengine.common.cqs.query;
 
 import static java.util.Objects.isNull;
 
-import me.moirai.storyengine.common.annotation.UseCaseHandler;
+import me.moirai.storyengine.common.annotation.QueryHandler;
 
-@UseCaseHandler
+@QueryHandler
 public abstract class AbstractQueryHandler<A extends Query<T>, T> {
 
     public abstract T execute(A request);

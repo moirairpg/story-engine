@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.enums.Moderation;
+import me.moirai.storyengine.common.enums.Visibility;
 
 public record AdventureDetails(
         UUID id,
@@ -13,10 +15,8 @@ public record AdventureDetails(
         String adventureStart,
         UUID worldId,
         UUID personaId,
-        String channelId,
-        String visibility,
-        String moderation,
-        String gameMode,
+        Visibility visibility,
+        Moderation moderation,
         boolean isMultiplayer,
         Instant creationDate,
         Instant lastUpdateDate,

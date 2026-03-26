@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.query.adventure;
 
+import static me.moirai.storyengine.common.enums.Moderation.STRICT;
+import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -78,11 +80,19 @@ public class GetAdventureByIdHandlerTest {
         var contextAttributes = new ContextAttributesDto(null, null, null, null, 0);
 
         var expectedDetails = new AdventureDetails(
-                AdventureFixture.PUBLIC_ID, "Name", "desc", "start",
-                WorldFixture.PUBLIC_ID, PersonaFixture.PUBLIC_ID,
-                "CHNLID", "PRIVATE", "STRICT", "RPG",
-                true, null, null,
-                modelConfiguration, contextAttributes,
+                AdventureFixture.PUBLIC_ID,
+                "Name",
+                "desc",
+                "start",
+                WorldFixture.PUBLIC_ID,
+                PersonaFixture.PUBLIC_ID,
+                PRIVATE,
+                STRICT,
+                true,
+                null,
+                null,
+                modelConfiguration,
+                contextAttributes,
                 Set.of());
 
         var query = new GetAdventureById(AdventureFixture.PUBLIC_ID);

@@ -209,17 +209,17 @@ public class DefaultStringProcessorsTest {
     }
 
     @Test
-    public void processor_whenRememberReceived_thenReturnFormatted() {
+    public void processor_whenSceneReceived_thenReturnFormatted() {
 
         // Given
-        String remember = "This is a remember";
-        String expectedRemember = "[ Important to remember: This is a remember ]";
+        String scene = "This is a scene";
+        String expectedScene = "[ Current scene: This is a scene ]";
 
         // When
-        String result = DefaultStringProcessors.formatRemember().apply(remember);
+        String result = DefaultStringProcessors.formatScene().apply(scene);
 
         // Then
-        assertThat(result).isEqualTo(expectedRemember);
+        assertThat(result).isEqualTo(expectedScene);
     }
 
     @Test

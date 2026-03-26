@@ -27,13 +27,11 @@ public class CreateAdventureTest {
                 adventure.getDescription(),
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
-                adventure.getChannelId(),
                 adventure.getVisibility(),
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getGameMode(),
                 adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().remember(),
+                adventure.getContextAttributes().scene(),
                 adventure.getContextAttributes().authorsNote(),
                 adventure.getContextAttributes().bump(),
                 adventure.getContextAttributes().bumpFrequency(),
@@ -49,8 +47,6 @@ public class CreateAdventureTest {
 
         // Then
         assertThat(updateAdventure.description()).isEqualTo(adventure.getDescription());
-        assertThat(updateAdventure.channelId()).isEqualTo(adventure.getChannelId());
-        assertThat(updateAdventure.gameMode()).isEqualTo(adventure.getGameMode());
         assertThat(updateAdventure.name()).isEqualTo(adventure.getName());
         assertThat(updateAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(updateAdventure.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
@@ -59,7 +55,7 @@ public class CreateAdventureTest {
         assertThat(updateAdventure.frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
         assertThat(updateAdventure.temperature()).isEqualTo(1.7);
         assertThat(updateAdventure.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
-        assertThat(updateAdventure.remember()).isEqualTo(adventure.getContextAttributes().remember());
+        assertThat(updateAdventure.scene()).isEqualTo(adventure.getContextAttributes().scene());
         assertThat(updateAdventure.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
         assertThat(updateAdventure.nudge()).isEqualTo(adventure.getContextAttributes().nudge());
         assertThat(updateAdventure.bump()).isEqualTo(adventure.getContextAttributes().bump());
@@ -79,13 +75,11 @@ public class CreateAdventureTest {
                 sample.description(),
                 sample.worldId(),
                 sample.personaId(),
-                sample.channelId(),
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.gameMode(),
                 sample.nudge(),
-                sample.remember(),
+                sample.scene(),
                 sample.authorsNote(),
                 sample.bump(),
                 sample.bumpFrequency(),
@@ -115,13 +109,11 @@ public class CreateAdventureTest {
                 sample.description(),
                 sample.worldId(),
                 sample.personaId(),
-                sample.channelId(),
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.gameMode(),
                 sample.nudge(),
-                sample.remember(),
+                sample.scene(),
                 sample.authorsNote(),
                 sample.bump(),
                 sample.bumpFrequency(),
@@ -151,13 +143,11 @@ public class CreateAdventureTest {
                 sample.description(),
                 sample.worldId(),
                 sample.personaId(),
-                sample.channelId(),
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.gameMode(),
                 sample.nudge(),
-                sample.remember(),
+                sample.scene(),
                 sample.authorsNote(),
                 sample.bump(),
                 sample.bumpFrequency(),
@@ -187,13 +177,11 @@ public class CreateAdventureTest {
                 sample.description(),
                 sample.worldId(),
                 sample.personaId(),
-                sample.channelId(),
                 sample.visibility(),
                 sample.aiModel(),
                 sample.moderation(),
-                sample.gameMode(),
                 sample.nudge(),
-                sample.remember(),
+                sample.scene(),
                 sample.authorsNote(),
                 sample.bump(),
                 sample.bumpFrequency(),

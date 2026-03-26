@@ -23,7 +23,7 @@ public class DefaultStringProcessors {
 
     public static final String BUMP_PLACEHOLDER = "[ Bump: %s ]";
     public static final String NUDGE_PLACEHOLDER = "[ Nudge: %s ]";
-    public static final String REMEMBER_PLACEHOLDER = "[ Important to remember: %s ]";
+    public static final String SCENE_PLACEHOLDER = "[ Current scene: %s ]";
     public static final String AUTHORS_NOTE_PLACEHOLDER = "[ Author's Note: %s ]";
 
     public static final String AS_NAME_PREFIX_EXPRESSION = "\\bAs %s, (\\w)";
@@ -131,8 +131,8 @@ public class DefaultStringProcessors {
         return nudge -> format(NUDGE_PLACEHOLDER, nudge);
     }
 
-    public static Function<String, String> formatRemember() {
+    public static Function<String, String> formatScene() {
 
-        return remember -> format(REMEMBER_PLACEHOLDER, remember);
+        return scene -> format(SCENE_PLACEHOLDER, scene);
     }
 }

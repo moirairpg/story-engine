@@ -22,11 +22,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.security.authentication.MoiraiCookie;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUser;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsById;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUser;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
+import me.moirai.storyengine.core.port.inbound.userdetails.RefreshSessionToken;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 
 @Hidden
@@ -108,7 +108,10 @@ public class AuthenticationController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.OK)
     public UserDetailsResult getAuthenticatedUserDetails() {
 
-        var query = new GetUserDetailsById(getAuthenticatedUser().publicId());
+        var query = new GetUserDetailsById(
+                getAuthenticatedUser().publicId(),
+                getAuthenticatedUser().authorizationToken());
+
         return queryRunner.run(query);
     }
 

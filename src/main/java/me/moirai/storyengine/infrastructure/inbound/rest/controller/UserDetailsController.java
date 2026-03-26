@@ -19,11 +19,11 @@ import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.DeleteUserById;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.GetUserDetailsById;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UpdateUserRole;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UpdateUserUsername;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.UserDetailsResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
+import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserRole;
+import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserUsername;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUserRoleRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUserUsernameRequest;
 
@@ -48,7 +48,10 @@ public class UserDetailsController extends SecurityContextAware {
     @Authorize(operation = AuthorizationOperation.MANAGE_USER, fields = "#userId")
     public UserDetailsResult getUserById(@PathVariable(required = true) UUID userId) {
 
-        var query = new GetUserDetailsById(userId);
+        var query = new GetUserDetailsById(
+                userId,
+                getAuthenticatedUser().authorizationToken());
+
         return queryRunner.run(query);
     }
 

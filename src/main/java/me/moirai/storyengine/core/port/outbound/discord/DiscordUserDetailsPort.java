@@ -4,7 +4,5 @@ import java.util.Optional;
 
 public interface DiscordUserDetailsPort {
 
-    Optional<DiscordUserDetails> getUserById(String userDiscordId);
-
-    Optional<DiscordUserDetails> getGuildMemberById(String userId, String guildId);
+    Optional<DiscordUserDataResponse> getUserById(String userDiscordId, String token);
 }

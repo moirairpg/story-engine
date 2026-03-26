@@ -72,4 +72,7 @@
   <include file="db/changelog/migrations/1774400011_alter_table_world_lorebook_rename_creator_id.sql" />
   <include file="db/changelog/migrations/1774400012_alter_table_adventure_lorebook_rename_creator_id.sql" />
   <include file="db/changelog/migrations/1774400013_alter_table_moirai_user_rename_creator_id.sql" />
+  <include file="db/changelog/migrations/1774532482_alter_table_adventure_remove_game_mode.sql" />
+  <include file="db/changelog/migrations/1774532492_alter_table_adventure_remove_discord_channel_id.sql" />
+  <include file="db/changelog/migrations/1742983200_rename_remember_to_scene_in_adventure.sql" />
 </databaseChangeLog>

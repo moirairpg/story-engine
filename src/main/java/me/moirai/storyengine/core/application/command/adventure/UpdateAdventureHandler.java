@@ -63,15 +63,13 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         adventure.updatePersona(persona.getId());
         adventure.updateAiModel(command.aiModel());
         adventure.updateModeration(command.moderation());
-        adventure.updateChannel(command.channelId());
-        adventure.updateGameMode(command.gameMode());
         adventure.updateTemperature(command.temperature());
         adventure.updateFrequencyPenalty(command.frequencyPenalty());
         adventure.updatePresencePenalty(command.presencePenalty());
         adventure.updateAdventureStart(command.adventureStart());
         adventure.updateDescription(command.description());
         adventure.updateNudge(command.nudge());
-        adventure.updateRemember(command.remember());
+        adventure.updateScene(command.scene());
         adventure.updateAuthorsNote(command.authorsNote());
         adventure.updateBump(command.bump());
         adventure.updateBumpFrequency(command.bumpFrequency());
@@ -141,7 +139,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         var contextAttributes = new ContextAttributesDto(
                 savedAdventure.getContextAttributes().nudge(),
                 savedAdventure.getContextAttributes().authorsNote(),
-                savedAdventure.getContextAttributes().remember(),
+                savedAdventure.getContextAttributes().scene(),
                 savedAdventure.getContextAttributes().bump(),
                 savedAdventure.getContextAttributes().bumpFrequency());
 
@@ -152,10 +150,8 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 savedAdventure.getAdventureStart(),
                 worldPublicId,
                 personaPublicId,
-                savedAdventure.getChannelId(),
-                savedAdventure.getVisibility().name(),
-                savedAdventure.getModeration().name(),
-                savedAdventure.getGameMode().name(),
+                savedAdventure.getVisibility(),
+                savedAdventure.getModeration(),
                 savedAdventure.isMultiplayer(),
                 savedAdventure.getCreationDate(),
                 savedAdventure.getLastUpdateDate(),

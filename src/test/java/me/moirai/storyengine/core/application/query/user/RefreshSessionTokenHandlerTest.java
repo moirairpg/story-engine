@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.port.inbound.discord.userdetails.RefreshSessionToken;
+import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
+import me.moirai.storyengine.core.port.inbound.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 
 @ExtendWith(MockitoExtension.class)

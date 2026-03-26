@@ -5,7 +5,6 @@ moirai:
       client-secret: ${DISCORD_BOT_CLIENT_SECRET}
       redirect-url: ${DISCORD_BOT_REDIRECT_URL}
     api:
-      token: ${DISCORD_BOT_API_TOKEN}
       base-url: https://discord.com/api
       token-uri: /oauth2/token
       token-revoke-uri: /oauth2/token/revoke
@@ -73,7 +72,6 @@ logging:
     root: ERROR
     org.hibernate: ERROR
     com.zaxxer.hikari: ERROR
-    net.dv8tion: ERROR
     org.springframework: ERROR
     ch.qos.logback: ERROR
 
