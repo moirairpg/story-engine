@@ -75,7 +75,7 @@ public class GetAdventureByIdHandlerTest {
 
         // Given
         var modelConfiguration = new ModelConfigurationDto(
-                ArtificialIntelligenceModel.GPT4_MINI, 2048, 1.0, 0.0, 0.0, Set.of(), Map.of());
+                ArtificialIntelligenceModel.GPT54_MINI, 2048, 1.0, 0.0, 0.0, Set.of(), Map.of());
 
         var contextAttributes = new ContextAttributesDto(null, null, null, null, 0);
 

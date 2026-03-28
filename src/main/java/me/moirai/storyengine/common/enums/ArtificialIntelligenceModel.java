@@ -6,9 +6,9 @@ import me.moirai.storyengine.common.exception.AIModelNotSupportedException;
 
 public enum ArtificialIntelligenceModel {
 
-    GPT35_TURBO("GPT-3.5 Turbo", "gpt-3.5-turbo", 16385),
-    GPT4_MINI("GPT-4 Mini", "gpt-4o-mini", 128000),
-    GPT4_OMNI("GPT-4 Omni", "gpt-4o", 128000);
+    GPT54("GPT-5.4", "gpt-5.4", 1050000),
+    GPT54_MINI("GPT-5.4 Mini", "gpt-5.4-mini", 400000),
+    GPT54_NANO("GPT-5.4 Nano", "gpt-5.4-nano", 400000);
 
     private final String fullModelName;
     private final String officialModelName;

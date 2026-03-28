@@ -14,10 +14,10 @@ public class ArtificialIntelligenceModelTest {
     public void retrieveModelFromName() {
 
         // Given
-        String internalModelName = "GPT4_OMNI";
-        String fullModelName = "GPT-4 Omni";
-        String officialModelName = "gpt-4o";
-        int hardTokenLimit = 128000;
+        String internalModelName = "GPT54";
+        String fullModelName = "GPT-5.4";
+        String officialModelName = "gpt-5.4";
+        int hardTokenLimit = 1050000;
 
         // When
         ArtificialIntelligenceModel model = ArtificialIntelligenceModel.fromString(internalModelName);

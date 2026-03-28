@@ -19,7 +19,7 @@ public class ModelConfigurationFixture {
         stopSequences.add("ABC");
 
         return ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT35_TURBO)
+                .aiModel(ArtificialIntelligenceModel.GPT54_NANO)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -39,7 +39,7 @@ public class ModelConfigurationFixture {
         stopSequences.add("ABC");
 
         return ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -59,7 +59,7 @@ public class ModelConfigurationFixture {
         stopSequences.add("ABC");
 
         return ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_OMNI)
+                .aiModel(ArtificialIntelligenceModel.GPT54)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)

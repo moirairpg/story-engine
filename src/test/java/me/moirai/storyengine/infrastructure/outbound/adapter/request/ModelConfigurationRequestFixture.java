@@ -11,7 +11,7 @@ public class ModelConfigurationRequestFixture {
 
     public static ModelConfigurationRequest gpt4Mini() {
 
-        var aiModel = ArtificialIntelligenceModel.GPT4_MINI;
+        var aiModel = ArtificialIntelligenceModel.GPT54_MINI;
         return new ModelConfigurationRequest(
                 new AiModelRequest(aiModel.toString(), aiModel.getOfficialModelName(),
                         aiModel.getHardTokenLimit()),
@@ -22,7 +22,7 @@ public class ModelConfigurationRequestFixture {
 
     public static ModelConfigurationRequest gpt4Omni() {
 
-        var aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
+        var aiModel = ArtificialIntelligenceModel.GPT54;
         return new ModelConfigurationRequest(
                 new AiModelRequest(aiModel.toString(), aiModel.getOfficialModelName(),
                         aiModel.getHardTokenLimit()),

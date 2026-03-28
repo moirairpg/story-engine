@@ -1,8 +1,8 @@
 package me.moirai.storyengine.core.application.query.model;
 
-import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT35_TURBO;
-import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT4_MINI;
-import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT4_OMNI;
+import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT54;
+import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT54_MINI;
+import static me.moirai.storyengine.common.enums.ArtificialIntelligenceModel.GPT54_NANO;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -42,8 +42,8 @@ public class SearchModelsHandlerTest {
     public void whenSpecificModelSearchedThroughFullName_thenItIsReturned() {
 
         // Then
-        SearchModels query = new SearchModels("GPT-4 Omni", null);
-        ArtificialIntelligenceModel expectedModel = GPT4_OMNI;
+        SearchModels query = new SearchModels("GPT-5.4 Mini", null);
+        ArtificialIntelligenceModel expectedModel = GPT54_MINI;
 
         // When
         List<AiModelResult> result = handler.handle(query);
@@ -64,8 +64,8 @@ public class SearchModelsHandlerTest {
     public void whenSpecificModelSearchedThroughTokenLimit_thenItIsReturned() {
 
         // Then
-        SearchModels query = new SearchModels(null, "16385");
-        ArtificialIntelligenceModel expectedModel = GPT35_TURBO;
+        SearchModels query = new SearchModels(null, "1050000");
+        ArtificialIntelligenceModel expectedModel = GPT54;
 
         // When
         List<AiModelResult> result = handler.handle(query);
@@ -86,9 +86,9 @@ public class SearchModelsHandlerTest {
     public void whenGeneralModelSearchedThroughFullName_thenMatchingResultsReturned() {
 
         // Then
-        SearchModels query = new SearchModels("gpt-4", null);
-        ArtificialIntelligenceModel omni = GPT4_OMNI;
-        ArtificialIntelligenceModel mini = GPT4_MINI;
+        SearchModels query = new SearchModels("5.4 ", null);
+        ArtificialIntelligenceModel mini = GPT54_MINI;
+        ArtificialIntelligenceModel nano = GPT54_NANO;
 
         // When
         List<AiModelResult> result = handler.handle(query);
@@ -104,11 +104,11 @@ public class SearchModelsHandlerTest {
         assertThat(miniFound.officialModelName()).isEqualTo(mini.getOfficialModelName());
         assertThat(miniFound.hardTokenLimit()).isEqualTo(mini.getHardTokenLimit());
 
-        AiModelResult omniFound = result.get(1);
-        assertThat(omniFound.fullModelName()).isEqualTo(omni.getFullModelName());
-        assertThat(omniFound.internalModelName()).isEqualTo(omni.toString());
-        assertThat(omniFound.officialModelName()).isEqualTo(omni.getOfficialModelName());
-        assertThat(omniFound.hardTokenLimit()).isEqualTo(omni.getHardTokenLimit());
+        AiModelResult nanoFound = result.get(1);
+        assertThat(nanoFound.fullModelName()).isEqualTo(nano.getFullModelName());
+        assertThat(nanoFound.internalModelName()).isEqualTo(nano.toString());
+        assertThat(nanoFound.officialModelName()).isEqualTo(nano.getOfficialModelName());
+        assertThat(nanoFound.hardTokenLimit()).isEqualTo(nano.getHardTokenLimit());
     }
 
     @Test

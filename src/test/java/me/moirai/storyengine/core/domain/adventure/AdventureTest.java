@@ -232,7 +232,7 @@ public class AdventureTest {
     public void updateAdventure_whenNewAiModelIsProvided_thenAiModelShouldBeUpdated() {
 
         // given
-        var aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
+        var aiModel = ArtificialIntelligenceModel.GPT54;
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
         // when
@@ -407,7 +407,7 @@ public class AdventureTest {
         var token = "TOKEN";
         var bias = 1.3;
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -459,7 +459,7 @@ public class AdventureTest {
         // given
         var token = "TOKEN";
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -485,7 +485,7 @@ public class AdventureTest {
         // given
         var token = "TOKEN";
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -512,7 +512,7 @@ public class AdventureTest {
         var token = "TOKEN";
         var bias = 1.3;
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)

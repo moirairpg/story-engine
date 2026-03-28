@@ -29,7 +29,7 @@ public class ModelConfigurationTest {
 
         // When
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -40,7 +40,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThat(modelConfiguration).isNotNull();
-        assertThat(modelConfiguration.getAiModel()).isEqualTo(ArtificialIntelligenceModel.GPT4_MINI);
+        assertThat(modelConfiguration.getAiModel()).isEqualTo(ArtificialIntelligenceModel.GPT54_MINI);
         assertThat(modelConfiguration.getFrequencyPenalty()).isEqualTo(0.2);
         assertThat(modelConfiguration.getPresencePenalty()).isEqualTo(0.2);
         assertThat(modelConfiguration.getMaxTokenLimit()).isEqualTo(100);
@@ -57,7 +57,7 @@ public class ModelConfigurationTest {
 
         // When
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -75,7 +75,7 @@ public class ModelConfigurationTest {
     public void updateAiModel() {
 
         // Given
-        ArtificialIntelligenceModel newModel = ArtificialIntelligenceModel.GPT4_OMNI;
+        ArtificialIntelligenceModel newModel = ArtificialIntelligenceModel.GPT54;
         ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini();
 
         // When
@@ -240,7 +240,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(temperature)
                 .frequencyPenalty(0.2)
@@ -258,7 +258,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(temperature)
                 .frequencyPenalty(0.2)
@@ -276,7 +276,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(maxTokenLimit)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -290,12 +290,12 @@ public class ModelConfigurationTest {
     public void errorWhenMaxTokenLimitIsHigherThanModelLimit() {
 
         // Given
-        int gpt4MiniMaxTokenLimit = 200000;
-        int gpt4OmniMaxTokenLimit = 500000;
+        int gpt4MiniMaxTokenLimit = 500000;
+        int gpt4OmniMaxTokenLimit = 1100000;
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(gpt4MiniMaxTokenLimit)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -304,7 +304,7 @@ public class ModelConfigurationTest {
                 .logitBias(new HashMap<>())
                 .build());
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_OMNI)
+                .aiModel(ArtificialIntelligenceModel.GPT54)
                 .maxTokenLimit(gpt4OmniMaxTokenLimit)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -323,7 +323,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -342,7 +342,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -360,7 +360,7 @@ public class ModelConfigurationTest {
 
         // When
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -382,7 +382,7 @@ public class ModelConfigurationTest {
 
         // When
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -404,7 +404,7 @@ public class ModelConfigurationTest {
 
         // When
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(null)
@@ -426,7 +426,7 @@ public class ModelConfigurationTest {
 
         // When
         var modelConfiguration = ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -448,7 +448,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(frequencyPenalty)
@@ -466,7 +466,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(frequencyPenalty)
@@ -484,7 +484,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
@@ -502,7 +502,7 @@ public class ModelConfigurationTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, () -> ModelConfiguration.builder()
-                .aiModel(ArtificialIntelligenceModel.GPT4_MINI)
+                .aiModel(ArtificialIntelligenceModel.GPT54_MINI)
                 .maxTokenLimit(100)
                 .temperature(1.0)
                 .frequencyPenalty(0.2)
