@@ -9,7 +9,6 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributes;
@@ -59,6 +58,15 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var modelConfiguration = buildModelConfiguration(command);
         var contextAttributes = buildContextAttributes(command);
 
+        var permissions = emptyIfNull(command.permissions()).stream()
+                .map(dto -> {
+                    var user = userRepository.findByPublicId(dto.userId())
+                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                    return new Permission(user.getId(), dto.level());
+                })
+                .collect(Collectors.toSet());
+
         var adventure = adventureRepository.save(Adventure.builder()
                 .modelConfiguration(modelConfiguration)
                 .name(command.name())
@@ -70,12 +78,8 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 .adventureStart(world.getAdventureStart())
                 .contextAttributes(contextAttributes)
                 .description(command.description())
+                .permissions(permissions.toArray(Permission[]::new))
                 .build());
-
-        emptyIfNull(command.usersAllowedToRead())
-                .forEach(id -> adventure.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWrite())
-                .forEach(id -> adventure.grant(new Permission(id, PermissionLevel.WRITE)));
 
         world.getLorebook().forEach(worldEntry -> adventure.addLorebookEntry(
                 worldEntry.getName(),

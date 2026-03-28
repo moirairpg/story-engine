@@ -122,7 +122,7 @@ public class PersonaTest {
         // given
         var userId = 1234567890L;
         var persona = PersonaFixture.publicPersona().build();
-        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        persona.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
 
         // when
         persona.grant(new Permission(userId, PermissionLevel.WRITE));
@@ -138,7 +138,7 @@ public class PersonaTest {
         // given
         var userId = 1234567890L;
         var persona = PersonaFixture.publicPersona().build();
-        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        persona.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
 
         // when
         persona.grant(new Permission(userId, PermissionLevel.READ));
@@ -154,7 +154,7 @@ public class PersonaTest {
         // given
         var userId = 1234567890L;
         var persona = PersonaFixture.privatePersona().build();
-        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        persona.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
         persona.grant(new Permission(userId, PermissionLevel.READ));
 
         // when
@@ -171,7 +171,7 @@ public class PersonaTest {
         // given
         var userId = 1234567890L;
         var persona = PersonaFixture.privatePersona().build();
-        persona.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        persona.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
         persona.grant(new Permission(userId, PermissionLevel.WRITE));
 
         // when

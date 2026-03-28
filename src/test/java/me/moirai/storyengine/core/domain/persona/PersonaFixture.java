@@ -52,14 +52,14 @@ public class PersonaFixture {
     public static Persona publicPersonaWithIdAndPermissions() {
 
         var persona = publicPersonaWithId();
-        persona.permissions.addAll(PermissionFixture.samplePermissions());
+        persona.permissions().addAll(PermissionFixture.samplePermissions());
         return persona;
     }
 
     public static Persona privatePersonaWithIdAndPermissions() {
 
         var persona = privatePersonaWithId();
-        persona.permissions.addAll(PermissionFixture.samplePermissions());
+        persona.permissions().addAll(PermissionFixture.samplePermissions());
         return persona;
     }
 }

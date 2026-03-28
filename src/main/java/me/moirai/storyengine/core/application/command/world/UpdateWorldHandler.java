@@ -8,7 +8,6 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
@@ -60,12 +59,16 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd())
-                .forEach(id -> world.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWriteToAdd())
-                .forEach(id -> world.grant(new Permission(id, PermissionLevel.WRITE)));
-        emptyIfNull(command.usersAllowedToReadToRemove()).forEach(world::revoke);
-        emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(world::revoke);
+        var newPermissions = emptyIfNull(command.permissions()).stream()
+                .map(dto -> {
+                    var user = userRepository.findByPublicId(dto.userId())
+                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                    return new Permission(user.getId(), dto.level());
+                })
+                .collect(Collectors.toSet());
+
+        world.updatePermissions(newPermissions);
 
         return mapResult(repository.save(world));
     }

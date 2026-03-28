@@ -113,7 +113,7 @@ public class WorldTest {
         // given
         var userId = 1234567890L;
         var world = WorldFixture.publicWorld().build();
-        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
 
         // when
         world.grant(new Permission(userId, PermissionLevel.WRITE));
@@ -128,7 +128,7 @@ public class WorldTest {
         // given
         var userId = 1234567890L;
         var world = WorldFixture.publicWorld().build();
-        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
 
         // when
         world.grant(new Permission(userId, PermissionLevel.READ));
@@ -143,7 +143,7 @@ public class WorldTest {
         // given
         var userId = 1234567890L;
         var world = WorldFixture.publicWorld().build();
-        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
         world.grant(new Permission(userId, PermissionLevel.READ));
 
         // when
@@ -159,7 +159,7 @@ public class WorldTest {
         // given
         var userId = 1234567890L;
         var world = WorldFixture.publicWorld().build();
-        world.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
         world.grant(new Permission(userId, PermissionLevel.WRITE));
 
         // when
@@ -175,7 +175,7 @@ public class WorldTest {
         // given
         var ownerId = 1234567890L;
         var world = WorldFixture.privateWorld().build();
-        world.permissions.add(new Permission(ownerId, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(ownerId, PermissionLevel.OWNER));
 
         // when
         var isOwner = world.isOwner(ownerId);
@@ -190,7 +190,7 @@ public class WorldTest {
         // given
         var ownerId = 1234567890L;
         var world = WorldFixture.privateWorld().build();
-        world.permissions.add(new Permission(ownerId, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(ownerId, PermissionLevel.OWNER));
 
         // when
         var canWrite = world.canWrite(ownerId);
@@ -205,7 +205,7 @@ public class WorldTest {
         // given
         var ownerId = 1234567890L;
         var world = WorldFixture.privateWorld().build();
-        world.permissions.add(new Permission(ownerId, PermissionLevel.OWNER));
+        world.permissions().add(new Permission(ownerId, PermissionLevel.OWNER));
 
         // when
         var canRead = world.canRead(ownerId);

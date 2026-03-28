@@ -8,7 +8,6 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
@@ -58,12 +57,16 @@ public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, 
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd())
-                .forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWriteToAdd())
-                .forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
-        emptyIfNull(command.usersAllowedToReadToRemove()).forEach(persona::revoke);
-        emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(persona::revoke);
+        var newPermissions = emptyIfNull(command.permissions()).stream()
+                .map(dto -> {
+                    var user = userRepository.findByPublicId(dto.userId())
+                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                    return new Permission(user.getId(), dto.level());
+                })
+                .collect(Collectors.toSet());
+
+        persona.updatePermissions(newPermissions);
 
         var updatedPersona = repository.save(persona);
 

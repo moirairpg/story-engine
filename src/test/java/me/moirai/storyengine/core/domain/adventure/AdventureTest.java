@@ -100,7 +100,7 @@ public class AdventureTest {
         // given
         var userId = 1234567890L;
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        adventure.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
 
         // when
         adventure.grant(new Permission(userId, PermissionLevel.WRITE));
@@ -116,7 +116,7 @@ public class AdventureTest {
         // given
         var userId = 1234567890L;
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        adventure.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
 
         // when
         adventure.grant(new Permission(userId, PermissionLevel.READ));
@@ -132,7 +132,7 @@ public class AdventureTest {
         // given
         var userId = 1234567890L;
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        adventure.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
         adventure.grant(new Permission(userId, PermissionLevel.READ));
 
         // when
@@ -149,7 +149,7 @@ public class AdventureTest {
         // given
         var userId = 1234567890L;
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        adventure.permissions.add(new Permission(9999L, PermissionLevel.OWNER));
+        adventure.permissions().add(new Permission(9999L, PermissionLevel.OWNER));
         adventure.grant(new Permission(userId, PermissionLevel.WRITE));
 
         // when

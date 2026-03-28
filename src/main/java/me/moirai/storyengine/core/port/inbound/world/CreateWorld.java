@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import me.moirai.storyengine.common.cqs.command.Command;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.Visibility;
 
 public record CreateWorld(
@@ -12,9 +13,12 @@ public record CreateWorld(
         String adventureStart,
         Visibility visibility,
         List<LorebookEntry> lorebookEntries,
-        Set<Long> usersAllowedToWrite,
-        Set<Long> usersAllowedToRead)
+        Set<PermissionDto> permissions)
         implements Command<WorldDetails> {
+
+    public CreateWorld {
+        permissions = permissions != null ? Set.copyOf(permissions) : Set.of();
+    }
 
     public record LorebookEntry(
             String name,

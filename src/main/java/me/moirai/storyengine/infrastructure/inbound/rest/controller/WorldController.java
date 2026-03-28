@@ -1,8 +1,9 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +27,7 @@ import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
@@ -86,6 +88,10 @@ public class WorldController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.CREATED)
     public WorldDetails createWorld(@Valid @RequestBody CreateWorldRequest request) {
 
+        var permissions = emptyIfNull(request.permissions()).stream()
+                .map(p -> new PermissionDto(p.userId(), p.level()))
+                .collect(Collectors.toSet());
+
         var command = new CreateWorld(
                 request.name(),
                 request.description(),
@@ -97,8 +103,7 @@ public class WorldController extends SecurityContextAware {
                                 entry.regex(),
                                 entry.description()))
                         .toList(),
-                request.usersAllowedToWrite(),
-                request.usersAllowedToRead());
+                permissions);
 
         return commandRunner.run(command);
     }
@@ -109,16 +114,17 @@ public class WorldController extends SecurityContextAware {
     public WorldDetails updateWorld(@PathVariable(required = true) UUID worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
+        var updatePermissions = emptyIfNull(request.permissions()).stream()
+                .map(p -> new PermissionDto(p.userId(), p.level()))
+                .collect(Collectors.toSet());
+
         var command = new UpdateWorld(
                 worldId,
                 request.name(),
                 request.description(),
                 request.adventureStart(),
                 request.visibility(),
-                request.usersAllowedToWriteToAdd(),
-                request.usersAllowedToWriteToRemove(),
-                request.usersAllowedToReadToAdd(),
-                request.usersAllowedToReadToRemove());
+                updatePermissions);
 
         return commandRunner.run(command);
     }

@@ -8,7 +8,6 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
@@ -34,16 +33,22 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
     @Override
     public WorldDetails execute(CreateWorld command) {
 
+        var permissions = emptyIfNull(command.permissions()).stream()
+                .map(dto -> {
+                    var user = userRepository.findByPublicId(dto.userId())
+                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                    return new Permission(user.getId(), dto.level());
+                })
+                .collect(Collectors.toSet());
+
         var world = repository.save(World.builder()
                 .name(command.name())
                 .description(command.description())
                 .adventureStart(command.adventureStart())
                 .visibility(command.visibility())
+                .permissions(permissions.toArray(Permission[]::new))
                 .build());
-
-        emptyIfNull(command.usersAllowedToRead()).forEach(id -> world.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWrite())
-                .forEach(id -> world.grant(new Permission(id, PermissionLevel.WRITE)));
 
         command.lorebookEntries().forEach(entry -> world.addLorebookEntry(
                 entry.name(),

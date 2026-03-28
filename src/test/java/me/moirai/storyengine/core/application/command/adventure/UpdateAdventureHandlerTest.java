@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.dto.PermissionDto;
+import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
@@ -55,7 +58,7 @@ public class UpdateAdventureHandlerTest {
         var command = new UpdateAdventure(
                 null,
                 null, null, null, null, null, null, null, false,
-                null, null, null, null, null, null);
+                null, null, null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -180,5 +183,43 @@ public class UpdateAdventureHandlerTest {
         // then
         var capturedAdventure = adventureCaptor.getValue();
         assertThat(capturedAdventure.isMultiplayer()).isFalse();
+    }
+
+    @Test
+    public void shouldOverwritePermissionsWhenUpdateAdventure() {
+
+        // given
+        var permissionDto = new PermissionDto(UserFixture.PUBLIC_ID, PermissionLevel.READ);
+        var sample = UpdateAdventureFixture.sample();
+        var command = new UpdateAdventure(
+                sample.adventureId(),
+                sample.description(),
+                sample.adventureStart(),
+                sample.name(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                Set.of(permissionDto),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        var user = UserFixture.playerWithId();
+
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(personaRepository.findByPublicId(any(UUID.class)))
+                .thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
+        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(WorldFixture.publicWorldWithId()));
+        when(userRepository.findByPublicId(UserFixture.PUBLIC_ID)).thenReturn(Optional.of(user));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+
+        // when
+        handler.execute(command);
+
+        // then
+        assertThat(adventure.getPermissions()).isNotNull();
     }
 }

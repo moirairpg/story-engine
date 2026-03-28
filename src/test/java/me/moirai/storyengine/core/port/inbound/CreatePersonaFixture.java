@@ -15,7 +15,6 @@ public class CreatePersonaFixture {
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                Set.of(),
                 Set.of());
     }
 }

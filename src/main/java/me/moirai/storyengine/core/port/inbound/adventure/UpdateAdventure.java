@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 
@@ -17,11 +18,12 @@ public record UpdateAdventure(
         Visibility visibility,
         Moderation moderation,
         boolean isMultiplayer,
-        Set<Long> usersAllowedToWriteToAdd,
-        Set<Long> usersAllowedToWriteToRemove,
-        Set<Long> usersAllowedToReadToAdd,
-        Set<Long> usersAllowedToReadToRemove,
+        Set<PermissionDto> permissions,
         UpdateModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes)
         implements Command<AdventureDetails> {
+
+    public UpdateAdventure {
+        permissions = permissions != null ? Set.copyOf(permissions) : Set.of();
+    }
 }

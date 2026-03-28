@@ -10,7 +10,6 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -108,12 +107,16 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd())
-                .forEach(id -> adventure.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWriteToAdd())
-                .forEach(id -> adventure.grant(new Permission(id, PermissionLevel.WRITE)));
-        emptyIfNull(command.usersAllowedToReadToRemove()).forEach(adventure::revoke);
-        emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(adventure::revoke);
+        var newPermissions = emptyIfNull(command.permissions()).stream()
+                .map(dto -> {
+                    var user = userRepository.findByPublicId(dto.userId())
+                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                    return new Permission(user.getId(), dto.level());
+                })
+                .collect(Collectors.toSet());
+
+        adventure.updatePermissions(newPermissions);
     }
 
     private void updateLogitBias(UpdateAdventure command, Adventure adventure) {

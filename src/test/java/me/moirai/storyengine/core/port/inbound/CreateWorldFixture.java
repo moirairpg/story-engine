@@ -18,7 +18,6 @@ public class CreateWorldFixture {
                 world.getAdventureStart(),
                 world.getVisibility(),
                 Collections.emptyList(),
-                Set.of(),
                 Set.of());
     }
 }

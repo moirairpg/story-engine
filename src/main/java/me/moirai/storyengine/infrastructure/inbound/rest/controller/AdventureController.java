@@ -1,6 +1,9 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,6 +37,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureAuthorsNoteById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureBumpById;
@@ -114,16 +118,19 @@ public class AdventureController extends SecurityContextAware {
     public AdventureDetails createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
+        var permissions = emptyIfNull(request.permissions()).stream()
+                .map(p -> new PermissionDto(p.userId(), p.level()))
+                .collect(Collectors.toSet());
+
         var command = new CreateAdventure(
                 request.name(),
-                null,
+                request.description(),
                 request.worldId(),
                 request.personaId(),
                 request.visibility(),
                 request.moderation(),
                 request.isMultiplayer(),
-                request.usersAllowedToWrite(),
-                request.usersAllowedToRead(),
+                permissions,
                 new ModelConfigurationDto(
                         request.modelConfiguration().aiModel(),
                         request.modelConfiguration().maxTokenLimit(),
@@ -149,9 +156,13 @@ public class AdventureController extends SecurityContextAware {
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
 
+        var updatePermissions = emptyIfNull(request.permissions()).stream()
+                .map(p -> new PermissionDto(p.userId(), p.level()))
+                .collect(Collectors.toSet());
+
         var command = new UpdateAdventure(
                 adventureId,
-                null,
+                request.description(),
                 request.adventureStart(),
                 request.name(),
                 request.worldId(),
@@ -159,10 +170,7 @@ public class AdventureController extends SecurityContextAware {
                 request.visibility(),
                 request.moderation(),
                 request.isMultiplayer(),
-                request.usersAllowedToWriteToAdd(),
-                request.usersAllowedToWriteToRemove(),
-                request.usersAllowedToReadToAdd(),
-                request.usersAllowedToReadToRemove(),
+                updatePermissions,
                 new UpdateModelConfigurationDto(
                         request.modelConfiguration().aiModel(),
                         request.modelConfiguration().maxTokenLimit(),

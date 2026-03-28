@@ -1,6 +1,7 @@
 package me.moirai.storyengine.common.domain;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -14,7 +15,7 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 @MappedSuperclass
 public abstract class ShareableAsset extends Asset {
 
-    protected abstract Set<Permission> permissions();
+    protected abstract List<Permission> permissions();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "visibility")
@@ -79,8 +80,8 @@ public abstract class ShareableAsset extends Asset {
                                 || p.level() == PermissionLevel.OWNER));
     }
 
-    public Set<Permission> getPermissions() {
-        return Collections.unmodifiableSet(permissions());
+    public List<Permission> getPermissions() {
+        return Collections.unmodifiableList(permissions());
     }
 
     public boolean isPublic() {

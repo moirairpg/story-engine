@@ -76,14 +76,14 @@ public class Adventure extends ShareableAsset {
 
     @ElementCollection
     @CollectionTable(name = "adventure_permissions", joinColumns = @JoinColumn(name = "adventure_id"))
-    Set<Permission> permissions = new HashSet<>();
+    private List<Permission> permissions = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "adventure_id")
     private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
 
     @Override
-    protected Set<Permission> permissions() {
+    protected List<Permission> permissions() {
         return permissions;
     }
 

@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.Visibility;
 
 public record UpdatePersona(
@@ -11,9 +12,10 @@ public record UpdatePersona(
         String name,
         String personality,
         Visibility visibility,
-        Set<Long> usersAllowedToWriteToAdd,
-        Set<Long> usersAllowedToWriteToRemove,
-        Set<Long> usersAllowedToReadToAdd,
-        Set<Long> usersAllowedToReadToRemove)
+        Set<PermissionDto> permissions)
         implements Command<PersonaDetails> {
+
+    public UpdatePersona {
+        permissions = permissions != null ? Set.copyOf(permissions) : Set.of();
+    }
 }

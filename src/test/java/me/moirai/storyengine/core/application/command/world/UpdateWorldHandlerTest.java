@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -47,10 +48,7 @@ public class UpdateWorldHandlerTest {
                 "This is an RPG world",
                 "As you enter the city, people around you start looking at you.",
                 Visibility.PUBLIC,
-                null,
-                null,
-                null,
-                null);
+                Set.of());
 
         var expectedUpdatedWorld = WorldFixture.privateWorld().build();
         var unchangedWorld = WorldFixture.privateWorld().name(newName).build();
@@ -78,10 +76,7 @@ public class UpdateWorldHandlerTest {
                 "This is an RPG world",
                 "As you enter the city, people around you start looking at you.",
                 Visibility.PUBLIC,
-                null,
-                null,
-                null,
-                null);
+                Set.of());
 
         var unchangedWorld = WorldFixture.privateWorld().build();
         var expectedUpdatedWorld = WorldFixture.privateWorld()
@@ -113,9 +108,6 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
-                null,
-                null,
-                null,
                 null);
 
         var unchangedWorld = WorldFixture.privateWorld().build();
@@ -142,9 +134,6 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 Visibility.PRIVATE,
-                null,
-                null,
-                null,
                 null);
 
         var unchangedWorld = WorldFixture.publicWorld().build();
@@ -168,9 +157,6 @@ public class UpdateWorldHandlerTest {
         var id = WorldFixture.PUBLIC_ID;
         var command = new UpdateWorld(
                 id,
-                null,
-                null,
-                null,
                 null,
                 null,
                 null,
@@ -200,9 +186,6 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
-                null,
-                null,
-                null,
                 null);
 
         // then
@@ -217,9 +200,6 @@ public class UpdateWorldHandlerTest {
         var command = new UpdateWorld(
                 WorldFixture.PUBLIC_ID,
                 "SomeNewName",
-                null,
-                null,
-                null,
                 null,
                 null,
                 null,

@@ -5,8 +5,7 @@
 CREATE TABLE world_permissions (
     world_id    BIGINT  NOT NULL REFERENCES world(id) ON DELETE CASCADE,
     user_id     BIGINT  NOT NULL,
-    permission  VARCHAR NOT NULL,
-    CONSTRAINT uq_world_permissions UNIQUE (world_id, user_id)
+    permission  VARCHAR NOT NULL
 );
 
 /* liquibase rollback

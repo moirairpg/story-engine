@@ -60,7 +60,7 @@ public class WorldFixture {
     public static World publicWorldWithIdAndPermissions() {
 
         var world = publicWorldWithId();
-        world.permissions.addAll(PermissionFixture.samplePermissions());
+        world.permissions().addAll(PermissionFixture.samplePermissions());
 
         return world;
     }
@@ -68,7 +68,7 @@ public class WorldFixture {
     public static World privateWorldWithIdAndPermissions() {
 
         var world = privateWorldWithId();
-        world.permissions.addAll(PermissionFixture.samplePermissions());
+        world.permissions().addAll(PermissionFixture.samplePermissions());
 
         return world;
     }

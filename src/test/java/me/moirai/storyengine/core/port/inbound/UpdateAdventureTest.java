@@ -34,10 +34,7 @@ public class UpdateAdventureTest {
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
-                Set.of(12345L),
-                Set.of(12345L),
-                Set.of(12345L),
-                Set.of(12345L),
+                Set.of(),
                 new UpdateModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
@@ -92,10 +89,7 @@ public class UpdateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                sample.usersAllowedToWriteToRemove(),
-                sample.usersAllowedToReadToAdd(),
-                sample.usersAllowedToReadToRemove(),
+                sample.permissions(),
                 new UpdateModelConfigurationDto(
                         sample.modelConfiguration().aiModel(),
                         sample.modelConfiguration().maxTokenLimit(),
@@ -129,10 +123,7 @@ public class UpdateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                sample.usersAllowedToWriteToRemove(),
-                sample.usersAllowedToReadToAdd(),
-                sample.usersAllowedToReadToRemove(),
+                sample.permissions(),
                 new UpdateModelConfigurationDto(
                         sample.modelConfiguration().aiModel(),
                         sample.modelConfiguration().maxTokenLimit(),
@@ -166,10 +157,7 @@ public class UpdateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                sample.usersAllowedToWriteToRemove(),
-                sample.usersAllowedToReadToAdd(),
-                sample.usersAllowedToReadToRemove(),
+                sample.permissions(),
                 new UpdateModelConfigurationDto(
                         sample.modelConfiguration().aiModel(),
                         sample.modelConfiguration().maxTokenLimit(),
@@ -203,10 +191,7 @@ public class UpdateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                sample.usersAllowedToWriteToRemove(),
-                sample.usersAllowedToReadToAdd(),
-                sample.usersAllowedToReadToRemove(),
+                sample.permissions(),
                 new UpdateModelConfigurationDto(
                         sample.modelConfiguration().aiModel(),
                         sample.modelConfiguration().maxTokenLimit(),
@@ -224,7 +209,7 @@ public class UpdateAdventureTest {
     }
 
     @Test
-    public void updateAdventure_whenUsersAllowedToWriteToAddIsNull_thenListIsEmpty() {
+    public void updateAdventure_whenPermissionsIsNull_thenSetIsEmpty() {
 
         // Given
         UpdateAdventure sample = UpdateAdventureFixture.sample();
@@ -241,97 +226,10 @@ public class UpdateAdventureTest {
                 sample.moderation(),
                 sample.isMultiplayer(),
                 null,
-                sample.usersAllowedToWriteToRemove(),
-                sample.usersAllowedToReadToAdd(),
-                sample.usersAllowedToReadToRemove(),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
 
         // Then
-        assertThat(updateAdventure.usersAllowedToWriteToAdd()).isNull();
-    }
-
-    @Test
-    public void updateAdventure_whenUsersAllowedToWriteToRemoveIsNull_thenListIsEmpty() {
-
-        // Given
-        UpdateAdventure sample = UpdateAdventureFixture.sample();
-
-        // When
-        UpdateAdventure updateAdventure = new UpdateAdventure(
-                sample.adventureId(),
-                sample.description(),
-                sample.adventureStart(),
-                sample.name(),
-                sample.worldId(),
-                sample.personaId(),
-                sample.visibility(),
-                sample.moderation(),
-                sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                null,
-                sample.usersAllowedToReadToAdd(),
-                sample.usersAllowedToReadToRemove(),
-                sample.modelConfiguration(),
-                sample.contextAttributes());
-
-        // Then
-        assertThat(updateAdventure.usersAllowedToWriteToRemove()).isNull();
-    }
-
-    @Test
-    public void updateAdventure_whenUsersAllowedToReadToAddIsNull_thenListIsEmpty() {
-
-        // Given
-        UpdateAdventure sample = UpdateAdventureFixture.sample();
-
-        // When
-        UpdateAdventure updateAdventure = new UpdateAdventure(
-                sample.adventureId(),
-                sample.description(),
-                sample.adventureStart(),
-                sample.name(),
-                sample.worldId(),
-                sample.personaId(),
-                sample.visibility(),
-                sample.moderation(),
-                sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                sample.usersAllowedToWriteToRemove(),
-                null,
-                sample.usersAllowedToReadToRemove(),
-                sample.modelConfiguration(),
-                sample.contextAttributes());
-
-        // Then
-        assertThat(updateAdventure.usersAllowedToReadToAdd()).isNull();
-    }
-
-    @Test
-    public void updateAdventure_whenUsersAllowedToReadToRemoveIsNull_thenListIsEmpty() {
-
-        // Given
-        UpdateAdventure sample = UpdateAdventureFixture.sample();
-
-        // When
-        UpdateAdventure updateAdventure = new UpdateAdventure(
-                sample.adventureId(),
-                sample.description(),
-                sample.adventureStart(),
-                sample.name(),
-                sample.worldId(),
-                sample.personaId(),
-                sample.visibility(),
-                sample.moderation(),
-                sample.isMultiplayer(),
-                sample.usersAllowedToWriteToAdd(),
-                sample.usersAllowedToWriteToRemove(),
-                sample.usersAllowedToReadToAdd(),
-                null,
-                sample.modelConfiguration(),
-                sample.contextAttributes());
-
-        // Then
-        assertThat(updateAdventure.usersAllowedToReadToRemove()).isNull();
+        assertThat(updateAdventure.permissions()).isEmpty();
     }
 }

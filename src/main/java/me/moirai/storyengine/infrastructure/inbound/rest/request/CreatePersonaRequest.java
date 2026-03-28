@@ -11,6 +11,5 @@ public record CreatePersonaRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
         @Moderated @NotEmpty(message = "cannot be empty") String personality,
         @NotNull(message = "cannot be null") Visibility visibility,
-        Set<Long> usersAllowedToWrite,
-        Set<Long> usersAllowedToRead) {
+        Set<PermissionRequest> permissions) {
 }

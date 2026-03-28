@@ -5,8 +5,7 @@
 CREATE TABLE persona_permissions (
     persona_id  BIGINT  NOT NULL REFERENCES persona(id) ON DELETE CASCADE,
     user_id     BIGINT  NOT NULL,
-    permission  VARCHAR NOT NULL,
-    CONSTRAINT uq_persona_permissions UNIQUE (persona_id, user_id)
+    permission  VARCHAR NOT NULL
 );
 
 /* liquibase rollback

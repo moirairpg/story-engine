@@ -1,6 +1,9 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +27,7 @@ import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
@@ -86,12 +90,15 @@ public class PersonaController extends SecurityContextAware {
     public PersonaDetails createPersona(
             @Valid @RequestBody CreatePersonaRequest request) {
 
+        var permissions = emptyIfNull(request.permissions()).stream()
+                .map(p -> new PermissionDto(p.userId(), p.level()))
+                .collect(Collectors.toSet());
+
         var command = new CreatePersona(
                 request.name(),
                 request.personality(),
                 request.visibility(),
-                request.usersAllowedToRead(),
-                request.usersAllowedToWrite());
+                permissions);
 
         return commandRunner.run(command);
     }
@@ -103,15 +110,16 @@ public class PersonaController extends SecurityContextAware {
             @PathVariable(required = true) UUID personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
 
+        var updatePermissions = emptyIfNull(request.permissions()).stream()
+                .map(p -> new PermissionDto(p.userId(), p.level()))
+                .collect(Collectors.toSet());
+
         var command = new UpdatePersona(
                 personaId,
                 request.name(),
                 request.personality(),
                 request.visibility(),
-                request.usersAllowedToWriteToAdd(),
-                request.usersAllowedToReadToAdd(),
-                request.usersAllowedToWriteToRemove(),
-                request.usersAllowedToReadToRemove());
+                updatePermissions);
 
         return commandRunner.run(command);
     }

@@ -21,24 +21,18 @@ public class UpdateWorldTest {
                 "SomeDesc",
                 "SomeStart",
                 Visibility.PUBLIC,
-                Set.of(123123L),
-                Set.of(123123L),
-                Set.of(123123L),
-                Set.of(123123L));
+                Set.of());
 
         // Then
         assertThat(result).isNotNull();
         assertThat(result.name()).isNotNull();
         assertThat(result.adventureStart()).isNotNull();
         assertThat(result.description()).isNotNull();
-        assertThat(result.usersAllowedToReadToAdd()).isNotNull().isNotEmpty();
-        assertThat(result.usersAllowedToReadToRemove()).isNotNull().isNotEmpty();
-        assertThat(result.usersAllowedToWriteToAdd()).isNotNull().isNotEmpty();
-        assertThat(result.usersAllowedToWriteToRemove()).isNotNull().isNotEmpty();
+        assertThat(result.permissions()).isNotNull().isEmpty();
     }
 
     @Test
-    public void buildObject_whenModifiedListsAreNull_thenCreateInstanceWithNullLists() {
+    public void buildObject_whenPermissionsIsNull_thenSetIsEmpty() {
 
         // Given
         UpdateWorld result = new UpdateWorld(
@@ -47,9 +41,6 @@ public class UpdateWorldTest {
                 "SomeDesc",
                 "SomeStart",
                 Visibility.PUBLIC,
-                null,
-                null,
-                null,
                 null);
 
         // Then
@@ -57,9 +48,6 @@ public class UpdateWorldTest {
         assertThat(result.name()).isNotNull();
         assertThat(result.adventureStart()).isNotNull();
         assertThat(result.description()).isNotNull();
-        assertThat(result.usersAllowedToReadToAdd()).isNull();
-        assertThat(result.usersAllowedToReadToRemove()).isNull();
-        assertThat(result.usersAllowedToWriteToAdd()).isNull();
-        assertThat(result.usersAllowedToWriteToRemove()).isNull();
+        assertThat(result.permissions()).isEmpty();
     }
 }

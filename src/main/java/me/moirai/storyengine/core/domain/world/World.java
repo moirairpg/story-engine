@@ -51,14 +51,14 @@ public class World extends ShareableAsset {
 
     @ElementCollection
     @CollectionTable(name = "world_permissions", joinColumns = @JoinColumn(name = "world_id"))
-    Set<Permission> permissions = new HashSet<>();
+    private List<Permission> permissions = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "world_id")
     private List<WorldLorebookEntry> lorebook = new ArrayList<>();
 
     @Override
-    protected Set<Permission> permissions() {
+    protected List<Permission> permissions() {
         return permissions;
     }
 

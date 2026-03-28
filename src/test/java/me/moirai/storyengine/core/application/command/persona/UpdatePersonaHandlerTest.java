@@ -52,8 +52,7 @@ class UpdatePersonaHandlerTest {
 
         // given
         var command = new UpdatePersona(
-                null, null, null, null,
-                null, null, null, null);
+                null, null, null, null, null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -67,8 +66,7 @@ class UpdatePersonaHandlerTest {
         var command = new UpdatePersona(
                 personaId, "MoirAI", "I am a Discord chatbot",
                 Visibility.PUBLIC,
-                Set.of(123456L), Set.of(123456L),
-                Set.of(123456L), Set.of(123456L));
+                Set.of());
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -85,104 +83,7 @@ class UpdatePersonaHandlerTest {
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
                 Visibility.PUBLIC,
-                Set.of(123456L), Set.of(123456L),
-                Set.of(123456L), Set.of(123456L));
-
-        var unchangedPersona = PersonaFixture.privatePersona().build();
-        var expectedUpdatedPersona = PersonaFixture.privatePersona().name("New name").build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
-        when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
-
-        // when
-        var result = handler.handle(command);
-
-        // then
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void shouldUpdatePersonaWhenNoWriterUsersAreAdded() {
-
-        // given
-        var command = new UpdatePersona(
-                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC,
-                null, Set.of(4567L),
-                Set.of(123456L), Set.of(4567L));
-
-        var unchangedPersona = PersonaFixture.privatePersona().build();
-        var expectedUpdatedPersona = PersonaFixture.privatePersona().name("New name").build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
-        when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
-
-        // when
-        var result = handler.handle(command);
-
-        // then
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void shouldUpdatePersonaWhenNoReaderUsersAreAdded() {
-
-        // given
-        var command = new UpdatePersona(
-                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC,
-                Set.of(123456L), Set.of(4567L),
-                null, Set.of(4567L));
-
-        var unchangedPersona = PersonaFixture.privatePersona().build();
-        var expectedUpdatedPersona = PersonaFixture.privatePersona().name("New name").build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
-        when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
-
-        // when
-        var result = handler.handle(command);
-
-        // then
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void shouldUpdatePersonaWhenNoReaderUsersAreRemoved() {
-
-        // given
-        var command = new UpdatePersona(
-                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC,
-                Set.of(123456L), Set.of(123456L),
-                Set.of(123456L), null);
-
-        var unchangedPersona = PersonaFixture.privatePersona().build();
-        var expectedUpdatedPersona = PersonaFixture.privatePersona().name("New name").build();
-
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
-        when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
-
-        // when
-        var result = handler.handle(command);
-
-        // then
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void shouldUpdatePersonaWhenNoWriterUsersAreRemoved() {
-
-        // given
-        var command = new UpdatePersona(
-                PersonaFixture.PUBLIC_ID, "MoirAI", "I am a Discord chatbot",
-                Visibility.PUBLIC,
-                Set.of(123456L), null,
-                Set.of(123456L), Set.of(4567L));
+                Set.of());
 
         var unchangedPersona = PersonaFixture.privatePersona().build();
         var expectedUpdatedPersona = PersonaFixture.privatePersona().name("New name").build();
@@ -205,7 +106,7 @@ class UpdatePersonaHandlerTest {
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, null, null,
                 Visibility.PRIVATE,
-                null, null, null, null);
+                null);
 
         var unchangedPersona = PersonaFixture.publicPersona().build();
         var expectedUpdatedPersona = PersonaFixture.privatePersona().build();
@@ -228,7 +129,7 @@ class UpdatePersonaHandlerTest {
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, null, null,
                 null,
-                null, null, null, null);
+                null);
 
         var unchangedPersona = PersonaFixture.privatePersona().build();
         var expectedUpdatedPersona = PersonaFixture.privatePersona().build();
@@ -251,7 +152,7 @@ class UpdatePersonaHandlerTest {
         var command = new UpdatePersona(
                 PersonaFixture.PUBLIC_ID, null, null,
                 null,
-                null, null, null, null);
+                null);
 
         var unchangedPersona = PersonaFixture.privatePersona().build();
 

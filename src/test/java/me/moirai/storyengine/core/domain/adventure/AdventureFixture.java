@@ -107,14 +107,14 @@ public class AdventureFixture {
     public static Adventure publicMultiplayerAdventureWithIdAndPermissions() {
 
         var adventure = publicMultiplayerAdventureWithId();
-        adventure.permissions.addAll(PermissionFixture.samplePermissions());
+        adventure.permissions().addAll(PermissionFixture.samplePermissions());
         return adventure;
     }
 
     public static Adventure privateMultiplayerAdventureWithIdAndPermissions() {
 
         var adventure = privateMultiplayerAdventureWithId();
-        adventure.permissions.addAll(PermissionFixture.samplePermissions());
+        adventure.permissions().addAll(PermissionFixture.samplePermissions());
         return adventure;
     }
 }

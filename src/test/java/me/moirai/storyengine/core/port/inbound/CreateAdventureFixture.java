@@ -26,7 +26,6 @@ public class CreateAdventureFixture {
                 STRICT,
                 adventure.isMultiplayer(),
                 Set.of(),
-                Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
@@ -54,7 +53,6 @@ public class CreateAdventureFixture {
                 PRIVATE,
                 STRICT,
                 adventure.isMultiplayer(),
-                Set.of(),
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),

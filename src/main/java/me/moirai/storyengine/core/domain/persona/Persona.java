@@ -1,6 +1,8 @@
 package me.moirai.storyengine.core.domain.persona;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,10 +42,10 @@ public class Persona extends ShareableAsset {
 
     @ElementCollection
     @CollectionTable(name = "persona_permissions", joinColumns = @JoinColumn(name = "persona_id"))
-    Set<Permission> permissions = new HashSet<>();
+    private List<Permission> permissions = new ArrayList<>();
 
     @Override
-    protected Set<Permission> permissions() {
+    protected List<Permission> permissions() {
         return permissions;
     }
 

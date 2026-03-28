@@ -13,15 +13,13 @@ import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
 // TODO enrich to make world optional
 public record UpdateAdventureRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
+        @Moderated String description,
         @NotNull(message = "cannot be null") UUID worldId,
         @NotNull(message = "cannot be null") UUID personaId,
         @NotNull(message = "cannot be empty") Visibility visibility,
         @NotNull(message = "cannot be empty") Moderation moderation,
         boolean isMultiplayer,
-        Set<Long> usersAllowedToWriteToAdd,
-        Set<Long> usersAllowedToWriteToRemove,
-        Set<Long> usersAllowedToReadToAdd,
-        Set<Long> usersAllowedToReadToRemove,
+        Set<PermissionRequest> permissions,
         @Moderated String adventureStart,
         @NotNull(message = "cannot be null") @Valid UpdateModelConfigurationRequest modelConfiguration,
         @Valid ContextAttributesRequest contextAttributes) {
