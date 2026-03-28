@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.exception.DiscordApiException;
+import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
@@ -42,10 +42,10 @@ public class GetUserDetailsByIdHandler extends AbstractQueryHandler<GetUserDetai
     public UserDetailsResult execute(GetUserDetailsById useCase) {
 
         var moiraiUserDetails = userReader.getUserById(useCase.userId())
-                .orElseThrow(() -> new AssetNotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
         var discordUserDetails = discordUserDetailsPort.getUserById(moiraiUserDetails.discordId(), useCase.discordToken())
-                .orElseThrow(() -> new DiscordApiException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
+                .orElseThrow(() -> new RestException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
 
         var nickname = Optional.ofNullable(discordUserDetails.globalNickname())
                 .orElse(discordUserDetails.username());

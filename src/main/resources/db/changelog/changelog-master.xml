@@ -76,4 +76,6 @@
   <include file="db/changelog/migrations/1774532492_alter_table_adventure_remove_discord_channel_id.sql" />
   <include file="db/changelog/migrations/1742983200_rename_remember_to_scene_in_adventure.sql" />
   <include file="db/changelog/migrations/1742990400_create_table_message.sql" />
+  <include file="db/changelog/migrations/1774720141_drop_table_notification.sql" />
+  <include file="db/changelog/migrations/1774731362_alter_table_adventure_drop_model_configuration_extended_fields.sql" />
 </databaseChangeLog>

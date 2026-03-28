@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.common.exception.OpenAiApiException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.infrastructure.outbound.adapter.discord.DiscordUserDetailsAdapter;
 import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
@@ -60,7 +60,7 @@ public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.getUserById(userId, token))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.getUserById(userId, token))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -100,6 +100,6 @@ public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.getUserById(userId, token))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 }

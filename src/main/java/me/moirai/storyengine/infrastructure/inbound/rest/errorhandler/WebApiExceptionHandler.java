@@ -17,14 +17,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import io.micrometer.common.util.StringUtils;
-import me.moirai.storyengine.common.exception.AssetAccessDeniedException;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.AccessDeniedException;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
-import me.moirai.storyengine.common.exception.DiscordApiException;
 import me.moirai.storyengine.common.exception.ModerationException;
-import me.moirai.storyengine.common.exception.OpenAiApiException;
-import me.moirai.storyengine.common.exception.UnauthorizedException;
+import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.ErrorResponse;
 
 @RestControllerAdvice
@@ -38,8 +36,8 @@ public class WebApiExceptionHandler {
     private static final String RESOURCE_NOT_FOUND_ERROR = "The endpoint requested could not be found.";
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    @ExceptionHandler(AssetNotFoundException.class)
-    public ResponseEntity<ErrorResponse> assetNotFound(AssetNotFoundException exception) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> assetNotFound(NotFoundException exception) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(HttpStatus.NOT_FOUND)
@@ -94,20 +92,8 @@ public class WebApiExceptionHandler {
     }
 
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> unauthorizedError(UnauthorizedException exception) {
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(HttpStatus.FORBIDDEN)
-                .message(exception.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
-    }
-
-    @ResponseStatus(code = HttpStatus.FORBIDDEN)
-    @ExceptionHandler(AssetAccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> accessDeniedError(AssetAccessDeniedException exception) {
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDeniedError(AccessDeniedException exception) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(HttpStatus.FORBIDDEN)
@@ -168,25 +154,8 @@ public class WebApiExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
-    @ExceptionHandler(DiscordApiException.class)
-    public ResponseEntity<ErrorResponse> discordApiError(DiscordApiException exception) {
-
-        ErrorResponse.Builder errorResponseBuilder = ErrorResponse.builder();
-        errorResponseBuilder.code(exception.getHttpStatusCode());
-
-        if (StringUtils.isNotBlank(exception.getMessage())) {
-            errorResponseBuilder.message(exception.getMessage());
-        }
-
-        if (StringUtils.isNotBlank(exception.getErrorDescription())) {
-            errorResponseBuilder.details(Collections.singletonList(exception.getErrorDescription()));
-        }
-
-        return new ResponseEntity<>(errorResponseBuilder.build(), exception.getHttpStatusCode());
-    }
-
-    @ExceptionHandler(OpenAiApiException.class)
-    public ResponseEntity<ErrorResponse> openAiApiError(OpenAiApiException exception) {
+    @ExceptionHandler(RestException.class)
+    public ResponseEntity<ErrorResponse> restError(RestException exception) {
 
         ErrorResponse.Builder errorResponseBuilder = ErrorResponse.builder();
         errorResponseBuilder.code(exception.getHttpStatusCode());

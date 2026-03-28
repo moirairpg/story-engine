@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
@@ -48,7 +48,7 @@ public class GetPersonaByIdHandlerTest {
         when(reader.getPersonaById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
+        assertThrows(NotFoundException.class, () -> handler.handle(query));
     }
 
     @Test

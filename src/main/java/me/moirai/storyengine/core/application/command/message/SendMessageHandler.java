@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.AiRole;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.util.DefaultStringProcessors;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.message.Message;
-import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
@@ -68,10 +67,10 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
     public MessageResult execute(SendMessage command) {
 
         var adventure = adventureRepository.findByPublicId(command.adventureId())
-                .orElseThrow(() -> new AssetNotFoundException("Adventure not found"));
+                .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
         var persona = personaRepository.findById(adventure.getPersonaId())
-                .orElseThrow(() -> new AssetNotFoundException("Persona not found"));
+                .orElseThrow(() -> new NotFoundException("Persona not found"));
 
         var playerMessage = Message.builder()
                 .adventureId(adventure.getId())
@@ -82,18 +81,15 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         messageRepository.save(playerMessage);
 
         var history = messageReader.findActiveByAdventureId(adventure.getId(), messageWindowSize);
-        var context = assembleContext(persona, adventure, history);
+        var context = assembleContext(adventure, history);
         var modelConfig = adventure.getModelConfiguration();
 
         var generationRequest = new TextGenerationRequest(
                 modelConfig.getAiModel().getOfficialModelName(),
+                persona.getPersonality(),
                 context,
-                modelConfig.getStopSequences(),
                 modelConfig.getMaxTokenLimit(),
-                modelConfig.getTemperature(),
-                modelConfig.getPresencePenalty(),
-                modelConfig.getFrequencyPenalty(),
-                modelConfig.getLogitBias());
+                modelConfig.getTemperature());
 
         var generationResult = textCompletionPort.generateTextFrom(generationRequest);
 
@@ -113,14 +109,11 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
     }
 
     private List<ChatMessage> assembleContext(
-            Persona persona,
             Adventure adventure,
             List<MessageData> history) {
 
         var context = new ArrayList<ChatMessage>();
         var contextAttributes = adventure.getContextAttributes();
-
-        context.add(ChatMessage.asSystem(persona.getPersonality()));
 
         context.addAll(interleaveBumps(
                 history.stream().map(this::toChatMessage).toList(),

@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.user;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserRole;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
@@ -31,7 +31,7 @@ public class UpdateUserRoleHandler extends AbstractCommandHandler<UpdateUserRole
     @Override
     public Void execute(UpdateUserRole command) {
         var user = repository.findByPublicId(command.userId())
-                .orElseThrow(() -> new AssetNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
         user.updateRole(command.role());
         repository.save(user);

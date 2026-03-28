@@ -3,7 +3,7 @@ package me.moirai.storyengine.infrastructure.security.authorization.user;
 import org.springframework.stereotype.Component;
 
 import me.moirai.storyengine.common.enums.Role;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
@@ -29,7 +29,7 @@ public class UpdateUsernameAuthorizer implements OperationAuthorizer {
         var principal = context.getPrincipal();
 
         var user = reader.getUserById(userId)
-                .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         return user.publicId().equals(principal.publicId()) || principal.role().equals(Role.ADMIN);
     }

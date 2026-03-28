@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.persona;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
@@ -31,7 +31,7 @@ public class DeletePersonaHandler extends AbstractCommandHandler<DeletePersona, 
     public Void execute(DeletePersona request) {
 
         repository.findByPublicId(request.personaId())
-                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(PERSONA_NOT_FOUND));
 
         repository.deleteByPublicId(request.personaId());
 

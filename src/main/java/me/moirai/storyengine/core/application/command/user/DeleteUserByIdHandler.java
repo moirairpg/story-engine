@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.user;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
@@ -30,7 +30,7 @@ public class DeleteUserByIdHandler extends AbstractCommandHandler<DeleteUserById
     public Void execute(DeleteUserById useCase) {
 
         var discordUser = repository.findByPublicId(useCase.userId())
-                .orElseThrow(() -> new AssetNotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
         repository.delete(discordUser);
 

@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
@@ -68,7 +68,7 @@ public class DeleteWorldHandlerTest {
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThatExceptionOfType(AssetNotFoundException.class)
+        assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 }

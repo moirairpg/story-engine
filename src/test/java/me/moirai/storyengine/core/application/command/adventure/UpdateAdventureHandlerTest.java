@@ -20,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
@@ -98,7 +98,7 @@ public class UpdateAdventureHandlerTest {
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThrows(AssetNotFoundException.class, () -> handler.execute(updateAdventure));
+        assertThrows(NotFoundException.class, () -> handler.execute(updateAdventure));
     }
 
     @Test

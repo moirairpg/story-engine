@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.common.exception.OpenAiApiException;
+import me.moirai.storyengine.common.exception.RestException;
 
 class TextModerationAdapterTest extends AbstractWebMockTest {
 
@@ -66,7 +66,7 @@ class TextModerationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(errorResponse, BAD_REQUEST);
 
         assertThatThrownBy(() -> adapter.moderate("This is the input"))
-                .isInstanceOf(OpenAiApiException.class)
+                .isInstanceOf(RestException.class)
                 .hasMessageContaining("Bad request calling OpenAI Moderation API");
     }
 
@@ -83,7 +83,7 @@ class TextModerationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(errorResponse, INTERNAL_SERVER_ERROR);
 
         assertThatThrownBy(() -> adapter.moderate("This is the input"))
-                .isInstanceOf(OpenAiApiException.class)
+                .isInstanceOf(RestException.class)
                 .hasMessageContaining("Error on OpenAI Moderation API");
     }
 
@@ -100,7 +100,7 @@ class TextModerationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(errorResponse, UNAUTHORIZED);
 
         assertThatThrownBy(() -> adapter.moderate("This is the input"))
-                .isInstanceOf(OpenAiApiException.class)
+                .isInstanceOf(RestException.class)
                 .hasMessageContaining("Error authenticating user on OpenAI");
     }
 }

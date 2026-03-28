@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.world;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
@@ -26,7 +26,7 @@ public class UpdateWorldLorebookEntryHandler
     public WorldLorebookEntryDetails execute(UpdateWorldLorebookEntry command) {
 
         var world = repository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         var lorebookEntry = world.updateLorebookEntry(
                 command.entryId(),

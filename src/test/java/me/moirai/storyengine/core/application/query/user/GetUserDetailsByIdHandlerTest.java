@@ -17,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Role;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
-import me.moirai.storyengine.common.exception.DiscordApiException;
+import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
@@ -95,7 +95,7 @@ public class GetUserDetailsByIdHandlerTest {
         when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
-        assertThatExceptionOfType(AssetNotFoundException.class)
+        assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> handler.execute(query))
                 .withMessage(expectedMessage);
     }
@@ -114,7 +114,7 @@ public class GetUserDetailsByIdHandlerTest {
         when(discordUserDetailsPort.getUserById(anyString(), anyString())).thenReturn(Optional.empty());
 
         // Then
-        assertThatExceptionOfType(DiscordApiException.class)
+        assertThatExceptionOfType(RestException.class)
                 .isThrownBy(() -> handler.execute(query))
                 .withMessage(expectedMessage);
     }

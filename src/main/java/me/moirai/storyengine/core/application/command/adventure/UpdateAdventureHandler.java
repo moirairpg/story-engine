@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -10,7 +9,7 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
@@ -59,13 +58,13 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
     public AdventureDetails execute(UpdateAdventure command) {
 
         var adventure = repository.findByPublicId(command.adventureId())
-                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ADVENTURE_NOT_FOUND));
 
         var persona = personaRepository.findByPublicId(command.personaId())
-                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(PERSONA_NOT_FOUND));
 
         var world = worldRepository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(WORLD_NOT_FOUND));
 
         adventure.updateName(command.name());
         adventure.updateWorld(world.getId());
@@ -73,8 +72,6 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         adventure.updateAiModel(command.modelConfiguration().aiModel());
         adventure.updateModeration(command.moderation());
         adventure.updateTemperature(command.modelConfiguration().temperature());
-        adventure.updateFrequencyPenalty(command.modelConfiguration().frequencyPenalty());
-        adventure.updatePresencePenalty(command.modelConfiguration().presencePenalty());
         adventure.updateAdventureStart(command.adventureStart());
         adventure.updateDescription(command.description());
         adventure.updateNudge(command.contextAttributes().nudge());
@@ -89,8 +86,6 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
             adventure.makeSinglePlayer();
         }
 
-        updateStopSequences(command, adventure);
-        updateLogitBias(command, adventure);
         updatePermissions(command, adventure);
 
         var savedAdventure = repository.save(adventure);
@@ -110,7 +105,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         var newPermissions = emptyIfNull(command.permissions()).stream()
                 .map(dto -> {
                     var user = userRepository.findByPublicId(dto.userId())
-                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                            .orElseThrow(() -> new NotFoundException("User not found"));
 
                     return new Permission(user.getId(), dto.level());
                 })
@@ -119,37 +114,12 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         adventure.updatePermissions(newPermissions);
     }
 
-    private void updateLogitBias(UpdateAdventure command, Adventure adventure) {
-
-        emptyIfNull(command.modelConfiguration().logitBiasToAdd())
-                .entrySet()
-                .stream()
-                .forEach(entry -> adventure.addLogitBias(entry.getKey(), entry.getValue()));
-
-        emptyIfNull(command.modelConfiguration().logitBiasToRemove())
-                .forEach(adventure::removeLogitBias);
-    }
-
-    private void updateStopSequences(UpdateAdventure command, Adventure adventure) {
-
-        emptyIfNull(command.modelConfiguration().stopSequencesToAdd())
-                .stream()
-                .forEach(adventure::addStopSequence);
-
-        emptyIfNull(command.modelConfiguration().stopSequencesToRemove())
-                .forEach(adventure::removeStopSequence);
-    }
-
     private AdventureDetails mapResult(Adventure savedAdventure, UUID personaPublicId, UUID worldPublicId) {
 
         var modelConfiguration = new ModelConfigurationDto(
                 savedAdventure.getModelConfiguration().getAiModel(),
                 savedAdventure.getModelConfiguration().getMaxTokenLimit(),
-                savedAdventure.getModelConfiguration().getTemperature(),
-                savedAdventure.getModelConfiguration().getFrequencyPenalty(),
-                savedAdventure.getModelConfiguration().getPresencePenalty(),
-                savedAdventure.getModelConfiguration().getStopSequences(),
-                savedAdventure.getModelConfiguration().getLogitBias());
+                savedAdventure.getModelConfiguration().getTemperature());
 
         var contextAttributes = new ContextAttributesDto(
                 savedAdventure.getContextAttributes().nudge(),
@@ -175,7 +145,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 savedAdventure.getPermissions().stream()
                         .map(permission -> {
                             var user = userRepository.findById(permission.userId())
-                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                                    .orElseThrow(() -> new NotFoundException("User not found"));
 
                             return new PermissionDto(user.getPublicId(), permission.level());
                         })

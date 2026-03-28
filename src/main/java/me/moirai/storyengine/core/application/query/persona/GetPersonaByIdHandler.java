@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.query.persona;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.persona.GetPersonaById;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaReader;
@@ -31,6 +31,6 @@ public class GetPersonaByIdHandler extends AbstractQueryHandler<GetPersonaById, 
     public PersonaDetails execute(GetPersonaById query) {
 
         return reader.getPersonaById(query.personaId())
-                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(PERSONA_NOT_FOUND));
     }
 }

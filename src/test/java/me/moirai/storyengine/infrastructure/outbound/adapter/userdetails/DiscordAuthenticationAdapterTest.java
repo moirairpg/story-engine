@@ -13,7 +13,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.common.exception.OpenAiApiException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
@@ -111,7 +111,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.authenticate(request))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.authenticate(request))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.authenticate(request))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -185,7 +185,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -203,7 +203,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -257,7 +257,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -277,7 +277,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -297,6 +297,6 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
-                .isInstanceOf(OpenAiApiException.class);
+                .isInstanceOf(RestException.class);
     }
 }

@@ -22,11 +22,7 @@ public class GetAdventureResultFixture {
         var modelConfiguration = new ModelConfigurationDto(
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getLogitBias());
+                adventure.getModelConfiguration().getTemperature());
 
         var contextAttributes = new ContextAttributesDto(
                 adventure.getContextAttributes().nudge(),
@@ -66,11 +62,7 @@ public class GetAdventureResultFixture {
         var modelConfiguration = new ModelConfigurationDto(
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getLogitBias());
+                adventure.getModelConfiguration().getTemperature());
 
         var contextAttributes = new ContextAttributesDto(
                 adventure.getContextAttributes().nudge(),

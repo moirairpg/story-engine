@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import me.moirai.storyengine.common.exception.UnauthorizedException;
+import me.moirai.storyengine.common.exception.AccessDeniedException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 
 @Service
@@ -19,6 +19,6 @@ public class AuthorizationService {
     public void authorize(AuthorizationOperation operation, Map<String, Object> fields, MoiraiPrincipal principal) {
         var context = new AuthorizationContext(principal, fields);
         if (!authorizerFactory.getAuthorizer(operation).authorize(context))
-            throw new UnauthorizedException("Access denied for operation: " + operation);
+            throw new AccessDeniedException("Access denied for operation: " + operation);
     }
 }

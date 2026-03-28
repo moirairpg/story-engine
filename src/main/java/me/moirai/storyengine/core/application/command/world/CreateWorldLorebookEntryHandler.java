@@ -3,7 +3,7 @@ package me.moirai.storyengine.core.application.command.world;
 import io.micrometer.common.util.StringUtils;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
@@ -43,7 +43,7 @@ public class CreateWorldLorebookEntryHandler
     public WorldLorebookEntryDetails execute(CreateWorldLorebookEntry command) {
 
         var world = repository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(WORLD_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         var entry = world.addLorebookEntry(
                 command.name(),

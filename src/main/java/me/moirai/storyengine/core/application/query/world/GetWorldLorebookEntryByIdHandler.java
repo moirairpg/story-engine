@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.query.world;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldLorebookReader;
@@ -36,6 +36,6 @@ public class GetWorldLorebookEntryByIdHandler
     public WorldLorebookEntryDetails execute(GetWorldLorebookEntryById query) {
 
         return reader.getWorldLorebookEntryById(query.entryId(), query.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_LOREBOOK_ENTRY_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(WORLD_LOREBOOK_ENTRY_NOT_FOUND));
     }
 }

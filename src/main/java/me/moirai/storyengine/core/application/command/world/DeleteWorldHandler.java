@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.world;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
@@ -30,7 +30,7 @@ public class DeleteWorldHandler extends AbstractCommandHandler<DeleteWorld, Void
     public Void execute(DeleteWorld command) {
 
         repository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
 
         repository.deleteByPublicId(command.worldId());
 

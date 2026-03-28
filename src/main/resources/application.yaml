@@ -14,7 +14,7 @@ moirai:
       token: ${OPENAI_API_TOKEN}
       base-url: https://api.openai.com
       moderation-uri: /v1/moderations
-      completions-uri: /v1/chat/completions
+      responses-uri: /v1/responses
   adventure:
     message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
   security:

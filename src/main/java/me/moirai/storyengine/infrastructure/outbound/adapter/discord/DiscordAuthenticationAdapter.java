@@ -22,7 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
-import me.moirai.storyengine.common.exception.OpenAiApiException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
@@ -149,14 +149,14 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     }
 
     private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
-        throw new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
+        throw new RestException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
     }
 
     private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
 
         var error = mapErrorResponse(response);
         LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
-        throw new OpenAiApiException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
+        throw new RestException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
                 String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
     }
 
@@ -164,7 +164,7 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
 
         var error = mapErrorResponse(response);
         LOG.error(UNKNOWN_ERROR + " -> {}", error);
-        throw new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
+        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
                 String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
     }
 

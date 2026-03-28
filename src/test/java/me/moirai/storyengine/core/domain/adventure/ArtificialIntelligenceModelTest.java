@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.exception.AIModelNotSupportedException;
+import me.moirai.storyengine.common.exception.UnsupportedAiModelException;
 
 public class ArtificialIntelligenceModelTest {
 
@@ -39,7 +39,7 @@ public class ArtificialIntelligenceModelTest {
         String modelName = "new_model_super_turbo";
 
         // Then
-        assertThrows(AIModelNotSupportedException.class,
+        assertThrows(UnsupportedAiModelException.class,
                 () -> ArtificialIntelligenceModel.fromString(modelName));
     }
 }

@@ -2,13 +2,13 @@ package me.moirai.storyengine.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class OpenAiApiException extends RuntimeException {
+public class RestException extends RuntimeException {
 
     private final HttpStatus httpStatusCode;
     private final String errorMessage;
     private final String errorDescription;
 
-    public OpenAiApiException(HttpStatus httpStatusCode, String message) {
+    public RestException(HttpStatus httpStatusCode, String message) {
 
         super(message);
 
@@ -17,7 +17,7 @@ public class OpenAiApiException extends RuntimeException {
         this.errorDescription = null;
     }
 
-    public OpenAiApiException(HttpStatus httpStatusCode, String errorMessage,
+    public RestException(HttpStatus httpStatusCode, String errorMessage,
             String errorDescription, String message) {
 
         super(message);
@@ -27,7 +27,7 @@ public class OpenAiApiException extends RuntimeException {
         this.errorDescription = errorDescription;
     }
 
-    public OpenAiApiException(HttpStatus httpStatusCode, String errorMessage,
+    public RestException(HttpStatus httpStatusCode, String errorMessage,
             String errorDescription, String message, Throwable t) {
 
         super(message, t);

@@ -15,7 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.DeletePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
@@ -51,7 +51,7 @@ public class DeletePersonaHandlerTest {
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThatExceptionOfType(AssetNotFoundException.class)
+        assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 

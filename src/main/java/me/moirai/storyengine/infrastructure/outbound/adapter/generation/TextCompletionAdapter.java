@@ -16,8 +16,8 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
 import tools.jackson.databind.json.JsonMapper;
-import me.moirai.storyengine.common.exception.OpenAiApiException;
-import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
+import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
@@ -38,27 +38,27 @@ public class TextCompletionAdapter implements TextCompletionPort {
             .isSameCodeAs(HttpStatusCode.valueOf(401));
 
     private final String token;
-    private final String completionsUri;
-    private final RestClient discordClient;
+    private final String responsesUri;
+    private final RestClient openAiClient;
     private final JsonMapper jsonMapper;
 
     public TextCompletionAdapter(
-            @Value("${moirai.openai.api.completions-uri}") String completionsUri,
+            @Value("${moirai.openai.api.responses-uri}") String responsesUri,
             @Value("${moirai.openai.api.token}") String token,
-            RestClient discordClient,
+            RestClient openAiClient,
             JsonMapper jsonMapper) {
 
         this.token = token;
-        this.completionsUri = completionsUri;
-        this.discordClient = discordClient;
+        this.responsesUri = responsesUri;
+        this.openAiClient = openAiClient;
         this.jsonMapper = jsonMapper;
     }
 
     @Override
     public TextGenerationResult generateTextFrom(TextGenerationRequest request) {
 
-        var response = discordClient.post()
-                .uri(completionsUri)
+        var response = openAiClient.post()
+                .uri(responsesUri)
                 .headers(headers -> {
                     headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
                     headers.add(HttpHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
@@ -68,47 +68,55 @@ public class TextCompletionAdapter implements TextCompletionPort {
                 .onStatus(UNAUTHORIZED, this::handleUnauthorized)
                 .onStatus(BAD_REQUEST, this::handleBadRequest)
                 .onStatus(HttpStatusCode::isError, this::handleUnknownError)
-                .body(CompletionResponse.class);
+                .body(OpenAiResponsesApiResponse.class);
 
         return toResult(response);
     }
 
-    private CompletionRequest toRequest(TextGenerationRequest request) {
+    private OpenAiResponsesApiRequest toRequest(TextGenerationRequest request) {
 
-        return CompletionRequest.builder()
-                .frequencyPenalty(request.frequencyPenalty())
-                .presencePenalty(request.presencePenalty())
-                .temperature(request.temperature())
-                .logitBias(request.logitBias())
-                .stop(request.stopSequences())
-                .maxTokens(request.maxTokens())
+        var input = request.messages().stream()
+                .map(m -> new OpenAiInputMessage(toApiRole(m.role()), m.content()))
+                .toList();
+
+        return OpenAiResponsesApiRequest.builder()
                 .model(request.model())
-                .messages(request.messages()
-                        .stream()
-                        .map(message -> new ChatMessage(message.role(), message.content()))
-                        .toList())
+                .instructions(request.instructions())
+                .input(input)
+                .temperature(request.temperature())
+                .maxOutputTokens(request.maxTokens())
                 .build();
     }
 
-    private TextGenerationResult toResult(CompletionResponse response) {
+    private String toApiRole(AiRole role) {
+        return switch (role) {
+            case SYSTEM -> "developer";
+            case USER -> "user";
+            case ASSISTANT -> "assistant";
+        };
+    }
+
+    private TextGenerationResult toResult(OpenAiResponsesApiResponse response) {
+
+        var outputText = response.getOutput().get(0).getContent().get(0).getText();
 
         return TextGenerationResult.builder()
-                .completionTokens(response.getUsage().getCompletionTokens())
-                .promptTokens(response.getUsage().getPromptTokens())
+                .completionTokens(response.getUsage().getOutputTokens())
+                .promptTokens(response.getUsage().getInputTokens())
                 .totalTokens(response.getUsage().getTotalTokens())
-                .outputText(response.getChoices().get(0).getMessage().content())
+                .outputText(outputText)
                 .build();
     }
 
     private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
-        throw new OpenAiApiException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
+        throw new RestException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
     }
 
     private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
 
         var error = mapErrorResponse(response);
         LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
-        throw new OpenAiApiException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
+        throw new RestException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
                 String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
     }
 
@@ -116,7 +124,7 @@ public class TextCompletionAdapter implements TextCompletionPort {
 
         var error = mapErrorResponse(response);
         LOG.error(UNKNOWN_ERROR + " -> {}", error);
-        throw new OpenAiApiException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
+        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
                 String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
     }
 

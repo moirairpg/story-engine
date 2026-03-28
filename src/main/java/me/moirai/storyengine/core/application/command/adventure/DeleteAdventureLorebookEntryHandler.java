@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.adventure;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
@@ -36,7 +36,7 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractCommandHandler<
     public Void execute(DeleteAdventureLorebookEntry command) {
 
         var adventure = repository.findByPublicId(command.adventureId())
-                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         adventure.removeLorebookEntry(command.entryId());
         repository.save(adventure);

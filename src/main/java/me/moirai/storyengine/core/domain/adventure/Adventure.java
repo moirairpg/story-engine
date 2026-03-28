@@ -31,7 +31,7 @@ import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
@@ -208,42 +208,6 @@ public class Adventure extends ShareableAsset {
         this.modelConfiguration = newModelConfiguration;
     }
 
-    public void updateFrequencyPenalty(double frequencyPenalty) {
-
-        ModelConfiguration newModelConfiguration = this.modelConfiguration.updateFrequencyPenalty(frequencyPenalty);
-        this.modelConfiguration = newModelConfiguration;
-    }
-
-    public void updatePresencePenalty(double presencePenalty) {
-
-        ModelConfiguration newModelConfiguration = this.modelConfiguration.updatePresencePenalty(presencePenalty);
-        this.modelConfiguration = newModelConfiguration;
-    }
-
-    public void addStopSequence(String stopSequence) {
-
-        ModelConfiguration newModelConfiguration = this.modelConfiguration.addStopSequence(stopSequence);
-        this.modelConfiguration = newModelConfiguration;
-    }
-
-    public void removeStopSequence(String stopSequence) {
-
-        ModelConfiguration newModelConfiguration = this.modelConfiguration.removeStopSequence(stopSequence);
-        this.modelConfiguration = newModelConfiguration;
-    }
-
-    public void addLogitBias(String token, double bias) {
-
-        ModelConfiguration newModelConfiguration = this.modelConfiguration.addLogitBias(token, bias);
-        this.modelConfiguration = newModelConfiguration;
-    }
-
-    public void removeLogitBias(String token) {
-
-        ModelConfiguration newModelConfiguration = this.modelConfiguration.removeLogitBias(token);
-        this.modelConfiguration = newModelConfiguration;
-    }
-
     public void makeMultiplayer() {
         this.isMultiplayer = true;
     }
@@ -327,7 +291,7 @@ public class Adventure extends ShareableAsset {
         return lorebook.stream()
                 .filter(e -> entryId.equals(e.getPublicId()))
                 .findFirst()
-                .orElseThrow(() -> new AssetNotFoundException("Lorebook entry not found"));
+                .orElseThrow(() -> new NotFoundException("Lorebook entry not found"));
     }
 
     public List<AdventureLorebookEntry> getLorebookEntriesByRegex(String value) {

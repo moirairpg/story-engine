@@ -9,7 +9,7 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributes;
 import me.moirai.storyengine.core.domain.adventure.ModelConfiguration;
@@ -50,10 +50,10 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
     public AdventureDetails execute(CreateAdventure command) {
 
         var world = worldRepository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_DOES_NOT_EXIST));
+                .orElseThrow(() -> new NotFoundException(WORLD_DOES_NOT_EXIST));
 
         var persona = personaRepository.findByPublicId(command.personaId())
-                .orElseThrow(() -> new AssetNotFoundException(PERSONA_DOES_NOT_EXIST));
+                .orElseThrow(() -> new NotFoundException(PERSONA_DOES_NOT_EXIST));
 
         var modelConfiguration = buildModelConfiguration(command);
         var contextAttributes = buildContextAttributes(command);
@@ -61,7 +61,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var permissions = emptyIfNull(command.permissions()).stream()
                 .map(dto -> {
                     var user = userRepository.findByPublicId(dto.userId())
-                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                            .orElseThrow(() -> new NotFoundException("User not found"));
 
                     return new Permission(user.getId(), dto.level());
                 })
@@ -97,11 +97,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var modelConfiguration = new ModelConfigurationDto(
                 adventure.getModelConfiguration().getAiModel(),
                 adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getLogitBias());
+                adventure.getModelConfiguration().getTemperature());
 
         var contextAttributes = new ContextAttributesDto(
                 adventure.getContextAttributes().nudge(),
@@ -127,7 +123,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 adventure.getPermissions().stream()
                         .map(permission -> {
                             var user = userRepository.findById(permission.userId())
-                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                                    .orElseThrow(() -> new NotFoundException("User not found"));
 
                             return new PermissionDto(user.getPublicId(), permission.level());
                         })
@@ -162,10 +158,6 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 .aiModel(command.modelConfiguration().aiModel())
                 .maxTokenLimit(command.modelConfiguration().maxTokenLimit())
                 .temperature(command.modelConfiguration().temperature())
-                .frequencyPenalty(command.modelConfiguration().frequencyPenalty())
-                .presencePenalty(command.modelConfiguration().presencePenalty())
-                .stopSequences(command.modelConfiguration().stopSequences())
-                .logitBias(command.modelConfiguration().logitBias())
                 .build();
     }
 }

@@ -8,7 +8,7 @@ import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -45,7 +45,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
     public WorldDetails execute(UpdateWorld command) {
 
         var world = repository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(WORLD_NOT_FOUND));
 
         world.updateName(command.name());
         world.updateDescription(command.description());
@@ -62,7 +62,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
         var newPermissions = emptyIfNull(command.permissions()).stream()
                 .map(dto -> {
                     var user = userRepository.findByPublicId(dto.userId())
-                            .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                            .orElseThrow(() -> new NotFoundException("User not found"));
 
                     return new Permission(user.getId(), dto.level());
                 })
@@ -84,7 +84,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
                 world.getPermissions().stream()
                         .map(permission -> {
                             var user = userRepository.findById(permission.userId())
-                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                                    .orElseThrow(() -> new NotFoundException("User not found"));
 
                             return new PermissionDto(user.getPublicId(), permission.level());
                         })

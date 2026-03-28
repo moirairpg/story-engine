@@ -4,7 +4,7 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
@@ -48,7 +48,7 @@ public class UpdateAdventureLorebookEntryHandler
     public AdventureLorebookEntryDetails execute(UpdateAdventureLorebookEntry command) {
 
         var adventure = repository.findByPublicId(command.adventureId())
-                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND));
 
         var lorebookEntry = adventure.updateLorebookEntry(
                 command.entryId(),

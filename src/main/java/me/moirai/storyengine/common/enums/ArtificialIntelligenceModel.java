@@ -2,7 +2,7 @@ package me.moirai.storyengine.common.enums;
 
 import java.util.Arrays;
 
-import me.moirai.storyengine.common.exception.AIModelNotSupportedException;
+import me.moirai.storyengine.common.exception.UnsupportedAiModelException;
 
 public enum ArtificialIntelligenceModel {
 
@@ -47,6 +47,6 @@ public enum ArtificialIntelligenceModel {
         return Arrays.stream(values())
                 .filter(aiModel -> aiModel.name().equals(modelToSearch.toUpperCase()))
                 .findFirst()
-                .orElseThrow(() -> new AIModelNotSupportedException("Unsupported model: " + modelToSearch));
+                .orElseThrow(() -> new UnsupportedAiModelException("Unsupported model: " + modelToSearch));
     }
 }

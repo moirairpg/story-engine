@@ -29,11 +29,7 @@ public class CreateAdventureFixture {
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
-                        1.7,
-                        adventure.getModelConfiguration().getFrequencyPenalty(),
-                        adventure.getModelConfiguration().getPresencePenalty(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        adventure.getModelConfiguration().getLogitBias()),
+                        1.7),
                 new ContextAttributesDto(
                         adventure.getContextAttributes().nudge(),
                         adventure.getContextAttributes().authorsNote(),
@@ -57,11 +53,7 @@ public class CreateAdventureFixture {
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
-                        1.7,
-                        adventure.getModelConfiguration().getFrequencyPenalty(),
-                        adventure.getModelConfiguration().getPresencePenalty(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        adventure.getModelConfiguration().getLogitBias()),
+                        1.7),
                 new ContextAttributesDto(
                         adventure.getContextAttributes().nudge(),
                         adventure.getContextAttributes().authorsNote(),

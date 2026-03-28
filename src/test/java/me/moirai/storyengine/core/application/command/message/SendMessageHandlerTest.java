@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
@@ -71,7 +71,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // When / Then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SendMessageHandlerTest {
         when(personaRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // When / Then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
     }
 
     @Test

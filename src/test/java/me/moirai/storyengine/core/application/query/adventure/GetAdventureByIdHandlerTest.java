@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -19,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
@@ -67,7 +66,7 @@ public class GetAdventureByIdHandlerTest {
         when(reader.getAdventureById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
+        assertThrows(NotFoundException.class, () -> handler.handle(query));
     }
 
     @Test
@@ -75,7 +74,7 @@ public class GetAdventureByIdHandlerTest {
 
         // Given
         var modelConfiguration = new ModelConfigurationDto(
-                ArtificialIntelligenceModel.GPT54_MINI, 2048, 1.0, 0.0, 0.0, Set.of(), Map.of());
+                ArtificialIntelligenceModel.GPT54_MINI, 2048, 1.0);
 
         var contextAttributes = new ContextAttributesDto(null, null, null, null, 0);
 

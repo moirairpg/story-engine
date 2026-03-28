@@ -5,7 +5,7 @@ import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -34,7 +34,7 @@ public class ViewWorldAuthorizer implements OperationAuthorizer {
         var principal = context.getPrincipal();
 
         var authData = reader.getAuthorizationData(worldId)
-                .orElseThrow(() -> new AssetNotFoundException("World not found"));
+                .orElseThrow(() -> new NotFoundException("World not found"));
 
         return canRead(authData, principal);
     }

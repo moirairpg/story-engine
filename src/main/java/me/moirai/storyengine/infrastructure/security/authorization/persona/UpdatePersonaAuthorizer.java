@@ -4,7 +4,7 @@ import static me.moirai.storyengine.common.enums.Role.ADMIN;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -33,7 +33,7 @@ public class UpdatePersonaAuthorizer implements OperationAuthorizer {
         var principal = context.getPrincipal();
 
         var authData = reader.getAuthorizationData(personaId)
-                .orElseThrow(() -> new AssetNotFoundException("Persona not found"));
+                .orElseThrow(() -> new NotFoundException("Persona not found"));
 
         return canWrite(authData, principal);
     }

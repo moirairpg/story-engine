@@ -4,7 +4,7 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserUsername;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
@@ -33,7 +33,7 @@ public class UpdateUsernameHandler extends AbstractCommandHandler<UpdateUserUser
     @Override
     public Void execute(UpdateUserUsername command) {
         var user = repository.findByPublicId(command.userId())
-                .orElseThrow(() -> new AssetNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
         user.updateUsername(command.username());
         repository.save(user);

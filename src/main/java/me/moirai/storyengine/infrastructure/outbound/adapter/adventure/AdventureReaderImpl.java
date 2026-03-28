@@ -1,10 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -43,8 +41,6 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.bump_frequency,
                     a.max_token_limit,
                     a.temperature,
-                    a.frequency_penalty,
-                    a.presence_penalty,
                     a.is_multiplayer,
                     a.creation_date,
                     a.last_update_date
@@ -66,19 +62,6 @@ public class AdventureReaderImpl implements AdventureReader {
             FROM adventure_lorebook al
            WHERE al.adventure_id = :adventureId
           """;
-
-    private static final String SELECT_STOP_SEQUENCES = """
-            SELECT value
-              FROM adventure_stop_sequences
-             WHERE adventure_id = :adventureId
-            """;
-
-    private static final String SELECT_LOGIT_BIAS = """
-            SELECT token_id,
-                   bias
-              FROM adventure_logit_bias
-             WHERE adventure_id = :adventureId
-            """;
 
     private static final String SELECT_PERMISSIONS = """
             SELECT a.public_id,
@@ -107,18 +90,6 @@ public class AdventureReaderImpl implements AdventureReader {
         return (rs, _) -> {
             var adventureId = rs.getLong("id");
 
-            var stopSequences = new HashSet<>(jdbcClient.sql(SELECT_STOP_SEQUENCES)
-                    .param("adventureId", adventureId)
-                    .query((r, __) -> r.getString("value"))
-                    .list());
-
-            var logitBias = jdbcClient.sql(SELECT_LOGIT_BIAS)
-                    .param("adventureId", adventureId)
-                    .query((r, __) -> Map.entry(r.getString("token_id"), r.getDouble("bias")))
-                    .list()
-                    .stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
             var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
                     .param("adventureId", adventureId)
                     .query((r, __) -> new PermissionDto(UUID.fromString(r.getString("public_id")),
@@ -128,11 +99,7 @@ public class AdventureReaderImpl implements AdventureReader {
             var modelConfiguration = new ModelConfigurationDto(
                     ArtificialIntelligenceModel.fromString(rs.getString("ai_model")),
                     rs.getInt("max_token_limit"),
-                    rs.getDouble("temperature"),
-                    rs.getDouble("frequency_penalty"),
-                    rs.getDouble("presence_penalty"),
-                    stopSequences,
-                    logitBias);
+                    rs.getDouble("temperature"));
 
             var contextAttributes = new ContextAttributesDto(
                     rs.getString("nudge"),

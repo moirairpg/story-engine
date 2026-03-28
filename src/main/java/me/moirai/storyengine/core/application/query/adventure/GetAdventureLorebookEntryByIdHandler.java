@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.query.adventure;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
@@ -36,6 +36,6 @@ public class GetAdventureLorebookEntryByIdHandler
     public AdventureLorebookEntryDetails execute(GetAdventureLorebookEntryById query) {
 
         return reader.getAdventureLorebookEntryById(query.entryId(), query.adventureId())
-                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_LOREBOOK_ENTRY_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ADVENTURE_LOREBOOK_ENTRY_NOT_FOUND));
     }
 }

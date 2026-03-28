@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureNudgeById;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
@@ -41,7 +41,7 @@ public class UpdateAdventureNudgeByIdHandlerTest {
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
     }
 
     @Test

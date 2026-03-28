@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
@@ -42,7 +42,7 @@ public class MoiraiUserDetailsService implements UserDetailsService {
 
         try {
             var moiraiUser = userReader.getUserByDiscordId(discordUser.id())
-                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                    .orElseThrow(() -> new NotFoundException("User not found"));
 
             return new MoiraiPrincipal(
                     moiraiUser.publicId(),
@@ -54,7 +54,7 @@ public class MoiraiUserDetailsService implements UserDetailsService {
                     refreshToken,
                     moiraiUser.role(),
                     null);
-        } catch (AssetNotFoundException e) {
+        } catch (NotFoundException e) {
             throw new AuthenticationFailedException("Invalid user requested authentication", e);
         }
     }

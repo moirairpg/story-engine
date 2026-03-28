@@ -21,6 +21,6 @@ public record UpdateAdventureRequest(
         boolean isMultiplayer,
         Set<PermissionRequest> permissions,
         @Moderated String adventureStart,
-        @NotNull(message = "cannot be null") @Valid UpdateModelConfigurationRequest modelConfiguration,
+        @NotNull(message = "cannot be null") @Valid ModelConfigurationRequest modelConfiguration,
         @Valid ContextAttributesRequest contextAttributes) {
 }

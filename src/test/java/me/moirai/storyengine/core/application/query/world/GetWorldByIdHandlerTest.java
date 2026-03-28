@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -88,7 +88,7 @@ public class GetWorldByIdHandlerTest {
         when(reader.getWorldById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then
-        assertThatExceptionOfType(AssetNotFoundException.class)
+        assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 }

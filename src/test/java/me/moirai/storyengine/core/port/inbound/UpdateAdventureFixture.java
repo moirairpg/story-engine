@@ -2,22 +2,20 @@ package me.moirai.storyengine.core.port.inbound;
 
 import java.util.Set;
 
-import org.assertj.core.util.Maps;
-
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateModelConfigurationDto;
 
 public class UpdateAdventureFixture {
 
     public static UpdateAdventure sample() {
 
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new UpdateAdventure(
                 AdventureFixture.PUBLIC_ID,
                 adventure.getDescription(),
@@ -29,16 +27,10 @@ public class UpdateAdventureFixture {
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
                 Set.of(),
-                new UpdateModelConfigurationDto(
+                new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
-                        adventure.getModelConfiguration().getTemperature(),
-                        adventure.getModelConfiguration().getFrequencyPenalty(),
-                        adventure.getModelConfiguration().getPresencePenalty(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        Maps.newHashMap("TKNID", 99D),
-                        Set.of("TKN")),
+                        adventure.getModelConfiguration().getTemperature()),
                 new ContextAttributesDto(
                         adventure.getContextAttributes().nudge(),
                         adventure.getContextAttributes().authorsNote(),
@@ -61,16 +53,10 @@ public class UpdateAdventureFixture {
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
                 Set.of(),
-                new UpdateModelConfigurationDto(
+                new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
-                        adventure.getModelConfiguration().getTemperature(),
-                        adventure.getModelConfiguration().getFrequencyPenalty(),
-                        adventure.getModelConfiguration().getPresencePenalty(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        Maps.newHashMap("TKNID", 99D),
-                        Set.of("TKN")),
+                        adventure.getModelConfiguration().getTemperature()),
                 new ContextAttributesDto(
                         adventure.getContextAttributes().nudge(),
                         adventure.getContextAttributes().authorsNote(),
@@ -93,16 +79,10 @@ public class UpdateAdventureFixture {
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
                 Set.of(),
-                new UpdateModelConfigurationDto(
+                new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
-                        adventure.getModelConfiguration().getTemperature(),
-                        adventure.getModelConfiguration().getFrequencyPenalty(),
-                        adventure.getModelConfiguration().getPresencePenalty(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        Maps.newHashMap("TKNID", 99D),
-                        Set.of("TKN")),
+                        adventure.getModelConfiguration().getTemperature()),
                 new ContextAttributesDto(
                         adventure.getContextAttributes().nudge(),
                         adventure.getContextAttributes().authorsNote(),
@@ -125,16 +105,10 @@ public class UpdateAdventureFixture {
                 adventure.getModeration(),
                 isMultiplayer,
                 Set.of(),
-                new UpdateModelConfigurationDto(
+                new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
                         adventure.getModelConfiguration().getMaxTokenLimit(),
-                        adventure.getModelConfiguration().getTemperature(),
-                        adventure.getModelConfiguration().getFrequencyPenalty(),
-                        adventure.getModelConfiguration().getPresencePenalty(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        adventure.getModelConfiguration().getStopSequences(),
-                        Maps.newHashMap("TKNID", 99D),
-                        Set.of("TKN")),
+                        adventure.getModelConfiguration().getTemperature()),
                 new ContextAttributesDto(
                         adventure.getContextAttributes().nudge(),
                         adventure.getContextAttributes().authorsNote(),

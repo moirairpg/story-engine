@@ -23,7 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -80,7 +80,7 @@ public class CreateAdventureHandlerTest {
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class CreateAdventureHandlerTest {
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
     }
 
     @Test
@@ -199,6 +199,6 @@ public class CreateAdventureHandlerTest {
         when(userRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
     }
 }

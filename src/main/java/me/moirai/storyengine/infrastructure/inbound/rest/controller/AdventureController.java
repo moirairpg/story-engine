@@ -24,6 +24,7 @@ import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -37,13 +38,11 @@ import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
-import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureAuthorsNoteById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureBumpById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureNudgeById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureSceneById;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateModelConfigurationDto;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureAuthorsNoteRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureBumpRequest;
@@ -112,7 +111,6 @@ public class AdventureController extends SecurityContextAware {
         return queryRunner.run(query);
     }
 
-    // TODO create authorizer that validates world and persona permission
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public AdventureDetails createAdventure(
@@ -134,11 +132,7 @@ public class AdventureController extends SecurityContextAware {
                 new ModelConfigurationDto(
                         request.modelConfiguration().aiModel(),
                         request.modelConfiguration().maxTokenLimit(),
-                        request.modelConfiguration().temperature(),
-                        request.modelConfiguration().frequencyPenalty(),
-                        request.modelConfiguration().presencePenalty(),
-                        request.modelConfiguration().stopSequences(),
-                        request.modelConfiguration().logitBias()),
+                        request.modelConfiguration().temperature()),
                 new ContextAttributesDto(
                         request.contextAttributes().nudge(),
                         request.contextAttributes().authorsNote(),
@@ -171,16 +165,10 @@ public class AdventureController extends SecurityContextAware {
                 request.moderation(),
                 request.isMultiplayer(),
                 updatePermissions,
-                new UpdateModelConfigurationDto(
+                new ModelConfigurationDto(
                         request.modelConfiguration().aiModel(),
                         request.modelConfiguration().maxTokenLimit(),
-                        request.modelConfiguration().temperature(),
-                        request.modelConfiguration().frequencyPenalty(),
-                        request.modelConfiguration().presencePenalty(),
-                        request.modelConfiguration().stopSequencesToAdd(),
-                        request.modelConfiguration().stopSequencesToRemove(),
-                        request.modelConfiguration().logitBiasToAdd(),
-                        request.modelConfiguration().logitBiasToRemove()),
+                        request.modelConfiguration().temperature()),
                 new ContextAttributesDto(
                         request.contextAttributes().nudge(),
                         request.contextAttributes().authorsNote(),

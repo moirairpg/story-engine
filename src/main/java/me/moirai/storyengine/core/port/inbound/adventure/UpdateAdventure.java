@@ -19,7 +19,7 @@ public record UpdateAdventure(
         Moderation moderation,
         boolean isMultiplayer,
         Set<PermissionDto> permissions,
-        UpdateModelConfigurationDto modelConfiguration,
+        ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes)
         implements Command<AdventureDetails> {
 

@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -109,7 +109,7 @@ class UpdatePersonaAuthorizerTest {
 
         // then
         assertThatThrownBy(() -> authorizer.authorize(context))
-                .isInstanceOf(AssetNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     private AssetPermissionsData personaWithPermissions() {

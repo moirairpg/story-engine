@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
@@ -72,7 +72,7 @@ class UpdatePersonaHandlerTest {
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(AssetNotFoundException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("Persona was not found");
     }
 

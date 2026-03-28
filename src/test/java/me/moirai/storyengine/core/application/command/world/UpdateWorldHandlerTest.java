@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
@@ -208,7 +208,7 @@ public class UpdateWorldHandlerTest {
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
-        assertThatExceptionOfType(AssetNotFoundException.class)
+        assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 }

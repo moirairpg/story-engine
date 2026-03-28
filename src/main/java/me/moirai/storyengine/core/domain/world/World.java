@@ -25,7 +25,7 @@ import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.AssetNotFoundException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
@@ -160,7 +160,7 @@ public class World extends ShareableAsset {
         return lorebook.stream()
                 .filter(e -> e.getPublicId().equals(entryId))
                 .findFirst()
-                .orElseThrow(() -> new AssetNotFoundException("Lorebook entry not found"));
+                .orElseThrow(() -> new NotFoundException("Lorebook entry not found"));
     }
 
     public List<WorldLorebookEntry> getLorebookEntriesByRegex(String value) {
