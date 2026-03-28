@@ -31,7 +31,7 @@ class TextCompletionAdapterTest extends AbstractWebMockTest {
                 .baseUrl("http://localhost:" + PORT)
                 .build();
 
-        adapter = new TextCompletionAdapter("/responses", "test-token", restClient, jsonMapper);
+        adapter = new TextCompletionAdapter("/responses", "test-token", restClient);
     }
 
     @Test

@@ -6,49 +6,28 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
-import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordTokenRevocationRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
-import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DiscordAuthenticationAdapter.class);
-
     private static final String BEARER = "Bearer %s";
     private static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
-    private static final String AUTHENTICATION_ERROR = "Error authenticating user on Discord";
-    private static final String UNKNOWN_ERROR = "Error on Discord API";
-    private static final String BAD_REQUEST_ERROR = "Bad request calling Discord API";
-
-    private static final Predicate<HttpStatusCode> BAD_REQUEST_PREDICATE = statusCode -> statusCode
-            .isSameCodeAs(HttpStatusCode.valueOf(400));
-
-    private static final Predicate<HttpStatusCode> UNAUTHORIZED_PREDICATE = statusCode -> statusCode
-            .isSameCodeAs(HttpStatusCode.valueOf(401));
 
     private final String usersUri;
     private final String tokenUri;
@@ -98,9 +77,6 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
                     headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
                 })
                 .retrieve()
-                .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
-                .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
-                .onStatus(HttpStatusCode::isError, this::handleUnknownError)
                 .body(DiscordUserDataResponse.class);
     }
 
@@ -142,33 +118,6 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
                     headers.add(ACCEPT, CONTENT_TYPE_VALUE);
                 })
                 .body(valueMap)
-                .retrieve()
-                .onStatus(UNAUTHORIZED_PREDICATE, this::handleUnauthorized)
-                .onStatus(BAD_REQUEST_PREDICATE, this::handleBadRequest)
-                .onStatus(HttpStatusCode::isError, this::handleUnknownError);
-    }
-
-    private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
-        throw new RestException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
-    }
-
-    private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
-
-        var error = mapErrorResponse(response);
-        LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
-        throw new RestException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
-                String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
-    }
-
-    private void handleUnknownError(HttpRequest request, ClientHttpResponse response) throws IOException {
-
-        var error = mapErrorResponse(response);
-        LOG.error(UNKNOWN_ERROR + " -> {}", error);
-        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
-                String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
-    }
-
-    private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
-        return jsonMapper.readValue(response.getBody(), CompletionResponseError.class);
+                .retrieve();
     }
 }
