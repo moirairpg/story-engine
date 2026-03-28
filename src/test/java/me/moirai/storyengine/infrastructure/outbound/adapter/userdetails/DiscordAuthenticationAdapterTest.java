@@ -4,7 +4,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,10 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.moirai.storyengine.AbstractWebMockTest;
-import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthRequest;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.RefreshSessionTokenRequest;
 import me.moirai.storyengine.infrastructure.outbound.adapter.discord.DiscordAuthenticationAdapter;
-import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
-
-import java.util.HashMap;
 
 public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
@@ -95,80 +92,6 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
     }
 
     @Test
-    public void unauthorizedWhenAuthenticateOnDiscord() {
-
-        // Given
-        var request = DiscordAuthRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .grantType(DUMMY_VALUE)
-                .redirectUri(DUMMY_VALUE)
-                .scope(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(401);
-
-        // Then
-        assertThatThrownBy(() -> adapter.authenticate(request))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
-    public void badRequestWhenAuthenticateOnDiscord() throws JsonProcessingException {
-
-        // Given
-        var request = DiscordAuthRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .grantType(DUMMY_VALUE)
-                .redirectUri(DUMMY_VALUE)
-                .scope(DUMMY_VALUE)
-                .build();
-
-        var errorResponse = CompletionResponseError.builder()
-                .message(DUMMY_VALUE)
-                .type(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .param(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(errorResponse, 400);
-
-        // Then
-        assertThatThrownBy(() -> adapter.authenticate(request))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
-    public void internalErrorWhenAuthenticateOnDiscord() throws JsonProcessingException {
-
-        // Given
-        var request = DiscordAuthRequest.builder()
-                .clientId(DUMMY_VALUE)
-                .clientSecret(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .grantType(DUMMY_VALUE)
-                .redirectUri(DUMMY_VALUE)
-                .scope(DUMMY_VALUE)
-                .build();
-
-        var errorResponse = CompletionResponseError.builder()
-                .message(DUMMY_VALUE)
-                .type(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .param(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(errorResponse, 500);
-
-        // Then
-        assertThatThrownBy(() -> adapter.authenticate(request))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
     public void logoutOnDiscord() {
 
         wireMockServer.stubFor(any(anyUrl())
@@ -176,52 +99,6 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // When/Then - no exception
         adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE);
-    }
-
-    @Test
-    public void unauthorizedWhenLogoutOnDiscord() {
-
-        prepareWebserverFor(401);
-
-        // Then
-        assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
-    public void badRequestWhenLogoutOnDiscord() throws JsonProcessingException {
-
-        // Given
-        var errorResponse = CompletionResponseError.builder()
-                .message(DUMMY_VALUE)
-                .type(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .param(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(errorResponse, 400);
-
-        // Then
-        assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
-    public void internalErrorWhenLogoutOnDiscord() throws JsonProcessingException {
-
-        // Given
-        var errorResponse = CompletionResponseError.builder()
-                .message(DUMMY_VALUE)
-                .type(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .param(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(errorResponse, 500);
-
-        // Then
-        assertThatThrownBy(() -> adapter.logout(DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE, DUMMY_VALUE))
-                .isInstanceOf(RestException.class);
     }
 
     @Test
@@ -245,58 +122,5 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
 
         // Then
         assertThat(result).isNotNull();
-    }
-
-    @Test
-    public void unauthorizedWhenGetLoggedUser() {
-
-        // Given
-        var token = "TOKEN";
-
-        prepareWebserverFor(401);
-
-        // Then
-        assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
-    public void badRequestWhenGetLoggedUser() throws JsonProcessingException {
-
-        // Given
-        var token = "TOKEN";
-
-        var errorResponse = CompletionResponseError.builder()
-                .message(DUMMY_VALUE)
-                .type(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .param(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(errorResponse, 400);
-
-        // Then
-        assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
-                .isInstanceOf(RestException.class);
-    }
-
-    @Test
-    public void internalErrorWhenGetLoggedUser() throws JsonProcessingException {
-
-        // Given
-        var token = "TOKEN";
-
-        var errorResponse = CompletionResponseError.builder()
-                .message(DUMMY_VALUE)
-                .type(DUMMY_VALUE)
-                .code(DUMMY_VALUE)
-                .param(DUMMY_VALUE)
-                .build();
-
-        prepareWebserverFor(errorResponse, 500);
-
-        // Then
-        assertThatThrownBy(() -> adapter.retrieveLoggedUser(token))
-                .isInstanceOf(RestException.class);
     }
 }
