@@ -31,7 +31,9 @@ import me.moirai.storyengine.core.port.inbound.CreateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateAdventureHandlerTest {
@@ -46,6 +48,9 @@ public class CreateAdventureHandlerTest {
 
     @Mock
     private AdventureRepository repository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private CreateAdventureHandler handler;
@@ -112,6 +117,7 @@ public class CreateAdventureHandlerTest {
         when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         AdventureDetails result = handler.handle(command);

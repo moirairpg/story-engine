@@ -38,9 +38,6 @@ public class AdventureLorebookEntry extends Asset {
     @Column(name = "is_player_character")
     private boolean isPlayerCharacter;
 
-    @Column(name = "adventure_id")
-    private Long adventureId;
-
     private AdventureLorebookEntry(Builder builder) {
 
         super();

@@ -9,6 +9,8 @@ public interface UserRepository {
 
     Optional<User> findByDiscordId(String discordUserId);
 
+    Optional<User> findById(Long id);
+
     Optional<User> findByPublicId(UUID publicId);
 
     User save(User user);

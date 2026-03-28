@@ -8,7 +8,9 @@ import java.util.Set;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 
 public class CreateAdventureFixture {
 
@@ -21,22 +23,24 @@ public class CreateAdventureFixture {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 PRIVATE,
-                adventure.getModelConfiguration().getAiModel(),
                 STRICT,
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                1.7,
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                adventure.getModelConfiguration().getLogitBias(),
-                adventure.getModelConfiguration().getStopSequences(),
+                adventure.isMultiplayer(),
                 Set.of(),
                 Set.of(),
-                adventure.isMultiplayer());
+                new ModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        1.7,
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getLogitBias()),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
     }
 
     public static CreateAdventure sampleWithRequesterId(String requesterId) {
@@ -48,21 +52,23 @@ public class CreateAdventureFixture {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 PRIVATE,
-                adventure.getModelConfiguration().getAiModel(),
                 STRICT,
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                1.7,
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                adventure.getModelConfiguration().getLogitBias(),
-                adventure.getModelConfiguration().getStopSequences(),
+                adventure.isMultiplayer(),
                 Set.of(),
                 Set.of(),
-                adventure.isMultiplayer());
+                new ModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        1.7,
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getLogitBias()),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
     }
 }

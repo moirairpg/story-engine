@@ -19,13 +19,18 @@ import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateWorldHandlerTest {
 
     @Mock
     private WorldRepository repository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private UpdateWorldHandler handler;
@@ -52,6 +57,7 @@ public class UpdateWorldHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedUpdatedWorld);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -87,6 +93,7 @@ public class UpdateWorldHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedUpdatedWorld);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -115,6 +122,7 @@ public class UpdateWorldHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -144,6 +152,7 @@ public class UpdateWorldHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedWorld);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -172,6 +181,7 @@ public class UpdateWorldHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);

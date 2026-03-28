@@ -10,12 +10,13 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
@@ -53,16 +54,38 @@ public class AdventureReaderImpl implements AdventureReader {
               WHERE a.public_id = :publicId
             """;
 
+    private static final String SELECT_LOREBOOK = """
+          SELECT al.public_id,
+                 al.name,
+                 al.regex,
+                 al.description,
+                 al.player_id,
+                 al.is_player_character,
+                 al.creation_date,
+                 al.last_update_date
+            FROM adventure_lorebook al
+           WHERE al.adventure_id = :adventureId
+          """;
+
     private static final String SELECT_STOP_SEQUENCES = """
-            SELECT value FROM adventure_stop_sequences WHERE adventure_id = :adventureId
+            SELECT value
+              FROM adventure_stop_sequences
+             WHERE adventure_id = :adventureId
             """;
 
     private static final String SELECT_LOGIT_BIAS = """
-            SELECT token_id, bias FROM adventure_logit_bias WHERE adventure_id = :adventureId
+            SELECT token_id,
+                   bias
+              FROM adventure_logit_bias
+             WHERE adventure_id = :adventureId
             """;
 
     private static final String SELECT_PERMISSIONS = """
-            SELECT ap.user_id, ap.permission FROM adventure_permissions ap WHERE ap.adventure_id = :adventureId
+            SELECT a.public_id,
+                   ap.permission
+              FROM adventure_permissions ap
+                   INNER JOIN adventure a ON ap.adventure_id = a.id
+             WHERE ap.adventure_id = :adventureId
             """;
     //@formatter:on
 
@@ -98,7 +121,8 @@ public class AdventureReaderImpl implements AdventureReader {
 
             var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
                     .param("adventureId", adventureId)
-                    .query((r, __) -> new Permission(r.getLong("user_id"), PermissionLevel.valueOf(r.getString("permission"))))
+                    .query((r, __) -> new PermissionDto(UUID.fromString(r.getString("public_id")),
+                            PermissionLevel.valueOf(r.getString("permission"))))
                     .list());
 
             var modelConfiguration = new ModelConfigurationDto(
@@ -117,6 +141,20 @@ public class AdventureReaderImpl implements AdventureReader {
                     rs.getString("bump"),
                     rs.getObject("bump_frequency", Integer.class));
 
+            var lorebook = new HashSet<>(jdbcClient.sql(SELECT_LOREBOOK)
+                    .param("adventureId", adventureId)
+                    .query((r, __) -> new AdventureLorebookEntryDetails(
+                            UUID.fromString(r.getString("public_id")),
+                            UUID.fromString(rs.getString("public_id")),
+                            r.getString("name"),
+                            r.getString("regex"),
+                            r.getString("description"),
+                            r.getString("player_id"),
+                            r.getBoolean("is_player_character"),
+                            r.getTimestamp("creation_date").toInstant(),
+                            r.getTimestamp("last_update_date").toInstant()))
+                    .list());
+
             return new AdventureDetails(
                     UUID.fromString(rs.getString("public_id")),
                     rs.getString("name"),
@@ -131,7 +169,8 @@ public class AdventureReaderImpl implements AdventureReader {
                     rs.getTimestamp("last_update_date").toInstant(),
                     modelConfiguration,
                     contextAttributes,
-                    permissions);
+                    permissions,
+                    lorebook);
         };
     }
 }

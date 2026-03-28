@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 
 public record WorldDetails(
         UUID id,
@@ -12,11 +12,13 @@ public record WorldDetails(
         String description,
         String adventureStart,
         String visibility,
-        Set<Permission> permissions,
+        Set<PermissionDto> permissions,
+        Set<WorldLorebookEntryDetails> lorebook,
         Instant creationDate,
         Instant lastUpdateDate) {
 
     public WorldDetails {
         permissions = Set.copyOf(permissions);
+        lorebook = Set.copyOf(lorebook);
     }
 }

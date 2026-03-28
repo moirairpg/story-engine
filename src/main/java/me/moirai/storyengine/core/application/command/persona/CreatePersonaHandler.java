@@ -2,22 +2,32 @@ package me.moirai.storyengine.core.application.command.persona;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import java.util.stream.Collectors;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
+import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
 public class CreatePersonaHandler extends AbstractCommandHandler<CreatePersona, PersonaDetails> {
 
     private final PersonaRepository repository;
+    private final UserRepository userRepository;
 
-    public CreatePersonaHandler(PersonaRepository repository) {
+    public CreatePersonaHandler(
+            PersonaRepository repository,
+            UserRepository userRepository) {
+
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -29,8 +39,10 @@ public class CreatePersonaHandler extends AbstractCommandHandler<CreatePersona, 
                 .visibility(command.visibility())
                 .build());
 
-        emptyIfNull(command.usersAllowedToRead()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWrite()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToRead())
+                .forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWrite())
+                .forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
 
         var savedPersona = repository.save(persona);
         return mapResult(savedPersona);
@@ -43,7 +55,14 @@ public class CreatePersonaHandler extends AbstractCommandHandler<CreatePersona, 
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getPermissions(),
+                persona.getPermissions().stream()
+                        .map(permission -> {
+                            var user = userRepository.findById(permission.userId())
+                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                            return new PermissionDto(user.getPublicId(), permission.level());
+                        })
+                        .collect(Collectors.toSet()),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }

@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.Visibility;
 
 public record PersonaDetails(
@@ -12,7 +12,7 @@ public record PersonaDetails(
         String name,
         String personality,
         Visibility visibility,
-        Set<Permission> permissions,
+        Set<PermissionDto> permissions,
         Instant creationDate,
         Instant lastUpdateDate) {
 

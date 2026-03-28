@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 
@@ -22,9 +22,11 @@ public record AdventureDetails(
         Instant lastUpdateDate,
         ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes,
-        Set<Permission> permissions) {
+        Set<PermissionDto> permissions,
+        Set<AdventureLorebookEntryDetails> lorebook) {
 
     public AdventureDetails {
         permissions = Set.copyOf(permissions);
+        lorebook = Set.copyOf(lorebook);
     }
 }

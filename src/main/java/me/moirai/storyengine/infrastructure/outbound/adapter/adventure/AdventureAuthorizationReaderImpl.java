@@ -18,7 +18,12 @@ public class AdventureAuthorizationReaderImpl implements AdventureAuthorizationR
 
     //@formatter:off
     private static final String SELECT_PERMISSIONS = """
-            SELECT MAX(mu.public_id) FILTER (WHERE ap.permission = 'OWNER') AS owner_id,
+            SELECT (SELECT mu2.public_id
+                      FROM adventure_permissions ap2
+                      JOIN moirai_user mu2 ON mu2.id = ap2.user_id
+                     WHERE ap2.adventure_id = a.id
+                           AND ap2.permission = 'OWNER'
+                     LIMIT 1) AS owner_id,
                    COALESCE(array_agg(mu.public_id) FILTER (WHERE ap.permission = 'WRITE'), ARRAY[]::UUID[]) AS writers,
                    COALESCE(array_agg(mu.public_id) FILTER (WHERE ap.permission = 'READ'), ARRAY[]::UUID[]) AS readers,
                    a.visibility
@@ -26,7 +31,7 @@ public class AdventureAuthorizationReaderImpl implements AdventureAuthorizationR
               LEFT JOIN adventure_permissions ap ON ap.adventure_id = a.id
               LEFT JOIN moirai_user mu ON mu.id = ap.user_id
              WHERE a.public_id = :publicId
-             GROUP BY a.visibility
+             GROUP BY a.id, a.visibility
             """;
     //@formatter:on
 

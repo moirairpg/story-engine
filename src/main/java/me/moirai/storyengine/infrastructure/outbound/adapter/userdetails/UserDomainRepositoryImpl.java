@@ -36,4 +36,9 @@ public class UserDomainRepositoryImpl implements UserRepository {
     public void delete(User user) {
         jpaRepository.delete(user);
     }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return jpaRepository.findById(id);
+    }
 }

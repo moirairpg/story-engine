@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
@@ -31,8 +31,10 @@ public class PersonaReaderImpl implements PersonaReader {
             """;
 
     private static final String SELECT_PERMISSIONS = """
-            SELECT pp.user_id, pp.permission
+            SELECT p.public_id,
+                   pp.permission
               FROM persona_permissions pp
+                   INNER JOIN persona p ON pp.persona_id = p.id
              WHERE pp.persona_id = :personaId
             """;
     //@formatter:on
@@ -56,8 +58,10 @@ public class PersonaReaderImpl implements PersonaReader {
             var numericId = rs.getLong("numeric_id");
             var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
                     .param("personaId", numericId)
-                    .query((r, __) -> new Permission(r.getLong("user_id"), PermissionLevel.valueOf(r.getString("permission"))))
+                    .query((r, __) -> new PermissionDto(UUID.fromString(r.getString("public_id")),
+                            PermissionLevel.valueOf(r.getString("permission"))))
                     .list());
+
             return new PersonaDetails(
                     UUID.fromString(rs.getString("public_id")),
                     rs.getString("name"),

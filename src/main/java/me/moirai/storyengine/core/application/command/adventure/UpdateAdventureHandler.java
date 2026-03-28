@@ -4,19 +4,23 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
@@ -30,12 +34,18 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
     private final AdventureRepository repository;
     private final PersonaRepository personaRepository;
     private final WorldRepository worldRepository;
+    private final UserRepository userRepository;
 
-    public UpdateAdventureHandler(AdventureRepository repository, PersonaRepository personaRepository,
-            WorldRepository worldRepository) {
+    public UpdateAdventureHandler(
+            AdventureRepository repository,
+            PersonaRepository personaRepository,
+            WorldRepository worldRepository,
+            UserRepository userRepository) {
+
         this.repository = repository;
         this.personaRepository = personaRepository;
         this.worldRepository = worldRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -61,18 +71,18 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         adventure.updateName(command.name());
         adventure.updateWorld(world.getId());
         adventure.updatePersona(persona.getId());
-        adventure.updateAiModel(command.aiModel());
+        adventure.updateAiModel(command.modelConfiguration().aiModel());
         adventure.updateModeration(command.moderation());
-        adventure.updateTemperature(command.temperature());
-        adventure.updateFrequencyPenalty(command.frequencyPenalty());
-        adventure.updatePresencePenalty(command.presencePenalty());
+        adventure.updateTemperature(command.modelConfiguration().temperature());
+        adventure.updateFrequencyPenalty(command.modelConfiguration().frequencyPenalty());
+        adventure.updatePresencePenalty(command.modelConfiguration().presencePenalty());
         adventure.updateAdventureStart(command.adventureStart());
         adventure.updateDescription(command.description());
-        adventure.updateNudge(command.nudge());
-        adventure.updateScene(command.scene());
-        adventure.updateAuthorsNote(command.authorsNote());
-        adventure.updateBump(command.bump());
-        adventure.updateBumpFrequency(command.bumpFrequency());
+        adventure.updateNudge(command.contextAttributes().nudge());
+        adventure.updateScene(command.contextAttributes().scene());
+        adventure.updateAuthorsNote(command.contextAttributes().authorsNote());
+        adventure.updateBump(command.contextAttributes().bump());
+        adventure.updateBumpFrequency(command.contextAttributes().bumpFrequency());
 
         if (command.isMultiplayer()) {
             adventure.makeMultiplayer();
@@ -98,30 +108,32 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd()).forEach(id -> adventure.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWriteToAdd()).forEach(id -> adventure.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToReadToAdd())
+                .forEach(id -> adventure.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWriteToAdd())
+                .forEach(id -> adventure.grant(new Permission(id, PermissionLevel.WRITE)));
         emptyIfNull(command.usersAllowedToReadToRemove()).forEach(adventure::revoke);
         emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(adventure::revoke);
     }
 
     private void updateLogitBias(UpdateAdventure command, Adventure adventure) {
 
-        emptyIfNull(command.logitBiasToAdd())
+        emptyIfNull(command.modelConfiguration().logitBiasToAdd())
                 .entrySet()
                 .stream()
                 .forEach(entry -> adventure.addLogitBias(entry.getKey(), entry.getValue()));
 
-        emptyIfNull(command.logitBiasToRemove())
+        emptyIfNull(command.modelConfiguration().logitBiasToRemove())
                 .forEach(adventure::removeLogitBias);
     }
 
     private void updateStopSequences(UpdateAdventure command, Adventure adventure) {
 
-        emptyIfNull(command.stopSequencesToAdd())
+        emptyIfNull(command.modelConfiguration().stopSequencesToAdd())
                 .stream()
                 .forEach(adventure::addStopSequence);
 
-        emptyIfNull(command.stopSequencesToRemove())
+        emptyIfNull(command.modelConfiguration().stopSequencesToRemove())
                 .forEach(adventure::removeStopSequence);
     }
 
@@ -157,6 +169,25 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 savedAdventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                savedAdventure.getPermissions());
+                savedAdventure.getPermissions().stream()
+                        .map(permission -> {
+                            var user = userRepository.findById(permission.userId())
+                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                            return new PermissionDto(user.getPublicId(), permission.level());
+                        })
+                        .collect(Collectors.toSet()),
+                savedAdventure.getLorebook().stream()
+                        .map(entry -> new AdventureLorebookEntryDetails(
+                                entry.getPublicId(),
+                                savedAdventure.getPublicId(),
+                                entry.getName(),
+                                entry.getRegex(),
+                                entry.getDescription(),
+                                entry.getPlayerId(),
+                                entry.isPlayerCharacter(),
+                                entry.getCreationDate(),
+                                entry.getLastUpdateDate()))
+                        .collect(Collectors.toSet()));
     }
 }

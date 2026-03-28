@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,15 @@ public class GetWorldByIdHandlerTest {
 
         // Given
         var expectedDetails = new WorldDetails(
-                WorldFixture.PUBLIC_ID, "MoirAI", "desc", "start", "PUBLIC",
-                java.util.Set.of(), null, null);
+                WorldFixture.PUBLIC_ID,
+                "MoirAI",
+                "desc",
+                "start",
+                "PUBLIC",
+                Set.of(),
+                Set.of(),
+                null,
+                null);
 
         var query = new GetWorldById(WorldFixture.PUBLIC_ID);
 

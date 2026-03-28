@@ -8,9 +8,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
 @Repository
@@ -30,9 +31,22 @@ public class WorldReaderImpl implements WorldReader {
              WHERE w.public_id = :publicId
             """;
 
+    private static final String SELECT_LOREBOOK = """
+          SELECT wl.public_id,
+                 wl.name,
+                 wl.regex,
+                 wl.description,
+                 wl.creation_date,
+                 wl.last_update_date
+            FROM world_lorebook wl
+           WHERE wl.world_id = :worldId
+          """;
+
     private static final String SELECT_PERMISSIONS = """
-            SELECT wp.user_id, wp.permission
+            SELECT w.public_id,
+                   wp.permission
               FROM world_permissions wp
+                   INNER JOIN world w ON wp.world_id = w.id
              WHERE wp.world_id = :worldId
             """;
     //@formatter:on
@@ -56,8 +70,22 @@ public class WorldReaderImpl implements WorldReader {
             var numericId = rs.getLong("numeric_id");
             var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
                     .param("worldId", numericId)
-                    .query((r, __) -> new Permission(r.getLong("user_id"), PermissionLevel.valueOf(r.getString("permission"))))
+                    .query((r, __) -> new PermissionDto(UUID.fromString(r.getString("public_id")),
+                            PermissionLevel.valueOf(r.getString("permission"))))
                     .list());
+
+            var lorebook = new HashSet<>(jdbcClient.sql(SELECT_LOREBOOK)
+                    .param("worldId", numericId)
+                    .query((r, __) -> new WorldLorebookEntryDetails(
+                            UUID.fromString(r.getString("public_id")),
+                            UUID.fromString(rs.getString("public_id")),
+                            r.getString("name"),
+                            r.getString("regex"),
+                            r.getString("description"),
+                            r.getTimestamp("creation_date").toInstant(),
+                            r.getTimestamp("last_update_date").toInstant()))
+                    .list());
+
             return new WorldDetails(
                     UUID.fromString(rs.getString("public_id")),
                     rs.getString("name"),
@@ -65,6 +93,7 @@ public class WorldReaderImpl implements WorldReader {
                     rs.getString("adventure_start"),
                     rs.getString("visibility"),
                     permissions,
+                    lorebook,
                     rs.getTimestamp("creation_date").toInstant(),
                     rs.getTimestamp("last_update_date").toInstant());
         };

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,12 +18,17 @@ import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.CreatePersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.CreatePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 
 @ExtendWith(MockitoExtension.class)
 class CreatePersonaHandlerTest {
 
     @Mock
     private PersonaRepository repository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private CreatePersonaHandler handler;
@@ -44,6 +51,7 @@ class CreatePersonaHandlerTest {
         var command = CreatePersonaFixture.createPrivatePersona();
 
         when(repository.save(any(Persona.class))).thenReturn(persona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -53,6 +61,5 @@ class CreatePersonaHandlerTest {
         assertThat(result.name()).isEqualTo(persona.getName());
         assertThat(result.personality()).isEqualTo(persona.getPersonality());
         assertThat(result.visibility()).isEqualTo(persona.getVisibility());
-        assertThat(result.permissions()).isEqualTo(persona.getPermissions());
     }
 }

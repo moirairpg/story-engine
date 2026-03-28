@@ -2,15 +2,19 @@ package me.moirai.storyengine.core.application.command.persona;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import java.util.stream.Collectors;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaDetails;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
 public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, PersonaDetails> {
@@ -19,10 +23,14 @@ public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, 
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
 
     private final PersonaRepository repository;
+    private final UserRepository userRepository;
 
-    public UpdatePersonaHandler(PersonaRepository repository) {
+    public UpdatePersonaHandler(
+            PersonaRepository repository,
+            UserRepository userRepository) {
 
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -50,8 +58,10 @@ public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, 
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWriteToAdd()).forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToReadToAdd())
+                .forEach(id -> persona.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWriteToAdd())
+                .forEach(id -> persona.grant(new Permission(id, PermissionLevel.WRITE)));
         emptyIfNull(command.usersAllowedToReadToRemove()).forEach(persona::revoke);
         emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(persona::revoke);
 
@@ -67,7 +77,14 @@ public class UpdatePersonaHandler extends AbstractCommandHandler<UpdatePersona, 
                 persona.getName(),
                 persona.getPersonality(),
                 persona.getVisibility(),
-                persona.getPermissions(),
+                persona.getPermissions().stream()
+                        .map(permission -> {
+                            var user = userRepository.findById(permission.userId())
+                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                            return new PermissionDto(user.getPublicId(), permission.level());
+                        })
+                        .collect(Collectors.toSet()),
                 persona.getCreationDate(),
                 persona.getLastUpdateDate());
     }

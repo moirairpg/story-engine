@@ -3,6 +3,9 @@
 --preconditions onFail:HALT, onError:HALT
 
 ALTER TABLE adventure_lorebook
+    ALTER adventure_id DROP NOT NULL;
+
+ALTER TABLE adventure_lorebook
     ADD CONSTRAINT fk_adventure_lorebook_adventure
     FOREIGN KEY (adventure_id) REFERENCES adventure(id) ON DELETE CASCADE;
 

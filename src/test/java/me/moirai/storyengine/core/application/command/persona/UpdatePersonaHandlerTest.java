@@ -22,12 +22,17 @@ import me.moirai.storyengine.core.domain.persona.Persona;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.persona.UpdatePersona;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 
 @ExtendWith(MockitoExtension.class)
 class UpdatePersonaHandlerTest {
 
     @Mock
     private PersonaRepository repository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private UpdatePersonaHandler handler;
@@ -88,6 +93,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -111,6 +117,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -134,6 +141,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -157,6 +165,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -180,6 +189,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -202,6 +212,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -224,6 +235,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);
@@ -245,6 +257,7 @@ class UpdatePersonaHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(unchangedPersona);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
         var result = handler.handle(command);

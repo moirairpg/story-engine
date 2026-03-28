@@ -18,7 +18,12 @@ public class WorldAuthorizationReaderImpl implements WorldAuthorizationReader {
 
     //@formatter:off
     private static final String SELECT_PERMISSIONS = """
-            SELECT MAX(mu.public_id) FILTER (WHERE wp.permission = 'OWNER') AS owner_id,
+            SELECT (SELECT mu2.public_id
+                      FROM world_permissions wp2
+                      JOIN moirai_user mu2 ON mu2.id = wp2.user_id
+                     WHERE wp2.world_id = w.id
+                           AND wp2.permission = 'OWNER'
+                     LIMIT 1) AS owner_id,
                    COALESCE(array_agg(mu.public_id) FILTER (WHERE wp.permission = 'WRITE'), ARRAY[]::UUID[]) AS writers,
                    COALESCE(array_agg(mu.public_id) FILTER (WHERE wp.permission = 'READ'), ARRAY[]::UUID[]) AS readers,
                    w.visibility
@@ -26,7 +31,7 @@ public class WorldAuthorizationReaderImpl implements WorldAuthorizationReader {
               LEFT JOIN world_permissions wp ON wp.world_id = w.id
               LEFT JOIN moirai_user mu ON mu.id = wp.user_id
              WHERE w.public_id = :publicId
-             GROUP BY w.visibility
+             GROUP BY w.id, w.visibility
             """;
     //@formatter:on
 

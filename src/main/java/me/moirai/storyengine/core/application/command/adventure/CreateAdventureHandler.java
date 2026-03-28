@@ -3,21 +3,25 @@ package me.moirai.storyengine.core.application.command.adventure;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributes;
 import me.moirai.storyengine.core.domain.adventure.ModelConfiguration;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
@@ -28,16 +32,19 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
 
     private final WorldRepository worldRepository;
     private final PersonaRepository personaRepository;
-    private final AdventureRepository repository;
+    private final AdventureRepository adventureRepository;
+    private final UserRepository userRepository;
 
     public CreateAdventureHandler(
             WorldRepository worldRepository,
             PersonaRepository personaRepository,
-            AdventureRepository repository) {
+            AdventureRepository adventureRepository,
+            UserRepository userRepository) {
 
         this.worldRepository = worldRepository;
         this.personaRepository = personaRepository;
-        this.repository = repository;
+        this.adventureRepository = adventureRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -52,7 +59,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         var modelConfiguration = buildModelConfiguration(command);
         var contextAttributes = buildContextAttributes(command);
 
-        var adventure = repository.save(Adventure.builder()
+        var adventure = adventureRepository.save(Adventure.builder()
                 .modelConfiguration(modelConfiguration)
                 .name(command.name())
                 .personaId(persona.getId())
@@ -76,7 +83,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 worldEntry.getDescription(),
                 null));
 
-        repository.save(adventure);
+        adventureRepository.save(adventure);
 
         return mapResult(adventure, persona.getPublicId(), world.getPublicId());
     }
@@ -113,29 +120,48 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 adventure.getLastUpdateDate(),
                 modelConfiguration,
                 contextAttributes,
-                adventure.getPermissions());
+                adventure.getPermissions().stream()
+                        .map(permission -> {
+                            var user = userRepository.findById(permission.userId())
+                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                            return new PermissionDto(user.getPublicId(), permission.level());
+                        })
+                        .collect(Collectors.toSet()),
+                adventure.getLorebook().stream()
+                        .map(entry -> new AdventureLorebookEntryDetails(
+                                entry.getPublicId(),
+                                adventure.getPublicId(),
+                                entry.getName(),
+                                entry.getRegex(),
+                                entry.getDescription(),
+                                entry.getPlayerId(),
+                                entry.isPlayerCharacter(),
+                                entry.getCreationDate(),
+                                entry.getLastUpdateDate()))
+                        .collect(Collectors.toSet()));
     }
 
     private ContextAttributes buildContextAttributes(CreateAdventure command) {
 
         return new ContextAttributes(
-                command.nudge(),
-                command.authorsNote(),
-                command.scene(),
-                command.bump(),
-                command.bumpFrequency());
+                command.contextAttributes().nudge(),
+                command.contextAttributes().authorsNote(),
+                command.contextAttributes().scene(),
+                command.contextAttributes().bump(),
+                command.contextAttributes().bumpFrequency());
     }
 
     private ModelConfiguration buildModelConfiguration(CreateAdventure command) {
 
         return ModelConfiguration.builder()
-                .aiModel(command.aiModel())
-                .maxTokenLimit(command.maxTokenLimit())
-                .temperature(command.temperature())
-                .frequencyPenalty(command.frequencyPenalty())
-                .presencePenalty(command.presencePenalty())
-                .stopSequences(command.stopSequences())
-                .logitBias(command.logitBias())
+                .aiModel(command.modelConfiguration().aiModel())
+                .maxTokenLimit(command.modelConfiguration().maxTokenLimit())
+                .temperature(command.modelConfiguration().temperature())
+                .frequencyPenalty(command.modelConfiguration().frequencyPenalty())
+                .presencePenalty(command.modelConfiguration().presencePenalty())
+                .stopSequences(command.modelConfiguration().stopSequences())
+                .logitBias(command.modelConfiguration().logitBias())
                 .build();
     }
 }

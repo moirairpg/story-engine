@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,13 +18,18 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.CreateWorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateWorldHandlerTest {
 
     @Mock
     private WorldRepository repository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private CreateWorldHandler handler;
@@ -47,6 +54,7 @@ public class CreateWorldHandlerTest {
         var command = CreateWorldFixture.createPrivateWorld();
 
         when(repository.save(any(World.class))).thenReturn(world);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // When
         var result = handler.handle(command);

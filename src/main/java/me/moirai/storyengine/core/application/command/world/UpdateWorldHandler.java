@@ -2,14 +2,19 @@ package me.moirai.storyengine.core.application.command.world;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import java.util.stream.Collectors;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
+import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.AssetNotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
@@ -19,10 +24,14 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
     private static final String WORLD_NOT_FOUND = "World to be updated was not found";
 
     private final WorldRepository repository;
+    private final UserRepository userRepository;
 
-    public UpdateWorldHandler(WorldRepository repository) {
+    public UpdateWorldHandler(
+            WorldRepository repository,
+            UserRepository userRepository) {
 
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -51,8 +60,10 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
             }
         }
 
-        emptyIfNull(command.usersAllowedToReadToAdd()).forEach(id -> world.grant(new Permission(id, PermissionLevel.READ)));
-        emptyIfNull(command.usersAllowedToWriteToAdd()).forEach(id -> world.grant(new Permission(id, PermissionLevel.WRITE)));
+        emptyIfNull(command.usersAllowedToReadToAdd())
+                .forEach(id -> world.grant(new Permission(id, PermissionLevel.READ)));
+        emptyIfNull(command.usersAllowedToWriteToAdd())
+                .forEach(id -> world.grant(new Permission(id, PermissionLevel.WRITE)));
         emptyIfNull(command.usersAllowedToReadToRemove()).forEach(world::revoke);
         emptyIfNull(command.usersAllowedToWriteToRemove()).forEach(world::revoke);
 
@@ -67,7 +78,24 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
                 world.getDescription(),
                 world.getAdventureStart(),
                 world.getVisibility().name(),
-                world.getPermissions(),
+                world.getPermissions().stream()
+                        .map(permission -> {
+                            var user = userRepository.findById(permission.userId())
+                                    .orElseThrow(() -> new AssetNotFoundException("User not found"));
+
+                            return new PermissionDto(user.getPublicId(), permission.level());
+                        })
+                        .collect(Collectors.toSet()),
+                world.getLorebook().stream()
+                        .map(entry -> new WorldLorebookEntryDetails(
+                                entry.getPublicId(),
+                                world.getPublicId(),
+                                entry.getName(),
+                                entry.getRegex(),
+                                entry.getDescription(),
+                                entry.getCreationDate(),
+                                entry.getLastUpdateDate()))
+                        .collect(Collectors.toSet()),
                 world.getCreationDate(),
                 world.getLastUpdateDate());
     }

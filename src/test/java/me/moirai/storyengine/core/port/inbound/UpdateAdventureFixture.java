@@ -9,7 +9,9 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateModelConfigurationDto;
 
 public class UpdateAdventureFixture {
 
@@ -24,26 +26,28 @@ public class UpdateAdventureFixture {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
-                adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                Maps.newHashMap("TKNID", 99D),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getStopSequences(),
-                Set.of("TKN"),
+                adventure.isMultiplayer(),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
-                adventure.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        adventure.getModelConfiguration().getTemperature(),
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        Maps.newHashMap("TKNID", 99D),
+                        Set.of("TKN")),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
     }
 
     public static UpdateAdventure sampleWithRequesterId(String requesterId) {
@@ -57,26 +61,28 @@ public class UpdateAdventureFixture {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
-                adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                Maps.newHashMap("TKNID", 99D),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getStopSequences(),
-                Set.of("TKN"),
+                adventure.isMultiplayer(),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
-                adventure.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        adventure.getModelConfiguration().getTemperature(),
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        Maps.newHashMap("TKNID", 99D),
+                        Set.of("TKN")),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
     }
 
     public static UpdateAdventure sampleWithVisibility(String requesterId, Visibility visibility) {
@@ -90,26 +96,28 @@ public class UpdateAdventureFixture {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 visibility,
-                adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                Maps.newHashMap("TKNID", 99D),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getStopSequences(),
-                Set.of("TKN"),
+                adventure.isMultiplayer(),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
-                adventure.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        adventure.getModelConfiguration().getTemperature(),
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        Maps.newHashMap("TKNID", 99D),
+                        Set.of("TKN")),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
     }
 
     public static UpdateAdventure sampleWithMultiplayer(String requesterId, boolean isMultiplayer) {
@@ -123,25 +131,27 @@ public class UpdateAdventureFixture {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
-                adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                Maps.newHashMap("TKNID", 99D),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getStopSequences(),
-                Set.of("TKN"),
+                isMultiplayer,
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
-                isMultiplayer);
+                new UpdateModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        adventure.getModelConfiguration().getTemperature(),
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        Maps.newHashMap("TKNID", 99D),
+                        Set.of("TKN")),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
     }
 }

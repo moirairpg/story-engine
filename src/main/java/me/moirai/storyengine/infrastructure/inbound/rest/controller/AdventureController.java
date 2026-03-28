@@ -28,15 +28,18 @@ import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSummary;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
+import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureAuthorsNoteById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureBumpById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureNudgeById;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureSceneById;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateModelConfigurationDto;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureAuthorsNoteRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureBumpRequest;
@@ -117,22 +120,24 @@ public class AdventureController extends SecurityContextAware {
                 request.worldId(),
                 request.personaId(),
                 request.visibility(),
-                request.aiModel(),
                 request.moderation(),
-                request.nudge(),
-                request.scene(),
-                request.authorsNote(),
-                request.bump(),
-                request.bumpFrequency(),
-                request.maxTokenLimit(),
-                request.temperature(),
-                request.frequencyPenalty(),
-                request.presencePenalty(),
-                request.logitBias(),
-                request.stopSequences(),
+                request.isMultiplayer(),
                 request.usersAllowedToWrite(),
                 request.usersAllowedToRead(),
-                request.isMultiplayer());
+                new ModelConfigurationDto(
+                        request.modelConfiguration().aiModel(),
+                        request.modelConfiguration().maxTokenLimit(),
+                        request.modelConfiguration().temperature(),
+                        request.modelConfiguration().frequencyPenalty(),
+                        request.modelConfiguration().presencePenalty(),
+                        request.modelConfiguration().stopSequences(),
+                        request.modelConfiguration().logitBias()),
+                new ContextAttributesDto(
+                        request.contextAttributes().nudge(),
+                        request.contextAttributes().authorsNote(),
+                        request.contextAttributes().scene(),
+                        request.contextAttributes().bump(),
+                        request.contextAttributes().bumpFrequency()));
 
         return commandRunner.run(command);
     }
@@ -152,26 +157,28 @@ public class AdventureController extends SecurityContextAware {
                 request.worldId(),
                 request.personaId(),
                 request.visibility(),
-                request.aiModel(),
                 request.moderation(),
-                request.nudge(),
-                request.scene(),
-                request.authorsNote(),
-                request.bump(),
-                request.bumpFrequency(),
-                request.maxTokenLimit(),
-                request.temperature(),
-                request.frequencyPenalty(),
-                request.presencePenalty(),
-                request.logitBiasToAdd(),
-                request.stopSequencesToAdd(),
-                request.stopSequencesToRemove(),
-                request.logitBiasToRemove(),
+                request.isMultiplayer(),
                 request.usersAllowedToWriteToAdd(),
                 request.usersAllowedToWriteToRemove(),
                 request.usersAllowedToReadToAdd(),
                 request.usersAllowedToReadToRemove(),
-                request.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        request.modelConfiguration().aiModel(),
+                        request.modelConfiguration().maxTokenLimit(),
+                        request.modelConfiguration().temperature(),
+                        request.modelConfiguration().frequencyPenalty(),
+                        request.modelConfiguration().presencePenalty(),
+                        request.modelConfiguration().stopSequencesToAdd(),
+                        request.modelConfiguration().stopSequencesToRemove(),
+                        request.modelConfiguration().logitBiasToAdd(),
+                        request.modelConfiguration().logitBiasToRemove()),
+                new ContextAttributesDto(
+                        request.contextAttributes().nudge(),
+                        request.contextAttributes().authorsNote(),
+                        request.contextAttributes().scene(),
+                        request.contextAttributes().bump(),
+                        request.contextAttributes().bumpFrequency()));
 
         return commandRunner.run(command);
     }

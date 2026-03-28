@@ -11,7 +11,9 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateModelConfigurationDto;
 
 public class UpdateAdventureTest {
 
@@ -30,26 +32,28 @@ public class UpdateAdventureTest {
                 WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
-                adventure.getModelConfiguration().getAiModel(),
                 adventure.getModeration(),
-                adventure.getContextAttributes().nudge(),
-                adventure.getContextAttributes().scene(),
-                adventure.getContextAttributes().authorsNote(),
-                adventure.getContextAttributes().bump(),
-                adventure.getContextAttributes().bumpFrequency(),
-                adventure.getModelConfiguration().getMaxTokenLimit(),
-                adventure.getModelConfiguration().getTemperature(),
-                adventure.getModelConfiguration().getFrequencyPenalty(),
-                adventure.getModelConfiguration().getPresencePenalty(),
-                Maps.newHashMap("TKNID", 99D),
-                adventure.getModelConfiguration().getStopSequences(),
-                adventure.getModelConfiguration().getStopSequences(),
-                Set.of("TKN"),
+                adventure.isMultiplayer(),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
                 Set.of(12345L),
-                adventure.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        adventure.getModelConfiguration().getAiModel(),
+                        adventure.getModelConfiguration().getMaxTokenLimit(),
+                        adventure.getModelConfiguration().getTemperature(),
+                        adventure.getModelConfiguration().getFrequencyPenalty(),
+                        adventure.getModelConfiguration().getPresencePenalty(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        adventure.getModelConfiguration().getStopSequences(),
+                        Maps.newHashMap("TKNID", 99D),
+                        Set.of("TKN")),
+                new ContextAttributesDto(
+                        adventure.getContextAttributes().nudge(),
+                        adventure.getContextAttributes().authorsNote(),
+                        adventure.getContextAttributes().scene(),
+                        adventure.getContextAttributes().bump(),
+                        adventure.getContextAttributes().bumpFrequency()));
 
         // Then
         assertThat(updateAdventure.adventureId()).isEqualTo(AdventureFixture.PUBLIC_ID);
@@ -59,16 +63,16 @@ public class UpdateAdventureTest {
         assertThat(updateAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
         assertThat(updateAdventure.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(updateAdventure.visibility()).isEqualTo(adventure.getVisibility());
-        assertThat(updateAdventure.presencePenalty()).isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
-        assertThat(updateAdventure.frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
-        assertThat(updateAdventure.temperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
-        assertThat(updateAdventure.maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
-        assertThat(updateAdventure.scene()).isEqualTo(adventure.getContextAttributes().scene());
-        assertThat(updateAdventure.authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
-        assertThat(updateAdventure.nudge()).isEqualTo(adventure.getContextAttributes().nudge());
-        assertThat(updateAdventure.bump()).isEqualTo(adventure.getContextAttributes().bump());
-        assertThat(updateAdventure.bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
-        assertThat(updateAdventure.aiModel()).isEqualTo(adventure.getModelConfiguration().getAiModel());
+        assertThat(updateAdventure.modelConfiguration().presencePenalty()).isEqualTo(adventure.getModelConfiguration().getPresencePenalty());
+        assertThat(updateAdventure.modelConfiguration().frequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
+        assertThat(updateAdventure.modelConfiguration().temperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
+        assertThat(updateAdventure.modelConfiguration().maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
+        assertThat(updateAdventure.contextAttributes().scene()).isEqualTo(adventure.getContextAttributes().scene());
+        assertThat(updateAdventure.contextAttributes().authorsNote()).isEqualTo(adventure.getContextAttributes().authorsNote());
+        assertThat(updateAdventure.contextAttributes().nudge()).isEqualTo(adventure.getContextAttributes().nudge());
+        assertThat(updateAdventure.contextAttributes().bump()).isEqualTo(adventure.getContextAttributes().bump());
+        assertThat(updateAdventure.contextAttributes().bumpFrequency()).isEqualTo(adventure.getContextAttributes().bumpFrequency());
+        assertThat(updateAdventure.modelConfiguration().aiModel()).isEqualTo(adventure.getModelConfiguration().getAiModel());
     }
 
     @Test
@@ -86,29 +90,26 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                null,
-                sample.stopSequencesToRemove(),
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 sample.usersAllowedToWriteToRemove(),
                 sample.usersAllowedToReadToAdd(),
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        sample.modelConfiguration().aiModel(),
+                        sample.modelConfiguration().maxTokenLimit(),
+                        sample.modelConfiguration().temperature(),
+                        sample.modelConfiguration().frequencyPenalty(),
+                        sample.modelConfiguration().presencePenalty(),
+                        null,
+                        sample.modelConfiguration().stopSequencesToRemove(),
+                        sample.modelConfiguration().logitBiasToAdd(),
+                        sample.modelConfiguration().logitBiasToRemove()),
+                sample.contextAttributes());
 
         // Then
-        assertThat(updateAdventure.stopSequencesToAdd()).isNull();
+        assertThat(updateAdventure.modelConfiguration().stopSequencesToAdd()).isNull();
     }
 
     @Test
@@ -126,29 +127,26 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                sample.stopSequencesToAdd(),
-                null,
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 sample.usersAllowedToWriteToRemove(),
                 sample.usersAllowedToReadToAdd(),
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        sample.modelConfiguration().aiModel(),
+                        sample.modelConfiguration().maxTokenLimit(),
+                        sample.modelConfiguration().temperature(),
+                        sample.modelConfiguration().frequencyPenalty(),
+                        sample.modelConfiguration().presencePenalty(),
+                        sample.modelConfiguration().stopSequencesToAdd(),
+                        null,
+                        sample.modelConfiguration().logitBiasToAdd(),
+                        sample.modelConfiguration().logitBiasToRemove()),
+                sample.contextAttributes());
 
         // Then
-        assertThat(updateAdventure.stopSequencesToRemove()).isNull();
+        assertThat(updateAdventure.modelConfiguration().stopSequencesToRemove()).isNull();
     }
 
     @Test
@@ -166,29 +164,26 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                null,
-                sample.stopSequencesToAdd(),
-                sample.stopSequencesToRemove(),
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 sample.usersAllowedToWriteToRemove(),
                 sample.usersAllowedToReadToAdd(),
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        sample.modelConfiguration().aiModel(),
+                        sample.modelConfiguration().maxTokenLimit(),
+                        sample.modelConfiguration().temperature(),
+                        sample.modelConfiguration().frequencyPenalty(),
+                        sample.modelConfiguration().presencePenalty(),
+                        sample.modelConfiguration().stopSequencesToAdd(),
+                        sample.modelConfiguration().stopSequencesToRemove(),
+                        null,
+                        sample.modelConfiguration().logitBiasToRemove()),
+                sample.contextAttributes());
 
         // Then
-        assertThat(updateAdventure.logitBiasToAdd()).isNull();
+        assertThat(updateAdventure.modelConfiguration().logitBiasToAdd()).isNull();
     }
 
     @Test
@@ -206,29 +201,26 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                sample.stopSequencesToAdd(),
-                sample.stopSequencesToRemove(),
-                null,
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 sample.usersAllowedToWriteToRemove(),
                 sample.usersAllowedToReadToAdd(),
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                new UpdateModelConfigurationDto(
+                        sample.modelConfiguration().aiModel(),
+                        sample.modelConfiguration().maxTokenLimit(),
+                        sample.modelConfiguration().temperature(),
+                        sample.modelConfiguration().frequencyPenalty(),
+                        sample.modelConfiguration().presencePenalty(),
+                        sample.modelConfiguration().stopSequencesToAdd(),
+                        sample.modelConfiguration().stopSequencesToRemove(),
+                        sample.modelConfiguration().logitBiasToAdd(),
+                        null),
+                sample.contextAttributes());
 
         // Then
-        assertThat(updateAdventure.logitBiasToRemove()).isNull();
+        assertThat(updateAdventure.modelConfiguration().logitBiasToRemove()).isNull();
     }
 
     @Test
@@ -246,26 +238,14 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                sample.stopSequencesToAdd(),
-                sample.stopSequencesToRemove(),
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 null,
                 sample.usersAllowedToWriteToRemove(),
                 sample.usersAllowedToReadToAdd(),
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                sample.modelConfiguration(),
+                sample.contextAttributes());
 
         // Then
         assertThat(updateAdventure.usersAllowedToWriteToAdd()).isNull();
@@ -286,26 +266,14 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                sample.stopSequencesToAdd(),
-                sample.stopSequencesToRemove(),
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 null,
                 sample.usersAllowedToReadToAdd(),
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                sample.modelConfiguration(),
+                sample.contextAttributes());
 
         // Then
         assertThat(updateAdventure.usersAllowedToWriteToRemove()).isNull();
@@ -326,26 +294,14 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                sample.stopSequencesToAdd(),
-                sample.stopSequencesToRemove(),
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 sample.usersAllowedToWriteToRemove(),
                 null,
                 sample.usersAllowedToReadToRemove(),
-                sample.isMultiplayer());
+                sample.modelConfiguration(),
+                sample.contextAttributes());
 
         // Then
         assertThat(updateAdventure.usersAllowedToReadToAdd()).isNull();
@@ -366,26 +322,14 @@ public class UpdateAdventureTest {
                 sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
-                sample.aiModel(),
                 sample.moderation(),
-                sample.nudge(),
-                sample.scene(),
-                sample.authorsNote(),
-                sample.bump(),
-                sample.bumpFrequency(),
-                sample.maxTokenLimit(),
-                sample.temperature(),
-                sample.frequencyPenalty(),
-                sample.presencePenalty(),
-                sample.logitBiasToAdd(),
-                sample.stopSequencesToAdd(),
-                sample.stopSequencesToRemove(),
-                sample.logitBiasToRemove(),
+                sample.isMultiplayer(),
                 sample.usersAllowedToWriteToAdd(),
                 sample.usersAllowedToWriteToRemove(),
                 sample.usersAllowedToReadToAdd(),
                 null,
-                sample.isMultiplayer());
+                sample.modelConfiguration(),
+                sample.contextAttributes());
 
         // Then
         assertThat(updateAdventure.usersAllowedToReadToRemove()).isNull();

@@ -3,6 +3,9 @@
 --preconditions onFail:HALT, onError:HALT
 
 ALTER TABLE world_lorebook
+    ALTER world_id DROP NOT NULL;
+
+ALTER TABLE world_lorebook
     ADD CONSTRAINT fk_world_lorebook_world
     FOREIGN KEY (world_id) REFERENCES world(id) ON DELETE CASCADE;
 

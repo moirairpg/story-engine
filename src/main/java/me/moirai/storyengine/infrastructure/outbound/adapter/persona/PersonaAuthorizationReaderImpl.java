@@ -18,7 +18,12 @@ public class PersonaAuthorizationReaderImpl implements PersonaAuthorizationReade
 
     //@formatter:off
     private static final String SELECT_PERMISSIONS = """
-            SELECT MAX(mu.public_id) FILTER (WHERE pp.permission = 'OWNER') AS owner_id,
+            SELECT (SELECT mu2.public_id
+                      FROM persona_permissions pp2
+                      JOIN moirai_user mu2 ON mu2.id = pp2.user_id
+                     WHERE pp2.persona_id = p.id
+                           AND pp2.permission = 'OWNER'
+                     LIMIT 1) AS owner_id,
                    COALESCE(array_agg(mu.public_id) FILTER (WHERE pp.permission = 'WRITE'), ARRAY[]::UUID[]) AS writers,
                    COALESCE(array_agg(mu.public_id) FILTER (WHERE pp.permission = 'READ'), ARRAY[]::UUID[]) AS readers,
                    p.visibility
@@ -26,7 +31,7 @@ public class PersonaAuthorizationReaderImpl implements PersonaAuthorizationReade
               LEFT JOIN persona_permissions pp ON pp.persona_id = p.id
               LEFT JOIN moirai_user mu ON mu.id = pp.user_id
              WHERE p.public_id = :publicId
-             GROUP BY p.visibility
+             GROUP BY p.id, p.visibility
             """;
     //@formatter:on
 
