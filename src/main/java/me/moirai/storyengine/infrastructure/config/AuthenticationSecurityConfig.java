@@ -52,6 +52,7 @@ public class AuthenticationSecurityConfig {
                         .requestMatchers(unsecuredPaths).permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(withDefaults())
+                .anonymous(anonymous -> anonymous.disable())
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .exceptionHandling(handler -> handler

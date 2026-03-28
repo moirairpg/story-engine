@@ -34,7 +34,6 @@ services:
       DISCORD_BOT_REDIRECT_URL: http://localhost:8081/auth/code
       DISCORD_BOT_API_TOKEN: CHANGE_THIS_VALUE
       OPENAI_API_TOKEN: CHANGE_THIS_VALUE
-      SPRING_APPLICATION_PROFILES: default
       POSTGRES_HOST: postgresql:5432
       POSTGRES_DB: moirai
       POSTGRES_USER: moirai

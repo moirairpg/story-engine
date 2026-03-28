@@ -1,4 +1,4 @@
-package me.moirai.storyengine.common.dto;
+package me.moirai.storyengine.core.port.outbound.generation;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

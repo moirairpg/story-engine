@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,8 +33,16 @@ import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureAuthorsNoteById;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureBumpById;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureNudgeById;
+import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureSceneById;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateAdventureRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureAuthorsNoteRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureBumpRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureNudgeRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureSceneRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchGameMode;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModel;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModeration;
@@ -165,6 +174,46 @@ public class AdventureController extends SecurityContextAware {
                 request.isMultiplayer());
 
         return commandRunner.run(command);
+    }
+
+    @PatchMapping("/{adventureId}/authors-note")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void updateAuthorsNote(
+            @PathVariable(required = true) UUID adventureId,
+            @Valid @RequestBody UpdateAdventureAuthorsNoteRequest request) {
+
+        commandRunner.run(new UpdateAdventureAuthorsNoteById(request.authorsNote(), adventureId));
+    }
+
+    @PatchMapping("/{adventureId}/bump")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void updateBump(
+            @PathVariable(required = true) UUID adventureId,
+            @Valid @RequestBody UpdateAdventureBumpRequest request) {
+
+        commandRunner.run(new UpdateAdventureBumpById(request.bump(), request.bumpFrequency(), adventureId));
+    }
+
+    @PatchMapping("/{adventureId}/nudge")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void updateNudge(
+            @PathVariable(required = true) UUID adventureId,
+            @Valid @RequestBody UpdateAdventureNudgeRequest request) {
+
+        commandRunner.run(new UpdateAdventureNudgeById(request.nudge(), adventureId));
+    }
+
+    @PatchMapping("/{adventureId}/scene")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void updateScene(
+            @PathVariable(required = true) UUID adventureId,
+            @Valid @RequestBody UpdateAdventureSceneRequest request) {
+
+        commandRunner.run(new UpdateAdventureSceneById(request.scene(), adventureId));
     }
 
     @DeleteMapping("/{adventureId}")

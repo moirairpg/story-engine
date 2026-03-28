@@ -33,6 +33,7 @@ public class AuthenticationSecurityConfigTest {
                         .requestMatchers(IGNORED_PATHS).permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
+                .anonymous(anonymous -> anonymous.disable())
                 .build();
     }
 }

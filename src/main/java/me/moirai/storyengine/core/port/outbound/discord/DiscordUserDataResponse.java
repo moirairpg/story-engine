@@ -8,8 +8,8 @@ import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorRe
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DiscordUserDataResponse(
         @JsonProperty("id") String id,
-        @JsonProperty("redirect_uri") String username,
-        @JsonProperty("display_name") String globalNickname,
+        @JsonProperty("username") String username,
+        @JsonProperty("global_name") String globalNickname,
         @JsonProperty("avatar") String avatar,
         @JsonProperty("email") String email,
         @JsonProperty("error") DiscordErrorResponse error) {

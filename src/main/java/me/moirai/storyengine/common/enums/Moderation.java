@@ -30,12 +30,14 @@ public enum Moderation {
     private static final String SEXUAL_MINORS = "sexual/minors";
     private static final String VIOLENCE = "violence";
     private static final String VIOLENCE_GRAPHIC = "violence/graphic";
+    private static final String ILLICIT = "illicit";
+    private static final String ILLICIT_VIOLENT = "illicit/violent";
 
     private static Map<String, Double> permissiveThresholds() {
 
         Map<String, Double> thresholds = new HashMap<>();
         thresholds.put(HATE, 0.8);
-        thresholds.put(HATE_THREATENING, 0.6);
+        thresholds.put(HATE_THREATENING, 0.8);
         thresholds.put(HARASSMENT, DISABLED_TOPIC);
         thresholds.put(HARASSMENT_THREATENING, 0.8);
         thresholds.put(SELF_HARM, 0.3);
@@ -44,7 +46,9 @@ public enum Moderation {
         thresholds.put(SEXUAL, 0.8);
         thresholds.put(SEXUAL_MINORS, 0.1);
         thresholds.put(VIOLENCE, DISABLED_TOPIC);
-        thresholds.put(VIOLENCE_GRAPHIC, 0.6);
+        thresholds.put(VIOLENCE_GRAPHIC, 0.7);
+        thresholds.put(ILLICIT, 0.7);
+        thresholds.put(ILLICIT_VIOLENT, 0.7);
 
         return thresholds;
     }

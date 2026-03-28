@@ -3,14 +3,13 @@ package me.moirai.storyengine.common.dbutil;
 import java.time.Instant;
 import java.util.Optional;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import me.moirai.storyengine.common.domain.Asset;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
+import me.moirai.storyengine.common.security.authentication.MoiraiSecurityContext;
 
 public class AssetBaseDataAssigner {
 
@@ -18,7 +17,7 @@ public class AssetBaseDataAssigner {
     @PrePersist
     public void setBaseData(Asset asset) {
 
-        var authenticatedUser = getAuthenticatedUser();
+        var authenticatedUser = MoiraiSecurityContext.getAuthenticatedUser();
         if (asset.getCreatedBy() == null) {
             var createdBy = Optional.ofNullable(authenticatedUser)
                     .map(MoiraiPrincipal::username)
@@ -43,12 +42,5 @@ public class AssetBaseDataAssigner {
         }
 
         asset.setLastUpdateDate(now);
-    }
-
-    private MoiraiPrincipal getAuthenticatedUser() {
-
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .map(auth -> (MoiraiPrincipal) auth.getPrincipal())
-                .orElse(null);
     }
 }

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import me.moirai.storyengine.common.dto.ChatMessage;
-
 public record TextGenerationRequest(
 
         String model,

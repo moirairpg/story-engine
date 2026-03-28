@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.security.authentication.MoiraiCookie;
 import me.moirai.storyengine.common.web.SecurityContextAware;
@@ -47,6 +48,7 @@ public class AuthenticationController extends SecurityContextAware {
     private final String logoutPath;
     private final DiscordAuthenticationPort discordAuthenticationPort;
     private final QueryRunner queryRunner;
+    private final CommandRunner commandRunner;
 
     public AuthenticationController(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
@@ -56,7 +58,8 @@ public class AuthenticationController extends SecurityContextAware {
             @Value("${moirai.security.redirect-path.fail}") String failPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
             DiscordAuthenticationPort discordAuthenticationPort,
-            QueryRunner queryRunner) {
+            QueryRunner queryRunner,
+            CommandRunner commandRunner) {
 
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -65,6 +68,7 @@ public class AuthenticationController extends SecurityContextAware {
         this.failPath = failPath;
         this.discordAuthenticationPort = discordAuthenticationPort;
         this.queryRunner = queryRunner;
+        this.commandRunner = commandRunner;
     }
 
     @GetMapping("/code")
@@ -79,7 +83,7 @@ public class AuthenticationController extends SecurityContextAware {
         }
 
         var query = new AuthenticateUser(code);
-        var authenticatedUser = queryRunner.run(query);
+        var authenticatedUser = commandRunner.run(query);
 
         handleSessionAuthentication(response, authenticatedUser, successPath);
     }

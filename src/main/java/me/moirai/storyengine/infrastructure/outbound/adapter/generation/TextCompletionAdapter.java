@@ -16,9 +16,8 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
 import tools.jackson.databind.json.JsonMapper;
-
-import me.moirai.storyengine.common.dto.ChatMessage;
 import me.moirai.storyengine.common.exception.OpenAiApiException;
+import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;

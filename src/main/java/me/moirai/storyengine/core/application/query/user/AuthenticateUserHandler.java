@@ -5,8 +5,8 @@ import static me.moirai.storyengine.common.enums.Role.PLAYER;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import me.moirai.storyengine.common.annotation.QueryHandler;
-import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
+import me.moirai.storyengine.common.annotation.CommandHandler;
+import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
@@ -15,8 +15,8 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPor
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
-@QueryHandler
-public class AuthenticateUserHandler extends AbstractQueryHandler<AuthenticateUser, AuthenticateUserResult> {
+@CommandHandler
+public class AuthenticateUserHandler extends AbstractCommandHandler<AuthenticateUser, AuthenticateUserResult> {
 
     private static final String DISCORD_SCOPE = "identify";
     private static final String DISCORD_GRANT_TYPE = "authorization_code";
