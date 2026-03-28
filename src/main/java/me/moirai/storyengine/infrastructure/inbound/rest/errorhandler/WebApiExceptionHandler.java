@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,7 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.ModerationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.RestException;
+import me.moirai.storyengine.common.exception.TechnicalException;
 import me.moirai.storyengine.infrastructure.inbound.rest.response.ErrorResponse;
 
 @RestControllerAdvice
@@ -137,6 +139,34 @@ public class WebApiExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(TechnicalException.class)
+    public ResponseEntity<ErrorResponse> technicalException(TechnicalException exception) {
+
+        LOG.error("An unknown error has occurred", exception);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message(UNKNOWN_ERROR)
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> httpMessageNotReadableException(HttpMessageNotReadableException exception) {
+
+        LOG.error("An unknown error has occurred", exception);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(HttpStatus.BAD_REQUEST)
+                .message(exception.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ResponseStatus(code = HttpStatus.UNPROCESSABLE_CONTENT)
     @ExceptionHandler(ModerationException.class)
     public ResponseEntity<ErrorResponse> moderationFailed(ModerationException exception) {
@@ -154,6 +184,7 @@ public class WebApiExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RestException.class)
     public ResponseEntity<ErrorResponse> restError(RestException exception) {
 
