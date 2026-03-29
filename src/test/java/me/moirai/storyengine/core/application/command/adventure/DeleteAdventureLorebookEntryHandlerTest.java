@@ -17,16 +17,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteAdventureLorebookEntryHandlerTest {
 
     @Mock
     private AdventureRepository repository;
+
+    @Mock
+    private VectorSearchPort vectorSearchPort;
 
     @InjectMocks
     private DeleteAdventureLorebookEntryHandler handler;
@@ -58,7 +63,7 @@ public class DeleteAdventureLorebookEntryHandlerTest {
     }
 
     @Test
-    public void deleteAdventure() {
+    public void shouldDeleteVectorAfterSavingAdventureWhenDeleteSucceeds() {
 
         // given
         var command = new DeleteAdventureLorebookEntry(
@@ -66,8 +71,8 @@ public class DeleteAdventureLorebookEntryHandlerTest {
                 AdventureFixture.PUBLIC_ID);
 
         var baseAdventure = AdventureFixture.publicMultiplayerAdventure().build();
-
         var adventure = spy(baseAdventure);
+
         doNothing().when(adventure).removeLorebookEntry(any(UUID.class));
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
@@ -78,5 +83,22 @@ public class DeleteAdventureLorebookEntryHandlerTest {
 
         // then
         verify(repository, times(1)).save(any());
+        verify(vectorSearchPort, times(1)).delete(AdventureLorebookEntryFixture.PUBLIC_ID);
+    }
+
+    @Test
+    public void shouldThrowWhenAdventureNotFoundOnDelete() {
+
+        // given
+        var command = new DeleteAdventureLorebookEntry(
+                AdventureLorebookEntryFixture.PUBLIC_ID,
+                AdventureFixture.PUBLIC_ID);
+
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
+
+        // then
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+        verify(vectorSearchPort, times(0)).delete(any());
     }
 }

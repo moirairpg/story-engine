@@ -10,12 +10,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestClient;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+import io.qdrant.client.QdrantClient;
 import me.moirai.storyengine.common.testutil.DbTestHelper;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 import me.moirai.storyengine.infrastructure.config.DiscordApiConfig;
 import me.moirai.storyengine.infrastructure.config.OpenAiApiConfig;
+import me.moirai.storyengine.infrastructure.config.QdrantConfig;
 
 @ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
@@ -34,10 +38,22 @@ public abstract class AbstractIntegrationTest {
     private TextModerationPort textModerationPort;
 
     @MockitoBean
+    private EmbeddingPort embeddingPort;
+
+    @MockitoBean
+    private VectorSearchPort vectorSearchPort;
+
+    @MockitoBean
     private OpenAiApiConfig openAiApiConfig;
 
     @MockitoBean
     private DiscordApiConfig discordApiConfig;
+
+    @MockitoBean
+    private QdrantConfig qdrantConfig;
+
+    @MockitoBean
+    private QdrantClient qdrantClient;
 
     @MockitoBean
     private RestClient discordClient;

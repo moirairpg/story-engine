@@ -19,8 +19,10 @@ import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
@@ -33,17 +35,23 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
     private final PersonaRepository personaRepository;
     private final AdventureRepository adventureRepository;
     private final UserRepository userRepository;
+    private final EmbeddingPort embeddingPort;
+    private final VectorSearchPort vectorSearchPort;
 
     public CreateAdventureHandler(
             WorldRepository worldRepository,
             PersonaRepository personaRepository,
             AdventureRepository adventureRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            EmbeddingPort embeddingPort,
+            VectorSearchPort vectorSearchPort) {
 
         this.worldRepository = worldRepository;
         this.personaRepository = personaRepository;
         this.adventureRepository = adventureRepository;
         this.userRepository = userRepository;
+        this.embeddingPort = embeddingPort;
+        this.vectorSearchPort = vectorSearchPort;
     }
 
     @Override
@@ -88,6 +96,11 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 null));
 
         adventureRepository.save(adventure);
+
+        adventure.getLorebook().forEach(entry -> {
+            var vector = embeddingPort.embed(entry.getDescription());
+            vectorSearchPort.upsert(adventure.getPublicId(), entry.getPublicId(), vector);
+        });
 
         return mapResult(adventure, persona.getPublicId(), world.getPublicId());
     }

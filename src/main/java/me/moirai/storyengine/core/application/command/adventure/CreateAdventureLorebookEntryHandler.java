@@ -10,6 +10,8 @@ import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 
 @CommandHandler
 public class CreateAdventureLorebookEntryHandler
@@ -18,10 +20,17 @@ public class CreateAdventureLorebookEntryHandler
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
 
     private final AdventureRepository repository;
+    private final EmbeddingPort embeddingPort;
+    private final VectorSearchPort vectorSearchPort;
 
-    public CreateAdventureLorebookEntryHandler(AdventureRepository repository) {
+    public CreateAdventureLorebookEntryHandler(
+            AdventureRepository repository,
+            EmbeddingPort embeddingPort,
+            VectorSearchPort vectorSearchPort) {
 
         this.repository = repository;
+        this.embeddingPort = embeddingPort;
+        this.vectorSearchPort = vectorSearchPort;
     }
 
     @Override
@@ -53,6 +62,9 @@ public class CreateAdventureLorebookEntryHandler
                 command.playerId());
 
         repository.save(adventure);
+
+        var vector = embeddingPort.embed(lorebookEntry.getDescription());
+        vectorSearchPort.upsert(adventure.getPublicId(), lorebookEntry.getPublicId(), vector);
 
         return mapResult(adventure, lorebookEntry);
     }

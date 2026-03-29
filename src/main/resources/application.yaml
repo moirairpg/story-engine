@@ -15,6 +15,17 @@ moirai:
       base-url: https://api.openai.com
       moderation-uri: /v1/moderations
       responses-uri: /v1/responses
+      embeddings-uri: /v1/embeddings
+    models:
+      embedding: text-embedding-3-small
+  qdrant:
+    host: ${QDRANT_HOST:localhost}
+    port: ${QDRANT_PORT:6334}
+  rag:
+    lorebook:
+      top-k: 5
+      collection-name: lorebook
+      vector-size: 1536
   adventure:
     message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
   security:

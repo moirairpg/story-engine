@@ -1,8 +1,11 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -14,16 +17,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.CreateAdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateAdventureLorebookEntryHandlerTest {
 
     @Mock
     private AdventureRepository repository;
+
+    @Mock
+    private EmbeddingPort embeddingPort;
+
+    @Mock
+    private VectorSearchPort vectorSearchPort;
 
     @InjectMocks
     private CreateAdventureLorebookEntryHandler handler;
@@ -40,7 +52,8 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null);
 
         // then
-        assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(command));
     }
 
     @Test
@@ -55,7 +68,8 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null);
 
         // then
-        assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(command));
     }
 
     @Test
@@ -70,19 +84,20 @@ public class CreateAdventureLorebookEntryHandlerTest {
                 null);
 
         // then
-        assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(command));
     }
 
     @Test
-    public void createEntry_whenTriggered_thenCallService() {
+    public void shouldUpsertVectorAfterSavingEntryWhenCreateSucceeds() {
 
         // given
         var command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry();
-
         var adventure = AdventureFixture.privateMultiplayerAdventure().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(any())).thenReturn(adventure);
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
 
         // when
         var result = handler.handle(command);
@@ -90,5 +105,23 @@ public class CreateAdventureLorebookEntryHandlerTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo(command.name());
+        verify(repository, times(1)).save(any());
+        verify(embeddingPort, times(1)).embed(anyString());
+        verify(vectorSearchPort, times(1)).upsert(any(), any(), any(float[].class));
+    }
+
+    @Test
+    public void shouldThrowWhenAdventureNotFoundOnCreate() {
+
+        // given
+        var command = CreateAdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry();
+
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
+
+        // then
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+        verify(embeddingPort, times(0)).embed(anyString());
+        verify(vectorSearchPort, times(0)).upsert(any(), any(), any());
     }
 }

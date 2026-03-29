@@ -29,6 +29,7 @@
         <apache.commons.collections.version>4.5.0</apache.commons.collections.version>
         <wiremock.version>3.9.1</wiremock.version>
         <jacoco.version>0.8.14</jacoco.version>
+        <qdrant.version>1.13.0</qdrant.version>
         <skipUnitTests>false</skipUnitTests>
         <skipIntegrationTests>false</skipIntegrationTests>
     </properties>
@@ -127,6 +128,26 @@
             <groupId>com.knuddels</groupId>
             <artifactId>jtokkit</artifactId>
             <version>${tokenizer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.qdrant</groupId>
+            <artifactId>client</artifactId>
+            <version>${qdrant.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>1.65.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>1.65.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.1.3-android</version>
         </dependency>
 
         <!-- Libraries -->

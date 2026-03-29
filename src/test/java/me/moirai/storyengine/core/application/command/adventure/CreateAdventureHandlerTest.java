@@ -3,6 +3,9 @@ package me.moirai.storyengine.core.application.command.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -34,8 +37,10 @@ import me.moirai.storyengine.core.port.inbound.CreateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +59,12 @@ public class CreateAdventureHandlerTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private EmbeddingPort embeddingPort;
+
+    @Mock
+    private VectorSearchPort vectorSearchPort;
 
     @InjectMocks
     private CreateAdventureHandler handler;
@@ -171,6 +182,39 @@ public class CreateAdventureHandlerTest {
 
         // then
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void shouldUpsertVectorsForLorebookEntriesCopiedFromWorld() {
+
+        // given
+        var command = CreateAdventureFixture.sample();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var world = WorldFixture.privateWorld().build();
+        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
+        world.addLorebookEntry("Mana Shards", null, "Crystalized ancient magic");
+        world.addLorebookEntry("The Silence", null, "A void that devours magic");
+
+        var persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
+
+        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+        when(embeddingPort.embed(anyString())).thenReturn(new float[]{0.1f, 0.2f});
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(embeddingPort, times(2)).embed(anyString());
+        verify(vectorSearchPort, times(2)).upsert(any(UUID.class), any(), any(float[].class));
     }
 
     @Test

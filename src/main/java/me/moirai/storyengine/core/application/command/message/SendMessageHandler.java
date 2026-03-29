@@ -3,27 +3,31 @@ package me.moirai.storyengine.core.application.command.message;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.AiRole;
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.DefaultStringProcessors;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.message.MessageData;
 import me.moirai.storyengine.core.port.outbound.message.MessageReader;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
 
 @CommandHandler
 public class SendMessageHandler extends AbstractCommandHandler<SendMessage, MessageResult> {
@@ -33,7 +37,11 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
     private final MessageRepository messageRepository;
     private final MessageReader messageReader;
     private final TextCompletionPort textCompletionPort;
+    private final EmbeddingPort embeddingPort;
+    private final VectorSearchPort vectorSearchPort;
+    private final AdventureLorebookReader lorebookReader;
     private final int messageWindowSize;
+    private final int lorebookTopK;
 
     public SendMessageHandler(
             AdventureRepository adventureRepository,
@@ -41,14 +49,22 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
             MessageRepository messageRepository,
             MessageReader messageReader,
             TextCompletionPort textCompletionPort,
-            @Value("${moirai.adventure.message-window-size}") int messageWindowSize) {
+            EmbeddingPort embeddingPort,
+            VectorSearchPort vectorSearchPort,
+            AdventureLorebookReader lorebookReader,
+            @Value("${moirai.adventure.message-window-size}") int messageWindowSize,
+            @Value("${moirai.rag.lorebook.top-k}") int lorebookTopK) {
 
         this.adventureRepository = adventureRepository;
         this.personaRepository = personaRepository;
         this.messageRepository = messageRepository;
         this.messageReader = messageReader;
         this.textCompletionPort = textCompletionPort;
+        this.embeddingPort = embeddingPort;
+        this.vectorSearchPort = vectorSearchPort;
+        this.lorebookReader = lorebookReader;
         this.messageWindowSize = messageWindowSize;
+        this.lorebookTopK = lorebookTopK;
     }
 
     @Override
@@ -81,7 +97,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         messageRepository.save(playerMessage);
 
         var history = messageReader.findActiveByAdventureId(adventure.getId(), messageWindowSize);
-        var context = assembleContext(adventure, history);
+        var context = assembleContext(adventure, history, command.content());
         var modelConfig = adventure.getModelConfiguration();
 
         var generationRequest = new TextGenerationRequest(
@@ -110,10 +126,14 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
     private List<ChatMessage> assembleContext(
             Adventure adventure,
-            List<MessageData> history) {
+            List<MessageData> history,
+            String currentMessage) {
 
         var context = new ArrayList<ChatMessage>();
         var contextAttributes = adventure.getContextAttributes();
+
+        var lorebookMessages = retrieveLorebookContext(adventure.getPublicId(), currentMessage);
+        context.addAll(lorebookMessages);
 
         context.addAll(interleaveBumps(
                 history.stream().map(this::toChatMessage).toList(),
@@ -134,6 +154,22 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         }
 
         return Collections.unmodifiableList(context);
+    }
+
+    private List<ChatMessage> retrieveLorebookContext(UUID adventurePublicId, String currentMessage) {
+
+        var queryVector = embeddingPort.embed(currentMessage);
+        var entryIds = vectorSearchPort.search(adventurePublicId, queryVector, lorebookTopK);
+
+        if (entryIds.isEmpty()) {
+            return List.of();
+        }
+
+        var entries = lorebookReader.getAllByIds(entryIds);
+
+        return entries.stream()
+                .map(e -> ChatMessage.asSystem(e.name() + ": " + e.description()))
+                .toList();
     }
 
     private List<ChatMessage> interleaveBumps(
