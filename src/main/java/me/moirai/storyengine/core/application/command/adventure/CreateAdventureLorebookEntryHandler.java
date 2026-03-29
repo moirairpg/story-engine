@@ -2,6 +2,8 @@ package me.moirai.storyengine.core.application.command.adventure;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
 
+import java.util.Comparator;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
@@ -60,12 +62,16 @@ public class CreateAdventureLorebookEntryHandler
                 command.description(),
                 command.playerId());
 
-        repository.save(adventure);
+        var savedAdventure = repository.save(adventure);
+
+        var savedEntry = savedAdventure.getLorebook().stream()
+                .max(Comparator.comparing(AdventureLorebookEntry::getCreationDate))
+                .orElseThrow(() -> new NotFoundException(ADVENTURE_NOT_FOUND));
 
         var vector = embeddingPort.embed(lorebookEntry.getDescription());
-        vectorSearchPort.upsert(adventure.getPublicId(), lorebookEntry.getPublicId(), vector);
+        vectorSearchPort.upsert(adventure.getPublicId(), savedEntry.getPublicId(), vector);
 
-        return mapResult(adventure, lorebookEntry);
+        return mapResult(adventure, savedEntry);
     }
 
     private AdventureLorebookEntryDetails mapResult(Adventure adventure, AdventureLorebookEntry entry) {

@@ -248,11 +248,12 @@ public class Adventure extends ShareableAsset {
 
     public AdventureLorebookEntry addLorebookEntry(String name, String description, String playerId) {
 
-        AdventureLorebookEntry.Builder entryBuilder = AdventureLorebookEntry.builder()
+        var entry = AdventureLorebookEntry.builder()
                 .name(name)
-                .description(description);
+                .description(description)
+                .playerId(playerId)
+                .build();
 
-        AdventureLorebookEntry entry = entryBuilder.build();
         lorebook.add(entry);
         return entry;
     }

@@ -1,5 +1,13 @@
 package me.moirai.storyengine.core.application.command.message;
 
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.addChatPrefix;
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.formatScene;
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.replacePersonaNamePlaceholderWith;
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripAsNamePrefix;
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripAsNamePrefixForLowercase;
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripChatPrefix;
+import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripTrailingFragment;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +20,8 @@ import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.common.util.DefaultStringProcessors;
+import me.moirai.storyengine.common.security.authentication.MoiraiSecurityContext;
+import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
@@ -88,38 +97,56 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         var persona = personaRepository.findById(adventure.getPersonaId())
                 .orElseThrow(() -> new NotFoundException("Persona not found"));
 
+        var username = MoiraiSecurityContext.getAuthenticatedUser().username();
+
+        var characterName = adventure.getLorebookEntryByPlayerId(username)
+                .map(e -> e.getName())
+                .orElse(username);
+
         var playerMessage = Message.builder()
                 .adventureId(adventure.getId())
                 .role(AiRole.USER)
-                .content(command.content())
+                .content(addChatPrefix(characterName).apply(command.content()))
                 .build();
 
         messageRepository.save(playerMessage);
 
         var history = messageReader.findActiveByAdventureId(adventure.getId(), messageWindowSize);
+
+        var personality = replacePersonaNamePlaceholderWith(persona.getName())
+                .apply(persona.getPersonality());
+
         var context = assembleContext(adventure, history, command.content());
         var modelConfig = adventure.getModelConfiguration();
 
         var generationRequest = new TextGenerationRequest(
                 modelConfig.getAiModel().getOfficialModelName(),
-                persona.getPersonality(),
+                personality,
                 context,
                 modelConfig.getMaxTokenLimit(),
                 modelConfig.getTemperature());
 
         var generationResult = textCompletionPort.generateTextFrom(generationRequest);
 
+        var responseProcessor = new StringProcessor();
+        responseProcessor.addRule(stripChatPrefix());
+        responseProcessor.addRule(stripAsNamePrefix(persona.getName()));
+        responseProcessor.addRule(stripAsNamePrefixForLowercase(persona.getName()));
+        responseProcessor.addRule(stripTrailingFragment());
+
+        var cleanedResponse = responseProcessor.process(generationResult.getOutputText());
+
         var aiMessage = Message.builder()
                 .adventureId(adventure.getId())
                 .role(AiRole.ASSISTANT)
-                .content(generationResult.getOutputText())
+                .content(addChatPrefix(persona.getName()).apply(cleanedResponse))
                 .build();
 
         messageRepository.save(aiMessage);
 
         return new MessageResult(
                 aiMessage.getPublicId(),
-                aiMessage.getContent(),
+                cleanedResponse,
                 aiMessage.getRole(),
                 aiMessage.getCreationDate());
     }
@@ -146,7 +173,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
         if (contextAttributes.scene() != null && !contextAttributes.scene().isBlank()) {
             context.add(ChatMessage.asSystem(
-                    DefaultStringProcessors.formatScene().apply(contextAttributes.scene())));
+                    formatScene().apply(contextAttributes.scene())));
         }
 
         if (contextAttributes.nudge() != null && !contextAttributes.nudge().isBlank()) {

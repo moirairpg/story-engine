@@ -2,8 +2,6 @@ package me.moirai.storyengine.common.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 public class DefaultStringProcessorsTest {
@@ -105,53 +103,6 @@ public class DefaultStringProcessorsTest {
     }
 
     @Test
-    public void processor_whenChatMessageFormatRequired_thenFormatInput() {
-
-        // Given
-        String nickname = "John";
-        String username = "JohnSmith";
-        String input = "how are you doing today?";
-
-        // When
-        String output = DefaultStringProcessors.formatChatMessage(nickname, username).apply(input);
-
-        // Then
-        assertThat(output).isEqualTo("@JohnSmith (known as John) said: how are you doing today?");
-    }
-
-    @Test
-    public void processor_whenMessageWithDiscordMentionsProvided_thenExtractDiscordIds() {
-
-        // Given
-        String input = "This is <@4324234>, and <@4234234235> is also here.";
-
-        // When
-        List<String> output = DefaultStringProcessors.extractDiscordIds().apply(input);
-
-        // Then
-        assertThat(output).isNotNull()
-                .isNotEmpty()
-                .hasSize(2);
-
-        assertThat(output).element(0).isEqualTo("4324234");
-        assertThat(output).element(1).isEqualTo("4234234235");
-    }
-
-    @Test
-    public void processor_whenAuthorFormatRequired_thenFormatInput() {
-
-        // Given
-        String nameToUse = "John";
-        String input = "how are you doing today?";
-
-        // When
-        String output = DefaultStringProcessors.formatAuthorDirective(nameToUse).apply(input);
-
-        // Then
-        assertThat(output).isEqualTo("John said: [ how are you doing today? ]");
-    }
-
-    @Test
     public void processor_whenParagraphTooLong_thenTrimLastPiece() {
 
         // Given
@@ -174,7 +125,7 @@ public class DefaultStringProcessorsTest {
         String expectedFormattedContent = "Gabler the Great said: This is a message.";
 
         // When
-        String result = DefaultStringProcessors.formatRpgDirective(nickname).apply(messageContent);
+        String result = DefaultStringProcessors.formatChatMessage(nickname).apply(messageContent);
 
         // Then
         assertThat(result).isEqualTo(expectedFormattedContent);
