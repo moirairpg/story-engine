@@ -18,7 +18,6 @@ public class WorldLorebookReaderImpl implements WorldLorebookReader {
             SELECT wl.public_id,
                    wl.name,
                    wl.description,
-                   wl.regex,
                     w.public_id AS world_public_id,
                    wl.creation_date,
                    wl.last_update_date
@@ -49,7 +48,6 @@ public class WorldLorebookReaderImpl implements WorldLorebookReader {
                 UUID.fromString(rs.getString("public_id")),
                 UUID.fromString(rs.getString("world_public_id")),
                 rs.getString("name"),
-                rs.getString("regex"),
                 rs.getString("description"),
                 rs.getTimestamp("creation_date").toInstant(),
                 rs.getTimestamp("last_update_date").toInstant());

@@ -8,7 +8,6 @@ public record UpdateWorldLorebookEntry(
         UUID entryId,
         UUID worldId,
         String name,
-        String regex,
         String description)
         implements Command<WorldLorebookEntryDetails> {
 }

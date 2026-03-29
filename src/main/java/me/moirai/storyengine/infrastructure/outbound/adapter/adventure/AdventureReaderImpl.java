@@ -53,7 +53,6 @@ public class AdventureReaderImpl implements AdventureReader {
     private static final String SELECT_LOREBOOK = """
           SELECT al.public_id,
                  al.name,
-                 al.regex,
                  al.description,
                  al.player_id,
                  al.is_player_character,
@@ -114,7 +113,6 @@ public class AdventureReaderImpl implements AdventureReader {
                             UUID.fromString(r.getString("public_id")),
                             UUID.fromString(rs.getString("public_id")),
                             r.getString("name"),
-                            r.getString("regex"),
                             r.getString("description"),
                             r.getString("player_id"),
                             r.getBoolean("is_player_character"),

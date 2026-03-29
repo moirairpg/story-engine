@@ -78,4 +78,5 @@
   <include file="db/changelog/migrations/1742990400_create_table_message.sql" />
   <include file="db/changelog/migrations/1774720141_drop_table_notification.sql" />
   <include file="db/changelog/migrations/1774731362_alter_table_adventure_drop_model_configuration_extended_fields.sql" />
+  <include file="db/changelog/migrations/1743174000_drop_lorebook_regex.sql" />
 </databaseChangeLog>

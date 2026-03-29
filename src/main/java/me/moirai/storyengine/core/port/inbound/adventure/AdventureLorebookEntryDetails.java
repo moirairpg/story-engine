@@ -7,7 +7,6 @@ public record AdventureLorebookEntryDetails(
         UUID id,
         UUID adventureId,
         String name,
-        String regex,
         String description,
         String playerId,
         boolean isPlayerCharacter,

@@ -29,14 +29,10 @@ public class WorldLorebookEntry extends Asset {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "regex")
-    private String regex;
-
     private WorldLorebookEntry(Builder builder) {
 
         super();
         this.name = builder.name;
-        this.regex = builder.regex;
         this.description = builder.description;
     }
 
@@ -61,10 +57,6 @@ public class WorldLorebookEntry extends Asset {
         return name;
     }
 
-    public String getRegex() {
-        return regex;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -79,15 +71,9 @@ public class WorldLorebookEntry extends Asset {
         this.description = description;
     }
 
-    public void updateRegex(String regex) {
-
-        this.regex = regex;
-    }
-
     public static final class Builder {
 
         private String name;
-        private String regex;
         private String description;
 
         private Builder() {
@@ -102,12 +88,6 @@ public class WorldLorebookEntry extends Asset {
         public Builder description(String description) {
 
             this.description = description;
-            return this;
-        }
-
-        public Builder regex(String regex) {
-
-            this.regex = regex;
             return this;
         }
 

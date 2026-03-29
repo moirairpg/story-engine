@@ -7,7 +7,6 @@ import me.moirai.storyengine.common.cqs.command.Command;
 public record CreateWorldLorebookEntry(
         UUID worldId,
         String name,
-        String regex,
         String description)
         implements Command<WorldLorebookEntryDetails> {
 }

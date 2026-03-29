@@ -246,11 +246,10 @@ public class Adventure extends ShareableAsset {
         this.contextAttributes = newContextAttributes;
     }
 
-    public AdventureLorebookEntry addLorebookEntry(String name, String regex, String description, String playerId) {
+    public AdventureLorebookEntry addLorebookEntry(String name, String description, String playerId) {
 
         AdventureLorebookEntry.Builder entryBuilder = AdventureLorebookEntry.builder()
                 .name(name)
-                .regex(regex)
                 .description(description);
 
         AdventureLorebookEntry entry = entryBuilder.build();
@@ -261,14 +260,12 @@ public class Adventure extends ShareableAsset {
     public AdventureLorebookEntry updateLorebookEntry(
             UUID entryId,
             String name,
-            String regex,
             String description,
             String playerId) {
 
         AdventureLorebookEntry entry = getLorebookEntryById(entryId);
 
         entry.updateName(name);
-        entry.updateRegex(regex);
         entry.updateDescription(description);
 
         if (isBlank(playerId)) {
@@ -292,13 +289,6 @@ public class Adventure extends ShareableAsset {
                 .filter(e -> entryId.equals(e.getPublicId()))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Lorebook entry not found"));
-    }
-
-    public List<AdventureLorebookEntry> getLorebookEntriesByRegex(String value) {
-
-        return lorebook.stream()
-                .filter(e -> value.matches(e.getRegex()))
-                .toList();
     }
 
     public Optional<AdventureLorebookEntry> getLorebookEntryByPlayerId(String playerId) {

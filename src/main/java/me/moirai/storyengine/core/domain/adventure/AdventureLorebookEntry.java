@@ -29,9 +29,6 @@ public class AdventureLorebookEntry extends Asset {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "regex")
-    private String regex;
-
     @Column(name = "player_id")
     private String playerId;
 
@@ -42,7 +39,6 @@ public class AdventureLorebookEntry extends Asset {
 
         super();
         this.name = builder.name;
-        this.regex = builder.regex;
         this.description = builder.description;
         this.playerId = builder.playerId;
         this.isPlayerCharacter = builder.playerId != null;
@@ -69,10 +65,6 @@ public class AdventureLorebookEntry extends Asset {
         return name;
     }
 
-    public String getRegex() {
-        return regex;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -95,11 +87,6 @@ public class AdventureLorebookEntry extends Asset {
         this.description = description;
     }
 
-    public void updateRegex(String regex) {
-
-        this.regex = regex;
-    }
-
     public void assignPlayer(String playerId) {
 
         this.isPlayerCharacter = true;
@@ -115,7 +102,6 @@ public class AdventureLorebookEntry extends Asset {
     public static final class Builder {
 
         private String name;
-        private String regex;
         private String description;
         private String playerId;
 
@@ -131,12 +117,6 @@ public class AdventureLorebookEntry extends Asset {
         public Builder description(String description) {
 
             this.description = description;
-            return this;
-        }
-
-        public Builder regex(String regex) {
-
-            this.regex = regex;
             return this;
         }
 

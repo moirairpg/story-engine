@@ -10,7 +10,6 @@ public class CreateWorldLorebookEntryFixture {
         return new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "White River",
-                "[Ww]hite [Rr]iver",
                 "The White River goes through Falkreath, Whiterun and ends in Eastmarch.");
     }
 
@@ -19,7 +18,6 @@ public class CreateWorldLorebookEntryFixture {
         return new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.");
     }
 }

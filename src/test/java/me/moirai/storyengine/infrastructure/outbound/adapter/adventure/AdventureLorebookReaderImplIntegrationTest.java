@@ -55,7 +55,7 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
                 .personaId(persona.getId())
                 .build();
 
-        adventure.addLorebookEntry("Lorebook", "Lorebook", "Lorebook", null);
+        adventure.addLorebookEntry("Lorebook", "Lorebook", null);
 
         insert(adventure, Adventure.class);
 
@@ -71,7 +71,6 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
         assertThat(result.get().adventureId()).isEqualTo(adventure.getPublicId());
         assertThat(result.get().name()).isEqualTo(entry.getName());
         assertThat(result.get().description()).isEqualTo(entry.getDescription());
-        assertThat(result.get().regex()).isEqualTo(entry.getRegex());
         assertThat(result.get().isPlayerCharacter()).isFalse();
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
@@ -101,8 +100,8 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
                 .personaId(persona.getId())
                 .build();
 
-        adventure.addLorebookEntry("Entry One", "regex1", "Description One", null);
-        adventure.addLorebookEntry("Entry Two", "regex2", "Description Two", null);
+        adventure.addLorebookEntry("Entry One", "Description One", null);
+        adventure.addLorebookEntry("Entry Two", "Description Two", null);
 
         insert(adventure, Adventure.class);
 
@@ -129,7 +128,7 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
                 .personaId(persona.getId())
                 .build();
 
-        adventure.addLorebookEntry("Existing Entry", "regex", "Description", null);
+        adventure.addLorebookEntry("Existing Entry", "Description", null);
 
         insert(adventure, Adventure.class);
 

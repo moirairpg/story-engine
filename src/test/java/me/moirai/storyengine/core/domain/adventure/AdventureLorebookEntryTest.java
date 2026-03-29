@@ -14,7 +14,6 @@ public class AdventureLorebookEntryTest {
         AdventureLorebookEntry.Builder builder = AdventureLorebookEntry.builder()
                 .name("White River")
                 .description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.")
-                .regex("[Ww]hite [Rr]iver")
                 .playerId("2423423423423");
 
         // When
@@ -28,7 +27,6 @@ public class AdventureLorebookEntryTest {
         assertThat(entry.getPublicId()).isEqualTo(AdventureLorebookEntryFixture.PUBLIC_ID);
         assertThat(entry.getName()).isEqualTo("White River");
         assertThat(entry.getPlayerId()).isEqualTo("2423423423423");
-        assertThat(entry.getRegex()).isEqualTo("[Ww]hite [Rr]iver");
         assertThat(entry.isPlayerCharacter()).isTrue();
     }
 
@@ -56,19 +54,6 @@ public class AdventureLorebookEntryTest {
 
         // Then
         assertThat(entry.getDescription()).isEqualTo("New Description");
-    }
-
-    @Test
-    public void updateLorebookEntryRegex() {
-
-        // Given
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        entry.updateRegex("[Rr]egex");
-
-        // Then
-        assertThat(entry.getRegex()).isEqualTo("[Rr]egex");
     }
 
     @Test

@@ -31,7 +31,6 @@ public class UpdateWorldLorebookEntryHandler
         var lorebookEntry = world.updateLorebookEntry(
                 command.entryId(),
                 command.name(),
-                command.regex(),
                 command.description());
 
         repository.save(world);
@@ -44,7 +43,6 @@ public class UpdateWorldLorebookEntryHandler
                 savedEntry.getPublicId(),
                 world.getPublicId(),
                 savedEntry.getName(),
-                savedEntry.getRegex(),
                 savedEntry.getDescription(),
                 savedEntry.getCreationDate(),
                 savedEntry.getLastUpdateDate());

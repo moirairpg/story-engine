@@ -91,7 +91,6 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
 
         world.getLorebook().forEach(worldEntry -> adventure.addLorebookEntry(
                 worldEntry.getName(),
-                worldEntry.getRegex(),
                 worldEntry.getDescription(),
                 null));
 
@@ -146,7 +145,6 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                                 entry.getPublicId(),
                                 adventure.getPublicId(),
                                 entry.getName(),
-                                entry.getRegex(),
                                 entry.getDescription(),
                                 entry.getPlayerId(),
                                 entry.isPlayerCharacter(),

@@ -7,7 +7,6 @@ public record WorldLorebookEntryDetails(
         UUID id,
         UUID worldId,
         String name,
-        String regex,
         String description,
         Instant creationDate,
         Instant lastUpdateDate) {

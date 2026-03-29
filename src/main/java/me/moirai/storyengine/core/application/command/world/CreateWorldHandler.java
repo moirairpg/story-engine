@@ -52,7 +52,6 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
 
         command.lorebookEntries().forEach(entry -> world.addLorebookEntry(
                 entry.name(),
-                entry.regex(),
                 entry.description()));
 
         return mapResult(repository.save(world));
@@ -79,7 +78,6 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                                 entry.getPublicId(),
                                 world.getPublicId(),
                                 entry.getName(),
-                                entry.getRegex(),
                                 entry.getDescription(),
                                 entry.getCreationDate(),
                                 entry.getLastUpdateDate()))

@@ -32,16 +32,4 @@ public class WorldLorebookEntryTest {
         assertThat(entry.getDescription()).isEqualTo("New Description");
     }
 
-    @Test
-    public void updateLorebookEntryRegex() {
-
-        // Given
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        entry.updateRegex("[Rr]egex");
-
-        // Then
-        assertThat(entry.getRegex()).isEqualTo("[Rr]egex");
-    }
 }

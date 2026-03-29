@@ -44,7 +44,6 @@ public class CreateWorldLorebookEntryHandlerTest {
         var command = new CreateWorldLorebookEntry(
                 null,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.");
 
         // then
@@ -58,7 +57,6 @@ public class CreateWorldLorebookEntryHandlerTest {
         var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 null,
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.");
 
         // then
@@ -72,7 +70,6 @@ public class CreateWorldLorebookEntryHandlerTest {
         var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 null);
 
         // then
@@ -86,7 +83,6 @@ public class CreateWorldLorebookEntryHandlerTest {
         var command = new CreateWorldLorebookEntry(
                 WorldFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.");
 
         var world = WorldFixture.privateWorld().build();

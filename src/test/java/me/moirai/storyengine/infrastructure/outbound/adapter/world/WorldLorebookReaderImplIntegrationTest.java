@@ -44,7 +44,7 @@ public class WorldLorebookReaderImplIntegrationTest extends AbstractIntegrationT
 
         // Given
         var world = WorldFixture.publicWorld().build();
-        world.addLorebookEntry("Lorebook", "Lorebook", "Lorebook");
+        world.addLorebookEntry("Lorebook", "Lorebook");
 
         insert(world, World.class);
 
@@ -60,7 +60,6 @@ public class WorldLorebookReaderImplIntegrationTest extends AbstractIntegrationT
         assertThat(result.get().worldId()).isEqualTo(world.getPublicId());
         assertThat(result.get().name()).isEqualTo(entry.getName());
         assertThat(result.get().description()).isEqualTo(entry.getDescription());
-        assertThat(result.get().regex()).isEqualTo(entry.getRegex());
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
     }

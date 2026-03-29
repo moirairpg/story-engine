@@ -62,7 +62,6 @@ public class UpdateAdventureLorebookEntryHandler
         var lorebookEntry = adventure.updateLorebookEntry(
                 command.entryId(),
                 command.name(),
-                command.regex(),
                 command.description(),
                 command.playerId());
 
@@ -80,7 +79,6 @@ public class UpdateAdventureLorebookEntryHandler
                 savedEntry.getPublicId(),
                 adventure.getPublicId(),
                 savedEntry.getName(),
-                savedEntry.getRegex(),
                 savedEntry.getDescription(),
                 savedEntry.getPlayerId(),
                 savedEntry.isPlayerCharacter(),

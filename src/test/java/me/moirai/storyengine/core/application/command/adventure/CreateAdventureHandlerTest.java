@@ -196,8 +196,8 @@ public class CreateAdventureHandlerTest {
         var world = WorldFixture.privateWorld().build();
         ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
-        world.addLorebookEntry("Mana Shards", null, "Crystalized ancient magic");
-        world.addLorebookEntry("The Silence", null, "A void that devours magic");
+        world.addLorebookEntry("Mana Shards", "Crystalized ancient magic");
+        world.addLorebookEntry("The Silence", "A void that devours magic");
 
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);

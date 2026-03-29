@@ -16,7 +16,6 @@ public class CreateAdventureLorebookEntryTest {
         CreateAdventureLorebookEntry command = new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 "2423423423423");
 
@@ -25,7 +24,6 @@ public class CreateAdventureLorebookEntryTest {
         assertThat(command.adventureId()).isEqualTo(AdventureFixture.PUBLIC_ID);
         assertThat(command.name()).isEqualTo("Volin Habar");
         assertThat(command.description()).isEqualTo("Volin Habar is a warrior that fights with a sword.");
-        assertThat(command.regex()).isEqualTo("[Vv]olin [Hh]abar|[Vv]oha");
         assertThat(command.playerId()).isEqualTo("2423423423423");
     }
 }

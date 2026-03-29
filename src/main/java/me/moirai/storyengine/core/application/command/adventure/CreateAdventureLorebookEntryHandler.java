@@ -57,7 +57,6 @@ public class CreateAdventureLorebookEntryHandler
 
         var lorebookEntry = adventure.addLorebookEntry(
                 command.name(),
-                command.regex(),
                 command.description(),
                 command.playerId());
 
@@ -75,7 +74,6 @@ public class CreateAdventureLorebookEntryHandler
                 entry.getPublicId(),
                 adventure.getPublicId(),
                 entry.getName(),
-                entry.getRegex(),
                 entry.getDescription(),
                 entry.getPlayerId(),
                 entry.isPlayerCharacter(),

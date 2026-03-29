@@ -204,7 +204,6 @@ public class SendMessageHandlerTest {
                 entryId,
                 adventure.getPublicId(),
                 "Dragon",
-                null,
                 "A fearsome dragon",
                 null,
                 false,

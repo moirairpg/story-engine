@@ -47,7 +47,6 @@ public class CreateWorldLorebookEntryHandler
 
         var entry = world.addLorebookEntry(
                 command.name(),
-                command.regex(),
                 command.description());
 
         repository.save(world);
@@ -60,7 +59,6 @@ public class CreateWorldLorebookEntryHandler
                 entry.getPublicId(),
                 world.getPublicId(),
                 entry.getName(),
-                entry.getRegex(),
                 entry.getDescription(),
                 entry.getCreationDate(),
                 entry.getLastUpdateDate());

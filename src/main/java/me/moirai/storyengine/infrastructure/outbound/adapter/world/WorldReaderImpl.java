@@ -34,7 +34,6 @@ public class WorldReaderImpl implements WorldReader {
     private static final String SELECT_LOREBOOK = """
           SELECT wl.public_id,
                  wl.name,
-                 wl.regex,
                  wl.description,
                  wl.creation_date,
                  wl.last_update_date
@@ -80,7 +79,6 @@ public class WorldReaderImpl implements WorldReader {
                             UUID.fromString(r.getString("public_id")),
                             UUID.fromString(rs.getString("public_id")),
                             r.getString("name"),
-                            r.getString("regex"),
                             r.getString("description"),
                             r.getTimestamp("creation_date").toInstant(),
                             r.getTimestamp("last_update_date").toInstant()))

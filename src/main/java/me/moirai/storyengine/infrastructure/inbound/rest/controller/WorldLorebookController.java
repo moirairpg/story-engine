@@ -92,7 +92,6 @@ public class WorldLorebookController extends SecurityContextAware {
         var command = new CreateWorldLorebookEntry(
                 worldId,
                 request.name(),
-                request.regex(),
                 request.description());
 
         return commandRunner.run(command);
@@ -110,7 +109,6 @@ public class WorldLorebookController extends SecurityContextAware {
                 entryId,
                 worldId,
                 request.name(),
-                request.regex(),
                 request.description());
 
         return commandRunner.run(command);

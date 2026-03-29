@@ -36,7 +36,7 @@ public class AdventureLorebookSearchReaderImplIntegrationTest extends AbstractIn
                 .worldId(world.getId())
                 .personaId(persona.getId())
                 .build();
-        adventure.addLorebookEntry("White River", "[Ww]hite [Rr]iver", "A famous river", null);
+        adventure.addLorebookEntry("White River", "A famous river", null);
         insert(adventure, Adventure.class);
 
         var query = new SearchAdventureLorebookEntries(adventure.getPublicId(), null, null, null, null, null);
@@ -83,8 +83,8 @@ public class AdventureLorebookSearchReaderImplIntegrationTest extends AbstractIn
                 .worldId(world.getId())
                 .personaId(persona.getId())
                 .build();
-        adventure.addLorebookEntry("White River", "[Ww]hite [Rr]iver", "A famous river", null);
-        adventure.addLorebookEntry("Volin Habar", "[Vv]olin", "A warrior", null);
+        adventure.addLorebookEntry("White River", "A famous river", null);
+        adventure.addLorebookEntry("Volin Habar", "A warrior", null);
         insert(adventure, Adventure.class);
 
         var query = new SearchAdventureLorebookEntries(adventure.getPublicId(), "White", null, null, null, null);

@@ -23,7 +23,6 @@ public class AdventureLorebookSearchReaderImpl implements AdventureLorebookSearc
     private static final String SELECT_SQL = """
             SELECT al.public_id,
                    al.name,
-                   al.regex,
                    al.description,
                    al.creation_date
               FROM adventure_lorebook al
@@ -73,7 +72,6 @@ public class AdventureLorebookSearchReaderImpl implements AdventureLorebookSearc
         return (rs, _) -> new LorebookEntrySummary(
                 UUID.fromString(rs.getString("public_id")),
                 rs.getString("name"),
-                rs.getString("regex"),
                 rs.getString("description"),
                 rs.getTimestamp("creation_date").toInstant());
     }

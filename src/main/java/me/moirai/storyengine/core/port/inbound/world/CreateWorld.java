@@ -22,7 +22,6 @@ public record CreateWorld(
 
     public record LorebookEntry(
             String name,
-            String regex,
             String description) {
     }
 }

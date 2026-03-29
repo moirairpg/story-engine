@@ -10,7 +10,6 @@ public class CreateAdventureLorebookEntryFixture {
         return new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 null);
     }
@@ -20,7 +19,6 @@ public class CreateAdventureLorebookEntryFixture {
         return new CreateAdventureLorebookEntry(
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 "2423423423423");
     }

@@ -79,7 +79,7 @@ public class GetWorldLorebookEntryByIdHandlerTest {
         // Given
         var expectedDetails = new WorldLorebookEntryDetails(
                 WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID,
-                "White River", "[Ww]hite", "Description", null, null);
+                "White River", "Description", null, null);
 
         var query = new GetWorldLorebookEntryById(
                 WorldLorebookEntryFixture.PUBLIC_ID, WorldFixture.PUBLIC_ID);

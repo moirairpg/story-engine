@@ -38,7 +38,6 @@ public class UpdateWorldLorebookEntryHandlerTest {
                 WorldLorebookEntryFixture.PUBLIC_ID,
                 WorldFixture.PUBLIC_ID,
                 "MoirAI",
-                "MoirAI",
                 "This is an RPG world");
 
         var expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
@@ -47,7 +46,7 @@ public class UpdateWorldLorebookEntryHandlerTest {
 
         var world = spy(baseWorld);
         doReturn(expectedUpdatedEntry).when(world)
-                .updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString());
+                .updateLorebookEntry(any(UUID.class), anyString(), anyString());
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any())).thenReturn(world);

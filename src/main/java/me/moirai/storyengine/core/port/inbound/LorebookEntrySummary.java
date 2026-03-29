@@ -6,6 +6,5 @@ import java.util.UUID;
 public record LorebookEntrySummary(
         UUID id,
         String name,
-        String regex,
         String description,
         Instant creationDate) {}

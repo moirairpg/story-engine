@@ -100,7 +100,6 @@ public class WorldController extends SecurityContextAware {
                 emptyIfNull(request.lorebook()).stream()
                         .map(entry -> new CreateWorld.LorebookEntry(
                                 entry.name(),
-                                entry.regex(),
                                 entry.description()))
                         .toList(),
                 permissions);

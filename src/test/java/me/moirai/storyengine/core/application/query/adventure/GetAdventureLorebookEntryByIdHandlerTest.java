@@ -79,7 +79,7 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
         // Given
         var expectedDetails = new AdventureLorebookEntryDetails(
                 AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID,
-                "White River", "[Ww]hite", "Description", null, false, null, null);
+                "White River", "Description", null, false, null, null);
 
         var query = new GetAdventureLorebookEntryById(
                 AdventureLorebookEntryFixture.PUBLIC_ID, AdventureFixture.PUBLIC_ID);
@@ -94,7 +94,6 @@ public class GetAdventureLorebookEntryByIdHandlerTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(AdventureLorebookEntryFixture.PUBLIC_ID);
         assertThat(result.name()).isEqualTo(expectedDetails.name());
-        assertThat(result.regex()).isEqualTo(expectedDetails.regex());
         assertThat(result.description()).isEqualTo(expectedDetails.description());
         assertThat(result.isPlayerCharacter()).isFalse();
     }

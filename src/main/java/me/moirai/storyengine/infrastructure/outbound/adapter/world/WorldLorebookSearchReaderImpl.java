@@ -23,7 +23,6 @@ public class WorldLorebookSearchReaderImpl implements WorldLorebookSearchReader 
     private static final String SELECT_SQL = """
             SELECT wl.public_id,
                    wl.name,
-                   wl.regex,
                    wl.description,
                    wl.creation_date
               FROM world_lorebook wl
@@ -73,7 +72,6 @@ public class WorldLorebookSearchReaderImpl implements WorldLorebookSearchReader 
         return (rs, _) -> new LorebookEntrySummary(
                 UUID.fromString(rs.getString("public_id")),
                 rs.getString("name"),
-                rs.getString("regex"),
                 rs.getString("description"),
                 rs.getTimestamp("creation_date").toInstant());
     }

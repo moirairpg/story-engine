@@ -122,12 +122,10 @@ public class World extends ShareableAsset {
 
     public WorldLorebookEntry addLorebookEntry(
             String name,
-            String regex,
             String description) {
 
         WorldLorebookEntry entry = WorldLorebookEntry.builder()
                 .name(name)
-                .regex(regex)
                 .description(description)
                 .build();
 
@@ -138,12 +136,10 @@ public class World extends ShareableAsset {
     public WorldLorebookEntry updateLorebookEntry(
             UUID entryId,
             String name,
-            String regex,
             String description) {
 
         WorldLorebookEntry entry = getLorebookEntryById(entryId);
         entry.updateName(name);
-        entry.updateRegex(regex);
         entry.updateDescription(description);
 
         return entry;
@@ -161,13 +157,6 @@ public class World extends ShareableAsset {
                 .filter(e -> e.getPublicId().equals(entryId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Lorebook entry not found"));
-    }
-
-    public List<WorldLorebookEntry> getLorebookEntriesByRegex(String value) {
-
-        return lorebook.stream()
-                .filter(e -> value.matches(e.getRegex()))
-                .toList();
     }
 
     public static final class Builder {

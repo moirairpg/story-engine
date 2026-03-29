@@ -49,7 +49,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 null,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 null);
 
@@ -66,7 +65,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 null,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 null);
 
@@ -83,7 +81,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 null,
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 null);
 
@@ -100,7 +97,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 null,
                 null);
 
@@ -117,7 +113,6 @@ public class UpdateAdventureLorebookEntryHandlerTest {
                 AdventureLorebookEntryFixture.PUBLIC_ID,
                 AdventureFixture.PUBLIC_ID,
                 "Volin Habar",
-                "[Vv]olin [Hh]abar|[Vv]oha",
                 "Volin Habar is a warrior that fights with a sword.",
                 "2423423423423");
 
@@ -125,7 +120,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
         var baseAdventure = AdventureFixture.privateMultiplayerAdventure().build();
         var adventure = spy(baseAdventure);
 
-        doReturn(existingEntry).when(adventure).updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString(), anyString());
+        doReturn(existingEntry).when(adventure).updateLorebookEntry(any(UUID.class), anyString(), anyString(), anyString());
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(any())).thenReturn(adventure);
