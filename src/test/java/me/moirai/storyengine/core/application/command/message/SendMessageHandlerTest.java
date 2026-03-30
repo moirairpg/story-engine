@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -37,6 +38,8 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryD
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentData;
+import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
@@ -45,7 +48,8 @@ import me.moirai.storyengine.core.port.outbound.message.MessageData;
 import me.moirai.storyengine.core.port.outbound.message.MessageReader;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @ExtendWith(MockitoExtension.class)
 public class SendMessageHandlerTest {
@@ -69,10 +73,19 @@ public class SendMessageHandlerTest {
     private EmbeddingPort embeddingPort;
 
     @Mock
-    private VectorSearchPort vectorSearchPort;
+    private LorebookVectorSearchPort vectorSearchPort;
 
     @Mock
     private AdventureLorebookReader lorebookReader;
+
+    @Mock
+    private ChronicleVectorSearchPort chronicleVectorSearchPort;
+
+    @Mock
+    private ChronicleSegmentReader chronicleSegmentReader;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private SendMessageHandler handler;
 
@@ -93,8 +106,12 @@ public class SendMessageHandlerTest {
                 embeddingPort,
                 vectorSearchPort,
                 lorebookReader,
+                chronicleVectorSearchPort,
+                chronicleSegmentReader,
+                eventPublisher,
                 10,
-                5);
+                5,
+                3);
     }
 
     @AfterEach
@@ -580,6 +597,86 @@ public class SendMessageHandlerTest {
         // then
         verify(messageRepository, times(2)).save(captor.capture());
         assertThat(captor.getAllValues().get(1).getContent()).isEqualTo("MoirAI said: She walks forward.");
+    }
+
+    @Test
+    public void shouldInjectChronicleSegmentsIntoContextWhenVectorSearchReturnsResults() {
+
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var persona = PersonaFixture.publicPersona().build();
+
+        var savedMessage = MessageFixture.assistantMessage().build();
+        ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
+
+        var generationResult = TextGenerationResult.builder()
+                .outputText("AI response")
+                .build();
+
+        var segmentId = UUID.randomUUID();
+        var segmentData = new ChronicleSegmentData(segmentId, AdventureFixture.NUMERIC_ID, "The dragon was defeated.", null);
+
+        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
+        when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
+        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+        when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
+        when(chronicleVectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of(segmentId));
+        when(chronicleSegmentReader.getAllByIds(List.of(segmentId))).thenReturn(List.of(segmentData));
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
+
+        var captor = ArgumentCaptor.forClass(TextGenerationRequest.class);
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(textCompletionPort).generateTextFrom(captor.capture());
+        assertThat(captor.getValue().messages()).anySatisfy(m -> assertThat(m.content()).isEqualTo("The dragon was defeated."));
+    }
+
+    @Test
+    public void shouldNotInjectChronicleSegmentsWhenVectorSearchReturnsEmpty() {
+
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var persona = PersonaFixture.publicPersona().build();
+
+        var savedMessage = MessageFixture.assistantMessage().build();
+        ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
+
+        var generationResult = TextGenerationResult.builder()
+                .outputText("AI response")
+                .build();
+
+        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
+        when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
+        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+        when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
+        when(chronicleVectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.content()).isEqualTo("AI response");
     }
 
     @Test

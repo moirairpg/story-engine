@@ -18,6 +18,20 @@ import me.moirai.storyengine.core.port.outbound.message.MessageReader;
 public class MessageReaderImpl implements MessageReader {
 
     //@formatter:off
+    private static final String GET_ALL_ACTIVE_BY_ADVENTURE = """
+            SELECT m.public_id,
+                   m.adventure_id,
+                   m.created_by,
+                   m.role,
+                   m.content,
+                   m.creation_date,
+                   m.status
+              FROM message m
+             WHERE m.adventure_id = :adventureId
+               AND m.status = 'ACTIVE'
+             ORDER BY m.creation_date ASC
+            """;
+
     private static final String FIND_ACTIVE_BY_ADVENTURE = """
             SELECT m.public_id,
                    m.adventure_id,
@@ -38,6 +52,15 @@ public class MessageReaderImpl implements MessageReader {
 
     public MessageReaderImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
+    }
+
+    @Override
+    public List<MessageData> getAllActiveByAdventureId(Long adventureId) {
+
+        return jdbcClient.sql(GET_ALL_ACTIVE_BY_ADVENTURE)
+                .param("adventureId", adventureId)
+                .query(toMessageData())
+                .list();
     }
 
     @Override

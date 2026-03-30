@@ -40,7 +40,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,7 +64,7 @@ public class CreateAdventureHandlerTest {
     private EmbeddingPort embeddingPort;
 
     @Mock
-    private VectorSearchPort vectorSearchPort;
+    private LorebookVectorSearchPort vectorSearchPort;
 
     @InjectMocks
     private CreateAdventureHandler handler;

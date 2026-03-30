@@ -4,6 +4,15 @@ moirai:
     characters-amount: 10
   adventure:
     message-window-size: 10
+  rag:
+    lorebook:
+      top-k: 5
+      collection-name: lorebook
+      vector-size: 1536
+    chronicle:
+      top-k: 3
+      collection-name: chronicle
+      vector-size: 1536
   discord:
     oauth:
       client-id: dummy_value

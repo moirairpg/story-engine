@@ -22,7 +22,7 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteAdventureLorebookEntryHandlerTest {
@@ -31,7 +31,7 @@ public class DeleteAdventureLorebookEntryHandlerTest {
     private AdventureRepository repository;
 
     @Mock
-    private VectorSearchPort vectorSearchPort;
+    private LorebookVectorSearchPort vectorSearchPort;
 
     @InjectMocks
     private DeleteAdventureLorebookEntryHandler handler;

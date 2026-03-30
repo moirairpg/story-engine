@@ -24,7 +24,7 @@ import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryFixture
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateAdventureLorebookEntryHandlerTest {
@@ -36,7 +36,7 @@ public class UpdateAdventureLorebookEntryHandlerTest {
     private EmbeddingPort embeddingPort;
 
     @Mock
-    private VectorSearchPort vectorSearchPort;
+    private LorebookVectorSearchPort vectorSearchPort;
 
     @InjectMocks
     private UpdateAdventureLorebookEntryHandler handler;

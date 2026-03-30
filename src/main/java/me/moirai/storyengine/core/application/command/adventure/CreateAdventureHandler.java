@@ -22,7 +22,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
@@ -36,7 +36,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
     private final AdventureRepository adventureRepository;
     private final UserRepository userRepository;
     private final EmbeddingPort embeddingPort;
-    private final VectorSearchPort vectorSearchPort;
+    private final LorebookVectorSearchPort vectorSearchPort;
 
     public CreateAdventureHandler(
             WorldRepository worldRepository,
@@ -44,7 +44,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
             AdventureRepository adventureRepository,
             UserRepository userRepository,
             EmbeddingPort embeddingPort,
-            VectorSearchPort vectorSearchPort) {
+            LorebookVectorSearchPort vectorSearchPort) {
 
         this.worldRepository = worldRepository;
         this.personaRepository = personaRepository;

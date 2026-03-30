@@ -1,5 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.message;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Repository;
 
 import me.moirai.storyengine.core.domain.message.Message;
@@ -17,5 +20,10 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public Message save(Message message) {
         return jpaRepository.save(message);
+    }
+
+    @Override
+    public void markAsChronicled(List<UUID> publicIds) {
+        jpaRepository.markAsChronicled(publicIds);
     }
 }

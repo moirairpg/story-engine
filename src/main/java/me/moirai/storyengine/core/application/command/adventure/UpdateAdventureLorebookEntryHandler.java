@@ -11,7 +11,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryD
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @CommandHandler
 public class UpdateAdventureLorebookEntryHandler
@@ -21,12 +21,12 @@ public class UpdateAdventureLorebookEntryHandler
 
     private final AdventureRepository repository;
     private final EmbeddingPort embeddingPort;
-    private final VectorSearchPort vectorSearchPort;
+    private final LorebookVectorSearchPort vectorSearchPort;
 
     public UpdateAdventureLorebookEntryHandler(
             AdventureRepository repository,
             EmbeddingPort embeddingPort,
-            VectorSearchPort vectorSearchPort) {
+            LorebookVectorSearchPort vectorSearchPort) {
 
         this.repository = repository;
         this.embeddingPort = embeddingPort;

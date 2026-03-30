@@ -26,6 +26,10 @@ moirai:
       top-k: 5
       collection-name: lorebook
       vector-size: 1536
+    chronicle:
+      top-k: 3
+      collection-name: chronicle
+      vector-size: 1536
   adventure:
     message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
   security:

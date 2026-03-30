@@ -26,7 +26,7 @@ import io.qdrant.client.grpc.Points.UpsertPoints;
 import io.qdrant.client.grpc.PointsGrpc.PointsBlockingStub;
 
 @ExtendWith(MockitoExtension.class)
-class VectorSearchAdapterTest {
+class LorebookVectorSearchAdapterTest {
 
     @Mock(answer = Answers.RETURNS_MOCKS)
     private QdrantGrpcClient grpcClient;
@@ -35,7 +35,7 @@ class VectorSearchAdapterTest {
     private PointsBlockingStub pointsStub;
 
     @InjectMocks
-    private VectorSearchAdapter adapter;
+    private LorebookVectorSearchAdapter adapter;
 
     @BeforeEach
     void setUp() {

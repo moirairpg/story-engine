@@ -16,7 +16,8 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPor
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.VectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 import me.moirai.storyengine.infrastructure.config.DiscordApiConfig;
 import me.moirai.storyengine.infrastructure.config.OpenAiApiConfig;
 import me.moirai.storyengine.infrastructure.config.QdrantConfig;
@@ -41,7 +42,10 @@ public abstract class AbstractIntegrationTest {
     private EmbeddingPort embeddingPort;
 
     @MockitoBean
-    private VectorSearchPort vectorSearchPort;
+    private LorebookVectorSearchPort vectorSearchPort;
+
+    @MockitoBean
+    private ChronicleVectorSearchPort chronicleVectorSearchPort;
 
     @MockitoBean
     private OpenAiApiConfig openAiApiConfig;
