@@ -1,9 +1,9 @@
-package me.moirai.storyengine.core.application.query.slashcommand;
+package me.moirai.storyengine.core.application.query.tokenize;
 
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeInput;
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeInput;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeResult;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 
 @QueryHandler

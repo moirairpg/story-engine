@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.port.inbound.slashcommand;
+package me.moirai.storyengine.core.port.inbound.tokenize;
 
 public record TokenizeResult(
         String tokens,

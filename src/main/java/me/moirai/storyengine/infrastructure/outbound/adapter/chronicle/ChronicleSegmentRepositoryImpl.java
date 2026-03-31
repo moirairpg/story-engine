@@ -1,5 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.chronicle;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Repository;
 
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
@@ -17,5 +20,10 @@ public class ChronicleSegmentRepositoryImpl implements ChronicleSegmentRepositor
     @Override
     public ChronicleSegment save(ChronicleSegment segment) {
         return jpaRepository.save(segment);
+    }
+
+    @Override
+    public List<ChronicleSegment> getAllByIds(List<UUID> publicIds) {
+        return jpaRepository.findAllByPublicIdIn(publicIds);
     }
 }

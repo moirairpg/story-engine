@@ -73,7 +73,7 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
         var adventure = adventureRepository.findByPublicId(command.adventurePublicId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
-        var allActive = messageReader.getAllActiveByAdventureId(adventure.getId());
+        var allActive = messageReader.getAllActiveByAdventureId(adventure.getPublicId());
 
         if (allActive.size() <= messageWindowSize) {
             return null;

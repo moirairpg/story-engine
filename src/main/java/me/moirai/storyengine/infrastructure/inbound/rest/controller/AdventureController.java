@@ -29,8 +29,18 @@ import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureCatchUp;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
+import me.moirai.storyengine.core.port.inbound.adventure.CatchUpResult;
+import me.moirai.storyengine.core.port.inbound.adventure.MessageSummary;
+import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureMessages;
+import me.moirai.storyengine.core.port.inbound.message.Go;
+import me.moirai.storyengine.core.port.inbound.message.MessageResult;
+import me.moirai.storyengine.core.port.inbound.message.Retry;
+import me.moirai.storyengine.core.port.inbound.message.Say;
+import me.moirai.storyengine.core.port.inbound.message.StartAdventure;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.SayRequest;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
@@ -227,6 +237,59 @@ public class AdventureController extends SecurityContextAware {
 
         var command = new DeleteAdventure(adventureId);
         commandRunner.run(command);
+    }
+
+    @GetMapping("/{adventureId}/messages")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
+    public PaginatedResult<MessageSummary> getMessages(
+            @PathVariable UUID adventureId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+
+        return queryRunner.run(new SearchAdventureMessages(adventureId, page, size));
+    }
+
+    @GetMapping("/{adventureId}/catchup")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
+    public CatchUpResult getCatchUp(@PathVariable UUID adventureId) {
+
+        return queryRunner.run(new AdventureCatchUp(adventureId));
+    }
+
+    @PostMapping("/{adventureId}/start")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
+    public MessageResult start(@PathVariable UUID adventureId) {
+
+        return commandRunner.run(new StartAdventure(adventureId));
+    }
+
+    @PostMapping("/{adventureId}/go")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
+    public MessageResult go(@PathVariable UUID adventureId) {
+
+        return commandRunner.run(new Go(adventureId));
+    }
+
+    @PostMapping("/{adventureId}/retry")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
+    public MessageResult retry(@PathVariable UUID adventureId) {
+
+        return commandRunner.run(new Retry(adventureId));
+    }
+
+    @PostMapping("/{adventureId}/say")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
+    public MessageResult say(
+            @PathVariable UUID adventureId,
+            @RequestBody SayRequest request) {
+
+        return commandRunner.run(new Say(adventureId, request.content()));
     }
 
 }

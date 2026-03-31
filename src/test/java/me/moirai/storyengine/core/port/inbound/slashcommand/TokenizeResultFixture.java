@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.port.inbound.slashcommand;
 
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeResult;
+
 public class TokenizeResultFixture {
 
     public static TokenizeResult create() {

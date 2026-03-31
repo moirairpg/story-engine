@@ -3,7 +3,6 @@ package me.moirai.storyengine.core.application.command.chronicle;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -110,7 +109,7 @@ public class UpdateChronicleHandlerTest {
         var command = new UpdateChronicle(UUID.randomUUID());
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageReader.getAllActiveByAdventureId(anyLong())).thenReturn(List.of(
+        when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(List.of(
                 messageData(AiRole.USER),
                 messageData(AiRole.ASSISTANT),
                 messageData(AiRole.USER)));
@@ -138,7 +137,7 @@ public class UpdateChronicleHandlerTest {
         var command = new UpdateChronicle(UUID.randomUUID());
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageReader.getAllActiveByAdventureId(anyLong())).thenReturn(overflowingMessages(7));
+        when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(overflowingMessages(7));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
         when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -166,7 +165,7 @@ public class UpdateChronicleHandlerTest {
         var vector = new float[] { 0.1f, 0.2f };
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageReader.getAllActiveByAdventureId(anyLong())).thenReturn(overflowingMessages(7));
+        when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(overflowingMessages(7));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
         when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
         when(embeddingPort.embed(anyString())).thenReturn(vector);
@@ -192,7 +191,7 @@ public class UpdateChronicleHandlerTest {
         var command = new UpdateChronicle(UUID.randomUUID());
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageReader.getAllActiveByAdventureId(anyLong())).thenReturn(overflowingMessages(7));
+        when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(overflowingMessages(7));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
         when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -222,7 +221,7 @@ public class UpdateChronicleHandlerTest {
         var messages = overflowingMessages(8);
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageReader.getAllActiveByAdventureId(anyLong())).thenReturn(messages);
+        when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(messages);
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
         when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });

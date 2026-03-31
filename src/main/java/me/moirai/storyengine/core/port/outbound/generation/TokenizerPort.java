@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.port.outbound.generation;
 
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeResult;
 
 public interface TokenizerPort {
 

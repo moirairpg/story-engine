@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.query.slashcommand;
+package me.moirai.storyengine.core.application.query.tokenize;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeInput;
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeInput;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeResult;
 import me.moirai.storyengine.core.port.outbound.generation.TokenizerPort;
 
 @ExtendWith(MockitoExtension.class)

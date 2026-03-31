@@ -5,5 +5,5 @@ import java.util.UUID;
 
 public interface ChronicleSegmentReader {
     List<ChronicleSegmentData> getAllByIds(List<UUID> publicIds);
-    List<ChronicleSegmentData> getAllOrdered(Long adventureId);
+    List<ChronicleSegmentData> getAllOrdered(UUID adventurePublicId);
 }

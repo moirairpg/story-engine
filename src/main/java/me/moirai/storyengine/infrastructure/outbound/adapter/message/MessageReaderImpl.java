@@ -27,7 +27,8 @@ public class MessageReaderImpl implements MessageReader {
                    m.creation_date,
                    m.status
               FROM message m
-             WHERE m.adventure_id = :adventureId
+              JOIN adventure a ON m.adventure_id = a.id
+             WHERE a.public_id = :adventurePublicId
                AND m.status = 'ACTIVE'
              ORDER BY m.creation_date ASC
             """;
@@ -55,10 +56,10 @@ public class MessageReaderImpl implements MessageReader {
     }
 
     @Override
-    public List<MessageData> getAllActiveByAdventureId(Long adventureId) {
+    public List<MessageData> getAllActiveByAdventureId(UUID adventurePublicId) {
 
         return jdbcClient.sql(GET_ALL_ACTIVE_BY_ADVENTURE)
-                .param("adventureId", adventureId)
+                .param("adventurePublicId", adventurePublicId)
                 .query(toMessageData())
                 .list();
     }

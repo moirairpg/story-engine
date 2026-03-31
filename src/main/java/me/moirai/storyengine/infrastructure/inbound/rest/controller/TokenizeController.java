@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.web.SecurityContextAware;
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeInput;
-import me.moirai.storyengine.core.port.inbound.slashcommand.TokenizeResult;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeInput;
+import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeResult;
 
 @RestController
-@RequestMapping("/slash-command")
-@Tag(name = "Slash Commands", description = "Endpoints for MoirAI slash commands")
-public class SlashCommandController extends SecurityContextAware {
+@RequestMapping("/tokenize")
+@Tag(name = "Tokenize", description = "Endpoints for MoirAI tokenization")
+public class TokenizeController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
 
-    public SlashCommandController(QueryRunner queryRunner) {
+    public TokenizeController(QueryRunner queryRunner) {
         this.queryRunner = queryRunner;
     }
 
-    @GetMapping("/tokenize")
+    @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public TokenizeResult tokenize(@RequestParam(required = true) String input) {
 

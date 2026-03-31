@@ -30,7 +30,8 @@ public class ChronicleSegmentReaderImpl implements ChronicleSegmentReader {
                    cs.content,
                    cs.creation_date
               FROM chronicle_segment cs
-             WHERE cs.adventure_id = :adventureId
+              JOIN adventure a ON cs.adventure_id = a.id
+             WHERE a.public_id = :adventurePublicId
              ORDER BY cs.creation_date ASC
             """;
     //@formatter:on
@@ -57,10 +58,10 @@ public class ChronicleSegmentReaderImpl implements ChronicleSegmentReader {
     }
 
     @Override
-    public List<ChronicleSegmentData> getAllOrdered(Long adventureId) {
+    public List<ChronicleSegmentData> getAllOrdered(UUID adventurePublicId) {
 
         return jdbcClient.sql(GET_ALL_ORDERED)
-                .param("adventureId", adventureId)
+                .param("adventurePublicId", adventurePublicId)
                 .query(toChronicleSegmentData())
                 .list();
     }

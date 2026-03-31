@@ -10,8 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegmentFixture;
+import me.moirai.storyengine.core.domain.persona.Persona;
+import me.moirai.storyengine.core.domain.persona.PersonaFixture;
+import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
 
 public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrationTest {
@@ -41,10 +47,10 @@ public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrati
     public void shouldReturnEmptyListFromGetAllOrderedWhenNoSegmentsExist() {
 
         // Given
-        var adventureId = 999L;
+        var adventurePublicId = UUID.randomUUID();
 
         // When
-        var result = reader.getAllOrdered(adventureId);
+        var result = reader.getAllOrdered(adventurePublicId);
 
         // Then
         assertThat(result).isNotNull().isEmpty();
@@ -83,11 +89,19 @@ public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrati
     public void shouldReturnAllSegmentsOrderedByCreationDateAscending() {
 
         // Given
-        var first = insert(ChronicleSegmentFixture.chronicleSegment().content("First event").build(), ChronicleSegment.class);
-        var second = insert(ChronicleSegmentFixture.chronicleSegment().content("Second event").build(), ChronicleSegment.class);
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+        var insertedAdventure = insert(adventure, Adventure.class);
+
+        var first = insert(ChronicleSegmentFixture.chronicleSegment().adventureId(insertedAdventure.getId()).content("First event").build(), ChronicleSegment.class);
+        var second = insert(ChronicleSegmentFixture.chronicleSegment().adventureId(insertedAdventure.getId()).content("Second event").build(), ChronicleSegment.class);
 
         // When
-        var result = reader.getAllOrdered(1L);
+        var result = reader.getAllOrdered(insertedAdventure.getPublicId());
 
         // Then
         assertThat(result).isNotNull().hasSize(2);
