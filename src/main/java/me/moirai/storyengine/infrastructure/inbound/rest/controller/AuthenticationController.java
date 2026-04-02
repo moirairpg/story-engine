@@ -53,7 +53,6 @@ public class AuthenticationController extends SecurityContextAware {
     public AuthenticationController(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
             @Value("${moirai.discord.oauth.client-secret}") String clientSecret,
-            @Value("${moirai.discord.oauth.redirect-url}") String redirectUrl,
             @Value("${moirai.security.redirect-path.success}") String successPath,
             @Value("${moirai.security.redirect-path.fail}") String failPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
@@ -74,7 +73,8 @@ public class AuthenticationController extends SecurityContextAware {
     @GetMapping("/code")
     @ResponseStatus(code = HttpStatus.OK)
     public void codeExchange(
-            @RequestParam(required = false) String code,
+            @RequestParam(required = true) String code,
+            @RequestParam(name = "redirect_url", required = true) String redirectUrl,
             HttpServletResponse response) throws IOException {
 
         if (isBlank(code)) {
@@ -82,7 +82,7 @@ public class AuthenticationController extends SecurityContextAware {
             return;
         }
 
-        var query = new AuthenticateUser(code);
+        var query = new AuthenticateUser(code, redirectUrl);
         var authenticatedUser = commandRunner.run(query);
 
         handleSessionAuthentication(response, authenticatedUser, successPath);

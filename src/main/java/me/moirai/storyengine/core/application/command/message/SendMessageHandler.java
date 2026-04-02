@@ -29,15 +29,12 @@ import me.moirai.storyengine.core.port.inbound.message.SendMessage;
 import org.springframework.context.ApplicationEventPublisher;
 
 import me.moirai.storyengine.core.domain.chronicle.MessageWindowOverflowEvent;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
+import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
-import me.moirai.storyengine.core.port.outbound.message.MessageData;
-import me.moirai.storyengine.core.port.outbound.message.MessageReader;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
@@ -49,13 +46,11 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
     private final AdventureRepository adventureRepository;
     private final PersonaRepository personaRepository;
     private final MessageRepository messageRepository;
-    private final MessageReader messageReader;
     private final TextCompletionPort textCompletionPort;
     private final EmbeddingPort embeddingPort;
     private final LorebookVectorSearchPort vectorSearchPort;
-    private final AdventureLorebookReader lorebookReader;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
-    private final ChronicleSegmentReader chronicleSegmentReader;
+    private final ChronicleSegmentRepository chronicleSegmentRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final int messageWindowSize;
     private final int lorebookTopK;
@@ -65,13 +60,11 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
             AdventureRepository adventureRepository,
             PersonaRepository personaRepository,
             MessageRepository messageRepository,
-            MessageReader messageReader,
             TextCompletionPort textCompletionPort,
             EmbeddingPort embeddingPort,
             LorebookVectorSearchPort vectorSearchPort,
-            AdventureLorebookReader lorebookReader,
             ChronicleVectorSearchPort chronicleVectorSearchPort,
-            ChronicleSegmentReader chronicleSegmentReader,
+            ChronicleSegmentRepository chronicleSegmentRepository,
             ApplicationEventPublisher eventPublisher,
             @Value("${moirai.adventure.message-window-size}") int messageWindowSize,
             @Value("${moirai.rag.lorebook.top-k}") int lorebookTopK,
@@ -80,13 +73,11 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         this.adventureRepository = adventureRepository;
         this.personaRepository = personaRepository;
         this.messageRepository = messageRepository;
-        this.messageReader = messageReader;
         this.textCompletionPort = textCompletionPort;
         this.embeddingPort = embeddingPort;
         this.vectorSearchPort = vectorSearchPort;
-        this.lorebookReader = lorebookReader;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
-        this.chronicleSegmentReader = chronicleSegmentReader;
+        this.chronicleSegmentRepository = chronicleSegmentRepository;
         this.eventPublisher = eventPublisher;
         this.messageWindowSize = messageWindowSize;
         this.lorebookTopK = lorebookTopK;
@@ -128,7 +119,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
         messageRepository.save(playerMessage);
 
-        var history = messageReader.findActiveByAdventureId(adventure.getId(), messageWindowSize);
+        var history = messageRepository.findActiveByAdventureId(adventure.getId(), messageWindowSize);
 
         var personality = replacePersonaNamePlaceholderWith(persona.getName())
                 .apply(persona.getPersonality());
@@ -172,7 +163,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
     private List<ChatMessage> assembleContext(
             Adventure adventure,
-            List<MessageData> history,
+            List<Message> history,
             String currentMessage) {
 
         var context = new ArrayList<ChatMessage>();
@@ -180,7 +171,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
         var queryVector = embeddingPort.embed(currentMessage);
 
-        context.addAll(retrieveLorebookContext(adventure.getPublicId(), queryVector));
+        context.addAll(retrieveLorebookContext(adventure, queryVector));
         context.addAll(retrieveChronicleContext(adventure.getPublicId(), queryVector));
 
         context.addAll(interleaveBumps(
@@ -204,18 +195,17 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         return Collections.unmodifiableList(context);
     }
 
-    private List<ChatMessage> retrieveLorebookContext(UUID adventurePublicId, float[] queryVector) {
+    private List<ChatMessage> retrieveLorebookContext(Adventure adventure, float[] queryVector) {
 
-        var entryIds = vectorSearchPort.search(adventurePublicId, queryVector, lorebookTopK);
+        var entryIds = vectorSearchPort.search(adventure.getPublicId(), queryVector, lorebookTopK);
 
         if (entryIds.isEmpty()) {
             return List.of();
         }
 
-        var entries = lorebookReader.getAllByIds(entryIds);
-
-        return entries.stream()
-                .map(e -> ChatMessage.asSystem(e.name() + ": " + e.description()))
+        return adventure.getLorebook().stream()
+                .filter(e -> entryIds.contains(e.getPublicId()))
+                .map(e -> ChatMessage.asSystem(e.getName() + ": " + e.getDescription()))
                 .toList();
     }
 
@@ -227,10 +217,10 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
             return List.of();
         }
 
-        var segments = chronicleSegmentReader.getAllByIds(segmentIds);
+        var segments = chronicleSegmentRepository.getAllByIds(segmentIds);
 
         return segments.stream()
-                .map(s -> ChatMessage.asSystem(s.content()))
+                .map(s -> ChatMessage.asSystem(s.getContent()))
                 .toList();
     }
 
@@ -257,11 +247,11 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         return Collections.unmodifiableList(result);
     }
 
-    private ChatMessage toChatMessage(MessageData message) {
-        return switch (message.role()) {
-            case USER -> ChatMessage.asUser(message.content());
-            case ASSISTANT -> ChatMessage.asAssistant(message.content());
-            default -> throw new BusinessRuleViolationException("Unexpected role in message history: " + message.role());
+    private ChatMessage toChatMessage(Message message) {
+        return switch (message.getRole()) {
+            case USER -> ChatMessage.asUser(message.getContent());
+            case ASSISTANT -> ChatMessage.asAssistant(message.getContent());
+            default -> throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
         };
     }
 }

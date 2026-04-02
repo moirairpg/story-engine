@@ -30,22 +30,17 @@ import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
-import me.moirai.storyengine.core.domain.message.MessageStatus;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
-import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentData;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
+import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
-import me.moirai.storyengine.core.port.outbound.message.MessageData;
-import me.moirai.storyengine.core.port.outbound.message.MessageReader;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
@@ -64,9 +59,6 @@ public class SendMessageHandlerTest {
     private MessageRepository messageRepository;
 
     @Mock
-    private MessageReader messageReader;
-
-    @Mock
     private TextCompletionPort textCompletionPort;
 
     @Mock
@@ -76,13 +68,10 @@ public class SendMessageHandlerTest {
     private LorebookVectorSearchPort vectorSearchPort;
 
     @Mock
-    private AdventureLorebookReader lorebookReader;
-
-    @Mock
     private ChronicleVectorSearchPort chronicleVectorSearchPort;
 
     @Mock
-    private ChronicleSegmentReader chronicleSegmentReader;
+    private ChronicleSegmentRepository chronicleSegmentRepository;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -101,13 +90,11 @@ public class SendMessageHandlerTest {
                 adventureRepository,
                 personaRepository,
                 messageRepository,
-                messageReader,
                 textCompletionPort,
                 embeddingPort,
                 vectorSearchPort,
-                lorebookReader,
                 chronicleVectorSearchPort,
-                chronicleSegmentReader,
+                chronicleSegmentRepository,
                 eventPublisher,
                 10,
                 5,
@@ -170,7 +157,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -206,7 +193,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -238,25 +225,17 @@ public class SendMessageHandlerTest {
                 .build();
 
         var entryId = UUID.randomUUID();
-        var lorebookEntry = new AdventureLorebookEntryDetails(
-                entryId,
-                adventure.getPublicId(),
-                "Dragon",
-                "A fearsome dragon",
-                null,
-                false,
-                null,
-                null);
+        var lorebookEntry = adventure.addLorebookEntry("Dragon", "A fearsome dragon", null);
+        ReflectionTestUtils.setField(lorebookEntry, "publicId", entryId);
 
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of(entryId));
-        when(lorebookReader.getAllByIds(List.of(entryId))).thenReturn(List.of(lorebookEntry));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
 
         // when
@@ -290,7 +269,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -304,7 +283,7 @@ public class SendMessageHandlerTest {
     }
 
     @Test
-    public void shouldNotPrependLorebookEntriesWhenLorebookReaderReturnsEmptyList() {
+    public void shouldNotPrependLorebookEntriesWhenNoMatchingEntryInLorebook() {
 
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
@@ -327,10 +306,9 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of(entryId));
-        when(lorebookReader.getAllByIds(List.of(entryId))).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
 
         // when
@@ -386,7 +364,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -424,7 +402,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -457,18 +435,24 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var userMessageData = new MessageData(UUID.randomUUID(), AdventureFixture.NUMERIC_ID, "user",
-                AiRole.USER, "Aldric said: I look around.", null, MessageStatus.ACTIVE);
-        var assistantMessageData = new MessageData(UUID.randomUUID(), AdventureFixture.NUMERIC_ID, "system",
-                AiRole.ASSISTANT, "MoirAI said: You see a tavern.", null, MessageStatus.ACTIVE);
+        var userMessage = Message.builder()
+                .adventureId(AdventureFixture.NUMERIC_ID)
+                .role(AiRole.USER)
+                .content("Aldric said: I look around.")
+                .build();
+        var assistantMessage = Message.builder()
+                .adventureId(AdventureFixture.NUMERIC_ID)
+                .role(AiRole.ASSISTANT)
+                .content("MoirAI said: You see a tavern.")
+                .build();
 
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt()))
-                .thenReturn(List.of(userMessageData, assistantMessageData));
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt()))
+                .thenReturn(List.of(userMessage, assistantMessage));
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -508,7 +492,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -546,7 +530,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -584,7 +568,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -618,18 +602,21 @@ public class SendMessageHandlerTest {
                 .build();
 
         var segmentId = UUID.randomUUID();
-        var segmentData = new ChronicleSegmentData(segmentId, AdventureFixture.NUMERIC_ID, "The dragon was defeated.", null);
+        var segment = ChronicleSegment.builder()
+                .adventureId(AdventureFixture.NUMERIC_ID)
+                .content("The dragon was defeated.")
+                .build();
 
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(chronicleVectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of(segmentId));
-        when(chronicleSegmentReader.getAllByIds(List.of(segmentId))).thenReturn(List.of(segmentData));
+        when(chronicleSegmentRepository.getAllByIds(List.of(segmentId))).thenReturn(List.of(segment));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
 
         var captor = ArgumentCaptor.forClass(TextGenerationRequest.class);
@@ -665,7 +652,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(chronicleVectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
@@ -702,7 +689,7 @@ public class SendMessageHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageReader.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);

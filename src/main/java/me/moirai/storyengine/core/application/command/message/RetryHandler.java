@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -161,7 +162,11 @@ public class RetryHandler extends AbstractCommandHandler<Retry, MessageResult> {
         var context = new ArrayList<ChatMessage>();
         var contextAttributes = adventure.getContextAttributes();
 
-        var queryVector = embeddingPort.embed(currentMessage);
+        var queryText = history.stream()
+                .map(Message::getContent)
+                .collect(Collectors.joining(" ")) + " " + currentMessage;
+
+        var queryVector = embeddingPort.embed(queryText);
 
         context.addAll(retrieveLorebookContext(adventure, queryVector));
         context.addAll(retrieveChronicleContext(adventure.getPublicId(), queryVector));
@@ -242,7 +247,8 @@ public class RetryHandler extends AbstractCommandHandler<Retry, MessageResult> {
         return switch (message.getRole()) {
             case USER -> ChatMessage.asUser(message.getContent());
             case ASSISTANT -> ChatMessage.asAssistant(message.getContent());
-            default -> throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
+            default ->
+                throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
         };
     }
 }

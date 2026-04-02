@@ -35,8 +35,11 @@ public class AuthenticateUserHandlerTest {
     @BeforeEach
     public void before() {
 
-        handler = new AuthenticateUserHandler("/someuri", "/someuri",
-                "/someuri", repository, discordAuthenticationPort);
+        handler = new AuthenticateUserHandler(
+                "/someuri",
+                "/someuri",
+                repository,
+                discordAuthenticationPort);
     }
 
     @Test
@@ -44,8 +47,9 @@ public class AuthenticateUserHandlerTest {
 
         // Given
         String exchangeCode = null;
+        var redirectUrl = "/url";
         var expectedMessage = "Authentication code cannot be null";
-        var query = new AuthenticateUser(exchangeCode);
+        var query = new AuthenticateUser(exchangeCode, redirectUrl);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -58,7 +62,8 @@ public class AuthenticateUserHandlerTest {
 
         // Given
         var exchangeCode = "12345";
-        var query = new AuthenticateUser(exchangeCode);
+        var redirectUrl = "/url";
+        var query = new AuthenticateUser(exchangeCode, redirectUrl);
 
         var user = UserFixture.player().build();
 
@@ -97,7 +102,8 @@ public class AuthenticateUserHandlerTest {
 
         // Given
         var exchangeCode = "12345";
-        var query = new AuthenticateUser(exchangeCode);
+        var redirectUrl = "/url";
+        var query = new AuthenticateUser(exchangeCode, redirectUrl);
 
         var user = UserFixture.player().build();
 

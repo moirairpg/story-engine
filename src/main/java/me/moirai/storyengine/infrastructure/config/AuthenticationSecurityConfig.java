@@ -1,7 +1,5 @@
 package me.moirai.storyengine.infrastructure.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +49,7 @@ public class AuthenticationSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(unsecuredPaths).permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(withDefaults())
+                // .oauth2Login(withDefaults())
                 .anonymous(anonymous -> anonymous.disable())
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
