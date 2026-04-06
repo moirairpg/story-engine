@@ -68,7 +68,7 @@ public class CreateAdventureLorebookEntryHandler
                 .max(Comparator.comparing(AdventureLorebookEntry::getCreationDate))
                 .orElseThrow(() -> new NotFoundException(ADVENTURE_NOT_FOUND));
 
-        var vector = embeddingPort.embed(lorebookEntry.getDescription());
+        var vector = embeddingPort.embed(lorebookEntry.getName() + ": " + lorebookEntry.getDescription());
         vectorSearchPort.upsert(adventure.getPublicId(), savedEntry.getPublicId(), vector);
 
         return mapResult(adventure, savedEntry);

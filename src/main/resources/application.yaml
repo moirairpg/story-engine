@@ -22,11 +22,11 @@ moirai:
     port: ${QDRANT_PORT}
   rag:
     lorebook:
-      top-k: 5
+      top-k: 10
       collection-name: lorebook
       vector-size: 1536
     chronicle:
-      top-k: 3
+      top-k: 10
       collection-name: chronicle
       vector-size: 1536
   adventure:

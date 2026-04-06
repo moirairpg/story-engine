@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -154,10 +153,12 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
         var context = new ArrayList<ChatMessage>();
         var contextAttributes = adventure.getContextAttributes();
 
-        var queryText = history.stream()
-                .map(Message::getContent)
-                .collect(Collectors.joining(" ")) + " " + currentMessage;
+        var recentHistory = history.stream()
+                .skip(Math.max(0, history.size() - 10))
+                .map(this::toChatMessage)
+                .toList();
 
+        var queryText = buildRagQuery(recentHistory, currentMessage);
         var queryVector = embeddingPort.embed(queryText);
 
         context.addAll(retrieveLorebookContext(adventure, queryVector));
@@ -239,7 +240,38 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
         return switch (message.getRole()) {
             case USER -> ChatMessage.asUser(message.getContent());
             case ASSISTANT -> ChatMessage.asAssistant(message.getContent());
-            default -> throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
+            default ->
+                throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
         };
+    }
+
+    private String buildRagQuery(List<ChatMessage> recentHistory, String currentMessage) {
+
+        var primedMessages = new ArrayList<>(recentHistory);
+        primedMessages.add(ChatMessage.asUser(currentMessage));
+        primedMessages.add(ChatMessage.asAssistant("Location:"));
+
+        var ragQueryRequest = new TextGenerationRequest(
+                "gpt-4o-mini",
+                """
+                        You are a context extractor for a fantasy RPG. Extract key information from the conversation.
+                        Reply ONLY in this exact format, no extra text:
+
+                        Location: <current location>
+                        Characters: <comma-separated names>
+                        Factions: <comma-separated factions or guilds>
+                        Topics: <comma-separated themes, items, events>
+
+                        Example output:
+                        Location: College of Winterhold
+                        Characters: Faralda, Arch-Mage Savos Aren
+                        Factions: College of Winterhold, Synod
+                        Topics: magic, admission, ward spell, Winterhold
+                        """,
+                primedMessages,
+                100,
+                0.1);
+
+        return textCompletionPort.generateTextFrom(ragQueryRequest).getOutputText();
     }
 }

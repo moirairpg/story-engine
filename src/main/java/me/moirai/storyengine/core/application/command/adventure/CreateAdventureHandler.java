@@ -97,7 +97,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
         adventureRepository.save(adventure);
 
         adventure.getLorebook().forEach(entry -> {
-            var vector = embeddingPort.embed(entry.getDescription());
+            var vector = embeddingPort.embed(entry.getName() + ": " + entry.getDescription());
             vectorSearchPort.upsert(adventure.getPublicId(), entry.getPublicId(), vector);
         });
 

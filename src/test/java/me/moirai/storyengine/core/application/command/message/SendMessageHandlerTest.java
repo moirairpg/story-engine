@@ -463,8 +463,8 @@ public class SendMessageHandlerTest {
         handler.handle(command);
 
         // then
-        verify(textCompletionPort).generateTextFrom(captor.capture());
-        var messages = captor.getValue().messages();
+        verify(textCompletionPort, times(2)).generateTextFrom(captor.capture());
+        var messages = captor.getAllValues().get(1).messages();
         assertThat(messages).anySatisfy(m -> assertThat(m.content()).isEqualTo("Aldric said: I look around."));
         assertThat(messages).anySatisfy(m -> assertThat(m.content()).isEqualTo("MoirAI said: You see a tavern."));
     }
@@ -503,8 +503,8 @@ public class SendMessageHandlerTest {
         handler.handle(command);
 
         // then
-        verify(textCompletionPort).generateTextFrom(captor.capture());
-        assertThat(captor.getValue().instructions()).isEqualTo("I am MoirAI, a Discord chatbot");
+        verify(textCompletionPort, times(2)).generateTextFrom(captor.capture());
+        assertThat(captor.getAllValues().get(1).instructions()).isEqualTo("I am MoirAI, a Discord chatbot");
     }
 
     @Test
@@ -625,8 +625,8 @@ public class SendMessageHandlerTest {
         handler.handle(command);
 
         // then
-        verify(textCompletionPort).generateTextFrom(captor.capture());
-        assertThat(captor.getValue().messages()).anySatisfy(m -> assertThat(m.content()).isEqualTo("The dragon was defeated."));
+        verify(textCompletionPort, times(2)).generateTextFrom(captor.capture());
+        assertThat(captor.getAllValues().get(1).messages()).anySatisfy(m -> assertThat(m.content()).isEqualTo("The dragon was defeated."));
     }
 
     @Test

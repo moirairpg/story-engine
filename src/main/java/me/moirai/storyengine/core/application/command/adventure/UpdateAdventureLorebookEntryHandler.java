@@ -67,7 +67,7 @@ public class UpdateAdventureLorebookEntryHandler
 
         repository.save(adventure);
 
-        var vector = embeddingPort.embed(lorebookEntry.getDescription());
+        var vector = embeddingPort.embed(lorebookEntry.getName() + ": " + lorebookEntry.getDescription());
         vectorSearchPort.upsert(adventure.getPublicId(), lorebookEntry.getPublicId(), vector);
 
         return toResult(adventure, lorebookEntry);
