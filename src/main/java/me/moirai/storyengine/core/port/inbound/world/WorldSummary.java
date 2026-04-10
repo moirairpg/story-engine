@@ -8,4 +8,5 @@ public record WorldSummary(
         String name,
         String description,
         String visibility,
-        Instant creationDate) {}
+        Instant creationDate,
+        boolean canWrite) {}

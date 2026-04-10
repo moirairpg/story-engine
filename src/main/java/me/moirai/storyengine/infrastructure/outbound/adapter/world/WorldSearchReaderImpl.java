@@ -14,8 +14,8 @@ import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.WorldSortField;
-import me.moirai.storyengine.core.port.inbound.world.WorldSummary;
 import me.moirai.storyengine.core.port.outbound.world.WorldSearchReader;
+import me.moirai.storyengine.core.port.outbound.world.WorldSearchRow;
 
 @Repository
 public class WorldSearchReaderImpl implements WorldSearchReader {
@@ -26,8 +26,10 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
                    w.name,
                    w.description,
                    w.visibility,
-                   w.creation_date
+                   w.creation_date,
+                   wp_me.permission AS user_permission
               FROM world w
+              LEFT JOIN world_permissions wp_me ON wp_me.world_id = w.id AND wp_me.user_id = :requesterId
             """;
     //@formatter:on
 
@@ -38,7 +40,7 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
     }
 
     @Override
-    public PaginatedResult<WorldSummary> search(SearchWorlds query) {
+    public PaginatedResult<WorldSearchRow> search(SearchWorlds query) {
 
         var pq = PaginatedQuery.builder()
                 .select(SELECT_SQL)
@@ -48,13 +50,19 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
                 .page(query.page(), query.size())
                 .build();
 
+        var params = pq.parameters();
+        params.put("requesterId", query.requesterId());
+
+        var countParams = pq.countParameters();
+        countParams.put("requesterId", query.requesterId());
+
         var data = jdbcClient.sql(pq.sql())
-                .params(pq.parameters())
-                .query(toWorldSummary())
+                .params(params)
+                .query(toWorldSearchRow())
                 .list();
 
         var totalItems = jdbcClient.sql(pq.countSql())
-                .params(pq.countParameters())
+                .params(countParams)
                 .query(Long.class)
                 .single();
 
@@ -81,12 +89,13 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
         };
     }
 
-    private RowMapper<WorldSummary> toWorldSummary() {
-        return (rs, _) -> new WorldSummary(
+    private RowMapper<WorldSearchRow> toWorldSearchRow() {
+        return (rs, _) -> new WorldSearchRow(
                 UUID.fromString(rs.getString("public_id")),
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getString("visibility"),
-                rs.getTimestamp("creation_date").toInstant());
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getString("user_permission"));
     }
 }

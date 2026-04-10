@@ -15,7 +15,7 @@ import me.moirai.storyengine.core.port.outbound.world.WorldSearchReader;
 
 public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTest {
 
-    private static final Long OWNER_ID = 586678721356875L;
+    private static final Long OWNER_ID = WorldFixture.OWNER_ID;
 
     @Autowired
     private WorldSearchReader reader;
@@ -91,5 +91,37 @@ public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result).isNotNull();
         assertThat(result.items()).isEqualTo(1);
         assertThat(result.data().get(0).name()).isEqualTo("MoirAI");
+    }
+
+    @Test
+    public void search_whenUserIsOwner_thenUserPermissionIsOwner() {
+
+        // Given
+        insert(WorldFixture.publicWorld().build(), World.class);
+
+        var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+
+        // When
+        var result = reader.search(query);
+
+        // Then
+        assertThat(result.data()).hasSize(1);
+        assertThat(result.data().get(0).userPermission()).isEqualTo("OWNER");
+    }
+
+    @Test
+    public void search_whenUserHasNoPermission_thenUserPermissionIsNull() {
+
+        // Given
+        insert(WorldFixture.publicWorld().build(), World.class);
+
+        var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, null, null, 999999L);
+
+        // When
+        var result = reader.search(query);
+
+        // Then
+        assertThat(result.data()).hasSize(1);
+        assertThat(result.data().get(0).userPermission()).isNull();
     }
 }

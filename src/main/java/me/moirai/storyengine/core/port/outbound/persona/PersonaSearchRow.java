@@ -1,12 +1,13 @@
-package me.moirai.storyengine.core.port.inbound.persona;
+package me.moirai.storyengine.core.port.outbound.persona;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record PersonaSummary(
+public record PersonaSearchRow(
         UUID id,
         String name,
         String personality,
         String visibility,
         Instant creationDate,
-        boolean canWrite) {}
+        String userPermission) {
+}

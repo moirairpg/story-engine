@@ -1,9 +1,9 @@
-package me.moirai.storyengine.core.port.inbound.adventure;
+package me.moirai.storyengine.core.port.outbound.adventure;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record AdventureSummary(
+public record AdventureSearchRow(
         UUID id,
         String name,
         String description,
@@ -11,5 +11,5 @@ public record AdventureSummary(
         String personaName,
         String visibility,
         Instant creationDate,
-        boolean canWrite) {
+        String userPermission) {
 }

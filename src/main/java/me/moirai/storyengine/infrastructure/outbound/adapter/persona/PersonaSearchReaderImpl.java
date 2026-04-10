@@ -13,9 +13,9 @@ import me.moirai.storyengine.common.dbutil.PaginatedQuery;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.persona.PersonaSortField;
-import me.moirai.storyengine.core.port.inbound.persona.PersonaSummary;
 import me.moirai.storyengine.core.port.inbound.persona.SearchPersonas;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaSearchReader;
+import me.moirai.storyengine.core.port.outbound.persona.PersonaSearchRow;
 
 @Repository
 public class PersonaSearchReaderImpl implements PersonaSearchReader {
@@ -26,8 +26,10 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
                    p.name,
                    p.personality,
                    p.visibility,
-                   p.creation_date
+                   p.creation_date,
+                   pp_me.permission AS user_permission
               FROM persona p
+              LEFT JOIN persona_permissions pp_me ON pp_me.persona_id = p.id AND pp_me.user_id = :requesterId
             """;
     //@formatter:on
 
@@ -38,7 +40,7 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
     }
 
     @Override
-    public PaginatedResult<PersonaSummary> search(SearchPersonas query) {
+    public PaginatedResult<PersonaSearchRow> search(SearchPersonas query) {
 
         var pq = PaginatedQuery.builder()
                 .select(SELECT_SQL)
@@ -48,13 +50,19 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
                 .page(query.page(), query.size())
                 .build();
 
+        var params = pq.parameters();
+        params.put("requesterId", query.requesterId());
+
+        var countParams = pq.countParameters();
+        countParams.put("requesterId", query.requesterId());
+
         var data = jdbcClient.sql(pq.sql())
-                .params(pq.parameters())
-                .query(toPersonaSummary())
+                .params(params)
+                .query(toPersonaSearchRow())
                 .list();
 
         var totalItems = jdbcClient.sql(pq.countSql())
-                .params(pq.countParameters())
+                .params(countParams)
                 .query(Long.class)
                 .single();
 
@@ -81,12 +89,13 @@ public class PersonaSearchReaderImpl implements PersonaSearchReader {
         };
     }
 
-    private RowMapper<PersonaSummary> toPersonaSummary() {
-        return (rs, _) -> new PersonaSummary(
+    private RowMapper<PersonaSearchRow> toPersonaSearchRow() {
+        return (rs, _) -> new PersonaSearchRow(
                 UUID.fromString(rs.getString("public_id")),
                 rs.getString("name"),
                 rs.getString("personality"),
                 rs.getString("visibility"),
-                rs.getTimestamp("creation_date").toInstant());
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getString("user_permission"));
     }
 }

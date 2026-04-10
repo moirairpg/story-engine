@@ -19,7 +19,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchReader;
 
 public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegrationTest {
 
-    private static final Long OWNER_ID = 586678721356875L;
+    private static final Long OWNER_ID = AdventureFixture.OWNER_ID;
 
     @Autowired
     private AdventureSearchReader reader;
@@ -117,5 +117,53 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
         assertThat(result).isNotNull();
         assertThat(result.items()).isEqualTo(1);
         assertThat(result.data().get(0).name()).isEqualTo("Name");
+    }
+
+    @Test
+    public void search_whenUserIsOwner_thenUserPermissionIsOwner() {
+
+        // Given
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.publicSingleplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+
+        insert(adventure, Adventure.class);
+
+        var query = new SearchAdventures(null, null, null, null, null, null, null,
+                SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+
+        // When
+        var result = reader.search(query);
+
+        // Then
+        assertThat(result.data()).hasSize(1);
+        assertThat(result.data().get(0).userPermission()).isEqualTo("OWNER");
+    }
+
+    @Test
+    public void search_whenUserHasNoPermission_thenUserPermissionIsNull() {
+
+        // Given
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.publicSingleplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+
+        insert(adventure, Adventure.class);
+
+        var query = new SearchAdventures(null, null, null, null, null, null, null,
+                SearchView.EXPLORE, null, null, null, null, 999999L);
+
+        // When
+        var result = reader.search(query);
+
+        // Then
+        assertThat(result.data()).hasSize(1);
+        assertThat(result.data().get(0).userPermission()).isNull();
     }
 }

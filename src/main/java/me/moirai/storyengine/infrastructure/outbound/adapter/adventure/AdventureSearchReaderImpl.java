@@ -13,9 +13,9 @@ import me.moirai.storyengine.common.dbutil.PaginatedQuery;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchReader;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchRow;
 
 @Repository
 public class AdventureSearchReaderImpl implements AdventureSearchReader {
@@ -28,10 +28,12 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                     w.name    AS world_name,
                     p.name    AS persona_name,
                     a.visibility,
-                    a.creation_date
+                    a.creation_date,
+                    ap_me.permission AS user_permission
                FROM adventure a
-               JOIN world   w ON a.world_id   = w.id
+               LEFT JOIN world   w ON a.world_id   = w.id
                JOIN persona p ON a.persona_id = p.id
+               LEFT JOIN adventure_permissions ap_me ON ap_me.adventure_id = a.id AND ap_me.user_id = :requesterId
             """;
     //@formatter:on
 
@@ -42,7 +44,7 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
     }
 
     @Override
-    public PaginatedResult<AdventureSummary> search(SearchAdventures query) {
+    public PaginatedResult<AdventureSearchRow> search(SearchAdventures query) {
 
         var pq = PaginatedQuery.builder()
                 .select(SELECT_SQL)
@@ -58,13 +60,19 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 .page(query.page(), query.size())
                 .build();
 
+        var params = pq.parameters();
+        params.put("requesterId", query.requesterId());
+
+        var countParams = pq.countParameters();
+        countParams.put("requesterId", query.requesterId());
+
         var data = jdbcClient.sql(pq.sql())
-                .params(pq.parameters())
-                .query(toAdventureSummary())
+                .params(params)
+                .query(toAdventureSearchRow())
                 .list();
 
         var totalItems = jdbcClient.sql(pq.countSql())
-                .params(pq.countParameters())
+                .params(countParams)
                 .query(Long.class)
                 .single();
 
@@ -94,14 +102,15 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
         };
     }
 
-    private RowMapper<AdventureSummary> toAdventureSummary() {
-        return (rs, _) -> new AdventureSummary(
+    private RowMapper<AdventureSearchRow> toAdventureSearchRow() {
+        return (rs, _) -> new AdventureSearchRow(
                 UUID.fromString(rs.getString("public_id")),
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getString("world_name"),
                 rs.getString("persona_name"),
                 rs.getString("visibility"),
-                rs.getTimestamp("creation_date").toInstant());
+                rs.getTimestamp("creation_date").toInstant(),
+                rs.getString("user_permission"));
     }
 }
