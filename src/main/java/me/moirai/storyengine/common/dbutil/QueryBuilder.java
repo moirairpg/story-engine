@@ -6,20 +6,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import me.moirai.storyengine.common.enums.SortDirection;
+
 public class QueryBuilder {
 
     private final String selectClause;
     private final List<Filter> filters;
+    private final String sortField;
+    private final SortDirection sortDirection;
+    private final Integer limit;
 
-    private QueryBuilder(String selectClause, List<Filter> filters) {
+    private QueryBuilder(String selectClause, List<Filter> filters, String sortField, SortDirection sortDirection, Integer limit) {
         this.selectClause = selectClause;
         this.filters = filters;
+        this.sortField = sortField;
+        this.sortDirection = sortDirection;
+        this.limit = limit;
     }
 
     public String sql() {
 
         var sb = new StringBuilder(selectClause);
         appendWhereClause(sb);
+
+        if (sortField != null) {
+            sb.append(" ORDER BY ").append(sortField).append(" ").append(sortDirection.name());
+        }
+
+        if (limit != null) {
+            sb.append(" LIMIT ").append(limit);
+        }
 
         return sb.toString();
     }
@@ -68,6 +84,9 @@ public class QueryBuilder {
 
         private String selectClause;
         private final List<Filter> filters = new ArrayList<>();
+        private String sortField;
+        private SortDirection sortDirection;
+        private Integer limit;
 
         public Builder select(String selectClause) {
             this.selectClause = selectClause;
@@ -84,8 +103,19 @@ public class QueryBuilder {
             return this;
         }
 
+        public Builder sortBy(String sortField, SortDirection direction) {
+            this.sortField = sortField;
+            this.sortDirection = direction;
+            return this;
+        }
+
+        public Builder limit(int size) {
+            this.limit = size;
+            return this;
+        }
+
         public QueryBuilder build() {
-            return new QueryBuilder(selectClause, List.copyOf(filters));
+            return new QueryBuilder(selectClause, List.copyOf(filters), sortField, sortDirection, limit);
         }
     }
 }

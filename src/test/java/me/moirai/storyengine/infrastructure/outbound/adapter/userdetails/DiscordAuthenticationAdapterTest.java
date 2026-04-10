@@ -118,7 +118,7 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         prepareWebserverFor(response, 200);
 
         // When
-        var result = adapter.retrieveLoggedUser(token);
+        var result = adapter.getLoggedUser(token);
 
         // Then
         assertThat(result).isNotNull();

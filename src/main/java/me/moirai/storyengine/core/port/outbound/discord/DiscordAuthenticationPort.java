@@ -8,7 +8,7 @@ public interface DiscordAuthenticationPort {
 
     AuthenticateUserResult refreshSessionToken(RefreshSessionTokenRequest request);
 
-    DiscordUserDataResponse retrieveLoggedUser(String token);
+    DiscordUserDataResponse getLoggedUser(String token);
 
     void logout(String clientId, String clientSecret, String token, String tokenTypeHint);
 }

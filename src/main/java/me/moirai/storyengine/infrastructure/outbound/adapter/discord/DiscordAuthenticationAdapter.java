@@ -68,7 +68,7 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
     }
 
     @Override
-    public DiscordUserDataResponse retrieveLoggedUser(String token) {
+    public DiscordUserDataResponse getLoggedUser(String token) {
 
         return discordClient.get()
                 .uri(format(usersUri, "@me"))

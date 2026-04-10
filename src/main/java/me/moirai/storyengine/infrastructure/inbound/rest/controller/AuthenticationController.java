@@ -25,7 +25,7 @@ import me.moirai.storyengine.common.security.authentication.MoiraiCookie;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUser;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResult;
-import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetAuthenticatedUserDetails;
 import me.moirai.storyengine.core.port.inbound.userdetails.RefreshSessionToken;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
@@ -74,7 +74,6 @@ public class AuthenticationController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.OK)
     public void codeExchange(
             @RequestParam(required = true) String code,
-            @RequestParam(name = "redirect_url", required = true) String redirectUrl,
             HttpServletResponse response) throws IOException {
 
         if (isBlank(code)) {
@@ -82,7 +81,7 @@ public class AuthenticationController extends SecurityContextAware {
             return;
         }
 
-        var query = new AuthenticateUser(code, redirectUrl);
+        var query = new AuthenticateUser(code);
         var authenticatedUser = commandRunner.run(query);
 
         handleSessionAuthentication(response, authenticatedUser, successPath);
@@ -112,9 +111,7 @@ public class AuthenticationController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.OK)
     public UserDetailsResult getAuthenticatedUserDetails() {
 
-        var query = new GetUserDetailsById(
-                getAuthenticatedUser().publicId(),
-                getAuthenticatedUser().authorizationToken());
+        var query = new GetAuthenticatedUserDetails(getAuthenticatedUser().authorizationToken());
 
         return queryRunner.run(query);
     }

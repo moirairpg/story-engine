@@ -23,6 +23,7 @@ import jakarta.validation.Valid;
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.dto.CursorResult;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.SearchView;
@@ -242,12 +243,12 @@ public class AdventureController extends SecurityContextAware {
     @GetMapping("/{adventureId}/messages")
     @ResponseStatus(code = HttpStatus.OK)
     @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
-    public PaginatedResult<MessageSummary> getMessages(
+    public CursorResult<MessageSummary> getMessages(
             @PathVariable UUID adventureId,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) UUID lastMessageId,
+            @RequestParam int size) {
 
-        return queryRunner.run(new SearchAdventureMessages(adventureId, page, size));
+        return queryRunner.run(new SearchAdventureMessages(adventureId, lastMessageId, size));
     }
 
     @GetMapping("/{adventureId}/catchup")

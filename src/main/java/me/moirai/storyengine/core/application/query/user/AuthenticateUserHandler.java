@@ -23,17 +23,20 @@ public class AuthenticateUserHandler extends AbstractCommandHandler<Authenticate
 
     private final String clientId;
     private final String clientSecret;
+    private final String redirectUri;
     private final UserRepository repository;
     private final DiscordAuthenticationPort discordAuthenticationPort;
 
     public AuthenticateUserHandler(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
             @Value("${moirai.discord.oauth.client-secret}") String clientSecret,
+            @Value("${moirai.discord.oauth.redirect-url}") String redirectUri,
             UserRepository repository,
             DiscordAuthenticationPort discordAuthenticationPort) {
 
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.redirectUri = redirectUri;
         this.repository = repository;
         this.discordAuthenticationPort = discordAuthenticationPort;
     }
@@ -61,7 +64,7 @@ public class AuthenticateUserHandler extends AbstractCommandHandler<Authenticate
                 .code(useCase.authenticationCode())
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .redirectUri(useCase.redirectUrl())
+                .redirectUri(redirectUri)
                 .scope(DISCORD_SCOPE)
                 .grantType(DISCORD_GRANT_TYPE)
                 .build();
@@ -69,7 +72,7 @@ public class AuthenticateUserHandler extends AbstractCommandHandler<Authenticate
 
     private AuthenticateUserResult createUserIfNotExists(AuthenticateUserResult authenticateUserResult) {
 
-        var discordUserDetails = discordAuthenticationPort.retrieveLoggedUser(authenticateUserResult.accessToken());
+        var discordUserDetails = discordAuthenticationPort.getLoggedUser(authenticateUserResult.accessToken());
 
         repository.findByDiscordId(discordUserDetails.id())
                 .orElseGet(() -> createUser(discordUserDetails));

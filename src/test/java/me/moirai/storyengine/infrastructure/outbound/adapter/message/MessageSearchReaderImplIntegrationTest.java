@@ -32,30 +32,31 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     @Test
     public void shouldReturnEmptyResultWhenNoMessages() {
 
-        // Given
+        // given
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getId())
                 .personaId(persona.getId())
                 .build();
+
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventureMessages(adventure.getPublicId(), null, null);
+        var query = new SearchAdventureMessages(adventure.getPublicId(), null, 10);
 
-        // When
+        // when
         var result = reader.search(query);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
-        assertThat(result.totalItems()).isEqualTo(0);
         assertThat(result.data()).isEmpty();
+        assertThat(result.hasMore()).isFalse();
     }
 
     @Test
-    public void shouldReturnPagedMessages() {
+    public void shouldReturnHasMoreFalseWhenFewerMessagesThanSize() {
 
-        // Given
+        // given
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
@@ -64,26 +65,131 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
-        var userMsg = MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build();
-        var assistantMsg = MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build();
-        insert(userMsg, Message.class);
-        insert(assistantMsg, Message.class);
+        insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
 
-        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), 1, 10);
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), null, 10);
 
-        // When
+        // when
         var result = reader.search(query);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
-        assertThat(result.totalItems()).isEqualTo(2);
         assertThat(result.data()).hasSize(2);
+        assertThat(result.hasMore()).isFalse();
+    }
+
+    @Test
+    public void shouldReturnHasMoreTrueWhenExactlyAsManyMessagesAsSize() {
+
+        // given
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+        var insertedAdventure = insert(adventure, Adventure.class);
+
+        insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), null, 2);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.data()).hasSize(2);
+        assertThat(result.hasMore()).isTrue();
+    }
+
+    @Test
+    public void shouldReturnHasMoreTrueAndLimitResultsWhenMoreMessagesThanSize() {
+
+        // given
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+        var insertedAdventure = insert(adventure, Adventure.class);
+
+        insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), null, 2);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.data()).hasSize(2);
+        assertThat(result.hasMore()).isTrue();
+    }
+
+    @Test
+    public void shouldReturnOnlyMessagesOlderThanCursor() {
+
+        // given
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+        var insertedAdventure = insert(adventure, Adventure.class);
+
+        var first = insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        var second = insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), second.getPublicId(), 10);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.data()).hasSize(1);
+        assertThat(result.data().get(0).id()).isEqualTo(first.getPublicId());
+        assertThat(result.hasMore()).isFalse();
+    }
+
+    @Test
+    public void shouldReturnEmptyWhenCursorIsOlderThanAllMessages() {
+
+        // given
+        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
+                .worldId(world.getId())
+                .personaId(persona.getId())
+                .build();
+        var insertedAdventure = insert(adventure, Adventure.class);
+
+        var first = insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), first.getPublicId(), 10);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.data()).isEmpty();
+        assertThat(result.hasMore()).isFalse();
     }
 
     @Test
     public void shouldReturnBothActiveAndChronicledMessages() {
 
-        // Given
+        // given
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
@@ -98,23 +204,22 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
         insert(activeMsg, Message.class);
         insert(chronicledMsg, Message.class);
 
-        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), 1, 10);
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), null, 10);
 
-        // When
+        // when
         var result = reader.search(query);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
-        assertThat(result.totalItems()).isEqualTo(2);
         assertThat(result.data()).hasSize(2);
         assertThat(result.data()).anyMatch(m -> m.status() == MessageStatus.ACTIVE);
         assertThat(result.data()).anyMatch(m -> m.status() == MessageStatus.CHRONICLED);
     }
 
     @Test
-    public void shouldSortByCreationDateDescending() {
+    public void shouldSortByPublicIdDescending() {
 
-        // Given
+        // given
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
@@ -126,12 +231,12 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
         var first = insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
         var second = insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
 
-        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), 1, 10);
+        var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), null, 10);
 
-        // When
+        // when
         var result = reader.search(query);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.data()).hasSize(2);
         assertThat(result.data().get(0).id()).isEqualTo(second.getPublicId());

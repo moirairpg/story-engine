@@ -1,17 +1,15 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.message;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.common.dbutil.Filter;
 import me.moirai.storyengine.common.dbutil.Filters;
-import me.moirai.storyengine.common.dbutil.PaginatedQuery;
-import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.dbutil.QueryBuilder;
+import me.moirai.storyengine.common.dto.CursorResult;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
@@ -41,27 +39,23 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
     }
 
     @Override
-    public PaginatedResult<MessageSummary> search(SearchAdventureMessages query) {
+    public CursorResult<MessageSummary> search(SearchAdventureMessages query) {
 
-        var pq = PaginatedQuery.builder()
+        var built = QueryBuilder.builder()
                 .select(SELECT_SQL)
-                .filter(Optional.of(new Filter("a.public_id = :adventurePublicId", "adventurePublicId", query.adventureId())))
+                .filter(Filters.equals("a.public_id", "adventurePublicId", query.adventureId()))
                 .filter(Filters.in("m.status", "status", List.of(MessageStatus.ACTIVE.name(), MessageStatus.CHRONICLED.name())))
-                .sortBy("m.creation_date", SortDirection.DESC)
-                .page(query.page(), query.size())
+                .filter(Filters.lowerThan("m.public_id", "lastMessageId", query.lastMessageId()))
+                .sortBy("m.public_id", SortDirection.DESC)
+                .limit(query.size())
                 .build();
 
-        var data = jdbcClient.sql(pq.sql())
-                .params(pq.parameters())
+        var data = jdbcClient.sql(built.sql())
+                .params(built.parameters())
                 .query(toMessageSummary())
                 .list();
 
-        var totalItems = jdbcClient.sql(pq.countSql())
-                .params(pq.countParameters())
-                .query(Long.class)
-                .single();
-
-        return PaginatedResult.of(data, totalItems, pq.page(), pq.size());
+        return CursorResult.of(data, query.size());
     }
 
     private RowMapper<MessageSummary> toMessageSummary() {

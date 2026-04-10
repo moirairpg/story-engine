@@ -53,7 +53,7 @@ public class MoiraiUserDetailsServiceTest {
 
         var userData = new UserData(publicId, 1L, "12345", Role.PLAYER, Instant.now());
 
-        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(response);
+        when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(response);
         when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
 
         // When

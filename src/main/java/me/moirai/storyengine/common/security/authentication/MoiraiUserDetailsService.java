@@ -30,7 +30,7 @@ public class MoiraiUserDetailsService implements UserDetailsService {
 
         var authorizationToken = tokenCluster.split(" / ")[0];
         var refreshToken = tokenCluster.split(" / ")[1];
-        var loggedUser = discordAuthenticationPort.retrieveLoggedUser(authorizationToken);
+        var loggedUser = discordAuthenticationPort.getLoggedUser(authorizationToken);
 
         return getUserDetails(loggedUser, authorizationToken, refreshToken);
     }

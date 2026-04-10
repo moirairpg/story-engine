@@ -38,6 +38,7 @@ public class AuthenticateUserHandlerTest {
         handler = new AuthenticateUserHandler(
                 "/someuri",
                 "/someuri",
+                "/someuri",
                 repository,
                 discordAuthenticationPort);
     }
@@ -47,9 +48,8 @@ public class AuthenticateUserHandlerTest {
 
         // Given
         String exchangeCode = null;
-        var redirectUrl = "/url";
         var expectedMessage = "Authentication code cannot be null";
-        var query = new AuthenticateUser(exchangeCode, redirectUrl);
+        var query = new AuthenticateUser(exchangeCode);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -62,8 +62,7 @@ public class AuthenticateUserHandlerTest {
 
         // Given
         var exchangeCode = "12345";
-        var redirectUrl = "/url";
-        var query = new AuthenticateUser(exchangeCode, redirectUrl);
+        var query = new AuthenticateUser(exchangeCode);
 
         var user = UserFixture.player().build();
 
@@ -83,7 +82,7 @@ public class AuthenticateUserHandlerTest {
                 "type");
 
         when(discordAuthenticationPort.authenticate(any())).thenReturn(authResult);
-        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(discordUserData);
+        when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(discordUserData);
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
 
         // When
@@ -102,8 +101,7 @@ public class AuthenticateUserHandlerTest {
 
         // Given
         var exchangeCode = "12345";
-        var redirectUrl = "/url";
-        var query = new AuthenticateUser(exchangeCode, redirectUrl);
+        var query = new AuthenticateUser(exchangeCode);
 
         var user = UserFixture.player().build();
 
@@ -123,7 +121,7 @@ public class AuthenticateUserHandlerTest {
                 "type");
 
         when(discordAuthenticationPort.authenticate(any())).thenReturn(authResult);
-        when(discordAuthenticationPort.retrieveLoggedUser(anyString())).thenReturn(discordUserData);
+        when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(discordUserData);
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.empty());
         when(repository.save(any())).thenReturn(user);
 

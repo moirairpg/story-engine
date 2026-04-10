@@ -3,6 +3,7 @@ moirai:
     oauth:
       client-id: ${DISCORD_BOT_CLIENT_ID}
       client-secret: ${DISCORD_BOT_CLIENT_SECRET}
+      redirect-url: ${DISCORD_BOT_REDIRECT_URL}
     api:
       base-url: https://discord.com/api
       token-uri: /oauth2/token
