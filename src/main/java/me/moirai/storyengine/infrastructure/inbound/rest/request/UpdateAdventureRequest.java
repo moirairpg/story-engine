@@ -10,11 +10,9 @@ import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
 
-// TODO enrich to make world optional
 public record UpdateAdventureRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
         @Moderated String description,
-        @NotNull(message = "cannot be null") UUID worldId,
         @NotNull(message = "cannot be null") UUID personaId,
         @NotNull(message = "cannot be empty") Visibility visibility,
         @NotNull(message = "cannot be empty") Moderation moderation,

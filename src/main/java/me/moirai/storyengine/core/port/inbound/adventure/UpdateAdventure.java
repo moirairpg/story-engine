@@ -13,7 +13,6 @@ public record UpdateAdventure(
         String description,
         String adventureStart,
         String name,
-        UUID worldId,
         UUID personaId,
         Visibility visibility,
         Moderation moderation,

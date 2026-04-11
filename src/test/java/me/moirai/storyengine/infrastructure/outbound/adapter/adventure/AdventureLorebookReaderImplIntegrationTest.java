@@ -51,7 +51,7 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 
@@ -96,7 +96,7 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 
@@ -124,7 +124,7 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 

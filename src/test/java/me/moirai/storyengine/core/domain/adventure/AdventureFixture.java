@@ -22,7 +22,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(1L);
+        builder.worldId(UUID.randomUUID());
         builder.personaId(1L);
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
@@ -40,7 +40,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(1L);
+        builder.worldId(UUID.randomUUID());
         builder.personaId(1L);
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
@@ -58,7 +58,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(1L);
+        builder.worldId(UUID.randomUUID());
         builder.personaId(1L);
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
@@ -76,7 +76,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(1L);
+        builder.worldId(UUID.randomUUID());
         builder.personaId(1L);
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));

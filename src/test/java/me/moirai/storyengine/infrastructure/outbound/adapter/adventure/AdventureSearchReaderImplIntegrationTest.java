@@ -36,7 +36,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.publicSingleplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 
@@ -61,7 +61,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.publicSingleplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
         insert(adventure, Adventure.class);
@@ -101,7 +101,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.publicSingleplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 
@@ -126,7 +126,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.publicSingleplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 
@@ -150,7 +150,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
         var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.publicSingleplayerAdventure()
-                .worldId(world.getId())
+                .worldId(world.getPublicId())
                 .personaId(persona.getId())
                 .build();
 

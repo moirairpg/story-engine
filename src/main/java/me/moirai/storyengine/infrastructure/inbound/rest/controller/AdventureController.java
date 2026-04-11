@@ -32,6 +32,7 @@ import me.moirai.storyengine.common.security.authorization.AuthorizationOperatio
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureCatchUp;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
 import me.moirai.storyengine.core.port.inbound.adventure.CatchUpResult;
 import me.moirai.storyengine.core.port.inbound.adventure.MessageSummary;
@@ -131,6 +132,10 @@ public class AdventureController extends SecurityContextAware {
                 .map(p -> new PermissionDto(p.userId(), p.level()))
                 .collect(Collectors.toSet());
 
+        var lorebookEntries = emptyIfNull(request.lorebookEntries()).stream()
+                .map(e -> new AdventureLorebookEntryDetails(null, null, e.name(), e.description(), e.playerId(), false, null, null))
+                .collect(Collectors.toSet());
+
         var command = new CreateAdventure(
                 request.name(),
                 request.description(),
@@ -139,6 +144,8 @@ public class AdventureController extends SecurityContextAware {
                 request.visibility(),
                 request.moderation(),
                 request.isMultiplayer(),
+                request.adventureStart(),
+                lorebookEntries,
                 permissions,
                 new ModelConfigurationDto(
                         request.modelConfiguration().aiModel(),
@@ -170,7 +177,6 @@ public class AdventureController extends SecurityContextAware {
                 request.description(),
                 request.adventureStart(),
                 request.name(),
-                request.worldId(),
                 request.personaId(),
                 request.visibility(),
                 request.moderation(),

@@ -23,15 +23,12 @@ import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
 public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventure, AdventureDetails> {
 
-    private static final String WORLD_DOES_NOT_EXIST = "The world to be linked to this adventure does not exist";
     private static final String PERSONA_DOES_NOT_EXIST = "The persona to be linked to this adventure does not exist";
 
-    private final WorldRepository worldRepository;
     private final PersonaRepository personaRepository;
     private final AdventureRepository adventureRepository;
     private final UserRepository userRepository;
@@ -39,14 +36,12 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
     private final LorebookVectorSearchPort vectorSearchPort;
 
     public CreateAdventureHandler(
-            WorldRepository worldRepository,
             PersonaRepository personaRepository,
             AdventureRepository adventureRepository,
             UserRepository userRepository,
             EmbeddingPort embeddingPort,
             LorebookVectorSearchPort vectorSearchPort) {
 
-        this.worldRepository = worldRepository;
         this.personaRepository = personaRepository;
         this.adventureRepository = adventureRepository;
         this.userRepository = userRepository;
@@ -56,9 +51,6 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
 
     @Override
     public AdventureDetails execute(CreateAdventure command) {
-
-        var world = worldRepository.findByPublicId(command.worldId())
-                .orElseThrow(() -> new NotFoundException(WORLD_DOES_NOT_EXIST));
 
         var persona = personaRepository.findByPublicId(command.personaId())
                 .orElseThrow(() -> new NotFoundException(PERSONA_DOES_NOT_EXIST));
@@ -79,20 +71,18 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 .modelConfiguration(modelConfiguration)
                 .name(command.name())
                 .personaId(persona.getId())
-                .worldId(world.getId())
+                .worldId(command.worldId())
                 .visibility(command.visibility())
                 .moderation(command.moderation())
                 .isMultiplayer(command.isMultiplayer())
-                .adventureStart(world.getAdventureStart())
+                .adventureStart(command.adventureStart())
                 .contextAttributes(contextAttributes)
                 .description(command.description())
                 .permissions(permissions.toArray(Permission[]::new))
                 .build());
 
-        world.getLorebook().forEach(worldEntry -> adventure.addLorebookEntry(
-                worldEntry.getName(),
-                worldEntry.getDescription(),
-                null));
+        emptyIfNull(command.lorebookEntries()).forEach(entry ->
+                adventure.addLorebookEntry(entry.name(), entry.description(), entry.playerId()));
 
         adventureRepository.save(adventure);
 
@@ -101,7 +91,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
             vectorSearchPort.upsert(adventure.getPublicId(), entry.getPublicId(), vector);
         });
 
-        return mapResult(adventure, persona.getPublicId(), world.getPublicId());
+        return mapResult(adventure, persona.getPublicId(), command.worldId());
     }
 
     private AdventureDetails mapResult(Adventure adventure, UUID personaPublicId, UUID worldPublicId) {

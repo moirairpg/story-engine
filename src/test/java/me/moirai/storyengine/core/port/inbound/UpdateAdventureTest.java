@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
@@ -28,7 +27,6 @@ public class UpdateAdventureTest {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 adventure.getName(),
-                WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),
@@ -51,7 +49,6 @@ public class UpdateAdventureTest {
         assertThat(updateAdventure.description()).isEqualTo(adventure.getDescription());
         assertThat(updateAdventure.name()).isEqualTo(adventure.getName());
         assertThat(updateAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
-        assertThat(updateAdventure.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(updateAdventure.visibility()).isEqualTo(adventure.getVisibility());
         assertThat(updateAdventure.modelConfiguration().temperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
         assertThat(updateAdventure.modelConfiguration().maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
@@ -75,7 +72,6 @@ public class UpdateAdventureTest {
                 sample.description(),
                 sample.adventureStart(),
                 sample.name(),
-                sample.worldId(),
                 sample.personaId(),
                 sample.visibility(),
                 sample.moderation(),

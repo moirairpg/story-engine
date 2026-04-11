@@ -31,7 +31,7 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                     a.creation_date,
                     ap_me.permission AS user_permission
                FROM adventure a
-               LEFT JOIN world   w ON a.world_id   = w.id
+               LEFT JOIN world   w ON a.world_id   = w.public_id
                JOIN persona p ON a.persona_id = p.id
                LEFT JOIN adventure_permissions ap_me ON ap_me.adventure_id = a.id AND ap_me.user_id = :requesterId
             """;

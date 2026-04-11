@@ -80,4 +80,5 @@
   <include file="db/changelog/migrations/1774731362_alter_table_adventure_drop_model_configuration_extended_fields.sql" />
   <include file="db/changelog/migrations/1743174000_drop_lorebook_regex.sql" />
   <include file="db/changelog/migrations/1774836776_create_table_chronicle_segment.sql" />
+  <include file="db/changelog/migrations/1775926747_alter_table_adventure_world_id_to_uuid.sql" />
 </databaseChangeLog>

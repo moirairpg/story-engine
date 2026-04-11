@@ -16,6 +16,8 @@ public record CreateAdventure(
         Visibility visibility,
         Moderation moderation,
         boolean isMultiplayer,
+        String adventureStart,
+        Set<AdventureLorebookEntryDetails> lorebookEntries,
         Set<PermissionDto> permissions,
         ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes)
@@ -23,5 +25,6 @@ public record CreateAdventure(
 
     public CreateAdventure {
         permissions = permissions != null ? Set.copyOf(permissions) : Set.of();
+        lorebookEntries = lorebookEntries != null ? Set.copyOf(lorebookEntries) : Set.of();
     }
 }

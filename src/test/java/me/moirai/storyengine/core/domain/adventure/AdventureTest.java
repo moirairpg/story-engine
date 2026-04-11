@@ -4,6 +4,8 @@ import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.UUID;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +23,9 @@ public class AdventureTest {
 
         // given
         var adventureBuilder = Adventure.builder();
+        var worldId = UUID.randomUUID();
         adventureBuilder.name("Name");
-        adventureBuilder.worldId(1L);
+        adventureBuilder.worldId(worldId);
         adventureBuilder.personaId(1L);
         adventureBuilder.moderation(Moderation.STRICT);
         adventureBuilder.visibility(Visibility.fromString("PRIVATE"));
@@ -34,7 +37,7 @@ public class AdventureTest {
         // then
         assertThat(adventure).isNotNull();
         assertThat(adventure.getName()).isEqualTo("Name");
-        assertThat(adventure.getWorldId()).isEqualTo(1L);
+        assertThat(adventure.getWorldId()).isEqualTo(worldId);
         assertThat(adventure.getPersonaId()).isEqualTo(1L);
         assertThat(adventure.getModeration()).isEqualTo(Moderation.STRICT);
         assertThat(adventure.getVisibility()).isEqualTo(PRIVATE);
@@ -344,20 +347,6 @@ public class AdventureTest {
 
         // then
         assertThat(adventure.getAdventureStart()).isEqualTo("New Prompt");
-    }
-
-    @Test
-    public void adventure_whenUpdateWorldId_thenWorldIdIsUpdated() {
-
-        // given
-        var newWorldId = 12345L;
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-
-        // when
-        adventure.updateWorld(newWorldId);
-
-        // then
-        assertThat(adventure.getWorldId()).isEqualTo(newWorldId);
     }
 
     @Test

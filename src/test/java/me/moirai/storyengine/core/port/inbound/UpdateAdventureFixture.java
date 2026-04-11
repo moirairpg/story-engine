@@ -6,7 +6,6 @@ import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
-import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
@@ -21,7 +20,6 @@ public class UpdateAdventureFixture {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 adventure.getName(),
-                WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),
@@ -47,7 +45,6 @@ public class UpdateAdventureFixture {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 adventure.getName(),
-                WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),
@@ -73,7 +70,6 @@ public class UpdateAdventureFixture {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 adventure.getName(),
-                WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 visibility,
                 adventure.getModeration(),
@@ -99,7 +95,6 @@ public class UpdateAdventureFixture {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 adventure.getName(),
-                WorldFixture.PUBLIC_ID,
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),

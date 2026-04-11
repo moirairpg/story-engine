@@ -31,6 +31,8 @@ public class CreateAdventureTest {
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
+                adventure.getAdventureStart(),
+                Set.of(),
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -74,6 +76,8 @@ public class CreateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
                 sample.permissions(),
                 null,
                 sample.contextAttributes());
@@ -97,6 +101,8 @@ public class CreateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
                 null,
                 sample.modelConfiguration(),
                 sample.contextAttributes());

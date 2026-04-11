@@ -23,7 +23,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.exception.NotFoundException;
@@ -32,24 +31,20 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.CreateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
-import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateAdventureHandlerTest {
 
     private static final Long AUTHENTICATED_USER_ID = 99999L;
-
-    @Mock
-    private WorldRepository worldRepository;
 
     @Mock
     private PersonaRepository personaRepository;
@@ -84,25 +79,10 @@ public class CreateAdventureHandlerTest {
     }
 
     @Test
-    public void createAdventure_whenWorldNotFound_thenThrowException() {
+    public void shouldThrowExceptionWhenPersonaNotFound() {
 
         // given
         var command = CreateAdventureFixture.sample();
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
-
-        // then
-        assertThrows(NotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void createAdventure_whenPersonaNotFound_thenThrowException() {
-
-        // given
-        var command = CreateAdventureFixture.sample();
-        var world = WorldFixture.privateWorld().build();
-        world.grant(new Permission(AUTHENTICATED_USER_ID, PermissionLevel.READ));
-
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then
@@ -110,7 +90,46 @@ public class CreateAdventureHandlerTest {
     }
 
     @Test
-    public void createAdventure_whenValidDate_thenAdventureIsCreated() {
+    public void shouldCreateAdventureWhenWorldIdIsNull() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                null,
+                sample.personaId(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
+
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.worldId()).isNull();
+    }
+
+    @Test
+    public void shouldCreateAdventureWhenValidData() {
 
         // given
         var command = CreateAdventureFixture.sample();
@@ -118,15 +137,10 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var world = WorldFixture.privateWorld().build();
-        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
-
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
 
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
@@ -153,6 +167,8 @@ public class CreateAdventureHandlerTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
                 Set.of(permissionDto),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
@@ -161,17 +177,12 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var world = WorldFixture.privateWorld().build();
-        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
-
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
 
         var user = UserFixture.playerWithId();
 
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(userRepository.findByPublicId(UserFixture.PUBLIC_ID)).thenReturn(Optional.of(user));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
@@ -185,25 +196,34 @@ public class CreateAdventureHandlerTest {
     }
 
     @Test
-    public void shouldUpsertVectorsForLorebookEntriesCopiedFromWorld() {
+    public void shouldUpsertVectorsForLorebookEntriesFromCommand() {
 
         // given
-        var command = CreateAdventureFixture.sample();
+        var sample = CreateAdventureFixture.sample();
+        var lorebookEntry1 = new AdventureLorebookEntryDetails(null, null, "Mana Shards", "Crystalized ancient magic", null, false, null, null);
+        var lorebookEntry2 = new AdventureLorebookEntryDetails(null, null, "The Silence", "A void that devours magic", null, false, null, null);
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                sample.personaId(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(lorebookEntry1, lorebookEntry2),
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
         var adventure = AdventureFixture.privateMultiplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var world = WorldFixture.privateWorld().build();
-        ReflectionTestUtils.setField(world, "id", WorldFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(world, "publicId", WorldFixture.PUBLIC_ID);
-        world.addLorebookEntry("Mana Shards", "Crystalized ancient magic");
-        world.addLorebookEntry("The Silence", "A void that devours magic");
 
         var persona = PersonaFixture.privatePersona().build();
         ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
 
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
@@ -215,6 +235,32 @@ public class CreateAdventureHandlerTest {
         // then
         verify(embeddingPort, times(2)).embed(anyString());
         verify(vectorSearchPort, times(2)).upsert(any(UUID.class), any(), any(float[].class));
+    }
+
+    @Test
+    public void shouldNotUpsertVectorsWhenLorebookEntriesIsEmpty() {
+
+        // given
+        var command = CreateAdventureFixture.sample();
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var persona = PersonaFixture.privatePersona().build();
+        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
+
+        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(embeddingPort, times(0)).embed(anyString());
+        verify(vectorSearchPort, times(0)).upsert(any(UUID.class), any(), any(float[].class));
     }
 
     @Test
@@ -231,14 +277,14 @@ public class CreateAdventureHandlerTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
                 Set.of(permissionDto),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
 
-        var world = WorldFixture.privateWorld().build();
         var persona = PersonaFixture.privatePersona().build();
 
-        when(worldRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(userRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 

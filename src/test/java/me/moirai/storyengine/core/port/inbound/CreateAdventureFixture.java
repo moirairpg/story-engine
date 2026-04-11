@@ -25,6 +25,8 @@ public class CreateAdventureFixture {
                 PRIVATE,
                 STRICT,
                 adventure.isMultiplayer(),
+                adventure.getAdventureStart(),
+                Set.of(),
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -49,6 +51,8 @@ public class CreateAdventureFixture {
                 PRIVATE,
                 STRICT,
                 adventure.isMultiplayer(),
+                adventure.getAdventureStart(),
+                Set.of(),
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
