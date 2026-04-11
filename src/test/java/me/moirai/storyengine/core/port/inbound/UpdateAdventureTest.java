@@ -24,9 +24,9 @@ public class UpdateAdventureTest {
         // when
         var updateAdventure = new UpdateAdventure(
                 AdventureFixture.PUBLIC_ID,
+                adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                adventure.getName(),
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),
@@ -69,9 +69,9 @@ public class UpdateAdventureTest {
         // when
         var updateAdventure = new UpdateAdventure(
                 sample.adventureId(),
+                sample.name(),
                 sample.description(),
                 sample.adventureStart(),
-                sample.name(),
                 sample.personaId(),
                 sample.visibility(),
                 sample.moderation(),

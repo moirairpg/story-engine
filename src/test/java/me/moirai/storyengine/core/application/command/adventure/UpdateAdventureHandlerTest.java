@@ -184,9 +184,9 @@ public class UpdateAdventureHandlerTest {
         var sample = UpdateAdventureFixture.sample();
         var command = new UpdateAdventure(
                 sample.adventureId(),
+                sample.name(),
                 sample.description(),
                 sample.adventureStart(),
-                sample.name(),
                 sample.personaId(),
                 sample.visibility(),
                 sample.moderation(),

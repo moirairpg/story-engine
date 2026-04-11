@@ -17,9 +17,9 @@ public class UpdateAdventureFixture {
         var adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new UpdateAdventure(
                 AdventureFixture.PUBLIC_ID,
+                adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                adventure.getName(),
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),
@@ -42,9 +42,9 @@ public class UpdateAdventureFixture {
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new UpdateAdventure(
                 AdventureFixture.PUBLIC_ID,
+                adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                adventure.getName(),
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),
@@ -67,9 +67,9 @@ public class UpdateAdventureFixture {
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new UpdateAdventure(
                 AdventureFixture.PUBLIC_ID,
+                adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                adventure.getName(),
                 PersonaFixture.PUBLIC_ID,
                 visibility,
                 adventure.getModeration(),
@@ -92,9 +92,9 @@ public class UpdateAdventureFixture {
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
         return new UpdateAdventure(
                 AdventureFixture.PUBLIC_ID,
+                adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                adventure.getName(),
                 PersonaFixture.PUBLIC_ID,
                 adventure.getVisibility(),
                 adventure.getModeration(),

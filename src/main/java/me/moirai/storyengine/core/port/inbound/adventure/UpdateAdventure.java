@@ -10,9 +10,9 @@ import me.moirai.storyengine.common.enums.Visibility;
 
 public record UpdateAdventure(
         UUID adventureId,
+        String name,
         String description,
         String adventureStart,
-        String name,
         UUID personaId,
         Visibility visibility,
         Moderation moderation,

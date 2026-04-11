@@ -174,9 +174,9 @@ public class AdventureController extends SecurityContextAware {
 
         var command = new UpdateAdventure(
                 adventureId,
+                request.name(),
                 request.description(),
                 request.adventureStart(),
-                request.name(),
                 request.personaId(),
                 request.visibility(),
                 request.moderation(),
