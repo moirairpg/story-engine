@@ -56,7 +56,7 @@ public class GetUserDetailsByIdHandler extends AbstractQueryHandler<GetUserDetai
                 moiraiUserDetails.discordId(),
                 discordUserDetails.username(),
                 nickname,
-                discordUserDetails.avatar(),
+                discordUserDetails.avatarUrl(),
                 moiraiUserDetails.role(),
                 moiraiUserDetails.creationDate());
     }

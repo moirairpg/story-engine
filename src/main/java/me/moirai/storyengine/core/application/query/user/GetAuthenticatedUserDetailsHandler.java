@@ -43,7 +43,7 @@ public class GetAuthenticatedUserDetailsHandler extends AbstractQueryHandler<Get
                 moiraiUserDetails.discordId(),
                 discordUserDetails.username(),
                 nickname,
-                discordUserDetails.avatar(),
+                discordUserDetails.avatarUrl(),
                 moiraiUserDetails.role(),
                 moiraiUserDetails.creationDate());
     }

@@ -112,7 +112,9 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
                 "username",
                 "displayName",
                 null,
+                null,
                 "email@email.com",
+                null,
                 null);
 
         prepareWebserverFor(response, 200);

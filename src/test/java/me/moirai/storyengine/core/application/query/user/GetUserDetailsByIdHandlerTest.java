@@ -45,7 +45,7 @@ public class GetUserDetailsByIdHandlerTest {
         var token = "someToken";
         var query = new GetUserDetailsById(userId, token);
         var userData = new UserData(userId, 12345L, "1234", Role.PLAYER, Instant.now());
-        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", "natalis", null, null, null);
+        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", "natalis", null, null, null, null, null);
 
         when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
         when(discordUserDetailsPort.getUserById(anyString(), anyString())).thenReturn(Optional.of(userDetails));
@@ -68,7 +68,7 @@ public class GetUserDetailsByIdHandlerTest {
         var token = "someToken";
         var query = new GetUserDetailsById(userId, token);
         var userData = new UserData(userId, 12345L, "1234", Role.PLAYER, Instant.now());
-        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", null, null, null, null);
+        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", null, null, null, null, null, null);
 
         when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
         when(discordUserDetailsPort.getUserById(anyString(), anyString())).thenReturn(Optional.of(userDetails));

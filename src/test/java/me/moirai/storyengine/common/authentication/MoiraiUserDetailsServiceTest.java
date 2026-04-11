@@ -48,7 +48,9 @@ public class MoiraiUserDetailsServiceTest {
                 username,
                 nickname,
                 null,
+                null,
                 "email@email.com",
+                null,
                 null);
 
         var userData = new UserData(publicId, 1L, "12345", Role.PLAYER, Instant.now());

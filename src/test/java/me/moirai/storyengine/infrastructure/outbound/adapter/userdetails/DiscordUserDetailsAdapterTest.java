@@ -32,7 +32,7 @@ public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
         // Given
         var userId = "USRID";
         var token = "TOKEN";
-        var response = new DiscordUserDataResponse(userId, "username", "displayName", null, "email@email.com", null);
+        var response = new DiscordUserDataResponse(userId, "username", "displayName", null, null, "email@email.com", null, null);
 
         prepareWebserverFor(response, 200);
 

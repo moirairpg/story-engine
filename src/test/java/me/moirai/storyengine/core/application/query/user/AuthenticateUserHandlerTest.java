@@ -71,7 +71,9 @@ public class AuthenticateUserHandlerTest {
                 "someUsername",
                 "someNickname",
                 null,
+                null,
                 "some@email.com",
+                null,
                 null);
 
         var authResult = new AuthenticateUserResult(
@@ -110,7 +112,9 @@ public class AuthenticateUserHandlerTest {
                 "someUsername",
                 "someNickname",
                 null,
+                null,
                 "some@email.com",
+                null,
                 null);
 
         var authResult = new AuthenticateUserResult(
