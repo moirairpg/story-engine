@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
@@ -43,7 +42,8 @@ public class GetAdventureResultFixture {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 WorldFixture.PUBLIC_ID,
-                PersonaFixture.PUBLIC_ID,
+                adventure.getNarratorName(),
+                adventure.getNarratorPersonality(),
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
@@ -83,7 +83,8 @@ public class GetAdventureResultFixture {
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
                 WorldFixture.PUBLIC_ID,
-                PersonaFixture.PUBLIC_ID,
+                adventure.getNarratorName(),
+                adventure.getNarratorPersonality(),
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
@@ -27,7 +26,8 @@ public class CreateAdventureTest {
                 adventure.getName(),
                 adventure.getDescription(),
                 WorldFixture.PUBLIC_ID,
-                PersonaFixture.PUBLIC_ID,
+                adventure.getNarratorName(),
+                adventure.getNarratorPersonality(),
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
@@ -48,7 +48,7 @@ public class CreateAdventureTest {
         // then
         assertThat(createAdventure.description()).isEqualTo(adventure.getDescription());
         assertThat(createAdventure.name()).isEqualTo(adventure.getName());
-        assertThat(createAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(createAdventure.narratorName()).isEqualTo(adventure.getNarratorName());
         assertThat(createAdventure.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
         assertThat(createAdventure.visibility()).isEqualTo(adventure.getVisibility());
         assertThat(createAdventure.modelConfiguration().temperature()).isEqualTo(1.7);
@@ -72,7 +72,8 @@ public class CreateAdventureTest {
                 sample.name(),
                 sample.description(),
                 sample.worldId(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
@@ -97,7 +98,8 @@ public class CreateAdventureTest {
                 sample.name(),
                 sample.description(),
                 sample.worldId(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),

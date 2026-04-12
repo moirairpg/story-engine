@@ -20,6 +20,8 @@ public class UpdateWorldTest {
                 "SomeName",
                 "SomeDesc",
                 "SomeStart",
+                null,
+                null,
                 Visibility.PUBLIC,
                 Set.of());
 
@@ -40,6 +42,8 @@ public class UpdateWorldTest {
                 "SomeName",
                 "SomeDesc",
                 "SomeStart",
+                null,
+                null,
                 Visibility.PUBLIC,
                 null);
 

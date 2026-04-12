@@ -12,8 +12,6 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureMessages;
@@ -33,11 +31,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnEmptyResultWhenNoMessages() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
 
         insert(adventure, Adventure.class);
@@ -57,11 +53,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnHasMoreFalseWhenFewerMessagesThanSize() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
@@ -83,11 +77,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnHasMoreTrueWhenExactlyAsManyMessagesAsSize() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
@@ -109,11 +101,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnHasMoreTrueAndLimitResultsWhenMoreMessagesThanSize() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
@@ -136,11 +126,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnOnlyMessagesOlderThanCursor() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
@@ -164,11 +152,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnEmptyWhenCursorIsOlderThanAllMessages() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
@@ -190,11 +176,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldReturnBothActiveAndChronicledMessages() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
@@ -220,11 +204,9 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
     public void shouldSortByPublicIdDescending() {
 
         // given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 

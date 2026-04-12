@@ -33,7 +33,6 @@ import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
@@ -42,7 +41,6 @@ import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
@@ -51,9 +49,6 @@ public class SendMessageHandlerTest {
 
     @Mock
     private AdventureRepository adventureRepository;
-
-    @Mock
-    private PersonaRepository personaRepository;
 
     @Mock
     private MessageRepository messageRepository;
@@ -88,7 +83,6 @@ public class SendMessageHandlerTest {
 
         handler = new SendMessageHandler(
                 adventureRepository,
-                personaRepository,
                 messageRepository,
                 textCompletionPort,
                 embeddingPort,
@@ -118,32 +112,12 @@ public class SendMessageHandlerTest {
     }
 
     @Test
-    public void shouldThrowWhenPersonaNotFound() {
-
-        // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
-
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
-
-        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        // when / then
-        assertThrows(NotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
     public void shouldSavePlayerMessageBeforeGeneratingResponse() {
 
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -155,7 +129,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -176,10 +149,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -191,7 +161,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -212,10 +181,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -231,7 +197,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -252,10 +217,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -267,7 +229,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -288,10 +249,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -304,7 +262,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -345,12 +302,9 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
         adventure.addLorebookEntry("Aldric", "A brave warrior", "user");
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -362,7 +316,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -385,10 +338,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -400,7 +350,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -423,10 +372,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -449,7 +395,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt()))
                 .thenReturn(List.of(userMessage, assistantMessage));
@@ -470,15 +415,14 @@ public class SendMessageHandlerTest {
     }
 
     @Test
-    public void shouldReplaceNamePlaceholderInPersonaPersonality() {
+    public void shouldReplaceNamePlaceholderInNarratorPersonality() {
 
         // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
+                .narrator("MoirAI", "I am {name}, a Discord chatbot")
+                .build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().personality("I am {name}, a Discord chatbot").build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -490,7 +434,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -511,12 +454,11 @@ public class SendMessageHandlerTest {
     public void shouldStripChatPrefixFromAiResponseBeforeSaving() {
 
         // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
+                .narrator("MoirAI", "I am a Discord chatbot")
+                .build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -528,7 +470,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -549,12 +490,11 @@ public class SendMessageHandlerTest {
     public void shouldStripAsNamePrefixFromAiResponseBeforeSaving() {
 
         // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
+                .narrator("MoirAI", "I am a Discord chatbot")
+                .build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -566,7 +506,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -589,10 +528,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -610,7 +546,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -635,10 +570,7 @@ public class SendMessageHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -650,7 +582,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -670,12 +601,11 @@ public class SendMessageHandlerTest {
     public void shouldStripTrailingFragmentFromAiResponseBeforeSaving() {
 
         // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
+                .narrator("MoirAI", "I am a Discord chatbot")
+                .build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-
-        var persona = PersonaFixture.publicPersona().build();
 
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
@@ -687,7 +617,6 @@ public class SendMessageHandlerTest {
         var command = new SendMessage(UUID.randomUUID(), "Hello!");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
@@ -702,5 +631,39 @@ public class SendMessageHandlerTest {
         // then
         verify(messageRepository, times(2)).save(captor.capture());
         assertThat(captor.getAllValues().get(1).getContent()).isEqualTo("MoirAI said: She walks forward.");
+    }
+
+    @Test
+    public void shouldOmitPersonalityInGenerationRequestWhenNarratorIsNull() {
+
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var savedMessage = MessageFixture.assistantMessage().build();
+        ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
+
+        var generationResult = TextGenerationResult.builder()
+                .outputText("AI response")
+                .build();
+
+        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+        when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
+
+        var captor = ArgumentCaptor.forClass(TextGenerationRequest.class);
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(textCompletionPort, times(2)).generateTextFrom(captor.capture());
+        assertThat(captor.getAllValues().get(1).instructions()).isNull();
     }
 }

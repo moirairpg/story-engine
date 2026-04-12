@@ -16,6 +16,8 @@ public class CreateWorldFixture {
                 world.getName(),
                 world.getDescription(),
                 world.getAdventureStart(),
+                world.getNarrator().narratorName(),
+                world.getNarrator().narratorPersonality(),
                 world.getVisibility(),
                 Collections.emptyList(),
                 Set.of());

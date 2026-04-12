@@ -24,6 +24,8 @@ public class WorldReaderImpl implements WorldReader {
                    w.description,
                    w.adventure_start,
                    w.visibility,
+                   w.narrator_name,
+                   w.narrator_personality,
                    w.id AS numeric_id,
                    w.creation_date,
                    w.last_update_date
@@ -89,6 +91,8 @@ public class WorldReaderImpl implements WorldReader {
                     rs.getString("name"),
                     rs.getString("description"),
                     rs.getString("adventure_start"),
+                    rs.getString("narrator_name"),
+                    rs.getString("narrator_personality"),
                     rs.getString("visibility"),
                     permissions,
                     lorebook,

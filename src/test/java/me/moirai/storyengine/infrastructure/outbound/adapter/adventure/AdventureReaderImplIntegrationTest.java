@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -46,11 +44,9 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
     public void getAdventureById_whenFound_thenReturnDetails() {
 
         // Given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
 
         insert(adventure, Adventure.class);
@@ -63,7 +59,8 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result.get().id()).isEqualTo(adventure.getPublicId());
         assertThat(result.get().name()).isEqualTo(adventure.getName());
         assertThat(result.get().worldId()).isEqualTo(world.getPublicId());
-        assertThat(result.get().personaId()).isEqualTo(persona.getPublicId());
+        assertThat(result.get().narratorName()).isEqualTo(adventure.getNarratorName());
+        assertThat(result.get().narratorPersonality()).isEqualTo(adventure.getNarratorPersonality());
         assertThat(result.get().visibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.get().isMultiplayer()).isTrue();
         assertThat(result.get().creationDate()).isNotNull();

@@ -23,11 +23,9 @@ import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.UpdateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 
@@ -36,9 +34,6 @@ public class UpdateAdventureHandlerTest {
 
     @Mock
     private AdventureRepository repository;
-
-    @Mock
-    private PersonaRepository personaRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -52,7 +47,7 @@ public class UpdateAdventureHandlerTest {
         // given
         var command = new UpdateAdventure(
                 null,
-                null, null, null, null, null, null, false,
+                null, null, null, null, null, null, null, false,
                 null, null, null);
 
         // then
@@ -70,8 +65,6 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(expectedUpdatedAdventure));
         when(repository.save(any())).thenReturn(expectedUpdatedAdventure);
-        when(personaRepository.findByPublicId(any(UUID.class)))
-                .thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
@@ -114,8 +107,6 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(unchangedAdventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(expectedUpdatedAdventure);
-        when(personaRepository.findByPublicId(any(UUID.class)))
-                .thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
@@ -139,8 +130,6 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
-        when(personaRepository.findByPublicId(any(UUID.class)))
-                .thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
@@ -164,8 +153,6 @@ public class UpdateAdventureHandlerTest {
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(repository.save(adventureCaptor.capture())).thenReturn(adventure);
-        when(personaRepository.findByPublicId(any(UUID.class)))
-                .thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // when
@@ -187,7 +174,8 @@ public class UpdateAdventureHandlerTest {
                 sample.name(),
                 sample.description(),
                 sample.adventureStart(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
@@ -199,8 +187,6 @@ public class UpdateAdventureHandlerTest {
         var user = UserFixture.playerWithId();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findByPublicId(any(UUID.class)))
-                .thenReturn(Optional.of(PersonaFixture.publicPersonaWithId()));
         when(userRepository.findByPublicId(UserFixture.PUBLIC_ID)).thenReturn(Optional.of(user));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
@@ -210,5 +196,37 @@ public class UpdateAdventureHandlerTest {
 
         // then
         assertThat(adventure.getPermissions()).isNotNull();
+    }
+
+    @Test
+    public void shouldUpdateNarratorWhenNarratorFieldsAreProvided() {
+
+        // given
+        var sample = UpdateAdventureFixture.sample();
+        var command = new UpdateAdventure(
+                sample.adventureId(),
+                sample.name(),
+                sample.description(),
+                sample.adventureStart(),
+                "Elan",
+                "A wise elder narrator",
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
     }
 }

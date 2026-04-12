@@ -26,7 +26,7 @@ public class AdventureTest {
         var worldId = UUID.randomUUID();
         adventureBuilder.name("Name");
         adventureBuilder.worldId(worldId);
-        adventureBuilder.personaId(1L);
+        adventureBuilder.narrator("Aria", "A helpful guide");
         adventureBuilder.moderation(Moderation.STRICT);
         adventureBuilder.visibility(Visibility.fromString("PRIVATE"));
         adventureBuilder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
@@ -38,7 +38,7 @@ public class AdventureTest {
         assertThat(adventure).isNotNull();
         assertThat(adventure.getName()).isEqualTo("Name");
         assertThat(adventure.getWorldId()).isEqualTo(worldId);
-        assertThat(adventure.getPersonaId()).isEqualTo(1L);
+        assertThat(adventure.getNarratorName()).isEqualTo("Aria");
         assertThat(adventure.getModeration()).isEqualTo(Moderation.STRICT);
         assertThat(adventure.getVisibility()).isEqualTo(PRIVATE);
     }
@@ -200,17 +200,16 @@ public class AdventureTest {
     }
 
     @Test
-    public void updateAdventure_whenNewPersonaIdProvided_thenPersonaIdShouldBeUpdated() {
+    public void updateAdventure_whenNarratorPersonalitySetButNameNull_thenNameDefaultsToNarrator() {
 
         // given
-        var personaId = 42L;
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        var adventure = AdventureFixture.privateSingleplayerAdventure()
+                .narrator(null, "Some personality")
+                .build();
 
-        // when
-        adventure.updatePersona(personaId);
-
-        // then
-        assertThat(adventure.getPersonaId()).isEqualTo(personaId);
+        // when / then
+        assertThat(adventure.getNarratorName()).isEqualTo("Narrator");
+        assertThat(adventure.getNarratorPersonality()).isEqualTo("Some personality");
     }
 
     @Test

@@ -10,7 +10,6 @@ public class SearchAdventuresFixture {
         return new SearchAdventures(
                 "Adventure",
                 "1234",
-                "1234",
                 null,
                 "GPT54_NANO",
                 "RPG",
@@ -27,7 +26,6 @@ public class SearchAdventuresFixture {
 
         return new SearchAdventures(
                 "Adventure",
-                "1234",
                 "1234",
                 null,
                 "GPT54_NANO",

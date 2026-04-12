@@ -12,6 +12,8 @@ public record UpdateWorld(
         String name,
         String description,
         String adventureStart,
+        String narratorName,
+        String narratorPersonality,
         Visibility visibility,
         Set<PermissionDto> permissions)
         implements Command<WorldDetails> {

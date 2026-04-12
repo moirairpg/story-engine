@@ -32,7 +32,7 @@ public class SearchAdventuresHandler extends AbstractQueryHandler<SearchAdventur
                             row.name(),
                             row.description(),
                             row.worldName(),
-                            row.personaName(),
+                            row.narratorName(),
                             row.visibility(),
                             row.creationDate(),
                             canWrite);

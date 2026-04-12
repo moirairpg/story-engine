@@ -11,22 +11,18 @@ import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.Say;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @CommandHandler
 public class SayHandler extends AbstractCommandHandler<Say, MessageResult> {
 
     private final AdventureRepository adventureRepository;
-    private final PersonaRepository personaRepository;
     private final MessageRepository messageRepository;
 
     public SayHandler(
             AdventureRepository adventureRepository,
-            PersonaRepository personaRepository,
             MessageRepository messageRepository) {
 
         this.adventureRepository = adventureRepository;
-        this.personaRepository = personaRepository;
         this.messageRepository = messageRepository;
     }
 
@@ -47,13 +43,10 @@ public class SayHandler extends AbstractCommandHandler<Say, MessageResult> {
         var adventure = adventureRepository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
-        var persona = personaRepository.findById(adventure.getPersonaId())
-                .orElseThrow(() -> new NotFoundException("Persona not found"));
-
         var message = Message.builder()
                 .adventureId(adventure.getId())
                 .role(AiRole.ASSISTANT)
-                .content(addChatPrefix(persona.getName()).apply(command.content()))
+                .content(addChatPrefix(adventure.getNarratorName()).apply(command.content()))
                 .build();
 
         var saved = messageRepository.save(message);

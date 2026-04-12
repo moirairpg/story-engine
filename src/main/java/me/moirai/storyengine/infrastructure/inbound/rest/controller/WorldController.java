@@ -96,6 +96,8 @@ public class WorldController extends SecurityContextAware {
                 request.name(),
                 request.description(),
                 request.adventureStart(),
+                request.narratorName(),
+                request.narratorPersonality(),
                 request.visibility(),
                 emptyIfNull(request.lorebook()).stream()
                         .map(entry -> new CreateWorld.LorebookEntry(
@@ -122,6 +124,8 @@ public class WorldController extends SecurityContextAware {
                 request.name(),
                 request.description(),
                 request.adventureStart(),
+                request.narratorName(),
+                request.narratorPersonality(),
                 request.visibility(),
                 updatePermissions);
 

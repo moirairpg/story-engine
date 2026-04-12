@@ -40,7 +40,6 @@ public class SearchAdventuresHandlerTest {
                 null,
                 null,
                 null,
-                null,
                 SearchView.MY_STUFF,
                 null,
                 null,
@@ -66,11 +65,11 @@ public class SearchAdventuresHandlerTest {
 
         // Given
         var query = new SearchAdventures(
-                null, null, null, null, null, null, null,
+                null, null, null, null, null, null,
                 SearchView.MY_STUFF, null, null, 1, 2, 1L);
 
         var row = new AdventureSearchRow(
-                UUID.randomUUID(), "name", "desc", "world", "persona", "PUBLIC", Instant.now(), "OWNER");
+                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), "OWNER");
 
         when(reader.search(any(SearchAdventures.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));
@@ -88,11 +87,11 @@ public class SearchAdventuresHandlerTest {
 
         // Given
         var query = new SearchAdventures(
-                null, null, null, null, null, null, null,
+                null, null, null, null, null, null,
                 SearchView.EXPLORE, null, null, 1, 2, null);
 
         var row = new AdventureSearchRow(
-                UUID.randomUUID(), "name", "desc", "world", "persona", "PUBLIC", Instant.now(), "READ");
+                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), "READ");
 
         when(reader.search(any(SearchAdventures.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));
@@ -110,11 +109,11 @@ public class SearchAdventuresHandlerTest {
 
         // Given
         var query = new SearchAdventures(
-                null, null, null, null, null, null, null,
+                null, null, null, null, null, null,
                 SearchView.EXPLORE, null, null, 1, 2, null);
 
         var row = new AdventureSearchRow(
-                UUID.randomUUID(), "name", "desc", "world", "persona", "PUBLIC", Instant.now(), null);
+                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), null);
 
         when(reader.search(any(SearchAdventures.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));

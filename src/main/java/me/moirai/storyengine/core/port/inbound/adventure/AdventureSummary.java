@@ -8,7 +8,7 @@ public record AdventureSummary(
         String name,
         String description,
         String worldName,
-        String personaName,
+        String narratorName,
         String visibility,
         Instant creationDate,
         boolean canWrite) {

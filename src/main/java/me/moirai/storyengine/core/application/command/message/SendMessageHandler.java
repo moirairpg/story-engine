@@ -11,6 +11,7 @@ import static me.moirai.storyengine.common.util.DefaultStringProcessors.stripTra
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,6 @@ import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
@@ -43,7 +43,6 @@ import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearc
 public class SendMessageHandler extends AbstractCommandHandler<SendMessage, MessageResult> {
 
     private final AdventureRepository adventureRepository;
-    private final PersonaRepository personaRepository;
     private final MessageRepository messageRepository;
     private final TextCompletionPort textCompletionPort;
     private final EmbeddingPort embeddingPort;
@@ -57,7 +56,6 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
     public SendMessageHandler(
             AdventureRepository adventureRepository,
-            PersonaRepository personaRepository,
             MessageRepository messageRepository,
             TextCompletionPort textCompletionPort,
             EmbeddingPort embeddingPort,
@@ -70,7 +68,6 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
             @Value("${moirai.rag.chronicle.top-k}") int chronicleTopK) {
 
         this.adventureRepository = adventureRepository;
-        this.personaRepository = personaRepository;
         this.messageRepository = messageRepository;
         this.textCompletionPort = textCompletionPort;
         this.embeddingPort = embeddingPort;
@@ -101,9 +98,6 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         var adventure = adventureRepository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
-        var persona = personaRepository.findById(adventure.getPersonaId())
-                .orElseThrow(() -> new NotFoundException("Persona not found"));
-
         var username = MoiraiSecurityContext.getAuthenticatedUser().username();
 
         var characterName = adventure.getLorebookEntryByPlayerId(username)
@@ -120,8 +114,9 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
         var history = messageRepository.findActiveByAdventureId(adventure.getId(), messageWindowSize);
 
-        var personality = replacePersonaNamePlaceholderWith(persona.getName())
-                .apply(persona.getPersonality());
+        var personality = Optional.ofNullable(adventure.getNarratorPersonality())
+                .map(p -> replacePersonaNamePlaceholderWith(adventure.getNarratorName()).apply(p))
+                .orElse(null);
 
         var context = assembleContext(adventure, history, command.content());
         var modelConfig = adventure.getModelConfiguration();
@@ -137,8 +132,8 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
 
         var responseProcessor = new StringProcessor();
         responseProcessor.addRule(stripChatPrefix());
-        responseProcessor.addRule(stripAsNamePrefix(persona.getName()));
-        responseProcessor.addRule(stripAsNamePrefixForLowercase(persona.getName()));
+        responseProcessor.addRule(stripAsNamePrefix(adventure.getNarratorName()));
+        responseProcessor.addRule(stripAsNamePrefixForLowercase(adventure.getNarratorName()));
         responseProcessor.addRule(stripTrailingFragment());
 
         var cleanedResponse = responseProcessor.process(generationResult.getOutputText());
@@ -146,7 +141,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         var aiMessage = Message.builder()
                 .adventureId(adventure.getId())
                 .role(AiRole.ASSISTANT)
-                .content(addChatPrefix(persona.getName()).apply(cleanedResponse))
+                .content(addChatPrefix(adventure.getNarratorName()).apply(cleanedResponse))
                 .build();
 
         messageRepository.save(aiMessage);

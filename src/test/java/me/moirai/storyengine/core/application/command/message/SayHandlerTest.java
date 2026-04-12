@@ -3,7 +3,6 @@ package me.moirai.storyengine.core.application.command.message;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,11 +22,9 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.message.Say;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SayHandlerTest {
@@ -36,16 +33,13 @@ public class SayHandlerTest {
     private AdventureRepository adventureRepository;
 
     @Mock
-    private PersonaRepository personaRepository;
-
-    @Mock
     private MessageRepository messageRepository;
 
     private SayHandler handler;
 
     @BeforeEach
     void setup() {
-        handler = new SayHandler(adventureRepository, personaRepository, messageRepository);
+        handler = new SayHandler(adventureRepository, messageRepository);
     }
 
     @Test
@@ -86,16 +80,13 @@ public class SayHandlerTest {
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
 
-        var persona = PersonaFixture.publicPersona().build();
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
 
         var command = new Say(UUID.randomUUID(), "Hello world");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
 
         var captor = ArgumentCaptor.forClass(Message.class);
@@ -115,16 +106,13 @@ public class SayHandlerTest {
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
-        ReflectionTestUtils.setField(adventure, "personaId", PersonaFixture.NUMERIC_ID);
 
-        var persona = PersonaFixture.publicPersona().build();
         var savedMessage = MessageFixture.assistantMessage().build();
         ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
 
         var command = new Say(UUID.randomUUID(), "Hello world");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(personaRepository.findById(anyLong())).thenReturn(Optional.of(persona));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
 
         // when

@@ -8,7 +8,7 @@ public record AdventureSearchRow(
         String name,
         String description,
         String worldName,
-        String personaName,
+        String narratorName,
         String visibility,
         Instant creationDate,
         String userPermission) {

@@ -23,7 +23,6 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId(UUID.randomUUID());
-        builder.personaId(1L);
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
@@ -41,7 +40,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId(UUID.randomUUID());
-        builder.personaId(1L);
+        builder.narrator("Aria", "A helpful guide");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
@@ -59,7 +58,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId(UUID.randomUUID());
-        builder.personaId(1L);
+        builder.narrator("Aria", "A helpful guide");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
@@ -77,7 +76,7 @@ public class AdventureFixture {
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
         builder.worldId(UUID.randomUUID());
-        builder.personaId(1L);
+        builder.narrator("Aria", "A helpful guide");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());

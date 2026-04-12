@@ -30,7 +30,8 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.description,
                     a.adventure_start,
                     a.world_id,
-                    p.public_id AS persona_public_id,
+                    a.narrator_name,
+                    a.narrator_personality,
                     a.visibility,
                     a.ai_model,
                     a.moderation,
@@ -45,7 +46,6 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.creation_date,
                     a.last_update_date
                FROM adventure a
-               JOIN persona p ON a.persona_id = p.id
               WHERE a.public_id = :publicId
             """;
 
@@ -125,7 +125,8 @@ public class AdventureReaderImpl implements AdventureReader {
                     rs.getString("description"),
                     rs.getString("adventure_start"),
                     rs.getObject("world_id", UUID.class),
-                    UUID.fromString(rs.getString("persona_public_id")),
+                    rs.getString("narrator_name"),
+                    rs.getString("narrator_personality"),
                     Visibility.valueOf(rs.getString("visibility")),
                     Moderation.valueOf(rs.getString("moderation")),
                     rs.getBoolean("is_multiplayer"),

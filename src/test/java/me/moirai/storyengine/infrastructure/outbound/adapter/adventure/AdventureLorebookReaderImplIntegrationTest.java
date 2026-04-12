@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
@@ -48,11 +46,9 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
     public void getAdventureLorebookEntryById_whenFound_thenReturnDetails() {
 
         // Given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
 
         adventure.addLorebookEntry("Lorebook", "Lorebook", null);
@@ -93,11 +89,9 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
     public void getAllByIds_whenIdsExist_thenReturnMatchingEntries() {
 
         // Given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
 
         adventure.addLorebookEntry("Entry One", "Description One", null);
@@ -121,11 +115,9 @@ public class AdventureLorebookReaderImplIntegrationTest extends AbstractIntegrat
     public void getAllByIds_whenSomeIdsDoNotExist_thenReturnOnlyMatching() {
 
         // Given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
 
         adventure.addLorebookEntry("Existing Entry", "Description", null);

@@ -50,6 +50,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
         world.updateName(command.name());
         world.updateDescription(command.description());
         world.updateAdventureStart(command.adventureStart());
+        world.updateNarrator(command.narratorName(), command.narratorPersonality());
 
         if (command.visibility() != null) {
             switch (command.visibility()) {
@@ -80,6 +81,8 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
                 world.getName(),
                 world.getDescription(),
                 world.getAdventureStart(),
+                world.getNarratorName(),
+                world.getNarratorPersonality(),
                 world.getVisibility().name(),
                 world.getPermissions().stream()
                         .map(permission -> {

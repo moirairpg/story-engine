@@ -11,6 +11,8 @@ public record WorldDetails(
         String name,
         String description,
         String adventureStart,
+        String narratorName,
+        String narratorPersonality,
         String visibility,
         Set<PermissionDto> permissions,
         Set<WorldLorebookEntryDetails> lorebook,

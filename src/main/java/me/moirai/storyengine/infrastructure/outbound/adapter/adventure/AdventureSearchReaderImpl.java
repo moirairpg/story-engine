@@ -25,14 +25,13 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
             SELECT  a.public_id,
                     a.name,
                     a.description,
-                    w.name    AS world_name,
-                    p.name    AS persona_name,
+                    w.name          AS world_name,
+                    a.narrator_name AS narrator_name,
                     a.visibility,
                     a.creation_date,
                     ap_me.permission AS user_permission
                FROM adventure a
                LEFT JOIN world   w ON a.world_id   = w.public_id
-               JOIN persona p ON a.persona_id = p.id
                LEFT JOIN adventure_permissions ap_me ON ap_me.adventure_id = a.id AND ap_me.user_id = :requesterId
             """;
     //@formatter:on
@@ -51,7 +50,6 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 .filter(Optional.of(resolveView(query.view(), query.requesterId())))
                 .filter(Filters.containsIgnoreCase("a.name", "name", query.name()))
                 .filter(Filters.containsIgnoreCase("w.name", "worldName", query.worldName()))
-                .filter(Filters.containsIgnoreCase("p.name", "personaName", query.personaName()))
                 .filter(Filters.equals("a.ai_model", "model", query.model()))
                 .filter(Filters.equals("a.game_mode", "gameMode", query.gameMode()))
                 .filter(Filters.equals("a.moderation", "moderation", query.moderation()))
@@ -108,7 +106,7 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getString("world_name"),
-                rs.getString("persona_name"),
+                rs.getString("narrator_name"),
                 rs.getString("visibility"),
                 rs.getTimestamp("creation_date").toInstant(),
                 rs.getString("user_permission"));

@@ -5,7 +5,6 @@ import java.util.Set;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
@@ -20,7 +19,8 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
@@ -45,7 +45,8 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
@@ -70,7 +71,8 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 visibility,
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
@@ -95,7 +97,8 @@ public class UpdateAdventureFixture {
                 adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 isMultiplayer,

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
@@ -27,7 +26,8 @@ public class UpdateAdventureTest {
                 adventure.getName(),
                 adventure.getDescription(),
                 adventure.getAdventureStart(),
-                PersonaFixture.PUBLIC_ID,
+                adventure.getNarratorName(),
+                adventure.getNarratorPersonality(),
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
@@ -48,7 +48,7 @@ public class UpdateAdventureTest {
         assertThat(updateAdventure.adventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(updateAdventure.description()).isEqualTo(adventure.getDescription());
         assertThat(updateAdventure.name()).isEqualTo(adventure.getName());
-        assertThat(updateAdventure.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(updateAdventure.narratorName()).isEqualTo(adventure.getNarratorName());
         assertThat(updateAdventure.visibility()).isEqualTo(adventure.getVisibility());
         assertThat(updateAdventure.modelConfiguration().temperature()).isEqualTo(adventure.getModelConfiguration().getTemperature());
         assertThat(updateAdventure.modelConfiguration().maxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
@@ -72,7 +72,8 @@ public class UpdateAdventureTest {
                 sample.name(),
                 sample.description(),
                 sample.adventureStart(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),

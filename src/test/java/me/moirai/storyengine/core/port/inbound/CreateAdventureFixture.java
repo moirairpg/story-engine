@@ -6,7 +6,6 @@ import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
 import java.util.Set;
 
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
@@ -21,7 +20,8 @@ public class CreateAdventureFixture {
                 adventure.getName(),
                 adventure.getDescription(),
                 WorldFixture.PUBLIC_ID,
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 PRIVATE,
                 STRICT,
                 adventure.isMultiplayer(),
@@ -47,7 +47,8 @@ public class CreateAdventureFixture {
                 adventure.getName(),
                 adventure.getDescription(),
                 WorldFixture.PUBLIC_ID,
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 PRIVATE,
                 STRICT,
                 adventure.isMultiplayer(),

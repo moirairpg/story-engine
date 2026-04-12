@@ -47,6 +47,8 @@ public class UpdateWorldHandlerTest {
                 "MoirAI",
                 "This is an RPG world",
                 "As you enter the city, people around you start looking at you.",
+                null,
+                null,
                 Visibility.PUBLIC,
                 Set.of());
 
@@ -75,6 +77,8 @@ public class UpdateWorldHandlerTest {
                 "MoirAI",
                 "This is an RPG world",
                 "As you enter the city, people around you start looking at you.",
+                null,
+                null,
                 Visibility.PUBLIC,
                 Set.of());
 
@@ -108,6 +112,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
+                null,
+                null,
                 null);
 
         var unchangedWorld = WorldFixture.privateWorld().build();
@@ -130,6 +136,8 @@ public class UpdateWorldHandlerTest {
         var id = WorldFixture.PUBLIC_ID;
         var command = new UpdateWorld(
                 id,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -161,6 +169,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
+                null,
+                null,
                 null);
 
         var unchangedWorld = WorldFixture.privateWorld().build();
@@ -186,6 +196,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
+                null,
+                null,
                 null);
 
         // then
@@ -200,6 +212,8 @@ public class UpdateWorldHandlerTest {
         var command = new UpdateWorld(
                 WorldFixture.PUBLIC_ID,
                 "SomeNewName",
+                null,
+                null,
                 null,
                 null,
                 null,

@@ -29,7 +29,6 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 import me.moirai.storyengine.core.port.inbound.CreateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -37,7 +36,6 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryD
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
@@ -45,9 +43,6 @@ import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearc
 public class CreateAdventureHandlerTest {
 
     private static final Long AUTHENTICATED_USER_ID = 99999L;
-
-    @Mock
-    private PersonaRepository personaRepository;
 
     @Mock
     private AdventureRepository repository;
@@ -79,26 +74,16 @@ public class CreateAdventureHandlerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonaNotFound() {
-
-        // given
-        var command = CreateAdventureFixture.sample();
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
-
-        // then
-        assertThrows(NotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void shouldCreateAdventureWhenWorldIdIsNull() {
+    public void shouldCreateAdventureWithNarratorWhenNarratorFieldsAreProvided() {
 
         // given
         var sample = CreateAdventureFixture.sample();
         var command = new CreateAdventure(
                 sample.name(),
                 sample.description(),
-                null,
-                sample.personaId(),
+                sample.worldId(),
+                "Aria",
+                "A helpful guide",
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
@@ -112,11 +97,76 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var persona = PersonaFixture.privatePersona().build();
-        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.narratorName()).isEqualTo(adventure.getNarratorName());
+    }
+
+    @Test
+    public void shouldCreateAdventureWithNullNarratorWhenNoNarratorProvided() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                null,
+                null,
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.narratorPersonality()).isNull();
+    }
+
+    @Test
+    public void shouldCreateAdventureWhenWorldIdIsNull() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                null,
+                sample.narratorName(),
+                sample.narratorPersonality(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
@@ -137,11 +187,6 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var persona = PersonaFixture.privatePersona().build();
-        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
@@ -163,7 +208,8 @@ public class CreateAdventureHandlerTest {
                 sample.name(),
                 sample.description(),
                 sample.worldId(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
@@ -177,13 +223,8 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var persona = PersonaFixture.privatePersona().build();
-        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-
         var user = UserFixture.playerWithId();
 
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(userRepository.findByPublicId(UserFixture.PUBLIC_ID)).thenReturn(Optional.of(user));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
@@ -206,7 +247,8 @@ public class CreateAdventureHandlerTest {
                 sample.name(),
                 sample.description(),
                 sample.worldId(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
@@ -220,11 +262,6 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var persona = PersonaFixture.privatePersona().build();
-        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
         when(embeddingPort.embed(anyString())).thenReturn(new float[]{0.1f, 0.2f});
@@ -247,11 +284,6 @@ public class CreateAdventureHandlerTest {
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var persona = PersonaFixture.privatePersona().build();
-        ReflectionTestUtils.setField(persona, "id", PersonaFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(persona, "publicId", PersonaFixture.PUBLIC_ID);
-
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
 
@@ -273,7 +305,8 @@ public class CreateAdventureHandlerTest {
                 sample.name(),
                 sample.description(),
                 sample.worldId(),
-                sample.personaId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
@@ -283,9 +316,6 @@ public class CreateAdventureHandlerTest {
                 sample.modelConfiguration(),
                 sample.contextAttributes());
 
-        var persona = PersonaFixture.privatePersona().build();
-
-        when(personaRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(persona));
         when(userRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // then

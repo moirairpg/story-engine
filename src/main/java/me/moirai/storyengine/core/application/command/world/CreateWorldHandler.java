@@ -46,6 +46,7 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                 .name(command.name())
                 .description(command.description())
                 .adventureStart(command.adventureStart())
+                .narrator(command.narratorName(), command.narratorPersonality())
                 .visibility(command.visibility())
                 .permissions(permissions.toArray(Permission[]::new))
                 .build());
@@ -64,6 +65,8 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                 world.getName(),
                 world.getDescription(),
                 world.getAdventureStart(),
+                world.getNarratorName(),
+                world.getNarratorPersonality(),
                 world.getVisibility().name(),
                 world.getPermissions().stream()
                         .map(permission -> {

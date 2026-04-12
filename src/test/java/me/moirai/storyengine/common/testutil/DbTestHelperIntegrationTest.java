@@ -12,28 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.infrastructure.outbound.adapter.persona.PersonaJpaRepository;
-import me.moirai.storyengine.infrastructure.outbound.adapter.userdetails.UserJpaRepository;
+import me.moirai.storyengine.core.domain.world.World;
+import me.moirai.storyengine.core.domain.world.WorldFixture;
 
 public class DbTestHelperIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private JdbcClient jdbcClient;
 
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private PersonaJpaRepository personaJpaRepository;
-
     @BeforeEach
     public void setUp() {
-        personaJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
+        clearDatabase();
     }
 
     @Test
@@ -148,18 +139,20 @@ public class DbTestHelperIntegrationTest extends AbstractIntegrationTest {
     public void shouldInsertCorrectlyMapFieldsFromEmbeddedValueObject() {
 
         // Given
-        var persona = PersonaFixture.publicPersona().name("TestPersona").build();
+        var world = WorldFixture.publicWorld()
+                .narrator("TestNarrator", "Test personality")
+                .build();
 
         // When
-        insert(persona, Persona.class);
+        insert(world, World.class);
 
         // Then
-        var name = jdbcClient.sql("SELECT name FROM persona WHERE name = :name")
-                .param("name", "TestPersona")
+        var narratorName = jdbcClient.sql("SELECT narrator_name FROM world WHERE narrator_name = :name")
+                .param("name", "TestNarrator")
                 .query(String.class)
                 .single();
 
-        assertThat(name).isNotNull().isNotBlank();
+        assertThat(narratorName).isNotNull().isNotBlank();
     }
 
     @Test
@@ -300,17 +293,17 @@ public class DbTestHelperIntegrationTest extends AbstractIntegrationTest {
 
         // Given
         insert(UserFixture.player().discordId("unique-discord-10").build(), User.class);
-        insert(PersonaFixture.publicPersona().name("KeepPersona").build(), Persona.class);
+        insert(WorldFixture.publicWorld().build(), World.class);
 
         // When
         clear(User.class);
 
         // Then
-        var personaCount = jdbcClient.sql("SELECT COUNT(*) FROM persona")
+        var worldCount = jdbcClient.sql("SELECT COUNT(*) FROM world")
                 .query(Long.class)
                 .single();
 
-        assertThat(personaCount).isEqualTo(1L);
+        assertThat(worldCount).isEqualTo(1L);
     }
 
     @Test
@@ -318,7 +311,7 @@ public class DbTestHelperIntegrationTest extends AbstractIntegrationTest {
 
         // Given
         insert(UserFixture.player().discordId("unique-discord-11").build(), User.class);
-        insert(PersonaFixture.publicPersona().name("PersonaClearAll").build(), Persona.class);
+        insert(WorldFixture.publicWorld().build(), World.class);
 
         // When
         clearDatabase();
@@ -328,12 +321,12 @@ public class DbTestHelperIntegrationTest extends AbstractIntegrationTest {
                 .query(Long.class)
                 .single();
 
-        var personaCount = jdbcClient.sql("SELECT COUNT(*) FROM persona")
+        var worldCount = jdbcClient.sql("SELECT COUNT(*) FROM world")
                 .query(Long.class)
                 .single();
 
         assertThat(userCount).isEqualTo(0L);
-        assertThat(personaCount).isEqualTo(0L);
+        assertThat(worldCount).isEqualTo(0L);
     }
 
     @Test

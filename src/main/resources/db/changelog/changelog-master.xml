@@ -81,4 +81,7 @@
   <include file="db/changelog/migrations/1743174000_drop_lorebook_regex.sql" />
   <include file="db/changelog/migrations/1774836776_create_table_chronicle_segment.sql" />
   <include file="db/changelog/migrations/1775926747_alter_table_adventure_world_id_to_uuid.sql" />
+  <include file="db/changelog/migrations/1775947829_alter_table_adventure_world_add_narrator_columns.sql" />
+  <include file="db/changelog/migrations/1775947830_update_table_adventure_migrate_persona_to_narrator.sql" />
+  <include file="db/changelog/migrations/1775947831_drop_table_persona.sql" />
 </databaseChangeLog>

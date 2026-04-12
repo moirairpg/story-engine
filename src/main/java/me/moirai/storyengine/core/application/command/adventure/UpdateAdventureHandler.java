@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.application.command.adventure;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
@@ -17,7 +16,6 @@ import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.persona.PersonaRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
@@ -25,19 +23,15 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
-    private static final String PERSONA_NOT_FOUND = "Persona not found";
 
     private final AdventureRepository repository;
-    private final PersonaRepository personaRepository;
     private final UserRepository userRepository;
 
     public UpdateAdventureHandler(
             AdventureRepository repository,
-            PersonaRepository personaRepository,
             UserRepository userRepository) {
 
         this.repository = repository;
-        this.personaRepository = personaRepository;
         this.userRepository = userRepository;
     }
 
@@ -55,11 +49,8 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         var adventure = repository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException(ADVENTURE_NOT_FOUND));
 
-        var persona = personaRepository.findByPublicId(command.personaId())
-                .orElseThrow(() -> new NotFoundException(PERSONA_NOT_FOUND));
-
         adventure.updateName(command.name());
-        adventure.updatePersona(persona.getId());
+        adventure.updateNarrator(command.narratorName(), command.narratorPersonality());
         adventure.updateAiModel(command.modelConfiguration().aiModel());
         adventure.updateModeration(command.moderation());
         adventure.updateTemperature(command.modelConfiguration().temperature());
@@ -80,7 +71,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         updatePermissions(command, adventure);
 
         var savedAdventure = repository.save(adventure);
-        return mapResult(savedAdventure, persona.getPublicId());
+        return mapResult(savedAdventure);
     }
 
     private void updatePermissions(UpdateAdventure command, Adventure adventure) {
@@ -105,7 +96,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         adventure.updatePermissions(newPermissions);
     }
 
-    private AdventureDetails mapResult(Adventure savedAdventure, UUID personaPublicId) {
+    private AdventureDetails mapResult(Adventure savedAdventure) {
 
         var modelConfiguration = new ModelConfigurationDto(
                 savedAdventure.getModelConfiguration().getAiModel(),
@@ -125,7 +116,8 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 savedAdventure.getDescription(),
                 savedAdventure.getAdventureStart(),
                 savedAdventure.getWorldId(),
-                personaPublicId,
+                savedAdventure.getNarratorName(),
+                savedAdventure.getNarratorPersonality(),
                 savedAdventure.getVisibility(),
                 savedAdventure.getModeration(),
                 savedAdventure.isMultiplayer(),

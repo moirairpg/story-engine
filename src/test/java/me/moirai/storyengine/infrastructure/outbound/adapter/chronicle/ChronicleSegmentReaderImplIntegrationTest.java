@@ -14,8 +14,6 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegmentFixture;
-import me.moirai.storyengine.core.domain.persona.Persona;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
@@ -89,11 +87,9 @@ public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrati
     public void shouldReturnAllSegmentsOrderedByCreationDateAscending() {
 
         // Given
-        var persona = insert(PersonaFixture.publicPersona().build(), Persona.class);
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         var adventure = AdventureFixture.privateMultiplayerAdventure()
                 .worldId(world.getPublicId())
-                .personaId(persona.getId())
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 

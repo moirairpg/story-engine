@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.persona.PersonaFixture;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
@@ -84,7 +83,8 @@ public class GetAdventureByIdHandlerTest {
                 "desc",
                 "start",
                 WorldFixture.PUBLIC_ID,
-                PersonaFixture.PUBLIC_ID,
+                "Aria",
+                "A helpful guide",
                 PRIVATE,
                 STRICT,
                 true,
@@ -106,6 +106,7 @@ public class GetAdventureByIdHandlerTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(AdventureFixture.PUBLIC_ID);
         assertThat(result.worldId()).isEqualTo(WorldFixture.PUBLIC_ID);
-        assertThat(result.personaId()).isEqualTo(PersonaFixture.PUBLIC_ID);
+        assertThat(result.narratorName()).isEqualTo("Aria");
+        assertThat(result.narratorPersonality()).isEqualTo("A helpful guide");
     }
 }

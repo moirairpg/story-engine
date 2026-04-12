@@ -50,6 +50,8 @@ public class GetWorldByIdHandlerTest {
                 "MoirAI",
                 "desc",
                 "start",
+                null,
+                null,
                 "PUBLIC",
                 Set.of(),
                 Set.of(),

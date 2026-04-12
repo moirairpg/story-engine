@@ -11,6 +11,8 @@ public record CreateWorld(
         String name,
         String description,
         String adventureStart,
+        String narratorName,
+        String narratorPersonality,
         Visibility visibility,
         List<LorebookEntry> lorebookEntries,
         Set<PermissionDto> permissions)

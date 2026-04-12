@@ -26,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.RandomUuid;
+import me.moirai.storyengine.common.domain.Narrator;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
@@ -52,8 +53,8 @@ public class Adventure extends ShareableAsset {
     @Column(name = "world_id")
     private UUID worldId;
 
-    @Column(name = "persona_id")
-    private Long personaId;
+    @Embedded
+    private Narrator narrator;
 
     @Column(name = "description")
     private String description;
@@ -95,7 +96,7 @@ public class Adventure extends ShareableAsset {
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
         this.worldId = builder.worldId;
-        this.personaId = builder.personaId;
+        this.narrator = new Narrator(builder.narratorName, builder.narratorPersonality);
         this.contextAttributes = builder.contextAttributes;
         this.modelConfiguration = builder.modelConfiguration;
         this.moderation = builder.moderation;
@@ -131,8 +132,16 @@ public class Adventure extends ShareableAsset {
         return worldId;
     }
 
-    public Long getPersonaId() {
-        return personaId;
+    public Narrator getNarrator() {
+        return narrator;
+    }
+
+    public String getNarratorName() {
+        return Optional.ofNullable(narrator).map(Narrator::narratorName).orElse("Narrator");
+    }
+
+    public String getNarratorPersonality() {
+        return Optional.ofNullable(narrator).map(Narrator::narratorPersonality).orElse(null);
     }
 
     public ModelConfiguration getModelConfiguration() {
@@ -175,9 +184,9 @@ public class Adventure extends ShareableAsset {
         this.adventureStart = adventureStart;
     }
 
-    public void updatePersona(Long personaId) {
+    public void updateNarrator(String narratorName, String narratorPersonality) {
 
-        this.personaId = personaId;
+        this.narrator = new Narrator(narratorName, narratorPersonality);
     }
 
     public void updateModeration(Moderation moderation) {
@@ -300,7 +309,8 @@ public class Adventure extends ShareableAsset {
         private String description;
         private String adventureStart;
         private UUID worldId;
-        private Long personaId;
+        private String narratorName;
+        private String narratorPersonality;
         private boolean isMultiplayer;
         private ContextAttributes contextAttributes;
         private ModelConfiguration modelConfiguration;
@@ -335,9 +345,10 @@ public class Adventure extends ShareableAsset {
             return this;
         }
 
-        public Builder personaId(Long personaId) {
+        public Builder narrator(String narratorName, String narratorPersonality) {
 
-            this.personaId = personaId;
+            this.narratorName = narratorName;
+            this.narratorPersonality = narratorPersonality;
             return this;
         }
 

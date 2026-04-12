@@ -86,7 +86,6 @@ public class AdventureController extends SecurityContextAware {
     public PaginatedResult<AdventureSummary> search(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "world_name", required = false) String worldName,
-            @RequestParam(name = "persona_name", required = false) String personaName,
             @RequestParam(name = "is_multiplayer", required = false) Boolean isMultiplayer,
             @RequestParam(name = "model", required = false) SearchModel model,
             @RequestParam(name = "game_mode", required = false) SearchGameMode gameMode,
@@ -100,7 +99,6 @@ public class AdventureController extends SecurityContextAware {
         return queryRunner.run(new SearchAdventures(
                 name,
                 worldName,
-                personaName,
                 isMultiplayer,
                 model != null ? model.name() : null,
                 gameMode != null ? gameMode.name() : null,
@@ -132,7 +130,7 @@ public class AdventureController extends SecurityContextAware {
                 .map(p -> new PermissionDto(p.userId(), p.level()))
                 .collect(Collectors.toSet());
 
-        var lorebookEntries = emptyIfNull(request.lorebookEntries()).stream()
+        var lorebookEntries = emptyIfNull(request.lorebook()).stream()
                 .map(e -> new AdventureLorebookEntryDetails(null, null, e.name(), e.description(), e.playerId(), false, null, null))
                 .collect(Collectors.toSet());
 
@@ -140,7 +138,8 @@ public class AdventureController extends SecurityContextAware {
                 request.name(),
                 request.description(),
                 request.worldId(),
-                request.personaId(),
+                request.narratorName(),
+                request.narratorPersonality(),
                 request.visibility(),
                 request.moderation(),
                 request.isMultiplayer(),
@@ -177,7 +176,8 @@ public class AdventureController extends SecurityContextAware {
                 request.name(),
                 request.description(),
                 request.adventureStart(),
-                request.personaId(),
+                request.narratorName(),
+                request.narratorPersonality(),
                 request.visibility(),
                 request.moderation(),
                 request.isMultiplayer(),

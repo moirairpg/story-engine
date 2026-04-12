@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.annotation.RandomUuid;
+import me.moirai.storyengine.common.domain.Narrator;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.Visibility;
@@ -49,6 +52,9 @@ public class World extends ShareableAsset {
     @Column(name = "adventure_start")
     private String adventureStart;
 
+    @Embedded
+    private Narrator narrator;
+
     @ElementCollection
     @CollectionTable(name = "world_permissions", joinColumns = @JoinColumn(name = "world_id"))
     private List<Permission> permissions = new ArrayList<>();
@@ -69,6 +75,7 @@ public class World extends ShareableAsset {
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
+        this.narrator = new Narrator(builder.narratorName, builder.narratorPersonality);
         this.permissions.addAll(builder.permissions);
     }
 
@@ -101,6 +108,18 @@ public class World extends ShareableAsset {
         return adventureStart;
     }
 
+    public Narrator getNarrator() {
+        return narrator;
+    }
+
+    public String getNarratorName() {
+        return Optional.ofNullable(narrator).map(Narrator::narratorName).orElse("Narrator");
+    }
+
+    public String getNarratorPersonality() {
+        return Optional.ofNullable(narrator).map(Narrator::narratorPersonality).orElse(null);
+    }
+
     public List<WorldLorebookEntry> getLorebook() {
         return Collections.unmodifiableList(lorebook);
     }
@@ -118,6 +137,11 @@ public class World extends ShareableAsset {
     public void updateAdventureStart(String adventureStart) {
 
         this.adventureStart = adventureStart;
+    }
+
+    public void updateNarrator(String narratorName, String narratorPersonality) {
+
+        this.narrator = new Narrator(narratorName, narratorPersonality);
     }
 
     public WorldLorebookEntry addLorebookEntry(
@@ -164,6 +188,8 @@ public class World extends ShareableAsset {
         private String name;
         private String description;
         private String adventureStart;
+        private String narratorName;
+        private String narratorPersonality;
         private Visibility visibility;
         private Set<Permission> permissions = new HashSet<>();
 
@@ -185,6 +211,13 @@ public class World extends ShareableAsset {
         public Builder adventureStart(String adventureStart) {
 
             this.adventureStart = adventureStart;
+            return this;
+        }
+
+        public Builder narrator(String narratorName, String narratorPersonality) {
+
+            this.narratorName = narratorName;
+            this.narratorPersonality = narratorPersonality;
             return this;
         }
 
