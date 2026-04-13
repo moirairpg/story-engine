@@ -37,11 +37,15 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
 import me.moirai.storyengine.core.port.inbound.adventure.CatchUpResult;
 import me.moirai.storyengine.core.port.inbound.adventure.MessageSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureMessages;
+import me.moirai.storyengine.core.port.inbound.message.DeleteMessage;
+import me.moirai.storyengine.core.port.inbound.message.EditMessage;
 import me.moirai.storyengine.core.port.inbound.message.Go;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.Retry;
+import me.moirai.storyengine.core.port.inbound.message.RetryFromMessage;
 import me.moirai.storyengine.core.port.inbound.message.Say;
 import me.moirai.storyengine.core.port.inbound.message.StartAdventure;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.EditMessageRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.SayRequest;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
@@ -297,6 +301,37 @@ public class AdventureController extends SecurityContextAware {
             @RequestBody SayRequest request) {
 
         return commandRunner.run(new Say(adventureId, request.content()));
+    }
+
+    @DeleteMapping("/{adventureId}/message/{messageId}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void deleteMessage(
+            @PathVariable UUID adventureId,
+            @PathVariable UUID messageId) {
+
+        commandRunner.run(new DeleteMessage(adventureId, messageId));
+    }
+
+    @PostMapping("/{adventureId}/message/{messageId}/retry")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public MessageResult retryFromMessage(
+            @PathVariable UUID adventureId,
+            @PathVariable UUID messageId) {
+
+        return commandRunner.run(new RetryFromMessage(adventureId, messageId));
+    }
+
+    @PatchMapping("/{adventureId}/message/{messageId}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void editMessage(
+            @PathVariable UUID adventureId,
+            @PathVariable UUID messageId,
+            @Valid @RequestBody EditMessageRequest request) {
+
+        commandRunner.run(new EditMessage(adventureId, messageId, request.content(), authenticatedUsername()));
     }
 
 }

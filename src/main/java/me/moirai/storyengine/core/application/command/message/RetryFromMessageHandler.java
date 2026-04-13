@@ -26,8 +26,8 @@ import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.chronicle.MessageWindowOverflowEvent;
 import me.moirai.storyengine.core.domain.message.Message;
-import me.moirai.storyengine.core.port.inbound.message.Go;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
+import me.moirai.storyengine.core.port.inbound.message.RetryFromMessage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
@@ -39,7 +39,7 @@ import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSear
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @CommandHandler
-public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
+public class RetryFromMessageHandler extends AbstractCommandHandler<RetryFromMessage, MessageResult> {
 
     private static final String CONTINUE_GENERATION_INSTRUCTION = " Continue the story from the left message, no matter if it's a user or an assistant message. Simply generate the continuation so the story keeps going. Be creative. If it's an assistant message, do not repeat its content. Generate the continuation.";
 
@@ -55,7 +55,7 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
     private final int lorebookTopK;
     private final int chronicleTopK;
 
-    public GoHandler(
+    public RetryFromMessageHandler(
             AdventureRepository adventureRepository,
             MessageRepository messageRepository,
             TextCompletionPort textCompletionPort,
@@ -82,20 +82,26 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
     }
 
     @Override
-    public void validate(Go command) {
+    public void validate(RetryFromMessage command) {
         if (command.adventureId() == null) {
             throw new IllegalArgumentException("Adventure ID cannot be null");
+        }
+
+        if (command.messageId() == null) {
+            throw new IllegalArgumentException("Message ID cannot be null");
         }
     }
 
     @Override
-    public MessageResult execute(Go command) {
-
+    public MessageResult execute(RetryFromMessage command) {
         var adventure = adventureRepository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
+        messageRepository.deleteNewerThanByPublicId(command.adventureId(), command.messageId());
+        messageRepository.deleteByPublicId(command.adventureId(), command.messageId());
+
         var lastMessage = messageRepository.getLastActive(adventure.getId())
-                .orElseThrow(() -> new BusinessRuleViolationException("Cannot continue: adventure has no messages"));
+                .orElseThrow(() -> new BusinessRuleViolationException("Cannot retry: adventure has no messages after deletion"));
 
         var embeddingInput = lastMessage.getContent();
 
@@ -182,7 +188,6 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
     }
 
     private List<ChatMessage> retrieveLorebookContext(Adventure adventure, float[] queryVector) {
-
         var entryIds = vectorSearchPort.search(adventure.getPublicId(), queryVector, lorebookTopK);
 
         if (entryIds.isEmpty()) {
@@ -196,7 +201,6 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
     }
 
     private List<ChatMessage> retrieveChronicleContext(UUID adventurePublicId, float[] queryVector) {
-
         var segmentIds = chronicleVectorSearchPort.search(adventurePublicId, queryVector, chronicleTopK);
 
         if (segmentIds.isEmpty()) {
@@ -243,7 +247,6 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
     }
 
     private String buildRagQuery(List<ChatMessage> recentHistory, String currentMessage) {
-
         var primedMessages = new ArrayList<>(recentHistory);
         primedMessages.add(ChatMessage.asUser(currentMessage));
         primedMessages.add(ChatMessage.asAssistant("Location:"));

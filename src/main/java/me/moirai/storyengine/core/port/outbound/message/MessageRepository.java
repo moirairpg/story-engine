@@ -12,4 +12,7 @@ public interface MessageRepository {
     Optional<Message> getLastActive(Long adventureId);
     List<Message> findActiveByAdventureId(Long adventureId, int limit);
     void deleteLastAssistantMessage(Long adventureId);
+    void deleteByPublicId(UUID adventurePublicId, UUID messagePublicId);
+    void updateContent(UUID adventurePublicId, UUID messagePublicId, String content);
+    void deleteNewerThanByPublicId(UUID adventurePublicId, UUID messagePublicId);
 }

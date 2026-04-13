@@ -26,6 +26,7 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
                    m.role,
                    m.content,
                    m.status,
+                   m.created_by,
                    m.creation_date
               FROM message m
               JOIN adventure a ON m.adventure_id = a.id
@@ -64,6 +65,7 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
                 AiRole.valueOf(rs.getString("role")),
                 rs.getString("content"),
                 MessageStatus.valueOf(rs.getString("status")),
+                rs.getString("created_by"),
                 rs.getTimestamp("creation_date").toInstant());
     }
 }

@@ -41,6 +41,8 @@ import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearc
 @CommandHandler
 public class RetryHandler extends AbstractCommandHandler<Retry, MessageResult> {
 
+    private static final String CONTINUE_GENERATION_INSTRUCTION = " Continue the story from the left message, no matter if it's a user or an assistant message. Simply generate the continuation so the story keeps going. Be creative. If it's an assistant message, do not repeat its content. Generate the continuation.";
+
     private final AdventureRepository adventureRepository;
     private final MessageRepository messageRepository;
     private final TextCompletionPort textCompletionPort;
@@ -116,7 +118,7 @@ public class RetryHandler extends AbstractCommandHandler<Retry, MessageResult> {
 
         var generationRequest = new TextGenerationRequest(
                 modelConfig.getAiModel().getOfficialModelName(),
-                personality,
+                personality + CONTINUE_GENERATION_INSTRUCTION,
                 context,
                 modelConfig.getMaxTokenLimit(),
                 modelConfig.getTemperature());

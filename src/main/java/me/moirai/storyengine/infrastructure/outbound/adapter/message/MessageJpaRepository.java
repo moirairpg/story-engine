@@ -51,4 +51,44 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
                    )
             """)
     void deleteLastAssistantMessage(@Param("adventureId") Long adventureId);
+
+    @Modifying
+    @Query("""
+            DELETE FROM Message m
+             WHERE m.publicId = :messagePublicId
+               AND m.adventureId = (
+                   SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
+               )
+            """)
+    void deleteByPublicId(
+            @Param("adventurePublicId") UUID adventurePublicId,
+            @Param("messagePublicId") UUID messagePublicId);
+
+    @Modifying
+    @Query("""
+            UPDATE Message m
+               SET m.content = :content
+             WHERE m.publicId = :messagePublicId
+               AND m.adventureId = (
+                   SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
+               )
+            """)
+    void updateContent(
+            @Param("adventurePublicId") UUID adventurePublicId,
+            @Param("messagePublicId") UUID messagePublicId,
+            @Param("content") String content);
+
+    @Modifying
+    @Query("""
+            DELETE FROM Message m
+             WHERE m.adventureId = (
+                       SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
+                   )
+               AND m.id > (
+                       SELECT m2.id FROM Message m2 WHERE m2.publicId = :messagePublicId
+                   )
+            """)
+    void deleteNewerThanByPublicId(
+            @Param("adventurePublicId") UUID adventurePublicId,
+            @Param("messagePublicId") UUID messagePublicId);
 }

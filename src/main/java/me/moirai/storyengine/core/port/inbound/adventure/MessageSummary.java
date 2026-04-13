@@ -11,5 +11,6 @@ public record MessageSummary(
         AiRole role,
         String content,
         MessageStatus status,
+        String authorUsername,
         Instant creationDate) {
 }
