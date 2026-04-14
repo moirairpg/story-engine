@@ -107,10 +107,13 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
 
         var context = assembleContext(adventure, history, embeddingInput);
         var modelConfig = adventure.getModelConfiguration();
+        var instructions = Optional.ofNullable(personality)
+                .map(p -> p + CONTINUE_GENERATION_INSTRUCTION)
+                .orElse(CONTINUE_GENERATION_INSTRUCTION);
 
         var generationRequest = new TextGenerationRequest(
                 modelConfig.getAiModel().getOfficialModelName(),
-                personality + CONTINUE_GENERATION_INSTRUCTION,
+                instructions,
                 context,
                 modelConfig.getMaxTokenLimit(),
                 modelConfig.getTemperature());

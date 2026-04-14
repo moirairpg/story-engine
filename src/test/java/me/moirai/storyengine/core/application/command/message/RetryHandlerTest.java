@@ -72,6 +72,8 @@ public class RetryHandlerTest {
 
     private RetryHandler handler;
 
+    private static final String CONTINUE_GENERATION_INSTRUCTION = " Continue the story from the left message, no matter if it's a user or an assistant message. Simply generate the continuation so the story keeps going. Be creative. If it's an assistant message, do not repeat its content. Generate the continuation.";
+
     @BeforeEach
     void setup() {
         handler = new RetryHandler(
@@ -277,6 +279,6 @@ public class RetryHandlerTest {
 
         // then
         verify(textCompletionPort, times(2)).generateTextFrom(captor.capture());
-        assertThat(captor.getAllValues().get(1).instructions()).isNull();
+        assertThat(captor.getAllValues().get(1).instructions()).isEqualTo(CONTINUE_GENERATION_INSTRUCTION);
     }
 }
