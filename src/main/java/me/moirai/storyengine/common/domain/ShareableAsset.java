@@ -2,6 +2,7 @@ package me.moirai.storyengine.common.domain;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -88,12 +89,9 @@ public abstract class ShareableAsset extends Asset {
         return visibility.equals(Visibility.PUBLIC);
     }
 
-    public void makePublic() {
-        this.visibility = Visibility.PUBLIC;
-    }
-
-    public void makePrivate() {
-        this.visibility = Visibility.PRIVATE;
+    public void updateVisibility(Visibility visibility) {
+        this.visibility = Optional.ofNullable(visibility)
+                .orElse(Visibility.PRIVATE);
     }
 
     public Visibility getVisibility() {

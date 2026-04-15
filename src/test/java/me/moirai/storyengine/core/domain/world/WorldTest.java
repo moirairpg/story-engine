@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.domain.world;
 
+import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +21,7 @@ public class WorldTest {
         var world = WorldFixture.privateWorld().build();
 
         // when
-        world.makePublic();
+        world.updateVisibility(PUBLIC);
 
         // then
         assertThat(world.isPublic()).isTrue();
@@ -32,7 +34,7 @@ public class WorldTest {
         var world = WorldFixture.publicWorld().build();
 
         // when
-        world.makePrivate();
+        world.updateVisibility(PRIVATE);
 
         // then
         assertThat(world.isPublic()).isFalse();

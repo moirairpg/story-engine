@@ -51,14 +51,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
         world.updateDescription(command.description());
         world.updateAdventureStart(command.adventureStart());
         world.updateNarrator(command.narratorName(), command.narratorPersonality());
-
-        if (command.visibility() != null) {
-            switch (command.visibility()) {
-                case PUBLIC -> world.makePublic();
-                case PRIVATE -> world.makePrivate();
-                default -> world.makePrivate();
-            }
-        }
+        world.updateVisibility(command.visibility());
 
         var newPermissions = emptyIfNull(command.permissions()).stream()
                 .map(dto -> {

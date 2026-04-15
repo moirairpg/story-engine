@@ -76,14 +76,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
 
     private void updatePermissions(UpdateAdventure command, Adventure adventure) {
 
-        if (command.visibility() != null) {
-            switch (command.visibility()) {
-                case PUBLIC -> adventure.makePublic();
-                case PRIVATE -> adventure.makePrivate();
-                default -> adventure.makePrivate();
-            }
-        }
-
+        adventure.updateVisibility(command.visibility());
         var newPermissions = emptyIfNull(command.permissions()).stream()
                 .map(dto -> {
                     var user = userRepository.findByPublicId(dto.userId())

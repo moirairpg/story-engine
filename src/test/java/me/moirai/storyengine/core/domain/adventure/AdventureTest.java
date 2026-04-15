@@ -1,6 +1,7 @@
 package me.moirai.storyengine.core.domain.adventure;
 
 import static me.moirai.storyengine.common.enums.Visibility.PRIVATE;
+import static me.moirai.storyengine.common.enums.Visibility.PUBLIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -166,7 +167,7 @@ public class AdventureTest {
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
         // when
-        adventure.makePublic();
+        adventure.updateVisibility(PUBLIC);
 
         // then
         assertThat(adventure.isPublic()).isTrue();
@@ -179,7 +180,7 @@ public class AdventureTest {
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
 
         // when
-        adventure.makePrivate();
+        adventure.updateVisibility(PRIVATE);
 
         // then
         assertThat(adventure.isPublic()).isFalse();
