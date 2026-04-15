@@ -15,4 +15,5 @@ public interface MessageRepository {
     void deleteByPublicId(UUID adventurePublicId, UUID messagePublicId);
     void updateContent(UUID adventurePublicId, UUID messagePublicId, String content);
     void deleteNewerThanByPublicId(UUID adventurePublicId, UUID messagePublicId);
+    void deleteAllByAdventurePublicId(UUID adventurePublicId);
 }

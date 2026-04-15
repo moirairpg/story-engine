@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.validation.ConstraintValidator;
@@ -20,15 +21,20 @@ public class ModeratedContentValidator implements ConstraintValidator<Moderated,
     private static final Moderation DEFAULT_MODERATION = Moderation.PERMISSIVE;
 
     private final TextModerationPort textModerationPort;
+    private final boolean requestModerationEnabled;
 
-    public ModeratedContentValidator(TextModerationPort textModerationPort) {
+    public ModeratedContentValidator(
+            TextModerationPort textModerationPort,
+            @Value("${moirai.config.request-moderation}") boolean requestModerationEnabled) {
+
         this.textModerationPort = textModerationPort;
+        this.requestModerationEnabled = requestModerationEnabled;
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        if (StringUtils.isBlank(value)) {
+        if (!requestModerationEnabled || StringUtils.isBlank(value)) {
             return true;
         }
 
@@ -47,8 +53,8 @@ public class ModeratedContentValidator implements ConstraintValidator<Moderated,
 
     private List<String> getFlaggedTopics(String input) {
 
-        var response = textModerationPort.moderate(input);
-        return response.moderationScores()
+        var result = textModerationPort.moderate(input).get(0);
+        return result.moderationScores()
                 .entrySet()
                 .stream()
                 .filter(this::isTopicFlagged)

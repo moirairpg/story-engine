@@ -29,8 +29,9 @@ class TextModerationAdapterTest extends AbstractWebMockTest {
     @Test
     void shouldReturnModerationResultWhenValidRequest() throws JsonProcessingException {
 
+        // given
         var expectedResponse = ModerationResponse.builder()
-                .model("gpt-3.5")
+                .model("omni-moderation-latest")
                 .id("id123")
                 .results(Collections.singletonList(ModerationResult.builder()
                         .flagged(false)
@@ -41,10 +42,12 @@ class TextModerationAdapterTest extends AbstractWebMockTest {
 
         prepareWebserverFor(expectedResponse, 200);
 
-        var result = adapter.moderate("This is the input");
+        // when
+        var results = adapter.moderate("This is the input");
 
-        assertThat(result).isNotNull();
-        assertThat(result.moderationScores())
+        // then
+        assertThat(results).isNotNull().hasSize(1);
+        assertThat(results.get(0).moderationScores())
                 .containsAllEntriesOf(Collections.singletonMap("topic", 0.7));
     }
 }

@@ -79,7 +79,7 @@ public class Adventure extends ShareableAsset {
     @CollectionTable(name = "adventure_permissions", joinColumns = @JoinColumn(name = "adventure_id"))
     private List<Permission> permissions = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "adventure_id")
     private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
 

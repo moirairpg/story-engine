@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.generation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -26,21 +27,22 @@ public class TextModerationAdapter implements TextModerationPort {
     }
 
     @Override
-    public TextModerationResult moderate(String text) {
+    public List<TextModerationResult> moderate(String... texts) {
 
-        var request = new ModerationRequest(text);
+        var request = ModerationRequest.of(texts);
         var response = openAiClient.post()
                 .uri(moderationUrl)
                 .body(request)
                 .retrieve()
                 .body(ModerationResponse.class);
 
-        return toResult(response);
+        return response.getResults()
+                .stream()
+                .map(this::toResult)
+                .toList();
     }
 
-    private TextModerationResult toResult(ModerationResponse response) {
-
-        var result = response.getResults().get(0);
+    private TextModerationResult toResult(ModerationResult result) {
 
         var flaggedTopics = result.getCategories()
                 .entrySet()

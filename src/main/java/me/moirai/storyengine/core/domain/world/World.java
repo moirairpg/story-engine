@@ -59,7 +59,7 @@ public class World extends ShareableAsset {
     @CollectionTable(name = "world_permissions", joinColumns = @JoinColumn(name = "world_id"))
     private List<Permission> permissions = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "world_id")
     private List<WorldLorebookEntry> lorebook = new ArrayList<>();
 

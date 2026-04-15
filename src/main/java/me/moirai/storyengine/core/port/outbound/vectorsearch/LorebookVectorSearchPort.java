@@ -10,4 +10,5 @@ public interface LorebookVectorSearchPort {
     void delete(UUID entryId);
 
     List<UUID> search(UUID adventureId, float[] queryVector, int topK);
+    void deleteAllByAdventureId(UUID adventureId);
 }

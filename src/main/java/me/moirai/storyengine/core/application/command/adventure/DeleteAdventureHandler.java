@@ -5,6 +5,10 @@ import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
+import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @CommandHandler
 public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventure, Void> {
@@ -13,9 +17,23 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
     private final AdventureRepository repository;
+    private final MessageRepository messageRepository;
+    private final ChronicleSegmentRepository chronicleSegmentRepository;
+    private final LorebookVectorSearchPort lorebookVectorSearchPort;
+    private final ChronicleVectorSearchPort chronicleVectorSearchPort;
 
-    public DeleteAdventureHandler(AdventureRepository repository) {
+    public DeleteAdventureHandler(
+            AdventureRepository repository,
+            MessageRepository messageRepository,
+            ChronicleSegmentRepository chronicleSegmentRepository,
+            LorebookVectorSearchPort lorebookVectorSearchPort,
+            ChronicleVectorSearchPort chronicleVectorSearchPort) {
+
         this.repository = repository;
+        this.messageRepository = messageRepository;
+        this.chronicleSegmentRepository = chronicleSegmentRepository;
+        this.lorebookVectorSearchPort = lorebookVectorSearchPort;
+        this.chronicleVectorSearchPort = chronicleVectorSearchPort;
     }
 
     @Override
@@ -32,6 +50,10 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
         repository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException(ADVENTURE_NOT_FOUND));
 
+        messageRepository.deleteAllByAdventurePublicId(command.adventureId());
+        chronicleSegmentRepository.deleteAllByAdventurePublicId(command.adventureId());
+        lorebookVectorSearchPort.deleteAllByAdventureId(command.adventureId());
+        chronicleVectorSearchPort.deleteAllByAdventureId(command.adventureId());
         repository.deleteByPublicId(command.adventureId());
 
         return null;

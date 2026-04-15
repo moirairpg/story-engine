@@ -175,6 +175,14 @@ public class AdventureController extends SecurityContextAware {
                 .map(p -> new PermissionDto(p.userId(), p.level()))
                 .collect(Collectors.toSet());
 
+        var lorebookEntriesToAdd = emptyIfNull(request.lorebookEntriesToAdd()).stream()
+                .map(e -> new UpdateAdventure.LorebookEntryToAdd(e.name(), e.description(), e.playerId()))
+                .toList();
+
+        var lorebookEntriesToUpdate = emptyIfNull(request.lorebookEntriesToUpdate()).stream()
+                .map(e -> new UpdateAdventure.LorebookEntryToUpdate(e.id(), e.name(), e.description(), e.playerId()))
+                .toList();
+
         var command = new UpdateAdventure(
                 adventureId,
                 request.name(),
@@ -195,7 +203,10 @@ public class AdventureController extends SecurityContextAware {
                         request.contextAttributes().authorsNote(),
                         request.contextAttributes().scene(),
                         request.contextAttributes().bump(),
-                        request.contextAttributes().bumpFrequency()));
+                        request.contextAttributes().bumpFrequency()),
+                lorebookEntriesToAdd,
+                lorebookEntriesToUpdate,
+                emptyIfNull(request.lorebookEntriesToDelete()).stream().toList());
 
         return commandRunner.run(command);
     }

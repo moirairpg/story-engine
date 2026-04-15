@@ -116,6 +116,28 @@ public class LorebookVectorSearchAdapter implements LorebookVectorSearchPort {
         }
     }
 
+    @Override
+    public void deleteAllByAdventureId(UUID adventureId) {
+
+        var filter = Filter.newBuilder()
+                .addMust(matchKeyword("adventureId", adventureId.toString()))
+                .build();
+
+        var deleteRequest = DeletePoints.newBuilder()
+                .setCollectionName(collectionName)
+                .setPoints(PointsSelector.newBuilder()
+                        .setFilter(filter)
+                        .build())
+                .build();
+
+        try {
+            qdrantClient.delete(deleteRequest);
+        } catch (StatusRuntimeException e) {
+            Thread.currentThread().interrupt();
+            throw new TechnicalException("Failed to delete vectors for adventure " + adventureId);
+        }
+    }
+
     private List<Float> toFloatList(float[] vector) {
 
         var list = new ArrayList<Float>(vector.length);

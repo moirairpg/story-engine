@@ -3,11 +3,12 @@ package me.moirai.storyengine.core.application.command.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -264,13 +265,13 @@ public class CreateAdventureHandlerTest {
 
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
-        when(embeddingPort.embed(anyString())).thenReturn(new float[]{0.1f, 0.2f});
+        when(embeddingPort.embedAll(anyList())).thenReturn(List.of(new float[]{0.1f, 0.2f}, new float[]{0.3f, 0.4f}));
 
         // when
         handler.handle(command);
 
         // then
-        verify(embeddingPort, times(2)).embed(anyString());
+        verify(embeddingPort).embedAll(anyList());
         verify(vectorSearchPort, times(2)).upsert(any(UUID.class), any(), any(float[].class));
     }
 
@@ -291,7 +292,7 @@ public class CreateAdventureHandlerTest {
         handler.handle(command);
 
         // then
-        verify(embeddingPort, times(0)).embed(anyString());
+        verify(embeddingPort, times(0)).embedAll(anyList());
         verify(vectorSearchPort, times(0)).upsert(any(UUID.class), any(), any(float[].class));
     }
 

@@ -119,6 +119,14 @@ public class WorldController extends SecurityContextAware {
                 .map(p -> new PermissionDto(p.userId(), p.level()))
                 .collect(Collectors.toSet());
 
+        var lorebookEntriesToAdd = emptyIfNull(request.lorebookEntriesToAdd()).stream()
+                .map(e -> new UpdateWorld.LorebookEntryToAdd(e.name(), e.description()))
+                .toList();
+
+        var lorebookEntriesToUpdate = emptyIfNull(request.lorebookEntriesToUpdate()).stream()
+                .map(e -> new UpdateWorld.LorebookEntryToUpdate(e.id(), e.name(), e.description()))
+                .toList();
+
         var command = new UpdateWorld(
                 worldId,
                 request.name(),
@@ -127,7 +135,10 @@ public class WorldController extends SecurityContextAware {
                 request.narratorName(),
                 request.narratorPersonality(),
                 request.visibility(),
-                updatePermissions);
+                updatePermissions,
+                lorebookEntriesToAdd,
+                lorebookEntriesToUpdate,
+                emptyIfNull(request.lorebookEntriesToDelete()).stream().toList());
 
         return commandRunner.run(command);
     }

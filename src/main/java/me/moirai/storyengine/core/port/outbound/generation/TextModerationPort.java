@@ -1,6 +1,8 @@
 package me.moirai.storyengine.core.port.outbound.generation;
 
+import java.util.List;
+
 public interface TextModerationPort {
 
-    TextModerationResult moderate(String text);
+    List<TextModerationResult> moderate(String... texts);
 }

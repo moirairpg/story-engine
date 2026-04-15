@@ -2,6 +2,7 @@ package me.moirai.storyengine.core.port.inbound;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,10 @@ public class UpdateAdventureTest {
                         adventure.getContextAttributes().authorsNote(),
                         adventure.getContextAttributes().scene(),
                         adventure.getContextAttributes().bump(),
-                        adventure.getContextAttributes().bumpFrequency()));
+                        adventure.getContextAttributes().bumpFrequency()),
+                List.of(),
+                List.of(),
+                List.of());
 
         // then
         assertThat(updateAdventure.adventureId()).isEqualTo(AdventureFixture.PUBLIC_ID);
@@ -79,7 +83,10 @@ public class UpdateAdventureTest {
                 sample.isMultiplayer(),
                 null,
                 sample.modelConfiguration(),
-                sample.contextAttributes());
+                sample.contextAttributes(),
+                List.of(),
+                List.of(),
+                List.of());
 
         // then
         assertThat(updateAdventure.permissions()).isEmpty();

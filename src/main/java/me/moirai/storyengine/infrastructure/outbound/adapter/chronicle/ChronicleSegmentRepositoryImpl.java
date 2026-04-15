@@ -26,4 +26,9 @@ public class ChronicleSegmentRepositoryImpl implements ChronicleSegmentRepositor
     public List<ChronicleSegment> getAllByIds(List<UUID> publicIds) {
         return jpaRepository.findAllByPublicIdIn(publicIds);
     }
+
+    @Override
+    public void deleteAllByAdventurePublicId(UUID adventurePublicId) {
+        jpaRepository.deleteAllByAdventurePublicId(adventurePublicId);
+    }
 }

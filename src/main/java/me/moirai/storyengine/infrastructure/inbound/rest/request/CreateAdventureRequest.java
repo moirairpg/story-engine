@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
+import me.moirai.storyengine.infrastructure.inbound.rest.validation.ModeratedLorebook;
 
 public record CreateAdventureRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
@@ -20,7 +21,7 @@ public record CreateAdventureRequest(
         @NotNull(message = "cannot be empty") Moderation moderation,
         boolean isMultiplayer,
         @Moderated @NotEmpty(message = "cannot be empty") String adventureStart,
-        Set<AdventureLorebookEntryRequest> lorebook,
+        @ModeratedLorebook Set<AdventureLorebookEntryRequest> lorebook,
         Set<PermissionRequest> permissions,
         @NotNull(message = "cannot be null") @Valid ModelConfigurationRequest modelConfiguration,
         @Valid ContextAttributesRequest contextAttributes) {

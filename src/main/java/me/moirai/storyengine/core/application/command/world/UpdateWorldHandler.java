@@ -64,6 +64,15 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
 
         world.updatePermissions(newPermissions);
 
+        command.lorebookEntriesToDelete()
+                .forEach(world::removeLorebookEntry);
+
+        command.lorebookEntriesToUpdate()
+                .forEach(e -> world.updateLorebookEntry(e.id(), e.name(), e.description()));
+
+        command.lorebookEntriesToAdd()
+                .forEach(e -> world.addLorebookEntry(e.name(), e.description()));
+
         return mapResult(repository.save(world));
     }
 

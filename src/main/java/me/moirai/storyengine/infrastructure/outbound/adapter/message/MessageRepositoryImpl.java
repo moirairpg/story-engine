@@ -61,4 +61,9 @@ public class MessageRepositoryImpl implements MessageRepository {
     public void deleteNewerThanByPublicId(UUID adventurePublicId, UUID messagePublicId) {
         jpaRepository.deleteNewerThanByPublicId(adventurePublicId, messagePublicId);
     }
+
+    @Override
+    public void deleteAllByAdventurePublicId(UUID adventurePublicId) {
+        jpaRepository.deleteAllByAdventurePublicId(adventurePublicId);
+    }
 }

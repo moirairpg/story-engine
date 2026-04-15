@@ -1,5 +1,6 @@
 package me.moirai.storyengine.core.port.inbound;
 
+import java.util.List;
 import java.util.Set;
 
 import me.moirai.storyengine.common.enums.Visibility;
@@ -34,7 +35,10 @@ public class UpdateAdventureFixture {
                         adventure.getContextAttributes().authorsNote(),
                         adventure.getContextAttributes().scene(),
                         adventure.getContextAttributes().bump(),
-                        adventure.getContextAttributes().bumpFrequency()));
+                        adventure.getContextAttributes().bumpFrequency()),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     public static UpdateAdventure sampleWithRequesterId(String requesterId) {
@@ -60,7 +64,10 @@ public class UpdateAdventureFixture {
                         adventure.getContextAttributes().authorsNote(),
                         adventure.getContextAttributes().scene(),
                         adventure.getContextAttributes().bump(),
-                        adventure.getContextAttributes().bumpFrequency()));
+                        adventure.getContextAttributes().bumpFrequency()),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     public static UpdateAdventure sampleWithVisibility(String requesterId, Visibility visibility) {
@@ -86,7 +93,10 @@ public class UpdateAdventureFixture {
                         adventure.getContextAttributes().authorsNote(),
                         adventure.getContextAttributes().scene(),
                         adventure.getContextAttributes().bump(),
-                        adventure.getContextAttributes().bumpFrequency()));
+                        adventure.getContextAttributes().bumpFrequency()),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     public static UpdateAdventure sampleWithMultiplayer(String requesterId, boolean isMultiplayer) {
@@ -112,6 +122,9 @@ public class UpdateAdventureFixture {
                         adventure.getContextAttributes().authorsNote(),
                         adventure.getContextAttributes().scene(),
                         adventure.getContextAttributes().bump(),
-                        adventure.getContextAttributes().bumpFrequency()));
+                        adventure.getContextAttributes().bumpFrequency()),
+                List.of(),
+                List.of(),
+                List.of());
     }
 }

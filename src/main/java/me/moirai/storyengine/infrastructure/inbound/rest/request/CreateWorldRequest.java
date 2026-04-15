@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
+import me.moirai.storyengine.infrastructure.inbound.rest.validation.ModeratedLorebook;
 
 public record CreateWorldRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
@@ -16,5 +17,5 @@ public record CreateWorldRequest(
         @Moderated String narratorPersonality,
         @NotNull(message = "cannot be null") Visibility visibility,
         Set<PermissionRequest> permissions,
-        List<WorldLorebookEntryRequest> lorebook) {
+        @ModeratedLorebook List<WorldLorebookEntryRequest> lorebook) {
 }

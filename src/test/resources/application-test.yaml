@@ -1,4 +1,6 @@
 moirai:
+  config:
+    request-moderation: false
   nano-id:
     alphabet: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
     characters-amount: 10

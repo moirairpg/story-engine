@@ -10,13 +10,16 @@ import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
 @CommandHandler
 public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventure, AdventureDetails> {
@@ -26,13 +29,19 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
 
     private final AdventureRepository repository;
     private final UserRepository userRepository;
+    private final EmbeddingPort embeddingPort;
+    private final LorebookVectorSearchPort vectorSearchPort;
 
     public UpdateAdventureHandler(
             AdventureRepository repository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            EmbeddingPort embeddingPort,
+            LorebookVectorSearchPort vectorSearchPort) {
 
         this.repository = repository;
         this.userRepository = userRepository;
+        this.embeddingPort = embeddingPort;
+        this.vectorSearchPort = vectorSearchPort;
     }
 
     @Override
@@ -70,8 +79,51 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
 
         updatePermissions(command, adventure);
 
-        var savedAdventure = repository.save(adventure);
-        return mapResult(savedAdventure);
+        var originalIds = adventure.getLorebook().stream()
+                .map(AdventureLorebookEntry::getPublicId)
+                .collect(Collectors.toSet());
+
+        command.lorebookEntriesToDelete()
+                .forEach(adventure::removeLorebookEntry);
+
+        command.lorebookEntriesToUpdate()
+                .forEach(e -> adventure.updateLorebookEntry(e.id(), e.name(), e.description(), e.playerId()));
+
+        command.lorebookEntriesToAdd()
+                .forEach(e -> adventure.addLorebookEntry(e.name(), e.description(), e.playerId()));
+
+        var saved = repository.save(adventure);
+
+        command.lorebookEntriesToDelete().forEach(vectorSearchPort::delete);
+
+        if (!command.lorebookEntriesToUpdate().isEmpty()) {
+            var updateTexts = command.lorebookEntriesToUpdate().stream()
+                    .map(e -> e.name() + ": " + e.description())
+                    .toList();
+
+            var updateVectors = embeddingPort.embedAll(updateTexts);
+            var updateVectorIterator = updateVectors.iterator();
+
+            command.lorebookEntriesToUpdate()
+                    .forEach(e -> vectorSearchPort.upsert(saved.getPublicId(), e.id(), updateVectorIterator.next()));
+        }
+
+        var newEntries = saved.getLorebook().stream()
+                .filter(e -> !originalIds.contains(e.getPublicId()))
+                .toList();
+
+        if (!newEntries.isEmpty()) {
+            var newTexts = newEntries.stream()
+                    .map(e -> e.getName() + ": " + e.getDescription())
+                    .toList();
+
+            var newVectors = embeddingPort.embedAll(newTexts);
+            var newVectorIterator = newVectors.iterator();
+            newEntries
+                    .forEach(e -> vectorSearchPort.upsert(saved.getPublicId(), e.getPublicId(), newVectorIterator.next()));
+        }
+
+        return mapResult(saved);
     }
 
     private void updatePermissions(UpdateAdventure command, Adventure adventure) {

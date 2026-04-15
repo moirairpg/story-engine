@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 
 import io.grpc.StatusRuntimeException;
 import io.qdrant.client.QdrantGrpcClient;
+import io.qdrant.client.grpc.Points.DeletePoints;
 import io.qdrant.client.grpc.Points.Filter;
 import io.qdrant.client.grpc.Points.PointStruct;
+import io.qdrant.client.grpc.Points.PointsSelector;
 import io.qdrant.client.grpc.Points.SearchPoints;
 import io.qdrant.client.grpc.Points.UpsertPoints;
 import io.qdrant.client.grpc.Points.WithPayloadSelector;
@@ -90,6 +92,28 @@ public class ChronicleVectorSearchAdapter implements ChronicleVectorSearchPort {
         } catch (StatusRuntimeException e) {
             Thread.currentThread().interrupt();
             throw new TechnicalException("Failed to search vectors for adventure " + adventureId);
+        }
+    }
+
+    @Override
+    public void deleteAllByAdventureId(UUID adventureId) {
+
+        var filter = Filter.newBuilder()
+                .addMust(matchKeyword("adventureId", adventureId.toString()))
+                .build();
+
+        var deleteRequest = DeletePoints.newBuilder()
+                .setCollectionName(collectionName)
+                .setPoints(PointsSelector.newBuilder()
+                        .setFilter(filter)
+                        .build())
+                .build();
+
+        try {
+            qdrantClient.delete(deleteRequest);
+        } catch (StatusRuntimeException e) {
+            Thread.currentThread().interrupt();
+            throw new TechnicalException("Failed to delete vectors for adventure " + adventureId);
         }
     }
 

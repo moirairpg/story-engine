@@ -2,6 +2,7 @@ package me.moirai.storyengine.core.port.inbound;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,10 @@ public class UpdateWorldTest {
                 null,
                 null,
                 Visibility.PUBLIC,
-                Set.of());
+                Set.of(),
+                List.of(),
+                List.of(),
+                List.of());
 
         // Then
         assertThat(result).isNotNull();
@@ -45,7 +49,10 @@ public class UpdateWorldTest {
                 null,
                 null,
                 Visibility.PUBLIC,
-                null);
+                null,
+                List.of(),
+                List.of(),
+                List.of());
 
         // Then
         assertThat(result).isNotNull();

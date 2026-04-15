@@ -1,4 +1,6 @@
 moirai:
+  config:
+    request-moderation: true
   discord:
     oauth:
       client-id: ${DISCORD_BOT_CLIENT_ID}

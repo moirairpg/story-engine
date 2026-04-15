@@ -91,4 +91,13 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
     void deleteNewerThanByPublicId(
             @Param("adventurePublicId") UUID adventurePublicId,
             @Param("messagePublicId") UUID messagePublicId);
+
+    @Modifying
+    @Query("""
+            DELETE FROM Message m
+             WHERE m.adventureId = (
+                   SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
+                   )
+            """)
+    void deleteAllByAdventurePublicId(@Param("adventurePublicId") UUID adventurePublicId);
 }
