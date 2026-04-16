@@ -18,6 +18,7 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.CreateWorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
@@ -30,6 +31,9 @@ public class CreateWorldHandlerTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private CreateWorldHandler handler;

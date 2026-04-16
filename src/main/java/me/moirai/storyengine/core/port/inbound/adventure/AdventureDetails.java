@@ -19,6 +19,7 @@ public record AdventureDetails(
         Visibility visibility,
         Moderation moderation,
         boolean isMultiplayer,
+        String imageUrl,
         Instant creationDate,
         Instant lastUpdateDate,
         ModelConfigurationDto modelConfiguration,

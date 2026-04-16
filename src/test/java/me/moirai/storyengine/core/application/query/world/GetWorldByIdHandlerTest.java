@@ -53,6 +53,7 @@ public class GetWorldByIdHandlerTest {
                 null,
                 null,
                 "PUBLIC",
+                null,
                 Set.of(),
                 Set.of(),
                 null,

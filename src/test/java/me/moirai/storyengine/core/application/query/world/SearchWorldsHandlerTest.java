@@ -61,7 +61,7 @@ public class SearchWorldsHandlerTest {
         // Given
         var query = new SearchWorlds(null, SearchView.MY_STUFF, null, null, 1, 2, 1L);
 
-        var row = new WorldSearchRow(UUID.randomUUID(), "name", "desc", "PUBLIC", Instant.now(), "WRITE");
+        var row = new WorldSearchRow(UUID.randomUUID(), "name", "desc", "PUBLIC", Instant.now(), null, "WRITE");
 
         when(reader.search(any(SearchWorlds.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));
@@ -80,7 +80,7 @@ public class SearchWorldsHandlerTest {
         // Given
         var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, 1, 2, null);
 
-        var row = new WorldSearchRow(UUID.randomUUID(), "name", "desc", "PUBLIC", Instant.now(), null);
+        var row = new WorldSearchRow(UUID.randomUUID(), "name", "desc", "PUBLIC", Instant.now(), null, null);
 
         when(reader.search(any(SearchWorlds.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));

@@ -188,6 +188,7 @@ public class AdventureCatchUpHandlerTest {
                 false,
                 null,
                 null,
+                null,
                 modelConfig,
                 contextAttributes,
                 Set.of(),

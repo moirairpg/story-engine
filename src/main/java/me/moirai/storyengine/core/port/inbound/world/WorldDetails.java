@@ -14,6 +14,7 @@ public record WorldDetails(
         String narratorName,
         String narratorPersonality,
         String visibility,
+        String imageUrl,
         Set<PermissionDto> permissions,
         Set<WorldLorebookEntryDetails> lorebook,
         Instant creationDate,

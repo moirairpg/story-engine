@@ -26,8 +26,8 @@ public class OpenAiApiConfig {
     private static final Logger LOG = LoggerFactory.getLogger(OpenAiApiConfig.class);
 
     private static final String AUTHENTICATION_ERROR = "Error authenticating user on OpenAI";
-    private static final String UNKNOWN_ERROR = "Error on OpenAI Moderation API";
-    private static final String BAD_REQUEST_ERROR = "Bad request calling OpenAI Moderation API";
+    private static final String UNKNOWN_ERROR = "Error on OpenAI API";
+    private static final String BAD_REQUEST_ERROR = "Bad request calling OpenAI API";
     private static final String BEARER = "Bearer ";
 
     private static final Predicate<HttpStatusCode> BAD_REQUEST = statusCode -> statusCode

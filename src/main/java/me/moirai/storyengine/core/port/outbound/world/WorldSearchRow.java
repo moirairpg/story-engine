@@ -9,5 +9,6 @@ public record WorldSearchRow(
         String description,
         String visibility,
         Instant creationDate,
+        String imageUrl,
         String userPermission) {
 }

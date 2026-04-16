@@ -24,6 +24,7 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
@@ -36,6 +37,9 @@ public class UpdateWorldHandlerTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private UpdateWorldHandler handler;

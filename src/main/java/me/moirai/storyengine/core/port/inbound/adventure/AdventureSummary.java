@@ -11,5 +11,6 @@ public record AdventureSummary(
         String narratorName,
         String visibility,
         Instant creationDate,
+        String imageUrl,
         boolean canWrite) {
 }

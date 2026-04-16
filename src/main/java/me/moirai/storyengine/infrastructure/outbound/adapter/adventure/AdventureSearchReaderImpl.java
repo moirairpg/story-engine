@@ -16,6 +16,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureSortField;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchReader;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchRow;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @Repository
 public class AdventureSearchReaderImpl implements AdventureSearchReader {
@@ -29,6 +30,7 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                     a.narrator_name AS narrator_name,
                     a.visibility,
                     a.creation_date,
+                    a.image_key,
                     ap_me.permission AS user_permission
                FROM adventure a
                LEFT JOIN world   w ON a.world_id   = w.public_id
@@ -37,9 +39,11 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
     //@formatter:on
 
     private final JdbcClient jdbcClient;
+    private final StoragePort storagePort;
 
-    public AdventureSearchReaderImpl(JdbcClient jdbcClient) {
+    public AdventureSearchReaderImpl(JdbcClient jdbcClient, StoragePort storagePort) {
         this.jdbcClient = jdbcClient;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -109,6 +113,7 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 rs.getString("narrator_name"),
                 rs.getString("visibility"),
                 rs.getTimestamp("creation_date").toInstant(),
+                storagePort.resolveUrl(rs.getString("image_key")),
                 rs.getString("user_permission"));
     }
 }

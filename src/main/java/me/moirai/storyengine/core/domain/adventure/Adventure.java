@@ -62,6 +62,9 @@ public class Adventure extends ShareableAsset {
     @Column(name = "adventure_start")
     private String adventureStart;
 
+    @Column(name = "image_key")
+    private String imageKey;
+
     @Column(name = "is_multiplayer")
     private boolean isMultiplayer;
 
@@ -154,6 +157,14 @@ public class Adventure extends ShareableAsset {
 
     public ContextAttributes getContextAttributes() {
         return contextAttributes;
+    }
+
+    public String getImageKey() {
+        return imageKey;
+    }
+
+    public void updateImageKey(String imageKey) {
+        this.imageKey = imageKey;
     }
 
     public boolean isMultiplayer() {

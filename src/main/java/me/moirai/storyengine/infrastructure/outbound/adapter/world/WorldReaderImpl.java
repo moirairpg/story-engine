@@ -12,6 +12,7 @@ import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
 @Repository
@@ -26,6 +27,7 @@ public class WorldReaderImpl implements WorldReader {
                    w.visibility,
                    w.narrator_name,
                    w.narrator_personality,
+                   w.image_key,
                    w.id AS numeric_id,
                    w.creation_date,
                    w.last_update_date
@@ -53,9 +55,11 @@ public class WorldReaderImpl implements WorldReader {
     //@formatter:on
 
     private final JdbcClient jdbcClient;
+    private final StoragePort storagePort;
 
-    public WorldReaderImpl(JdbcClient jdbcClient) {
+    public WorldReaderImpl(JdbcClient jdbcClient, StoragePort storagePort) {
         this.jdbcClient = jdbcClient;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -94,6 +98,7 @@ public class WorldReaderImpl implements WorldReader {
                     rs.getString("narrator_name"),
                     rs.getString("narrator_personality"),
                     rs.getString("visibility"),
+                    storagePort.resolveUrl(rs.getString("image_key")),
                     permissions,
                     lorebook,
                     rs.getTimestamp("creation_date").toInstant(),

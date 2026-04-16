@@ -90,6 +90,7 @@ public class GetAdventureByIdHandlerTest {
                 true,
                 null,
                 null,
+                null,
                 modelConfiguration,
                 contextAttributes,
                 Set.of(),

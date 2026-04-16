@@ -1,6 +1,15 @@
 moirai:
   config:
     request-moderation: true
+  storage:
+    endpoint: ${S3_ENDPOINT}
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+    bucket: ${S3_BUCKET}
+    region: ${S3_REGION}
+  image-generation:
+    model: gpt-image-1
+    quality: medium
   discord:
     oauth:
       client-id: ${DISCORD_BOT_CLIENT_ID}
@@ -18,6 +27,7 @@ moirai:
       moderation-uri: /v1/moderations
       responses-uri: /v1/responses
       embeddings-uri: /v1/embeddings
+      image-uri: /v1/images/generations
     models:
       embedding: text-embedding-3-small
   qdrant:
@@ -36,10 +46,10 @@ moirai:
     message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
   security:
     redirect-path:
-      success: ${SUCCESS_REDIRECT_URL:/success}
-      fail: ${FAIL_REDIRECT_URL:/fail}
-      logout: ${LOGOUT_REDIRECT_URL:/logged-out}
-    ignored-paths: >
+      success: ${AUTH_SUCCESS_REDIRECT_URL}
+      fail: ${AUTH_FAIL_REDIRECT_URL}
+      logout: ${AUTH_LOGOUT_REDIRECT_URL}
+    unsecured-paths: >
       /auth/code,
       /api/swagger/webjars/swagger-ui/index.html,
       /api/swagger/webjars/swagger-ui/index.css,
@@ -53,6 +63,10 @@ moirai:
       /api/swagger/api-docs
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     show-sql: false
     properties.hibernate.format_sql: true

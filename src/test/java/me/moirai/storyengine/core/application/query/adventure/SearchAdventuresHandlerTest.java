@@ -69,7 +69,7 @@ public class SearchAdventuresHandlerTest {
                 SearchView.MY_STUFF, null, null, 1, 2, 1L);
 
         var row = new AdventureSearchRow(
-                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), "OWNER");
+                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), null, "OWNER");
 
         when(reader.search(any(SearchAdventures.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));
@@ -91,7 +91,7 @@ public class SearchAdventuresHandlerTest {
                 SearchView.EXPLORE, null, null, 1, 2, null);
 
         var row = new AdventureSearchRow(
-                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), "READ");
+                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), null, "READ");
 
         when(reader.search(any(SearchAdventures.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));
@@ -113,7 +113,7 @@ public class SearchAdventuresHandlerTest {
                 SearchView.EXPLORE, null, null, 1, 2, null);
 
         var row = new AdventureSearchRow(
-                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), null);
+                UUID.randomUUID(), "name", "desc", "world", "Aria", "PUBLIC", Instant.now(), null, null);
 
         when(reader.search(any(SearchAdventures.class)))
                 .thenReturn(PaginatedResult.of(List.of(row), 1L, 1, 2));

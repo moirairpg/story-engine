@@ -7,6 +7,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
@@ -21,19 +22,22 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
     private final ChronicleSegmentRepository chronicleSegmentRepository;
     private final LorebookVectorSearchPort lorebookVectorSearchPort;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
+    private final StoragePort storagePort;
 
     public DeleteAdventureHandler(
             AdventureRepository repository,
             MessageRepository messageRepository,
             ChronicleSegmentRepository chronicleSegmentRepository,
             LorebookVectorSearchPort lorebookVectorSearchPort,
-            ChronicleVectorSearchPort chronicleVectorSearchPort) {
+            ChronicleVectorSearchPort chronicleVectorSearchPort,
+            StoragePort storagePort) {
 
         this.repository = repository;
         this.messageRepository = messageRepository;
         this.chronicleSegmentRepository = chronicleSegmentRepository;
         this.lorebookVectorSearchPort = lorebookVectorSearchPort;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -47,8 +51,12 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
     @Override
     public Void execute(DeleteAdventure command) {
 
-        repository.findByPublicId(command.adventureId())
+        var adventure = repository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException(ADVENTURE_NOT_FOUND));
+
+        if (adventure.getImageKey() != null) {
+            storagePort.delete(adventure.getImageKey());
+        }
 
         messageRepository.deleteAllByAdventurePublicId(command.adventureId());
         chronicleSegmentRepository.deleteAllByAdventurePublicId(command.adventureId());

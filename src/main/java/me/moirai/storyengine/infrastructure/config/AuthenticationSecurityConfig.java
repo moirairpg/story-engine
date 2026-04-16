@@ -25,7 +25,7 @@ public class AuthenticationSecurityConfig {
     private final MoiraiUserDetailsService userDetailsService;
 
     public AuthenticationSecurityConfig(
-            @Value("${moirai.security.ignored-paths}") String[] unsecuredPaths,
+            @Value("${moirai.security.unsecured-paths}") String[] unsecuredPaths,
             @Value("${moirai.security.redirect-path.fail}") String authenticationFailedPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
             MoiraiUserDetailsService userDetailsService) {

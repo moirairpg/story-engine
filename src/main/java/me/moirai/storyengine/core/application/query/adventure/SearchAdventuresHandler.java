@@ -35,6 +35,7 @@ public class SearchAdventuresHandler extends AbstractQueryHandler<SearchAdventur
                             row.narratorName(),
                             row.visibility(),
                             row.creationDate(),
+                            row.imageUrl(),
                             canWrite);
                 })
                 .toList();

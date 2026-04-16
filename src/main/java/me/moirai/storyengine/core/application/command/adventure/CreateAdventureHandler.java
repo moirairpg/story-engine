@@ -20,6 +20,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
@@ -30,17 +31,20 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
     private final UserRepository userRepository;
     private final EmbeddingPort embeddingPort;
     private final LorebookVectorSearchPort vectorSearchPort;
+    private final StoragePort storagePort;
 
     public CreateAdventureHandler(
             AdventureRepository adventureRepository,
             UserRepository userRepository,
             EmbeddingPort embeddingPort,
-            LorebookVectorSearchPort vectorSearchPort) {
+            LorebookVectorSearchPort vectorSearchPort,
+            StoragePort storagePort) {
 
         this.adventureRepository = adventureRepository;
         this.userRepository = userRepository;
         this.embeddingPort = embeddingPort;
         this.vectorSearchPort = vectorSearchPort;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -118,6 +122,7 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
+                storagePort.resolveUrl(adventure.getImageKey()),
                 adventure.getCreationDate(),
                 adventure.getLastUpdateDate(),
                 modelConfiguration,

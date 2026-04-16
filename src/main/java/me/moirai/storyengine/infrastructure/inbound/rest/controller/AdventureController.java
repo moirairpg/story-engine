@@ -2,12 +2,15 @@ package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +29,10 @@ import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.CursorResult;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.dto.PermissionDto;
+import me.moirai.storyengine.core.port.inbound.ImageResult;
+import me.moirai.storyengine.core.port.inbound.adventure.RemoveAdventureImage;
+import me.moirai.storyengine.core.port.inbound.adventure.UploadAdventureImage;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UploadImageRequest;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -343,6 +350,36 @@ public class AdventureController extends SecurityContextAware {
             @Valid @RequestBody EditMessageRequest request) {
 
         commandRunner.run(new EditMessage(adventureId, messageId, request.content(), authenticatedUsername()));
+    }
+
+    @PutMapping(value = "/{adventureId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public ImageResult uploadAdventureImage(
+            @PathVariable UUID adventureId,
+            @Valid @ModelAttribute UploadImageRequest request) throws IOException {
+
+        var command = new UploadAdventureImage(
+                adventureId,
+                request.file().getBytes(),
+                request.file().getContentType(),
+                extractExtension(request.file().getOriginalFilename()));
+
+        return commandRunner.run(command);
+    }
+
+    @DeleteMapping("/{adventureId}/image")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    public void removeAdventureImage(@PathVariable UUID adventureId) {
+        commandRunner.run(new RemoveAdventureImage(adventureId));
+    }
+
+    private String extractExtension(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            return "png";
+        }
+        return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
     }
 
 }

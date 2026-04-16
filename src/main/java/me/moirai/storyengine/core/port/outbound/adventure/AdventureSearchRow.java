@@ -11,5 +11,6 @@ public record AdventureSearchRow(
         String narratorName,
         String visibility,
         Instant creationDate,
+        String imageUrl,
         String userPermission) {
 }

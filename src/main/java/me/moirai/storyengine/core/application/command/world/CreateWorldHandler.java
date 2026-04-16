@@ -13,6 +13,7 @@ import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
@@ -21,13 +22,16 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
 
     private final WorldRepository repository;
     private final UserRepository userRepository;
+    private final StoragePort storagePort;
 
     public CreateWorldHandler(
             WorldRepository repository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            StoragePort storagePort) {
 
         this.repository = repository;
         this.userRepository = userRepository;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -68,6 +72,7 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                 world.getNarratorName(),
                 world.getNarratorPersonality(),
                 world.getVisibility().name(),
+                storagePort.resolveUrl(world.getImageKey()),
                 world.getPermissions().stream()
                         .map(permission -> {
                             var user = userRepository.findById(permission.userId())

@@ -9,4 +9,5 @@ public record WorldSummary(
         String description,
         String visibility,
         Instant creationDate,
+        String imageUrl,
         boolean canWrite) {}

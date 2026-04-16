@@ -37,6 +37,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryD
 import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 
@@ -56,6 +57,9 @@ public class CreateAdventureHandlerTest {
 
     @Mock
     private LorebookVectorSearchPort vectorSearchPort;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private CreateAdventureHandler handler;

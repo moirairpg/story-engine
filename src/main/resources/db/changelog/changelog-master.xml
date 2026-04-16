@@ -84,4 +84,6 @@
   <include file="db/changelog/migrations/1775947829_alter_table_adventure_world_add_narrator_columns.sql" />
   <include file="db/changelog/migrations/1775947830_update_table_adventure_migrate_persona_to_narrator.sql" />
   <include file="db/changelog/migrations/1775947831_drop_table_persona.sql" />
+  <include file="db/changelog/migrations/1776297285_alter_table_world_add_image_key.sql" />
+  <include file="db/changelog/migrations/1776297288_alter_table_adventure_add_image_key.sql" />
 </databaseChangeLog>

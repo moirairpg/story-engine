@@ -18,6 +18,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryD
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @Repository
 public class AdventureReaderImpl implements AdventureReader {
@@ -43,6 +44,7 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.max_token_limit,
                     a.temperature,
                     a.is_multiplayer,
+                    a.image_key,
                     a.creation_date,
                     a.last_update_date
                FROM adventure a
@@ -71,9 +73,11 @@ public class AdventureReaderImpl implements AdventureReader {
     //@formatter:on
 
     private final JdbcClient jdbcClient;
+    private final StoragePort storagePort;
 
-    public AdventureReaderImpl(JdbcClient jdbcClient) {
+    public AdventureReaderImpl(JdbcClient jdbcClient, StoragePort storagePort) {
         this.jdbcClient = jdbcClient;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -130,6 +134,7 @@ public class AdventureReaderImpl implements AdventureReader {
                     Visibility.valueOf(rs.getString("visibility")),
                     Moderation.valueOf(rs.getString("moderation")),
                     rs.getBoolean("is_multiplayer"),
+                    storagePort.resolveUrl(rs.getString("image_key")),
                     rs.getTimestamp("creation_date").toInstant(),
                     rs.getTimestamp("last_update_date").toInstant(),
                     modelConfiguration,

@@ -52,6 +52,9 @@ public class World extends ShareableAsset {
     @Column(name = "adventure_start")
     private String adventureStart;
 
+    @Column(name = "image_key")
+    private String imageKey;
+
     @Embedded
     private Narrator narrator;
 
@@ -110,6 +113,14 @@ public class World extends ShareableAsset {
 
     public Narrator getNarrator() {
         return narrator;
+    }
+
+    public String getImageKey() {
+        return imageKey;
+    }
+
+    public void updateImageKey(String imageKey) {
+        this.imageKey = imageKey;
     }
 
     public String getNarratorName() {

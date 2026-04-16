@@ -2,12 +2,15 @@ package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,16 +31,20 @@ import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.common.dto.PermissionDto;
+import me.moirai.storyengine.core.port.inbound.ImageResult;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorld;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
+import me.moirai.storyengine.core.port.inbound.world.RemoveWorldImage;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
+import me.moirai.storyengine.core.port.inbound.world.UploadWorldImage;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.WorldSortField;
 import me.moirai.storyengine.core.port.inbound.world.WorldSummary;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateWorldRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateWorldRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UploadImageRequest;
 
 @RestController
 @RequestMapping("/world")
@@ -150,5 +157,35 @@ public class WorldController extends SecurityContextAware {
 
         var command = new DeleteWorld(worldId);
         commandRunner.run(command);
+    }
+
+    @PutMapping(value = "/{worldId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
+    public ImageResult uploadWorldImage(
+            @PathVariable UUID worldId,
+            @Valid @ModelAttribute UploadImageRequest request) throws IOException {
+
+        var command = new UploadWorldImage(
+                worldId,
+                request.file().getBytes(),
+                request.file().getContentType(),
+                extractExtension(request.file().getOriginalFilename()));
+
+        return commandRunner.run(command);
+    }
+
+    @DeleteMapping("/{worldId}/image")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
+    public void removeWorldImage(@PathVariable UUID worldId) {
+        commandRunner.run(new RemoveWorldImage(worldId));
+    }
+
+    private String extractExtension(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            return "png";
+        }
+        return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
     }
 }
