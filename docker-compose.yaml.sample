@@ -5,7 +5,7 @@ services:
     restart: always
     container_name: postgresql
     hostname: postgresql
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     networks:
       - moirai_network
     ports:
@@ -14,6 +14,50 @@ services:
       POSTGRES_USER: moirai
       POSTGRES_PASSWORD: moirai
       POSTGRES_DB: moirai
+    volumes:
+      - postgresql_data:/var/lib/postgresql
+  qdrant:
+    restart: always
+    container_name: qdrant
+    hostname: qdrant
+    image: qdrant/qdrant:v1.17.1
+    networks:
+      - moirai_network
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+  minio:
+    restart: always
+    container_name: minio
+    hostname: minio
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data --console-address ":9001"
+    networks:
+      - moirai_network
+    environment:
+      MINIO_ROOT_USER: moirairpg
+      MINIO_ROOT_PASSWORD: moirairpg
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+  minio-init:
+    container_name: minio-init
+    hostname: minio-init
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    networks:
+      - moirai_network
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set minio http://minio:9000 moirairpg moirairpg;
+      mc mb --ignore-existing minio/moirai;
+      mc anonymous set public minio/moirai;
+      exit 0;
+      "
   moirai:
     container_name: moirai
     hostname: moirai
@@ -31,15 +75,20 @@ services:
     environment:
       DISCORD_BOT_CLIENT_ID: CHANGE_THIS_VALUE
       DISCORD_BOT_CLIENT_SECRET: CHANGE_THIS_VALUE
-      DISCORD_BOT_REDIRECT_URL: http://localhost:8081/auth/code
       DISCORD_BOT_API_TOKEN: CHANGE_THIS_VALUE
       OPENAI_API_TOKEN: CHANGE_THIS_VALUE
-      SPRING_APPLICATION_PROFILES: default
       POSTGRES_HOST: postgresql:5432
       POSTGRES_DB: moirai
       POSTGRES_USER: moirai
       POSTGRES_PASSWORD: moirai
-      CHATRPG_LOG_LEVEL: INFO
       SUCCESS_REDIRECT_URL: http://localhost/success
       FAIL_REDIRECT_URL: http://localhost/fail
       LOGOUT_REDIRECT_URL: http://localhost/logout
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: moirai
+      MINIO_SECRET_KEY: moirai
+      MINIO_BUCKET: moirai
+
+volumes:
+  minio_data:
+  postgresql_data:

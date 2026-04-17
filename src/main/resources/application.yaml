@@ -1,14 +1,21 @@
 moirai:
-  nano-id:
-    alphabet: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
-    characters-amount: 10
+  config:
+    request-moderation: true
+  storage:
+    endpoint: ${S3_ENDPOINT}
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+    bucket: ${S3_BUCKET}
+    region: ${S3_REGION}
+  image-generation:
+    model: gpt-image-1
+    quality: medium
   discord:
     oauth:
       client-id: ${DISCORD_BOT_CLIENT_ID}
       client-secret: ${DISCORD_BOT_CLIENT_SECRET}
       redirect-url: ${DISCORD_BOT_REDIRECT_URL}
     api:
-      token: ${DISCORD_BOT_API_TOKEN}
       base-url: https://discord.com/api
       token-uri: /oauth2/token
       token-revoke-uri: /oauth2/token/revoke
@@ -18,13 +25,31 @@ moirai:
       token: ${OPENAI_API_TOKEN}
       base-url: https://api.openai.com
       moderation-uri: /v1/moderations
-      completions-uri: /v1/chat/completions
+      responses-uri: /v1/responses
+      embeddings-uri: /v1/embeddings
+      image-uri: /v1/images/generations
+    models:
+      embedding: text-embedding-3-small
+  qdrant:
+    host: ${QDRANT_HOST}
+    port: ${QDRANT_PORT}
+  rag:
+    lorebook:
+      top-k: 10
+      collection-name: lorebook
+      vector-size: 1536
+    chronicle:
+      top-k: 10
+      collection-name: chronicle
+      vector-size: 1536
+  adventure:
+    message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
   security:
     redirect-path:
-      success: ${SUCCESS_REDIRECT_URL:/success}
-      fail: ${FAIL_REDIRECT_URL:/fail}
-      logout: ${LOGOUT_REDIRECT_URL:/logged-out}
-    ignored-paths: >
+      success: ${AUTH_SUCCESS_REDIRECT_URL}
+      fail: ${AUTH_FAIL_REDIRECT_URL}
+      logout: ${AUTH_LOGOUT_REDIRECT_URL}
+    unsecured-paths: >
       /auth/code,
       /api/swagger/webjars/swagger-ui/index.html,
       /api/swagger/webjars/swagger-ui/index.css,
@@ -38,10 +63,13 @@ moirai:
       /api/swagger/api-docs
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     show-sql: false
     properties.hibernate.format_sql: true
-  profiles.active: default,prompts,${SPRING_APPLICATION_PROFILES}
   main.banner-mode: off
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}/${POSTGRES_DB}
@@ -51,29 +79,6 @@ spring:
     enabled: true
     defaultSchema: public
     change-log: classpath:db/changelog/changelog-master.xml
-  security:
-    oauth2:
-      client:
-        registration:
-          discord:
-            client-name: Discord
-            client-id: ${DISCORD_BOT_CLIENT_ID}
-            client-secret: ${DISCORD_BOT_CLIENT_SECRET}
-            redirect-uri: ${DISCORD_BOT_REDIRECT_URL}
-            scope: identify
-            client-authentication-method: none
-            authorization-grant-type: authorization_code
-        provider:
-          discord:
-            authorization-uri: https://discord.com/api/oauth2/authorize
-            token-uri: https://discord.com/api/oauth2/token
-            user-info-uri: https://discord.com/api/users/@me
-            user-name-attribute: id
-  rsocket:
-    server:
-      transport: websocket
-      mapping-path: /rs
-      port: 7000
 
 logging:
   level:
@@ -81,7 +86,6 @@ logging:
     root: ERROR
     org.hibernate: ERROR
     com.zaxxer.hikari: ERROR
-    net.dv8tion: ERROR
     org.springframework: ERROR
     ch.qos.logback: ERROR
 

@@ -1,0 +1,341 @@
+package me.moirai.storyengine.core.application.command.adventure;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import me.moirai.storyengine.common.dto.PermissionDto;
+import me.moirai.storyengine.common.enums.PermissionLevel;
+import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
+import me.moirai.storyengine.core.port.inbound.CreateAdventureFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
+import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventure;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
+import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
+import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
+
+@ExtendWith(MockitoExtension.class)
+public class CreateAdventureHandlerTest {
+
+    private static final Long AUTHENTICATED_USER_ID = 99999L;
+
+    @Mock
+    private AdventureRepository repository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private EmbeddingPort embeddingPort;
+
+    @Mock
+    private LorebookVectorSearchPort vectorSearchPort;
+
+    @Mock
+    private StoragePort storagePort;
+
+    @InjectMocks
+    private CreateAdventureHandler handler;
+
+    @BeforeEach
+    void setupSecurityContext() {
+
+        var principal = new MoiraiPrincipal(UUID.randomUUID(), AUTHENTICATED_USER_ID, "discordId",
+                "user", "user@test.com", "token", "refresh", null, null);
+        var authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    public void shouldCreateAdventureWithNarratorWhenNarratorFieldsAreProvided() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                "Aria",
+                "A helpful guide",
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                null,
+                null,
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.narratorName()).isEqualTo(adventure.getNarratorName());
+    }
+
+    @Test
+    public void shouldCreateAdventureWithNullNarratorWhenNoNarratorProvided() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                null,
+                null,
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                null,
+                null,
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.narratorPersonality()).isNull();
+    }
+
+    @Test
+    public void shouldCreateAdventureWhenWorldIdIsNull() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                null,
+                sample.narratorName(),
+                sample.narratorPersonality(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                null,
+                null,
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.worldId()).isNull();
+    }
+
+    @Test
+    public void shouldCreateAdventureWhenValidData() {
+
+        // given
+        var command = CreateAdventureFixture.sample();
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        AdventureDetails result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(AdventureFixture.PUBLIC_ID);
+    }
+
+    @Test
+    public void shouldSetPermissionsFromCommandWhenCreateAdventure() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var permissionDto = new PermissionDto(UserFixture.PUBLIC_ID, PermissionLevel.READ);
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                null,
+                null,
+                Set.of(permissionDto),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var user = UserFixture.playerWithId();
+
+        when(userRepository.findByPublicId(UserFixture.PUBLIC_ID)).thenReturn(Optional.of(user));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+
+        // when
+        AdventureDetails result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void shouldUpsertVectorsForLorebookEntriesFromCommand() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var lorebookEntry1 = new AdventureLorebookEntryDetails(null, null, "Mana Shards", "Crystalized ancient magic", null, false, null, null);
+        var lorebookEntry2 = new AdventureLorebookEntryDetails(null, null, "The Silence", "A void that devours magic", null, false, null, null);
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(lorebookEntry1, lorebookEntry2),
+                null,
+                null,
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+        when(embeddingPort.embedAll(anyList())).thenReturn(List.of(new float[]{0.1f, 0.2f}, new float[]{0.3f, 0.4f}));
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(embeddingPort).embedAll(anyList());
+        verify(vectorSearchPort, times(2)).upsert(any(UUID.class), any(), any(float[].class));
+    }
+
+    @Test
+    public void shouldNotUpsertVectorsWhenLorebookEntriesIsEmpty() {
+
+        // given
+        var command = CreateAdventureFixture.sample();
+
+        var adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(embeddingPort, times(0)).embedAll(anyList());
+        verify(vectorSearchPort, times(0)).upsert(any(UUID.class), any(), any(float[].class));
+    }
+
+    @Test
+    public void shouldThrowWhenUserNotFoundDuringPermissionResolution() {
+
+        // given
+        var sample = CreateAdventureFixture.sample();
+        var permissionDto = new PermissionDto(UserFixture.PUBLIC_ID, PermissionLevel.READ);
+        var command = new CreateAdventure(
+                sample.name(),
+                sample.description(),
+                sample.worldId(),
+                sample.narratorName(),
+                sample.narratorPersonality(),
+                sample.visibility(),
+                sample.moderation(),
+                sample.isMultiplayer(),
+                sample.adventureStart(),
+                Set.of(),
+                null,
+                null,
+                Set.of(permissionDto),
+                sample.modelConfiguration(),
+                sample.contextAttributes());
+
+        when(userRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(NotFoundException.class, () -> handler.handle(command));
+    }
+}

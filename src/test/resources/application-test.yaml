@@ -1,26 +1,21 @@
 moirai:
+  config:
+    request-moderation: false
   nano-id:
     alphabet: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
     characters-amount: 10
+  adventure:
+    message-window-size: 10
+  rag:
+    lorebook:
+      top-k: 5
+      collection-name: lorebook
+      vector-size: 1536
+    chronicle:
+      top-k: 3
+      collection-name: chronicle
+      vector-size: 1536
   discord:
-    bot:
-      status: Writing stories, inspiring adventures.
-      commands:
-        go:
-          before-running:
-            - "The loom spins again — let us continue the tale's weave."
-          after-running:
-            - "The tapestry grows richer — your story continues to unfold."
-        retry:
-          before-running:
-            - "The loom rewinds, ready to spin a better thread."
-          after-running:
-            - "The thread is re-spun; a new path emerges."
-        start:
-          before-running:
-            - "The loom hums to life — your adventure begins here."
-          after-running:
-            - "The spindle spins; your adventure begins now."
     oauth:
       client-id: dummy_value
       client-secret: dummy_value
@@ -36,4 +31,4 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: none
