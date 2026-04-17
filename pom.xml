@@ -14,7 +14,7 @@
 
     <groupId>me.moirai</groupId>
     <artifactId>storyengine</artifactId>
-    <version>3.0.0-RC-SNAPSHOT</version>
+    <version>3.0.0</version>
     <name>MoirAI Story Engine</name>
     <description>MoirAI — AI-powered RPG engine</description>
 
