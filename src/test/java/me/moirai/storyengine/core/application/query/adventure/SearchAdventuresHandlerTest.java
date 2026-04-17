@@ -39,7 +39,6 @@ public class SearchAdventuresHandlerTest {
                 null,
                 null,
                 null,
-                null,
                 SearchView.MY_STUFF,
                 null,
                 null,
@@ -65,7 +64,7 @@ public class SearchAdventuresHandlerTest {
 
         // Given
         var query = new SearchAdventures(
-                null, null, null, null, null, null,
+                null, null, null, null, null,
                 SearchView.MY_STUFF, null, null, 1, 2, 1L);
 
         var row = new AdventureSearchRow(
@@ -87,7 +86,7 @@ public class SearchAdventuresHandlerTest {
 
         // Given
         var query = new SearchAdventures(
-                null, null, null, null, null, null,
+                null, null, null, null, null,
                 SearchView.EXPLORE, null, null, 1, 2, null);
 
         var row = new AdventureSearchRow(
@@ -109,7 +108,7 @@ public class SearchAdventuresHandlerTest {
 
         // Given
         var query = new SearchAdventures(
-                null, null, null, null, null, null,
+                null, null, null, null, null,
                 SearchView.EXPLORE, null, null, 1, 2, null);
 
         var row = new AdventureSearchRow(

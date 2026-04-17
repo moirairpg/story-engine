@@ -72,7 +72,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventure
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureNudgeRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateAdventureSceneRequest;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchGameMode;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModel;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModeration;
 
@@ -99,7 +98,6 @@ public class AdventureController extends SecurityContextAware {
             @RequestParam(name = "world_name", required = false) String worldName,
             @RequestParam(name = "is_multiplayer", required = false) Boolean isMultiplayer,
             @RequestParam(name = "model", required = false) SearchModel model,
-            @RequestParam(name = "game_mode", required = false) SearchGameMode gameMode,
             @RequestParam(name = "moderation", required = false) SearchModeration moderation,
             @RequestParam(name = "view", required = true) SearchView view,
             @RequestParam(name = "sorting_field", required = false) AdventureSortField sortingField,
@@ -112,7 +110,6 @@ public class AdventureController extends SecurityContextAware {
                 worldName,
                 isMultiplayer,
                 model != null ? model.name() : null,
-                gameMode != null ? gameMode.name() : null,
                 moderation != null ? moderation.name() : null,
                 view,
                 sortingField,
@@ -156,6 +153,8 @@ public class AdventureController extends SecurityContextAware {
                 request.isMultiplayer(),
                 request.adventureStart(),
                 lorebookEntries,
+                request.uiImagePositionX(),
+                request.uiImagePositionY(),
                 permissions,
                 new ModelConfigurationDto(
                         request.modelConfiguration().aiModel(),
@@ -200,6 +199,8 @@ public class AdventureController extends SecurityContextAware {
                 request.visibility(),
                 request.moderation(),
                 request.isMultiplayer(),
+                request.uiImagePositionX(),
+                request.uiImagePositionY(),
                 updatePermissions,
                 new ModelConfigurationDto(
                         request.modelConfiguration().aiModel(),

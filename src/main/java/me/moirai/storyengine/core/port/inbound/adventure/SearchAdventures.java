@@ -10,7 +10,6 @@ public record SearchAdventures(
         String worldName,
         Boolean isMultiplayer,
         String model,
-        String gameMode,
         String moderation,
         SearchView view,
         AdventureSortField sortingField,

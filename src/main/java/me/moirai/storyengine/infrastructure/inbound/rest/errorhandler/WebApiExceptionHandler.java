@@ -119,7 +119,7 @@ public class WebApiExceptionHandler {
 
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationFailedException.class)
-    public ResponseEntity<ErrorResponse> authenticationError(AuthenticationFailedException exception) {
+    public ResponseEntity<?> authenticationError(AuthenticationFailedException exception) {
 
         LOG.error("Error during authentication", exception);
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

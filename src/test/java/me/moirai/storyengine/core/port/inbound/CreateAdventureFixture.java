@@ -27,6 +27,8 @@ public class CreateAdventureFixture {
                 adventure.isMultiplayer(),
                 adventure.getAdventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -54,6 +56,8 @@ public class CreateAdventureFixture {
                 adventure.isMultiplayer(),
                 adventure.getAdventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),

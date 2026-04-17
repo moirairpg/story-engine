@@ -32,6 +32,8 @@ public class UpdateAdventureTest {
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -81,6 +83,8 @@ public class UpdateAdventureTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                null,
+                null,
                 null,
                 sample.modelConfiguration(),
                 sample.contextAttributes(),

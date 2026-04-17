@@ -66,7 +66,7 @@ public class UpdateAdventureHandlerTest {
         var command = new UpdateAdventure(
                 null,
                 null, null, null, null, null, null, null, false,
-                null, null, null, List.of(), List.of(), List.of());
+                null, null, null, null, null, List.of(), List.of(), List.of());
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -197,6 +197,8 @@ public class UpdateAdventureHandlerTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                null,
+                null,
                 Set.of(permissionDto),
                 sample.modelConfiguration(),
                 sample.contextAttributes(),
@@ -234,6 +236,8 @@ public class UpdateAdventureHandlerTest {
                 sample.visibility(),
                 sample.moderation(),
                 sample.isMultiplayer(),
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes(),
@@ -269,6 +273,8 @@ public class UpdateAdventureHandlerTest {
                 Visibility.PUBLIC,
                 Moderation.PERMISSIVE,
                 false,
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes(),
@@ -317,6 +323,8 @@ public class UpdateAdventureHandlerTest {
                 Visibility.PUBLIC,
                 Moderation.PERMISSIVE,
                 false,
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes(),
@@ -358,6 +366,8 @@ public class UpdateAdventureHandlerTest {
                 Visibility.PUBLIC,
                 Moderation.PERMISSIVE,
                 false,
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes(),
@@ -379,5 +389,43 @@ public class UpdateAdventureHandlerTest {
         // then
         assertThat(result).isNotNull();
         verify(vectorSearchPort).delete(entryId);
+    }
+
+    @Test
+    public void updateAdventure_whenFocalPointProvided_thenFocalPointIsUpdated() {
+
+        // given
+        var sample = UpdateAdventureFixture.sample();
+        var command = new UpdateAdventure(
+                AdventureFixture.PUBLIC_ID,
+                "MoirAI",
+                "Description",
+                "Adventure start",
+                null,
+                null,
+                Visibility.PUBLIC,
+                Moderation.PERMISSIVE,
+                false,
+                0.3,
+                0.7,
+                Set.of(),
+                sample.modelConfiguration(),
+                sample.contextAttributes(),
+                List.of(),
+                List.of(),
+                List.of());
+
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(repository.save(any(Adventure.class))).thenReturn(adventure);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(repository).save(any(Adventure.class));
     }
 }

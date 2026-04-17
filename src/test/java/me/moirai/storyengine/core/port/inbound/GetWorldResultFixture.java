@@ -33,7 +33,9 @@ public class GetWorldResultFixture {
                 permissions,
                 Set.of(),
                 world.getCreationDate(),
-                world.getLastUpdateDate());
+                world.getLastUpdateDate(),
+                null,
+                null);
     }
 
     public static WorldDetails privateWorld() {
@@ -58,6 +60,8 @@ public class GetWorldResultFixture {
                 permissions,
                 Set.of(),
                 world.getCreationDate(),
-                world.getLastUpdateDate());
+                world.getLastUpdateDate(),
+                null,
+                null);
     }
 }

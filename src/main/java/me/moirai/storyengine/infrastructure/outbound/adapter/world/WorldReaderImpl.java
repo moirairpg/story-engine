@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.world;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
+import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
@@ -28,6 +30,8 @@ public class WorldReaderImpl implements WorldReader {
                    w.narrator_name,
                    w.narrator_personality,
                    w.image_key,
+                   w.ui_image_position_x,
+                   w.ui_image_position_y,
                    w.id AS numeric_id,
                    w.creation_date,
                    w.last_update_date
@@ -102,7 +106,9 @@ public class WorldReaderImpl implements WorldReader {
                     permissions,
                     lorebook,
                     rs.getTimestamp("creation_date").toInstant(),
-                    rs.getTimestamp("last_update_date").toInstant());
+                    rs.getTimestamp("last_update_date").toInstant(),
+                    Functions.mapOrNull(rs.getBigDecimal("ui_image_position_x"), BigDecimal::doubleValue),
+                    Functions.mapOrNull(rs.getBigDecimal("ui_image_position_y"), BigDecimal::doubleValue));
         };
     }
 }

@@ -40,7 +40,7 @@ public class QueryBuilderTest {
         var sql = query.sql();
 
         // Then
-        assertThat(sql).isEqualTo(BASE_SELECT + " WHERE w.public_id = :id");
+        assertThat(sql).isEqualTo(BASE_SELECT + " WHERE (w.public_id = :id)");
     }
 
     @Test
@@ -58,7 +58,7 @@ public class QueryBuilderTest {
 
         // Then
         assertThat(sql).isEqualTo(
-                BASE_SELECT + " WHERE w.name ILIKE :name AND w.visibility = :visibility");
+                BASE_SELECT + " WHERE (w.name ILIKE :name) AND (w.visibility = :visibility)");
     }
 
     @Test
@@ -75,7 +75,7 @@ public class QueryBuilderTest {
         var sql = query.sql();
 
         // Then
-        assertThat(sql).isEqualTo(BASE_SELECT + " WHERE w.visibility = :visibility");
+        assertThat(sql).isEqualTo(BASE_SELECT + " WHERE (w.visibility = :visibility)");
     }
 
     @Test
@@ -127,7 +127,7 @@ public class QueryBuilderTest {
         var params = query.parameters();
 
         // Then
-        assertThat(sql).isEqualTo(BASE_SELECT + " WHERE w.active = TRUE");
+        assertThat(sql).isEqualTo(BASE_SELECT + " WHERE (w.active = TRUE)");
         assertThat(params).isEmpty();
     }
 }

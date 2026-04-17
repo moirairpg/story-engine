@@ -16,6 +16,8 @@ public record UpdateWorld(
         String narratorName,
         String narratorPersonality,
         Visibility visibility,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         Set<PermissionDto> permissions,
         List<LorebookEntryToAdd> lorebookEntriesToAdd,
         List<LorebookEntryToUpdate> lorebookEntriesToUpdate,

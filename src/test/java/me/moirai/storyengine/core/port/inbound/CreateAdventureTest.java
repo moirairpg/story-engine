@@ -33,6 +33,8 @@ public class CreateAdventureTest {
                 adventure.isMultiplayer(),
                 adventure.getAdventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -79,6 +81,8 @@ public class CreateAdventureTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 sample.permissions(),
                 null,
                 sample.contextAttributes());
@@ -105,6 +109,8 @@ public class CreateAdventureTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 null,
                 sample.modelConfiguration(),
                 sample.contextAttributes());

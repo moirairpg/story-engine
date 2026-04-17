@@ -19,6 +19,8 @@ public record UpdateAdventure(
         Visibility visibility,
         Moderation moderation,
         boolean isMultiplayer,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         Set<PermissionDto> permissions,
         ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes,

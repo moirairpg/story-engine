@@ -53,7 +53,9 @@ public class GetAdventureResultFixture {
                 modelConfiguration,
                 contextAttributes,
                 permissions,
-                Set.of());
+                Set.of(),
+                null,
+                null);
     }
 
     public static AdventureDetails publicMultiplayerAdventure() {
@@ -95,6 +97,8 @@ public class GetAdventureResultFixture {
                 modelConfiguration,
                 contextAttributes,
                 permissions,
-                Set.of());
+                Set.of(),
+                null,
+                null);
     }
 }

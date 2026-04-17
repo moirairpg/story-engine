@@ -25,6 +25,8 @@ public class UpdateAdventureFixture {
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -54,6 +56,8 @@ public class UpdateAdventureFixture {
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -83,6 +87,8 @@ public class UpdateAdventureFixture {
                 visibility,
                 adventure.getModeration(),
                 adventure.isMultiplayer(),
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),
@@ -112,6 +118,8 @@ public class UpdateAdventureFixture {
                 adventure.getVisibility(),
                 adventure.getModeration(),
                 isMultiplayer,
+                null,
+                null,
                 Set.of(),
                 new ModelConfigurationDto(
                         adventure.getModelConfiguration().getAiModel(),

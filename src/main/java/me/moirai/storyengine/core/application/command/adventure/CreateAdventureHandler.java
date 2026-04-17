@@ -76,6 +76,8 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                 .permissions(permissions.toArray(Permission[]::new))
                 .build());
 
+        adventure.updateUiImagePosition(command.uiImagePositionX(), command.uiImagePositionY());
+
         emptyIfNull(command.lorebookEntries()).forEach(entry ->
                 adventure.addLorebookEntry(entry.name(), entry.description(), entry.playerId()));
 
@@ -145,7 +147,9 @@ public class CreateAdventureHandler extends AbstractCommandHandler<CreateAdventu
                                 entry.isPlayerCharacter(),
                                 entry.getCreationDate(),
                                 entry.getLastUpdateDate()))
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()),
+                adventure.getUiImagePositionX(),
+                adventure.getUiImagePositionY());
     }
 
     private ContextAttributes buildContextAttributes(CreateAdventure command) {

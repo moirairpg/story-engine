@@ -192,6 +192,8 @@ public class AdventureCatchUpHandlerTest {
                 modelConfig,
                 contextAttributes,
                 Set.of(),
-                Set.of());
+                Set.of(),
+                null,
+                null);
     }
 }

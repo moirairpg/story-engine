@@ -75,6 +75,8 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
         adventure.updateBump(command.contextAttributes().bump());
         adventure.updateBumpFrequency(command.contextAttributes().bumpFrequency());
 
+        adventure.updateUiImagePosition(command.uiImagePositionX(), command.uiImagePositionY());
+
         if (command.isMultiplayer()) {
             adventure.makeMultiplayer();
         } else {
@@ -193,6 +195,8 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                                 entry.isPlayerCharacter(),
                                 entry.getCreationDate(),
                                 entry.getLastUpdateDate()))
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()),
+                savedAdventure.getUiImagePositionX(),
+                savedAdventure.getUiImagePositionY());
     }
 }

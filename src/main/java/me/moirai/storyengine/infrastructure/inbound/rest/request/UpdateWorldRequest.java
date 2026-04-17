@@ -17,6 +17,8 @@ public record UpdateWorldRequest(
         @Moderated String narratorName,
         @Moderated String narratorPersonality,
         @NotNull(message = "cannot be null") Visibility visibility,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         Set<PermissionRequest> permissions,
         @ModeratedLorebook List<WorldLorebookEntryRequest> lorebookEntriesToAdd,
         @ModeratedLorebook List<UpdateWorldLorebookEntryRequest> lorebookEntriesToUpdate,

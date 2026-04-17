@@ -25,7 +25,9 @@ public record AdventureDetails(
         ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes,
         Set<PermissionDto> permissions,
-        Set<AdventureLorebookEntryDetails> lorebook) {
+        Set<AdventureLorebookEntryDetails> lorebook,
+        Double uiImagePositionX,
+        Double uiImagePositionY) {
 
     public AdventureDetails {
         permissions = Set.copyOf(permissions);

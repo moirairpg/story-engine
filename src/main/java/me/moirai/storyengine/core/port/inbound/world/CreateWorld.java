@@ -14,6 +14,8 @@ public record CreateWorld(
         String narratorName,
         String narratorPersonality,
         Visibility visibility,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         List<LorebookEntry> lorebookEntries,
         Set<PermissionDto> permissions)
         implements Command<WorldDetails> {

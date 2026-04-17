@@ -19,6 +19,8 @@ public record CreateAdventure(
         boolean isMultiplayer,
         String adventureStart,
         Set<AdventureLorebookEntryDetails> lorebookEntries,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         Set<PermissionDto> permissions,
         ModelConfigurationDto modelConfiguration,
         ContextAttributesDto contextAttributes)

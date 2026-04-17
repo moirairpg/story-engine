@@ -56,6 +56,7 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
         world.updateAdventureStart(command.adventureStart());
         world.updateNarrator(command.narratorName(), command.narratorPersonality());
         world.updateVisibility(command.visibility());
+        world.updateUiImagePosition(command.uiImagePositionX(), command.uiImagePositionY());
 
         var newPermissions = emptyIfNull(command.permissions()).stream()
                 .map(dto -> {
@@ -109,6 +110,8 @@ public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, Worl
                                 entry.getLastUpdateDate()))
                         .collect(Collectors.toSet()),
                 world.getCreationDate(),
-                world.getLastUpdateDate());
+                world.getLastUpdateDate(),
+                world.getUiImagePositionX(),
+                world.getUiImagePositionY());
     }
 }

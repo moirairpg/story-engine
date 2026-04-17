@@ -55,7 +55,6 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
                 .filter(Filters.containsIgnoreCase("a.name", "name", query.name()))
                 .filter(Filters.containsIgnoreCase("w.name", "worldName", query.worldName()))
                 .filter(Filters.equals("a.ai_model", "model", query.model()))
-                .filter(Filters.equals("a.game_mode", "gameMode", query.gameMode()))
                 .filter(Filters.equals("a.moderation", "moderation", query.moderation()))
                 .filter(Filters.equals("a.is_multiplayer", "isMultiplayer", query.isMultiplayer()))
                 .sortBy(resolveSortingField(query.sortingField()), query.direction())
@@ -89,14 +88,15 @@ public class AdventureSearchReaderImpl implements AdventureSearchReader {
             case SHARED_WITH_ME -> new Filter(
                     "NOT EXISTS (SELECT 1 FROM adventure_permissions ap WHERE ap.adventure_id = a.id AND ap.user_id = :requesterId AND ap.permission = 'OWNER') AND EXISTS (SELECT 1 FROM adventure_permissions ap WHERE ap.adventure_id = a.id AND ap.user_id = :requesterId)",
                     "requesterId", requesterId);
-            case EXPLORE -> new Filter("a.visibility = 'PUBLIC'", null, null);
+            case EXPLORE -> new Filter(
+                    "a.visibility = 'PUBLIC' OR EXISTS (SELECT 1 FROM adventure_permissions ap WHERE ap.adventure_id = a.id AND ap.user_id = :requesterId)",
+                    "requesterId", requesterId);
         };
     }
 
     private String resolveSortingField(AdventureSortField field) {
         return switch (field) {
             case NAME -> "a.name";
-            case GAME_MODE -> "a.game_mode";
             case MODEL -> "a.ai_model";
             case MODERATION -> "a.moderation";
             case LAST_UPDATE_DATE -> "a.last_update_date";

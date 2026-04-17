@@ -55,5 +55,24 @@ public class WorldReaderImplIntegrationTest extends AbstractIntegrationTest {
         assertThat(result.get().adventureStart()).isEqualTo(world.getAdventureStart());
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
+        assertThat(result.get().uiImagePositionX()).isNull();
+        assertThat(result.get().uiImagePositionY()).isNull();
+    }
+
+    @Test
+    public void getWorldById_whenFocalPointSet_thenReturnFocalPoint() {
+
+        // Given
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        world.updateUiImagePosition(0.3, 0.7);
+        insert(world, World.class);
+
+        // When
+        var result = reader.getWorldById(world.getPublicId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get().uiImagePositionX()).isEqualTo(0.3);
+        assertThat(result.get().uiImagePositionY()).isEqualTo(0.7);
     }
 }

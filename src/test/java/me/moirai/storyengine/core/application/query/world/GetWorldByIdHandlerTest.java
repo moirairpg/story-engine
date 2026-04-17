@@ -57,6 +57,8 @@ public class GetWorldByIdHandlerTest {
                 Set.of(),
                 Set.of(),
                 null,
+                null,
+                null,
                 null);
 
         var query = new GetWorldById(WorldFixture.PUBLIC_ID);

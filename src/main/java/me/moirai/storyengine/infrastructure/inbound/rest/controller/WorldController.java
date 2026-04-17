@@ -106,6 +106,8 @@ public class WorldController extends SecurityContextAware {
                 request.narratorName(),
                 request.narratorPersonality(),
                 request.visibility(),
+                request.uiImagePositionX(),
+                request.uiImagePositionY(),
                 emptyIfNull(request.lorebook()).stream()
                         .map(entry -> new CreateWorld.LorebookEntry(
                                 entry.name(),
@@ -142,6 +144,8 @@ public class WorldController extends SecurityContextAware {
                 request.narratorName(),
                 request.narratorPersonality(),
                 request.visibility(),
+                request.uiImagePositionX(),
+                request.uiImagePositionY(),
                 updatePermissions,
                 lorebookEntriesToAdd,
                 lorebookEntriesToUpdate,

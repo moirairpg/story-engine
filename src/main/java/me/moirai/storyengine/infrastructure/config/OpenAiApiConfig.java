@@ -26,7 +26,7 @@ public class OpenAiApiConfig {
     private static final Logger LOG = LoggerFactory.getLogger(OpenAiApiConfig.class);
 
     private static final String AUTHENTICATION_ERROR = "Error authenticating user on OpenAI";
-    private static final String UNKNOWN_ERROR = "Error on OpenAI API";
+    private static final String UNKNOWN_ERROR = "Something went wrong. Contact support.";
     private static final String BAD_REQUEST_ERROR = "Bad request calling OpenAI API";
     private static final String BEARER = "Bearer ";
 
@@ -65,7 +65,10 @@ public class OpenAiApiConfig {
     }
 
     private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
-        throw new RestException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
+
+        var error = mapErrorResponse(response);
+        LOG.error(AUTHENTICATION_ERROR + " -> {}", error);
+        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
     }
 
     private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {

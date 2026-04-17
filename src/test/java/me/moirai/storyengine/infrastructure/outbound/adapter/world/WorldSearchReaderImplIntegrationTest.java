@@ -124,4 +124,38 @@ public class WorldSearchReaderImplIntegrationTest extends AbstractIntegrationTes
         assertThat(result.data()).hasSize(1);
         assertThat(result.data().get(0).userPermission()).isNull();
     }
+
+    @Test
+    public void search_whenExploreAndPrivateWorldWithPermission_thenReturnResults() {
+
+        // Given
+        insert(WorldFixture.privateWorld().build(), World.class);
+
+        var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, null, null, OWNER_ID);
+
+        // When
+        var result = reader.search(query);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.items()).isEqualTo(1);
+        assertThat(result.data()).hasSize(1);
+    }
+
+    @Test
+    public void search_whenExploreAndPrivateWorldWithoutPermission_thenNotReturned() {
+
+        // Given
+        insert(WorldFixture.privateWorld().build(), World.class);
+
+        var query = new SearchWorlds(null, SearchView.EXPLORE, null, null, null, null, 999999L);
+
+        // When
+        var result = reader.search(query);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.items()).isEqualTo(0);
+        assertThat(result.data()).isEmpty();
+    }
 }

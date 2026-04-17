@@ -81,7 +81,9 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
             case SHARED_WITH_ME -> new Filter(
                     "NOT EXISTS (SELECT 1 FROM world_permissions wp WHERE wp.world_id = w.id AND wp.user_id = :requesterId AND wp.permission = 'OWNER') AND EXISTS (SELECT 1 FROM world_permissions wp WHERE wp.world_id = w.id AND wp.user_id = :requesterId)",
                     "requesterId", requesterId);
-            case EXPLORE -> new Filter("w.visibility = 'PUBLIC'", null, null);
+            case EXPLORE -> new Filter(
+                    "w.visibility = 'PUBLIC' OR EXISTS (SELECT 1 FROM world_permissions wp WHERE wp.world_id = w.id AND wp.user_id = :requesterId)",
+                    "requesterId", requesterId);
         };
     }
 

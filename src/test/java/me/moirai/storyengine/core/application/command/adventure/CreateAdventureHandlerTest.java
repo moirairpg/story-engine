@@ -94,6 +94,8 @@ public class CreateAdventureHandlerTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
@@ -129,6 +131,8 @@ public class CreateAdventureHandlerTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
@@ -164,6 +168,8 @@ public class CreateAdventureHandlerTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
@@ -220,6 +226,8 @@ public class CreateAdventureHandlerTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(permissionDto),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
@@ -259,6 +267,8 @@ public class CreateAdventureHandlerTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(lorebookEntry1, lorebookEntry2),
+                null,
+                null,
                 Set.of(),
                 sample.modelConfiguration(),
                 sample.contextAttributes());
@@ -317,6 +327,8 @@ public class CreateAdventureHandlerTest {
                 sample.isMultiplayer(),
                 sample.adventureStart(),
                 Set.of(),
+                null,
+                null,
                 Set.of(permissionDto),
                 sample.modelConfiguration(),
                 sample.contextAttributes());

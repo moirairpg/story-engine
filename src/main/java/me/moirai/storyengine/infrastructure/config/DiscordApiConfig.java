@@ -27,7 +27,7 @@ public class DiscordApiConfig {
     private static final Logger LOG = LoggerFactory.getLogger(DiscordAuthenticationAdapter.class);
 
     private static final String AUTHENTICATION_ERROR = "Error authenticating user on Discord";
-    private static final String UNKNOWN_ERROR = "Error on Discord API";
+    private static final String UNKNOWN_ERROR = "Something went wrong. Contact support.";
     private static final String BAD_REQUEST_ERROR = "Bad request calling Discord API";
 
     private static final Predicate<HttpStatusCode> BAD_REQUEST_PREDICATE = statusCode -> statusCode
@@ -60,7 +60,10 @@ public class DiscordApiConfig {
     }
 
     private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
-        throw new RestException(HttpStatus.UNAUTHORIZED, AUTHENTICATION_ERROR);
+
+        var error = mapErrorResponse(response);
+        LOG.error(AUTHENTICATION_ERROR + " -> {}", error);
+        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
     }
 
     private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {

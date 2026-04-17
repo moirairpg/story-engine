@@ -94,7 +94,9 @@ public class GetAdventureByIdHandlerTest {
                 modelConfiguration,
                 contextAttributes,
                 Set.of(),
-                Set.of());
+                Set.of(),
+                null,
+                null);
 
         var query = new GetAdventureById(AdventureFixture.PUBLIC_ID);
 

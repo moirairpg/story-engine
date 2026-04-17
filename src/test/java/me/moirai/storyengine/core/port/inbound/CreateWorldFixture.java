@@ -19,6 +19,8 @@ public class CreateWorldFixture {
                 world.getNarrator().narratorName(),
                 world.getNarrator().narratorPersonality(),
                 world.getVisibility(),
+                null,
+                null,
                 Collections.emptyList(),
                 Set.of());
     }

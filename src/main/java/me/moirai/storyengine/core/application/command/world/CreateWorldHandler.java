@@ -55,6 +55,8 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                 .permissions(permissions.toArray(Permission[]::new))
                 .build());
 
+        world.updateUiImagePosition(command.uiImagePositionX(), command.uiImagePositionY());
+
         command.lorebookEntries().forEach(entry -> world.addLorebookEntry(
                 entry.name(),
                 entry.description()));
@@ -91,6 +93,8 @@ public class CreateWorldHandler extends AbstractCommandHandler<CreateWorld, Worl
                                 entry.getLastUpdateDate()))
                         .collect(Collectors.toSet()),
                 world.getCreationDate(),
-                world.getLastUpdateDate());
+                world.getLastUpdateDate(),
+                world.getUiImagePositionX(),
+                world.getUiImagePositionY());
     }
 }

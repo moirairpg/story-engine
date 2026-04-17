@@ -13,7 +13,7 @@ import me.moirai.storyengine.infrastructure.inbound.rest.validation.ModeratedLor
 
 public record CreateAdventureRequest(
         @Moderated @NotEmpty(message = "cannot be empty") String name,
-        @Moderated String description,
+        @Moderated @NotEmpty(message = "cannot be empty") String description,
         UUID worldId,
         @Moderated String narratorName,
         @Moderated String narratorPersonality,
@@ -22,6 +22,8 @@ public record CreateAdventureRequest(
         boolean isMultiplayer,
         @Moderated @NotEmpty(message = "cannot be empty") String adventureStart,
         @ModeratedLorebook Set<AdventureLorebookEntryRequest> lorebook,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         Set<PermissionRequest> permissions,
         @NotNull(message = "cannot be null") @Valid ModelConfigurationRequest modelConfiguration,
         @Valid ContextAttributesRequest contextAttributes) {

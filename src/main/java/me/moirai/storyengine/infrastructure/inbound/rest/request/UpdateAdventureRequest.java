@@ -20,6 +20,8 @@ public record UpdateAdventureRequest(
         @NotNull(message = "cannot be empty") Visibility visibility,
         @NotNull(message = "cannot be empty") Moderation moderation,
         boolean isMultiplayer,
+        Double uiImagePositionX,
+        Double uiImagePositionY,
         Set<PermissionRequest> permissions,
         @Moderated String adventureStart,
         @NotNull(message = "cannot be null") @Valid ModelConfigurationRequest modelConfiguration,

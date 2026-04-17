@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
+import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
@@ -45,6 +47,8 @@ public class AdventureReaderImpl implements AdventureReader {
                     a.temperature,
                     a.is_multiplayer,
                     a.image_key,
+                    a.ui_image_position_x,
+                    a.ui_image_position_y,
                     a.creation_date,
                     a.last_update_date
                FROM adventure a
@@ -140,7 +144,9 @@ public class AdventureReaderImpl implements AdventureReader {
                     modelConfiguration,
                     contextAttributes,
                     permissions,
-                    lorebook);
+                    lorebook,
+                    Functions.mapOrNull(rs.getBigDecimal("ui_image_position_x"), BigDecimal::doubleValue),
+                    Functions.mapOrNull(rs.getBigDecimal("ui_image_position_y"), BigDecimal::doubleValue));
         };
     }
 }

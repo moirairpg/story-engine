@@ -38,7 +38,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
 
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures(null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null,
                 SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
@@ -60,7 +60,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
                 .build();
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures(null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null,
                 SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
@@ -76,7 +76,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
     public void search_whenNoResults_thenReturnEmpty() {
 
         // Given
-        var query = new SearchAdventures(null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null,
                 SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
@@ -99,7 +99,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
 
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures("Name", null, null, null, null, null,
+        var query = new SearchAdventures("Name", null, null, null, null,
                 SearchView.MY_STUFF, null, null, null, null, OWNER_ID);
 
         // When
@@ -122,7 +122,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
 
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures(null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null,
                 SearchView.EXPLORE, null, null, null, null, OWNER_ID);
 
         // When
@@ -144,7 +144,7 @@ public class AdventureSearchReaderImplIntegrationTest extends AbstractIntegratio
 
         insert(adventure, Adventure.class);
 
-        var query = new SearchAdventures(null, null, null, null, null, null,
+        var query = new SearchAdventures(null, null, null, null, null,
                 SearchView.EXPLORE, null, null, null, null, 999999L);
 
         // When

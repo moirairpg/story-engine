@@ -64,7 +64,7 @@ public class QueryBuilder {
             if (i > 0) {
                 sb.append(" AND ");
             }
-            sb.append(filters.get(i).clause());
+            sb.append("(").append(filters.get(i).clause()).append(")");
         }
     }
 

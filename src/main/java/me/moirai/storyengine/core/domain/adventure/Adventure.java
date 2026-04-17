@@ -82,6 +82,12 @@ public class Adventure extends ShareableAsset {
     @CollectionTable(name = "adventure_permissions", joinColumns = @JoinColumn(name = "adventure_id"))
     private List<Permission> permissions = new ArrayList<>();
 
+    @Column(name = "ui_image_position_x")
+    private Double uiImagePositionX;
+
+    @Column(name = "ui_image_position_y")
+    private Double uiImagePositionY;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "adventure_id")
     private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
@@ -165,6 +171,19 @@ public class Adventure extends ShareableAsset {
 
     public void updateImageKey(String imageKey) {
         this.imageKey = imageKey;
+    }
+
+    public Double getUiImagePositionX() {
+        return uiImagePositionX;
+    }
+
+    public Double getUiImagePositionY() {
+        return uiImagePositionY;
+    }
+
+    public void updateUiImagePosition(Double uiImagePositionX, Double uiImagePositionY) {
+        this.uiImagePositionX = uiImagePositionX;
+        this.uiImagePositionY = uiImagePositionY;
     }
 
     public boolean isMultiplayer() {

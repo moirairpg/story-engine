@@ -18,7 +18,9 @@ public record WorldDetails(
         Set<PermissionDto> permissions,
         Set<WorldLorebookEntryDetails> lorebook,
         Instant creationDate,
-        Instant lastUpdateDate) {
+        Instant lastUpdateDate,
+        Double uiImagePositionX,
+        Double uiImagePositionY) {
 
     public WorldDetails {
         permissions = Set.copyOf(permissions);

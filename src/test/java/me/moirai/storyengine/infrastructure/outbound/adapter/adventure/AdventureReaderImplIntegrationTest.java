@@ -76,5 +76,29 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result.get().contextAttributes().scene()).isEqualTo("Scene");
         assertThat(result.get().contextAttributes().bump()).isEqualTo("Bump");
         assertThat(result.get().contextAttributes().bumpFrequency()).isEqualTo(1);
+        assertThat(result.get().uiImagePositionX()).isNull();
+        assertThat(result.get().uiImagePositionY()).isNull();
+    }
+
+    @Test
+    public void getAdventureById_whenFocalPointSet_thenReturnFocalPoint() {
+
+        // Given
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+        var adventure = AdventureFixture.privateMultiplayerAdventure()
+                .worldId(world.getPublicId())
+                .build();
+
+        var saved = insert(adventure, Adventure.class);
+        saved.updateUiImagePosition(0.3, 0.7);
+        insert(saved, Adventure.class);
+
+        // When
+        var result = reader.getAdventureById(saved.getPublicId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get().uiImagePositionX()).isEqualTo(0.3);
+        assertThat(result.get().uiImagePositionY()).isEqualTo(0.7);
     }
 }

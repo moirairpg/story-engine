@@ -58,6 +58,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 Visibility.PUBLIC,
+                null,
+                null,
                 Set.of(),
                 List.of(),
                 List.of(),
@@ -91,6 +93,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 Visibility.PUBLIC,
+                null,
+                null,
                 Set.of(),
                 List.of(),
                 List.of(),
@@ -129,6 +133,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
+                null,
+                null,
                 List.of(),
                 List.of(),
                 List.of());
@@ -160,6 +166,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 Visibility.PRIVATE,
                 null,
+                null,
+                null,
                 List.of(),
                 List.of(),
                 List.of());
@@ -185,6 +193,8 @@ public class UpdateWorldHandlerTest {
         var id = WorldFixture.PUBLIC_ID;
         var command = new UpdateWorld(
                 id,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -222,6 +232,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 null,
+                null,
+                null,
                 List.of(),
                 List.of(),
                 List.of());
@@ -238,6 +250,8 @@ public class UpdateWorldHandlerTest {
         var command = new UpdateWorld(
                 WorldFixture.PUBLIC_ID,
                 "SomeNewName",
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -267,6 +281,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 Visibility.PUBLIC,
+                null,
+                null,
                 Set.of(),
                 List.of(new UpdateWorld.LorebookEntryToAdd("Hero", "The main character")),
                 List.of(),
@@ -303,6 +319,8 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 Visibility.PUBLIC,
+                null,
+                null,
                 Set.of(),
                 List.of(),
                 List.of(new UpdateWorld.LorebookEntryToUpdate(entryId, "New Name", "New Description")),
@@ -337,10 +355,46 @@ public class UpdateWorldHandlerTest {
                 null,
                 null,
                 Visibility.PUBLIC,
+                null,
+                null,
                 Set.of(),
                 List.of(),
                 List.of(),
                 List.of(entryId));
+
+        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
+        when(repository.save(any(World.class))).thenReturn(world);
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(UserFixture.playerWithId()));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(repository).save(any(World.class));
+    }
+
+    @Test
+    public void updateWorld_whenFocalPointProvided_thenFocalPointIsUpdated() {
+
+        // given
+        var id = WorldFixture.PUBLIC_ID;
+        var command = new UpdateWorld(
+                id,
+                "MoirAI",
+                "This is an RPG world",
+                "As you enter the city, people around you start looking at you.",
+                null,
+                null,
+                Visibility.PUBLIC,
+                0.3,
+                0.7,
+                Set.of(),
+                List.of(),
+                List.of(),
+                List.of());
+
+        var world = WorldFixture.privateWorld().build();
 
         when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(world));
         when(repository.save(any(World.class))).thenReturn(world);

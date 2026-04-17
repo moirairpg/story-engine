@@ -27,7 +27,7 @@ public class PaginatedQueryTest {
 
         // Then
         assertThat(sql).isEqualTo(
-                BASE_SELECT + " WHERE a.name ILIKE :name ORDER BY a.name ASC LIMIT :limit OFFSET :offset");
+                BASE_SELECT + " WHERE (a.name ILIKE :name) ORDER BY a.name ASC LIMIT :limit OFFSET :offset");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class PaginatedQueryTest {
 
         // Then
         assertThat(countSql).isEqualTo(
-                "SELECT COUNT(*) FROM (" + BASE_SELECT + " WHERE a.game_mode = :gameMode) AS count_query");
+                "SELECT COUNT(*) FROM (" + BASE_SELECT + " WHERE (a.game_mode = :gameMode)) AS count_query");
     }
 
     @Test
@@ -204,7 +204,7 @@ public class PaginatedQueryTest {
 
         // Then
         assertThat(sql).isEqualTo(
-                BASE_SELECT + " WHERE a.game_mode = :gameMode ORDER BY a.name ASC LIMIT :limit OFFSET :offset");
+                BASE_SELECT + " WHERE (a.game_mode = :gameMode) ORDER BY a.name ASC LIMIT :limit OFFSET :offset");
     }
 
     @Test
