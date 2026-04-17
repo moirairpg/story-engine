@@ -9,6 +9,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Validate branch
+        run: |
+          if [[ "${{ github.ref_name }}" != "main" ]]; then
+            echo "::error::This workflow must be run on the main branch."
+            exit 1
+          fi
+
       - name: Checkout main
         uses: actions/checkout@v6.0.2
         with:
