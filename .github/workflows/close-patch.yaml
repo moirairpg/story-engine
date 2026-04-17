@@ -9,11 +9,19 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - name: Checkout develop
         uses: actions/checkout@v6.0.2
         with:
           ref: develop
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.2.0
@@ -67,7 +75,9 @@ jobs:
         run: |
           mvn versions:set -DnewVersion=${{ env.PATCH_VERSION }} -DgenerateBackupPoms=false
           git add pom.xml
-          git commit -m "patch: set version ${{ env.PATCH_VERSION }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "patch: set version ${{ env.PATCH_VERSION }}"
+          fi
           git push origin main
 
       - name: Merge main into develop
@@ -84,7 +94,9 @@ jobs:
         run: |
           mvn versions:set -DnewVersion=${{ env.DEVELOP_VERSION }} -DgenerateBackupPoms=false
           git add pom.xml
-          git commit -m "patch: restore develop version to ${{ env.DEVELOP_VERSION }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "patch: restore develop version to ${{ env.DEVELOP_VERSION }}"
+          fi
           git push origin develop
 
       - name: Delete patch branch
