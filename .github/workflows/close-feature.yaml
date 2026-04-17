@@ -49,8 +49,15 @@ jobs:
             git merge --abort
             exit 1
           fi
+          git push origin ${{ github.ref_name }}
 
-      - name: Normalize version
+      - name: Merge feature branch into develop
+        run: |
+          git checkout develop
+          git pull origin develop
+          git merge ${{ github.ref_name }} --no-ff -m "feature: merge ${{ github.ref_name }} into develop"
+
+      - name: Normalize version on develop
         run: |
           FEATURE_NAME="${GITHUB_REF_NAME#feature/}"
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
@@ -60,13 +67,6 @@ jobs:
           mvn versions:set -DnewVersion=$SNAPSHOT_VERSION -DgenerateBackupPoms=false
           git add pom.xml
           git commit -m "feature: normalize version to $SNAPSHOT_VERSION"
-          git push origin ${{ github.ref_name }}
-
-      - name: Merge feature branch into develop
-        run: |
-          git checkout develop
-          git pull origin develop
-          git merge ${{ github.ref_name }} --no-ff -m "feature: merge ${{ github.ref_name }} into develop"
           git push origin develop
 
       - name: Delete feature branch
