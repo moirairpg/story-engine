@@ -2,11 +2,6 @@ name: Close feature
 
 on:
   workflow_dispatch:
-    inputs:
-      feature_name:
-        description: "Feature name (e.g. my-feature)"
-        required: true
-        type: string
 
 jobs:
   close-feature:
@@ -14,10 +9,17 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Validate branch
+        run: |
+          if [[ "${{ github.ref_name }}" != feature/* ]]; then
+            echo "::error::This workflow must be run on a feature/* branch."
+            exit 1
+          fi
+
       - name: Checkout feature branch
         uses: actions/checkout@v6.0.2
         with:
-          ref: feature/${{ inputs.feature_name }}
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
       - name: Set up JDK 25
@@ -34,7 +36,7 @@ jobs:
       - name: Merge develop into feature branch
         run: |
           git fetch origin develop
-          if ! git merge origin/develop --no-ff -m "feature: merge develop into feature/${{ inputs.feature_name }}"; then
+          if ! git merge origin/develop --no-ff -m "feature: merge develop into ${{ github.ref_name }}"; then
             echo "::error::Merge conflicts detected. Resolve conflicts manually before closing this feature."
             git merge --abort
             exit 1
@@ -42,22 +44,23 @@ jobs:
 
       - name: Normalize version
         run: |
+          FEATURE_NAME="${GITHUB_REF_NAME#feature/}"
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           NUMERIC_VERSION=${CURRENT_VERSION%-SNAPSHOT}
-          NUMERIC_VERSION=${NUMERIC_VERSION%-${{ inputs.feature_name }}}
+          NUMERIC_VERSION=${NUMERIC_VERSION%-$FEATURE_NAME}
           SNAPSHOT_VERSION="${NUMERIC_VERSION}-SNAPSHOT"
           mvn versions:set -DnewVersion=$SNAPSHOT_VERSION -DgenerateBackupPoms=false
           git add pom.xml
           git commit -m "feature: normalize version to $SNAPSHOT_VERSION"
-          git push origin feature/${{ inputs.feature_name }}
+          git push origin ${{ github.ref_name }}
 
       - name: Merge feature branch into develop
         run: |
           git checkout develop
           git pull origin develop
-          git merge feature/${{ inputs.feature_name }} --no-ff -m "feature: merge feature/${{ inputs.feature_name }} into develop"
+          git merge ${{ github.ref_name }} --no-ff -m "feature: merge ${{ github.ref_name }} into develop"
           git push origin develop
 
       - name: Delete feature branch
         run: |
-          git push origin --delete feature/${{ inputs.feature_name }}
+          git push origin --delete ${{ github.ref_name }}
