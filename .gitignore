@@ -6,6 +6,7 @@ target/
 !**/src/test/**/target/
 *.log
 docker.env
+*.versionsBackup
 
 ### STS ###
 .apt_generated
