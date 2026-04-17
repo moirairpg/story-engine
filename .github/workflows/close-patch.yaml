@@ -75,7 +75,9 @@ jobs:
         run: |
           mvn versions:set -DnewVersion=${{ env.PATCH_VERSION }} -DgenerateBackupPoms=false
           git add pom.xml
-          git commit -m "patch: set version ${{ env.PATCH_VERSION }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "patch: set version ${{ env.PATCH_VERSION }}"
+          fi
           git push origin main
 
       - name: Merge main into develop
@@ -92,7 +94,9 @@ jobs:
         run: |
           mvn versions:set -DnewVersion=${{ env.DEVELOP_VERSION }} -DgenerateBackupPoms=false
           git add pom.xml
-          git commit -m "patch: restore develop version to ${{ env.DEVELOP_VERSION }}"
+          if ! git diff --cached --quiet; then
+            git commit -m "patch: restore develop version to ${{ env.DEVELOP_VERSION }}"
+          fi
           git push origin develop
 
       - name: Delete patch branch
