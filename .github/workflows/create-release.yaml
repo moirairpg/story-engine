@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     steps:
       - name: Checkout develop
         uses: actions/checkout@v6.0.2
@@ -47,7 +48,8 @@ jobs:
       - name: Set RC-SNAPSHOT version on main
         run: |
           mvn versions:set -DnewVersion=${{ env.RC_VERSION }} -DgenerateBackupPoms=false
-          git add pom.xml
+          sed -i "s/storyengine-[^ ]*\.jar/storyengine-${{ env.RC_VERSION }}.jar/g" README.md
+          git add pom.xml README.md
           git commit -m "release: set version ${{ env.RC_VERSION }}"
           git push origin main
 
@@ -56,15 +58,18 @@ jobs:
           git checkout develop
           git merge main --no-ff -m "release: merge main back into develop after ${{ env.TAG_NAME }}"
           mvn versions:set -DnewVersion=${{ env.NEXT_SNAPSHOT }} -DgenerateBackupPoms=false
-          git add pom.xml
+          sed -i "s/storyengine-[^ ]*\.jar/storyengine-${{ env.NEXT_SNAPSHOT }}.jar/g" README.md
+          git add pom.xml README.md
           git commit -m "release: bump version to ${{ env.NEXT_SNAPSHOT }}"
           git push origin develop
 
       - name: Create release branch and finalize version
         run: |
+          git checkout main
           git checkout -b release/${{ env.NUMERIC_VERSION }}
           mvn versions:set -DnewVersion=${{ env.NUMERIC_VERSION }} -DgenerateBackupPoms=false
-          git add pom.xml
+          sed -i "s/storyengine-[^ ]*\.jar/storyengine-${{ env.NUMERIC_VERSION }}.jar/g" README.md
+          git add pom.xml README.md
           git commit -m "release: set version ${{ env.NUMERIC_VERSION }}"
 
       - name: Tag and publish release
@@ -77,3 +82,17 @@ jobs:
           gh release create ${{ env.TAG_NAME }} \
             --title "MoirAI ${{ env.NUMERIC_VERSION }}" \
             --generate-notes
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ${{ vars.DOCKER_REPO_ADDR }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push release image
+        run: |
+          docker build \
+            --build-arg APP_VERSION=${{ env.NUMERIC_VERSION }} \
+            -t ${{ vars.DOCKER_REPO_ADDR }}/${{ vars.DOCKER_REPO }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ env.NUMERIC_VERSION }} .
+          docker push ${{ vars.DOCKER_REPO_ADDR }}/${{ vars.DOCKER_REPO }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ env.NUMERIC_VERSION }}
