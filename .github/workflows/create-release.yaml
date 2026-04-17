@@ -17,11 +17,19 @@ jobs:
             exit 1
           fi
 
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - name: Checkout develop
         uses: actions/checkout@v6.0.2
         with:
           ref: develop
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.2.0
@@ -81,7 +89,7 @@ jobs:
 
       - name: Tag and publish release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git tag ${{ env.TAG_NAME }}
           git push origin ${{ env.TAG_NAME }}

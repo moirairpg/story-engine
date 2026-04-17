@@ -16,11 +16,19 @@ jobs:
             exit 1
           fi
 
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - name: Checkout feature branch
         uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.2.0
