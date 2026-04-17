@@ -46,7 +46,7 @@ You will need your Discord OAuth2 client ID and secret, as well as your OpenAI A
 5. Run the application:
     - Through the IDE of your choice
     - Through Maven with `mvn spring-boot:run`
-    - By running the JAR directly with `java -jar storyengine-3.0.0-SNAPSHOT.jar`
+    - By running the JAR directly with `java -jar storyengine-3.1.0-SNAPSHOT.jar`
 
 ### With Docker
 1. Clone the repo

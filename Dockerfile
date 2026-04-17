@@ -27,9 +27,9 @@ ENV LOGOUT_REDIRECT_URL=
 
 WORKDIR /opt/moirai
 
-COPY --from=builder /opt/moirai/target/storyengine-3.0.0-RC-SNAPSHOT.jar storyengine-3.0.0-RC-SNAPSHOT.jar
+COPY --from=builder /opt/moirai/target/storyengine-3.1.0-SNAPSHOT.jar storyengine-3.1.0-SNAPSHOT.jar
 
 EXPOSE 8080
 EXPOSE 8000
 
-CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "-jar", "/opt/moirai/storyengine-3.0.0-RC-SNAPSHOT.jar"]
+CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "-jar", "/opt/moirai/storyengine-3.1.0-SNAPSHOT.jar"]
