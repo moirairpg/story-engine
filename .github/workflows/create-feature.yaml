@@ -42,9 +42,13 @@ jobs:
           distribution: "temurin"
 
       - name: Configure git
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          APP_SLUG="${{ steps.app-token.outputs.app-slug }}"
+          APP_USER_ID=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
 
       - name: Create feature branch
         run: |
