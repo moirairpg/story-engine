@@ -1,4 +1,4 @@
-name: Create MoirAI release
+name: Create release
 
 on:
   workflow_dispatch:
