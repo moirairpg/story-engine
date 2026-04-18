@@ -67,7 +67,6 @@ jobs:
             git merge --abort
             exit 1
           fi
-          git push origin ${{ env.PATCH_BRANCH }}
 
       - name: Merge patch branch into main
         run: |
