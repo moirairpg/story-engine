@@ -97,7 +97,6 @@ jobs:
         run: |
           git tag ${{ env.TAG_NAME }}
           git push origin ${{ env.TAG_NAME }}
-          git branch -D release/${{ env.NUMERIC_VERSION }}
           gh release create ${{ env.TAG_NAME }} \
             --title "MoirAI ${{ env.NUMERIC_VERSION }}" \
             --generate-notes
