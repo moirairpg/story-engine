@@ -54,7 +54,7 @@ jobs:
           NEXT_VERSION="${MAJOR}.$((MINOR + 1)).0"
           echo "NUMERIC_VERSION=$NUMERIC_VERSION" >> $GITHUB_ENV
           echo "RC_VERSION=${NUMERIC_VERSION}-RC-SNAPSHOT" >> $GITHUB_ENV
-          echo "TAG_NAME=v${NUMERIC_VERSION}" >> $GITHUB_ENV
+          echo "TAG_NAME=${NUMERIC_VERSION}" >> $GITHUB_ENV
           echo "NEXT_SNAPSHOT=${NEXT_VERSION}-SNAPSHOT" >> $GITHUB_ENV
 
       - name: Merge develop into main
