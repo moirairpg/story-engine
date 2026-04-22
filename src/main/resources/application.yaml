@@ -45,6 +45,8 @@ moirai:
   adventure:
     message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
   security:
+    allowed-origins: ${ALLOWED_ORIGINS}
+    allowed-headers: ${ALLOWED_HEADERS}
     redirect-path:
       success: ${AUTH_SUCCESS_REDIRECT_URL}
       fail: ${AUTH_FAIL_REDIRECT_URL}

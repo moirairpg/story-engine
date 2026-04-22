@@ -13,6 +13,8 @@ public interface UserRepository {
 
     Optional<User> findByPublicId(UUID publicId);
 
+    Optional<User> findByUsername(String username);
+
     User save(User user);
 
     void delete(User user);

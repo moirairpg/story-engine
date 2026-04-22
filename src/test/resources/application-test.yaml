@@ -22,6 +22,9 @@ moirai:
       redirect-url: http://dummy_value
     api-base-url: https://discord.com/api
     api-token: dummy_value
+  security:
+    allowed-origins: http://localhost
+    allowed-headers: Content-Type
 
 spring:
   main.banner-mode: 'off'

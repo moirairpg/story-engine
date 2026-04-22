@@ -15,5 +15,7 @@ public interface UserJpaRepository
 
         Optional<User> findByPublicId(UUID publicId);
 
+        Optional<User> findByUsername(String username);
+
         void deleteByDiscordId(String discordId);
 }

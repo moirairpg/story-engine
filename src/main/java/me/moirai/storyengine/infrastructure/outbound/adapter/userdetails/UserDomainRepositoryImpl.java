@@ -28,6 +28,11 @@ public class UserDomainRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return jpaRepository.findByUsername(username);
+    }
+
+    @Override
     public User save(User user) {
         return jpaRepository.save(user);
     }

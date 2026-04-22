@@ -7,6 +7,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
@@ -23,6 +24,7 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
     private final LorebookVectorSearchPort lorebookVectorSearchPort;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
     private final StoragePort storagePort;
+    private final NotificationRepository notificationRepository;
 
     public DeleteAdventureHandler(
             AdventureRepository repository,
@@ -30,7 +32,8 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
             ChronicleSegmentRepository chronicleSegmentRepository,
             LorebookVectorSearchPort lorebookVectorSearchPort,
             ChronicleVectorSearchPort chronicleVectorSearchPort,
-            StoragePort storagePort) {
+            StoragePort storagePort,
+            NotificationRepository notificationRepository) {
 
         this.repository = repository;
         this.messageRepository = messageRepository;
@@ -38,6 +41,7 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
         this.lorebookVectorSearchPort = lorebookVectorSearchPort;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
         this.storagePort = storagePort;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -62,6 +66,7 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
         chronicleSegmentRepository.deleteAllByAdventurePublicId(command.adventureId());
         lorebookVectorSearchPort.deleteAllByAdventureId(command.adventureId());
         chronicleVectorSearchPort.deleteAllByAdventureId(command.adventureId());
+        notificationRepository.deleteAllGameNotificationsByAdventureId(adventure.getId());
         repository.deleteByPublicId(command.adventureId());
 
         return null;

@@ -23,6 +23,7 @@ import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
+import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
@@ -47,6 +48,9 @@ public class DeleteAdventureHandlerTest {
 
     @Mock
     private StoragePort storagePort;
+
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @InjectMocks
     private DeleteAdventureHandler handler;
@@ -131,5 +135,21 @@ public class DeleteAdventureHandlerTest {
 
         // then
         verify(storagePort, never()).delete(any());
+    }
+
+    @Test
+    public void shouldDeleteGameNotificationsWhenAdventureIsDeleted() {
+
+        // given
+        var adventure = adventureWithId();
+        var command = new DeleteAdventure(AdventureFixture.PUBLIC_ID);
+
+        when(repository.findByPublicId(AdventureFixture.PUBLIC_ID)).thenReturn(Optional.of(adventure));
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(notificationRepository).deleteAllGameNotificationsByAdventureId(AdventureFixture.NUMERIC_ID);
     }
 }
