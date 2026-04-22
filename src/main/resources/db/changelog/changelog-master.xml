@@ -88,4 +88,6 @@
   <include file="db/changelog/migrations/1776297288_alter_table_adventure_add_image_key.sql" />
   <include file="db/changelog/migrations/1776377868_alter_table_world_add_ui_image_position.sql" />
   <include file="db/changelog/migrations/1776377873_alter_table_adventure_add_ui_image_position.sql" />
+  <include file="db/changelog/migrations/1776807608_create_table_notification.sql" />
+  <include file="db/changelog/migrations/1776807616_create_table_notification_read.sql" />
 </databaseChangeLog>

@@ -16,4 +16,7 @@ public enum AuthorizationOperation {
     MANAGE_USER,
     UPDATE_USER_USERNAME,
     UPDATE_USER_ROLE,
+
+    MANAGE_NOTIFICATION,
+    VIEW_NOTIFICATION,
 }
