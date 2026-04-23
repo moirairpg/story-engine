@@ -8,7 +8,6 @@ CREATE TABLE notification (
     message VARCHAR(2000) NOT NULL,
     type VARCHAR(50) NOT NULL,
     level VARCHAR(50),
-    target_user_id BIGINT,
     adventure_id BIGINT,
     is_interactable BOOLEAN DEFAULT FALSE,
     metadata JSONB,
@@ -18,6 +17,9 @@ CREATE TABLE notification (
     version INT DEFAULT 0 NOT NULL
 );
 
+CREATE INDEX idx_notification_adventure ON notification(adventure_id);
+
 /* liquibase rollback
-DROP TABLE notification
+DROP INDEX idx_notification_adventure;
+DROP TABLE notification;
 */

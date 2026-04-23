@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -22,14 +21,14 @@ public class ActiveSystemNotificationReaderImpl implements ActiveSystemNotificat
                    n.message,
                    n.type,
                    n.level,
-                   u.username,
                    a.public_id AS adventure_id,
                    n.is_interactable,
                    n.creation_date,
                    n.last_update_date
               FROM notification n
               LEFT JOIN adventure a ON n.adventure_id = a.id
-              JOIN moirai_user u ON n.target_user_id = u.id
+              JOIN notification_recipient nr_t ON nr_t.notification_id = n.id
+              JOIN moirai_user u ON u.id = nr_t.user_id
              WHERE n.type = 'SYSTEM'
                AND u.username = :username
                AND NOT EXISTS (
@@ -55,8 +54,7 @@ public class ActiveSystemNotificationReaderImpl implements ActiveSystemNotificat
                         rs.getString("message"),
                         NotificationType.valueOf(rs.getString("type")),
                         Functions.mapOrNull(rs.getString("level"), NotificationLevel::valueOf),
-                        NotificationStatus.UNREAD,
-                        rs.getString("username"),
+                        List.of(username),
                         rs.getObject("adventure_id", UUID.class),
                         rs.getBoolean("is_interactable"),
                         null,

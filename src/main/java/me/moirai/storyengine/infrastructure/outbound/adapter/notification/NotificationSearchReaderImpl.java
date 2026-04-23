@@ -10,7 +10,6 @@ import me.moirai.storyengine.common.dbutil.Filter;
 import me.moirai.storyengine.common.dbutil.Filters;
 import me.moirai.storyengine.common.dbutil.PaginatedQuery;
 import me.moirai.storyengine.common.dto.PaginatedResult;
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -28,11 +27,8 @@ public class NotificationSearchReaderImpl implements NotificationSearchReader {
                    n.message,
                    n.type,
                    n.level,
-                   n.creation_date,
-                   CASE WHEN nr.id IS NOT NULL THEN 'READ' ELSE 'UNREAD' END AS status
+                   n.creation_date
               FROM notification n
-              LEFT JOIN notification_read nr ON nr.notification_id = n.id
-                        AND nr.user_id = n.target_user_id
             """;
     //@formatter:on
 
@@ -50,7 +46,6 @@ public class NotificationSearchReaderImpl implements NotificationSearchReader {
                 .filter(resolveTypeFilter(query.type()))
                 .filter(Filters.equals("n.level", "level",
                         Functions.mapOrNull(query.level(), NotificationLevel::name)))
-                .filter(resolveStatusFilter(query.status()))
                 .filter(resolveReceiverFilter(query.receiverId()))
                 .sortBy(resolveSortField(query.sortingField()), query.direction())
                 .page(query.page(), query.size())
@@ -63,7 +58,6 @@ public class NotificationSearchReaderImpl implements NotificationSearchReader {
                         rs.getString("message"),
                         NotificationType.valueOf(rs.getString("type")),
                         Functions.mapOrNull(rs.getString("level"), NotificationLevel::valueOf),
-                        NotificationStatus.valueOf(rs.getString("status")),
                         rs.getTimestamp("creation_date").toInstant()))
                 .list();
 
@@ -84,21 +78,6 @@ public class NotificationSearchReaderImpl implements NotificationSearchReader {
         return Filters.equals("n.type", "type", type.name());
     }
 
-    private Optional<Filter> resolveStatusFilter(NotificationStatus status) {
-
-        if (status == null) {
-            return Optional.empty();
-        }
-
-        if (status == NotificationStatus.READ) {
-            return Optional.of(new Filter(
-                    "EXISTS (SELECT 1 FROM notification_read nr2 WHERE nr2.notification_id = n.id AND nr2.user_id = n.target_user_id)"));
-        }
-
-        return Optional.of(new Filter(
-                "NOT EXISTS (SELECT 1 FROM notification_read nr2 WHERE nr2.notification_id = n.id AND nr2.user_id = n.target_user_id)"));
-    }
-
     private Optional<Filter> resolveReceiverFilter(UUID receiverId) {
 
         if (receiverId == null) {
@@ -106,7 +85,9 @@ public class NotificationSearchReaderImpl implements NotificationSearchReader {
         }
 
         return Optional.of(new Filter(
-                "n.target_user_id = (SELECT u.id FROM moirai_user u WHERE u.public_id = :receiverId)",
+                "EXISTS (SELECT 1 FROM notification_recipient nr_f "
+                        + "JOIN moirai_user u ON u.id = nr_f.user_id "
+                        + "WHERE nr_f.notification_id = n.id AND u.public_id = :receiverId)",
                 "receiverId", receiverId));
     }
 

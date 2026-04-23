@@ -1,5 +1,8 @@
 package me.moirai.storyengine.infrastructure.outbound.websocket;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -11,7 +14,6 @@ import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationCreated;
-import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
@@ -55,42 +57,51 @@ public class NotificationEventListener {
     }
 
     private void sendAdventureNotification(Notification notification) {
+
         var adventure = adventureRepository.findById(notification.getAdventureId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
         messagingTemplate.convertAndSend(
                 "/topic/notifications/adventure/" + adventure.getPublicId(),
-                mapToDetails(notification, adventure, null));
+                mapToDetails(notification, adventure, Collections.emptyList()));
     }
 
     private void sendSystemNotification(Notification notification) {
-        var targetUser = userRepository.findById(notification.getTargetUserId())
-                .orElseThrow(() -> new NotFoundException(TARGET_USER_NOT_FOUND));
 
-        messagingTemplate.convertAndSendToUser(
-                targetUser.getUsername(),
-                "/queue/notifications/system",
-                mapToDetails(notification, null, targetUser));
+        var userIds = notification.getRecipientUserIds();
+        var users = userRepository.findAllById(userIds);
+
+        if (users.size() != userIds.size()) {
+            throw new NotFoundException(TARGET_USER_NOT_FOUND);
+        }
+
+        for (var user : users) {
+            var details = mapToDetails(notification, null, List.of(user.getUsername()));
+
+            messagingTemplate.convertAndSendToUser(
+                    user.getUsername(),
+                    "/queue/notifications/system",
+                    details);
+        }
     }
 
     private void sendBroadcastNotification(Notification notification) {
         messagingTemplate.convertAndSend(
                 "/topic/notifications/broadcast",
-                mapToDetails(notification, null, null));
+                mapToDetails(notification, null, Collections.emptyList()));
     }
 
     private NotificationDetails mapToDetails(
             Notification notification,
             Adventure adventure,
-            User user) {
+            List<String> targetUsernames) {
 
         return new NotificationDetails(
                 notification.getPublicId(),
                 notification.getMessage(),
                 notification.getType(),
                 notification.getLevel(),
-                Functions.mapOrNull(user, u -> notification.getStatus(u.getId())),
-                Functions.mapOrNull(user, User::getUsername),
+                targetUsernames,
                 Functions.mapOrNull(adventure, Adventure::getPublicId),
                 notification.isInteractable(),
                 notification.getMetadata(),

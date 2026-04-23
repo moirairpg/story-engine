@@ -1,11 +1,11 @@
 package me.moirai.storyengine.core.application.command.notification;
 
-import java.util.Optional;
+import java.util.List;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.UpdateNotification;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
@@ -46,24 +46,19 @@ public class UpdateNotificationHandler extends AbstractCommandHandler<UpdateNoti
         notification.updateLevel(command.level());
 
         var saved = notificationRepository.save(notification);
-        var user = Optional.ofNullable(notification.getTargetUserId())
-                .flatMap(userRepository::findById)
-                .orElse(null);
-
-        NotificationStatus status = null;
-        String targetUsername = null;
-        if (user != null) {
-            status = notification.getStatus(user.getId());
-            targetUsername = user.getUsername();
-        }
+        var recipientIds = saved.getRecipientUserIds();
+        var recipientUsernames = recipientIds.isEmpty()
+                ? List.<String>of()
+                : userRepository.findAllById(recipientIds).stream()
+                        .map(User::getUsername)
+                        .toList();
 
         return new NotificationDetails(
                 saved.getPublicId(),
                 saved.getMessage(),
                 saved.getType(),
                 saved.getLevel(),
-                status,
-                targetUsername,
+                recipientUsernames,
                 null,
                 saved.isInteractable(),
                 saved.getMetadata(),

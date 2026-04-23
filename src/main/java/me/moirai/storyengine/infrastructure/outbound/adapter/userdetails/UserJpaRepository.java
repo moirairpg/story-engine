@@ -1,5 +1,7 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +18,8 @@ public interface UserJpaRepository
         Optional<User> findByPublicId(UUID publicId);
 
         Optional<User> findByUsername(String username);
+
+        List<User> findAllByUsernameIn(Collection<String> usernames);
 
         void deleteByDiscordId(String discordId);
 }

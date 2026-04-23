@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.port.outbound.userdetails;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +16,10 @@ public interface UserRepository {
     Optional<User> findByPublicId(UUID publicId);
 
     Optional<User> findByUsername(String username);
+
+    List<User> findAllById(Collection<Long> ids);
+
+    List<User> findAllByUsernameIn(Collection<String> usernames);
 
     User save(User user);
 

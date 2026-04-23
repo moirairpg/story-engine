@@ -1,8 +1,5 @@
 package me.moirai.storyengine.core.domain.notification;
 
-import java.time.Instant;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,29 +10,25 @@ import jakarta.persistence.Table;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
-@Table(name = "notification_read")
-public class NotificationRead {
+@Table(name = "notification_recipient")
+public class NotificationRecipient {
 
     @EmbeddedId
-    private NotificationReadId id;
+    private NotificationRecipientId id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("notificationId")
     @JoinColumn(name = "notification_id")
     private Notification notification;
 
-    @Column(name = "read_date")
-    private Instant readDate;
-
-    protected NotificationRead() {
+    protected NotificationRecipient() {
         super();
     }
 
-    private NotificationRead(Builder builder) {
+    private NotificationRecipient(Builder builder) {
         super();
         this.notification = builder.notification;
-        this.readDate = builder.readDate;
-        this.id = new NotificationReadId(null, builder.userId);
+        this.id = new NotificationRecipientId(null, builder.userId);
     }
 
     public static Builder builder() {
@@ -46,23 +39,14 @@ public class NotificationRead {
         return notification;
     }
 
-    public Long getNotificationId() {
-        return notification != null ? notification.getId() : null;
-    }
-
     public Long getUserId() {
         return id.userId();
-    }
-
-    public Instant getReadDate() {
-        return readDate;
     }
 
     public static final class Builder {
 
         private Notification notification;
         private Long userId;
-        private Instant readDate;
 
         private Builder() {
         }
@@ -77,12 +61,7 @@ public class NotificationRead {
             return this;
         }
 
-        public Builder readDate(Instant readDate) {
-            this.readDate = readDate;
-            return this;
-        }
-
-        public NotificationRead build() {
+        public NotificationRecipient build() {
 
             if (notification == null) {
                 throw new BusinessRuleViolationException("Notification is required");
@@ -92,11 +71,7 @@ public class NotificationRead {
                 throw new BusinessRuleViolationException("User ID is required");
             }
 
-            if (readDate == null) {
-                throw new BusinessRuleViolationException("Read timestamp is required");
-            }
-
-            return new NotificationRead(this);
+            return new NotificationRecipient(this);
         }
     }
 }

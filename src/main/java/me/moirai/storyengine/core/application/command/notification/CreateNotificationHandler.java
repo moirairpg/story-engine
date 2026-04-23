@@ -1,15 +1,12 @@
 package me.moirai.storyengine.core.application.command.notification;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationEventPublisher;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationCreated;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -20,9 +17,8 @@ import me.moirai.storyengine.core.port.outbound.notification.NotificationReposit
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
-public class CreateNotificationHandler extends AbstractCommandHandler<CreateNotification, List<NotificationDetails>> {
+public class CreateNotificationHandler extends AbstractCommandHandler<CreateNotification, NotificationDetails> {
 
-    private static final String MESSAGE_REQUIRED = "Notification message cannot be null or empty";
     private static final String SYSTEM_REQUIRES_TARGET = "SYSTEM notifications must have at least one target user";
     private static final String BROADCAST_REQUIRES_NO_TARGET = "BROADCAST notifications cannot have target users";
     private static final String GAME_NOT_ALLOWED = "GAME notifications cannot be created via this command";
@@ -45,10 +41,6 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
     @Override
     public void validate(CreateNotification command) {
 
-        if (command.message() == null || command.message().isBlank()) {
-            throw new IllegalArgumentException(MESSAGE_REQUIRED);
-        }
-
         if (command.type() == NotificationType.GAME) {
             throw new IllegalArgumentException(GAME_NOT_ALLOWED);
         }
@@ -60,67 +52,18 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
         }
 
         if (command.type() == NotificationType.BROADCAST
-                && (command.targetUsernames() != null && !command.targetUsernames().isEmpty())) {
+                && command.targetUsernames() != null && !command.targetUsernames().isEmpty()) {
 
             throw new IllegalArgumentException(BROADCAST_REQUIRES_NO_TARGET);
         }
     }
 
     @Override
-    public List<NotificationDetails> execute(CreateNotification command) {
+    public NotificationDetails execute(CreateNotification command) {
 
-        if (command.type() == NotificationType.BROADCAST) {
-            var notification = createNotification(command, null);
-            return List.of(toResult(null, notification));
-        }
-
-        var resolvedUsers = resolveUsers(command.targetUsernames());
-        return resolvedUsers.stream()
-                .map(user -> {
-                    var notification = createNotification(command, user);
-                    return toResult(user, notification);
-                })
-                .toList();
-    }
-
-    private NotificationDetails toResult(
-            User user,
-            Notification notification) {
-
-        return new NotificationDetails(
-                notification.getPublicId(),
-                notification.getMessage(),
-                notification.getType(),
-                notification.getLevel(),
-                NotificationStatus.UNREAD,
-                Functions.mapOrNull(user, User::getUsername),
-                null,
-                notification.isInteractable(),
-                notification.getMetadata(),
-                notification.getCreationDate(),
-                notification.getLastUpdateDate());
-    }
-
-    private List<User> resolveUsers(List<String> usernames) {
-
-        var resolved = new ArrayList<User>();
-        var missing = new ArrayList<String>();
-
-        for (var username : usernames) {
-            userRepository.findByUsername(username)
-                    .ifPresentOrElse(resolved::add, () -> missing.add(username));
-        }
-
-        if (!missing.isEmpty()) {
-            throw new NotFoundException(UNKNOWN_USERS + String.join(", ", missing));
-        }
-
-        return resolved;
-    }
-
-    private Notification createNotification(
-            CreateNotification command,
-            User user) {
+        var recipients = command.type() == NotificationType.SYSTEM
+                ? resolveUsers(command.targetUsernames())
+                : List.<User>of();
 
         var notification = notificationRepository.save(Notification.builder()
                 .message(command.message())
@@ -128,11 +71,43 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
                 .level(command.level())
                 .isInteractable(command.isInteractable())
                 .metadata(command.metadata())
-                .targetUserId(Functions.mapOrNull(user, User::getId))
+                .recipientUserIds(recipients.stream().map(User::getId).toList())
                 .build());
 
         eventPublisher.publishEvent(new NotificationCreated(notification.getPublicId()));
 
-        return notification;
+        return toResult(recipients, notification);
+    }
+
+    private List<User> resolveUsers(List<String> usernames) {
+
+        var found = userRepository.findAllByUsernameIn(usernames);
+
+        if (found.size() != usernames.size()) {
+            var foundUsernames = found.stream().map(User::getUsername).toList();
+            var missing = usernames.stream().filter(u -> !foundUsernames.contains(u)).toList();
+            throw new NotFoundException(UNKNOWN_USERS + String.join(", ", missing));
+        }
+
+        return found;
+    }
+
+    private NotificationDetails toResult(List<User> recipients, Notification notification) {
+
+        var usernames = recipients.stream()
+                .map(User::getUsername)
+                .toList();
+
+        return new NotificationDetails(
+                notification.getPublicId(),
+                notification.getMessage(),
+                notification.getType(),
+                notification.getLevel(),
+                usernames,
+                null,
+                notification.isInteractable(),
+                notification.getMetadata(),
+                notification.getCreationDate(),
+                notification.getLastUpdateDate());
     }
 }

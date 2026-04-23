@@ -1,9 +1,9 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.PaginatedResult;
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
@@ -72,7 +72,6 @@ public class NotificationRestController extends SecurityContextAware {
     public PaginatedResult<NotificationSummary> searchNotifications(
             @RequestParam(required = false) NotificationType type,
             @RequestParam(required = false) NotificationLevel level,
-            @RequestParam(required = false) NotificationStatus status,
             @RequestParam(name = "receiver_id", required = false) UUID receiverId,
             @RequestParam(name = "sorting_field", required = false) NotificationSortField sortingField,
             @RequestParam(name = "sorting_direction", required = false) SortDirection direction,
@@ -82,7 +81,6 @@ public class NotificationRestController extends SecurityContextAware {
         return queryRunner.run(new SearchNotifications(
                 type,
                 level,
-                status,
                 receiverId,
                 sortingField,
                 direction,
@@ -91,16 +89,23 @@ public class NotificationRestController extends SecurityContextAware {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
-    public List<NotificationDetails> createNotification(@RequestBody CreateNotificationRequest request) {
-        return commandRunner.run(new CreateNotification(
+    public ResponseEntity<NotificationDetails> createNotification(@RequestBody CreateNotificationRequest request) {
+
+        var details = commandRunner.run(new CreateNotification(
                 request.message(),
                 request.type(),
                 request.level(),
                 request.targetUsernames(),
                 request.isInteractable(),
                 request.metadata()));
+
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{publicId}")
+                .buildAndExpand(details.publicId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(details);
     }
 
     @PatchMapping("/{notificationId}")

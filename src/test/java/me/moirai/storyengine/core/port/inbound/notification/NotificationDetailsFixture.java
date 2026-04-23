@@ -1,9 +1,9 @@
 package me.moirai.storyengine.core.port.inbound.notification;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
 
@@ -16,8 +16,7 @@ public class NotificationDetailsFixture {
                 "Broadcast message",
                 NotificationType.BROADCAST,
                 NotificationLevel.INFO,
-                NotificationStatus.UNREAD,
-                null,
+                List.of(),
                 null,
                 false,
                 null,
@@ -32,8 +31,7 @@ public class NotificationDetailsFixture {
                 "System message",
                 NotificationType.SYSTEM,
                 NotificationLevel.INFO,
-                NotificationStatus.UNREAD,
-                "some_user",
+                List.of("some_user"),
                 null,
                 false,
                 null,

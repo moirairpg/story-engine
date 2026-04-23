@@ -1,12 +1,12 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.notification;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -53,8 +53,7 @@ public class ActiveBroadcastNotificationReaderImpl implements ActiveBroadcastNot
                         rs.getString("message"),
                         NotificationType.valueOf(rs.getString("type")),
                         Functions.mapOrNull(rs.getString("level"), NotificationLevel::valueOf),
-                        NotificationStatus.UNREAD,
-                        null,
+                        Collections.emptyList(),
                         rs.getObject("adventure_id", UUID.class),
                         rs.getBoolean("is_interactable"),
                         null,

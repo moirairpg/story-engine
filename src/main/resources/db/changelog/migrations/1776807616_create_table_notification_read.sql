@@ -3,10 +3,10 @@
 --preconditions onFail:HALT, onError:HALT
 
 CREATE TABLE notification_read (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     notification_id BIGINT NOT NULL REFERENCES notification(id) ON DELETE CASCADE,
     user_id BIGINT NOT NULL,
-    read_date TIMESTAMPTZ(6)
+    read_date TIMESTAMPTZ(6),
+    PRIMARY KEY (notification_id, user_id)
 );
 
 /* liquibase rollback

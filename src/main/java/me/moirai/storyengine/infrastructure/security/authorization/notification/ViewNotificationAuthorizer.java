@@ -44,8 +44,8 @@ public class ViewNotificationAuthorizer implements OperationAuthorizer {
             return true;
         }
 
-        if (basicData.targetUsername() != null) {
-            return basicData.targetUsername().equals(principal.username());
+        if (!basicData.targetUsernames().isEmpty()) {
+            return basicData.targetUsernames().contains(principal.username());
         }
 
         return basicData.type() == BROADCAST;

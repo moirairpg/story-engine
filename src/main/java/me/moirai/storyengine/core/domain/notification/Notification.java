@@ -2,6 +2,7 @@ package me.moirai.storyengine.core.domain.notification;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,9 +51,6 @@ public class Notification extends Asset {
     @Column(name = "level")
     private NotificationLevel level;
 
-    @Column(name = "target_user_id")
-    private Long targetUserId;
-
     @Column(name = "adventure_id")
     private Long adventureId;
 
@@ -66,6 +64,9 @@ public class Notification extends Asset {
     @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<NotificationRead> reads = new ArrayList<>();
 
+    @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<NotificationRecipient> recipients = new ArrayList<>();
+
     protected Notification() {
         super();
     }
@@ -75,7 +76,6 @@ public class Notification extends Asset {
         this.message = builder.message;
         this.type = builder.type;
         this.level = builder.level;
-        this.targetUserId = builder.targetUserId;
         this.adventureId = builder.adventureId;
         this.isInteractable = builder.isInteractable;
         this.metadata = builder.metadata;
@@ -105,10 +105,6 @@ public class Notification extends Asset {
         return level;
     }
 
-    public Long getTargetUserId() {
-        return targetUserId;
-    }
-
     public Long getAdventureId() {
         return adventureId;
     }
@@ -119,6 +115,16 @@ public class Notification extends Asset {
 
     public Map<String, Object> getMetadata() {
         return metadata;
+    }
+
+    public List<NotificationRecipient> getRecipients() {
+        return Collections.unmodifiableList(recipients);
+    }
+
+    public List<Long> getRecipientUserIds() {
+        return recipients.stream()
+                .map(NotificationRecipient::getUserId)
+                .toList();
     }
 
     public void updateMessage(String message) {
@@ -158,10 +164,10 @@ public class Notification extends Asset {
         private String message;
         private NotificationType type;
         private NotificationLevel level;
-        private Long targetUserId;
         private Long adventureId;
         private boolean isInteractable;
         private Map<String, Object> metadata;
+        private final List<Long> recipientUserIds = new ArrayList<>();
 
         private Builder() {
         }
@@ -181,11 +187,6 @@ public class Notification extends Asset {
             return this;
         }
 
-        public Builder targetUserId(Long targetUserId) {
-            this.targetUserId = targetUserId;
-            return this;
-        }
-
         public Builder adventureId(Long adventureId) {
             this.adventureId = adventureId;
             return this;
@@ -198,6 +199,20 @@ public class Notification extends Asset {
 
         public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
+            return this;
+        }
+
+        public Builder recipientUserId(Long userId) {
+            this.recipientUserIds.add(userId);
+            return this;
+        }
+
+        public Builder recipientUserIds(List<Long> userIds) {
+
+            if (userIds != null) {
+                this.recipientUserIds.addAll(userIds);
+            }
+
             return this;
         }
 
@@ -215,7 +230,24 @@ public class Notification extends Asset {
                 throw new BusinessRuleViolationException("Non-GAME notifications require a level");
             }
 
-            return new Notification(this);
+            if (type == NotificationType.SYSTEM && recipientUserIds.isEmpty()) {
+                throw new BusinessRuleViolationException("SYSTEM notifications require at least one recipient");
+            }
+
+            if (type != NotificationType.SYSTEM && !recipientUserIds.isEmpty()) {
+                throw new BusinessRuleViolationException("Only SYSTEM notifications can have recipients");
+            }
+
+            var notification = new Notification(this);
+
+            for (var userId : recipientUserIds) {
+                notification.recipients.add(NotificationRecipient.builder()
+                        .notification(notification)
+                        .userId(userId)
+                        .build());
+            }
+
+            return notification;
         }
     }
 }

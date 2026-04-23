@@ -33,7 +33,7 @@ public class NotificationFixture {
                 .message("System message")
                 .type(NotificationType.SYSTEM)
                 .level(NotificationLevel.INFO)
-                .targetUserId(TARGET_USER_ID);
+                .recipientUserId(TARGET_USER_ID);
     }
 
     public static Notification.Builder game() {

@@ -14,5 +14,5 @@ public record CreateNotification(
         List<String> targetUsernames,
         boolean isInteractable,
         Map<String, Object> metadata)
-        implements Command<List<NotificationDetails>> {
+        implements Command<NotificationDetails> {
 }
