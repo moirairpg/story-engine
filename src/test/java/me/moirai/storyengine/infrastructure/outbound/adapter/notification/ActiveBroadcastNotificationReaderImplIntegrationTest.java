@@ -15,7 +15,7 @@ import me.moirai.storyengine.core.port.outbound.notification.ActiveBroadcastNoti
 
 public class ActiveBroadcastNotificationReaderImplIntegrationTest extends AbstractIntegrationTest {
 
-    private static final Long REQUESTER_ID = 1111L;
+    private static final String USERNAME = "some_user";
 
     @Autowired
     private ActiveBroadcastNotificationReader reader;
@@ -33,7 +33,7 @@ public class ActiveBroadcastNotificationReaderImplIntegrationTest extends Abstra
         insert(NotificationFixture.urgentBroadcast().build(), Notification.class);
 
         // when
-        var result = reader.getActiveBroadcasts(REQUESTER_ID);
+        var result = reader.getActiveBroadcasts(USERNAME);
 
         // then
         assertThat(result).hasSize(2);
@@ -46,7 +46,7 @@ public class ActiveBroadcastNotificationReaderImplIntegrationTest extends Abstra
         insert(NotificationFixture.game().build(), Notification.class);
 
         // when
-        var result = reader.getActiveBroadcasts(REQUESTER_ID);
+        var result = reader.getActiveBroadcasts(USERNAME);
 
         // then
         assertThat(result).isEmpty();
@@ -61,13 +61,13 @@ public class ActiveBroadcastNotificationReaderImplIntegrationTest extends Abstra
 
         var readRow = NotificationRead.builder()
                 .notification(dismissed)
-                .userId(REQUESTER_ID)
+                .userId(1111L)
                 .readDate(Instant.now())
                 .build();
         insert(readRow, NotificationRead.class);
 
         // when
-        var result = reader.getActiveBroadcasts(REQUESTER_ID);
+        var result = reader.getActiveBroadcasts(USERNAME);
 
         // then
         assertThat(result).hasSize(1);
@@ -88,7 +88,7 @@ public class ActiveBroadcastNotificationReaderImplIntegrationTest extends Abstra
         insert(readRow, NotificationRead.class);
 
         // when
-        var result = reader.getActiveBroadcasts(REQUESTER_ID);
+        var result = reader.getActiveBroadcasts(USERNAME);
 
         // then
         assertThat(result).hasSize(1);

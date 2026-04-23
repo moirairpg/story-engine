@@ -30,7 +30,7 @@ public class GetNotificationHandler extends AbstractQueryHandler<GetNotification
     @Override
     public NotificationDetails execute(GetNotification query) {
 
-        return reader.getNotificationByPublicId(query.notificationId(), query.requesterId(), query.isAdmin())
+        return reader.getNotificationByPublicId(query.notificationId(), query.requesterUsername(), query.requesterRole())
                 .orElseThrow(() -> new NotFoundException(NOTIFICATION_NOT_FOUND));
     }
 }

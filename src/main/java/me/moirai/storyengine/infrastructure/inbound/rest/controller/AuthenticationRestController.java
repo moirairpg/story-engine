@@ -33,7 +33,7 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPor
 @Hidden
 @RestController
 @RequestMapping("/auth")
-public class AuthenticationController extends SecurityContextAware {
+public class AuthenticationRestController extends SecurityContextAware {
 
     private static final String NONE = "None";
     private static final String ROOT = "/";
@@ -50,7 +50,7 @@ public class AuthenticationController extends SecurityContextAware {
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
 
-    public AuthenticationController(
+    public AuthenticationRestController(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
             @Value("${moirai.discord.oauth.client-secret}") String clientSecret,
             @Value("${moirai.security.redirect-path.success}") String successPath,

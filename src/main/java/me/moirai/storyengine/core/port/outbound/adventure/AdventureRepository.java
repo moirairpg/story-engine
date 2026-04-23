@@ -20,4 +20,6 @@ public interface AdventureRepository {
     void updateBumpByPublicId(String bumpContent, int bumpFrequency, UUID publicId);
 
     Optional<Adventure> findByPublicId(UUID publicId);
+
+    Optional<Adventure> findById(Long id);
 }

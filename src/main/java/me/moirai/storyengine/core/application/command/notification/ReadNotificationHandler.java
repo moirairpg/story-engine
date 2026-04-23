@@ -6,6 +6,7 @@ import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
 public class ReadNotificationHandler extends AbstractCommandHandler<ReadNotification, Void> {
@@ -14,9 +15,14 @@ public class ReadNotificationHandler extends AbstractCommandHandler<ReadNotifica
     private static final String ID_REQUIRED = "Notification ID cannot be null";
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public ReadNotificationHandler(NotificationRepository notificationRepository) {
+    public ReadNotificationHandler(
+            NotificationRepository notificationRepository,
+            UserRepository userRepository) {
+
         this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -33,8 +39,11 @@ public class ReadNotificationHandler extends AbstractCommandHandler<ReadNotifica
         var notification = notificationRepository.findByPublicId(command.notificationId())
                 .orElseThrow(() -> new NotFoundException(NOTIFICATION_NOT_FOUND));
 
-        if (notification.getStatus(command.requesterId()) == NotificationStatus.UNREAD) {
-            notification.markAsRead(command.requesterId());
+        var user = userRepository.findByUsername(command.username())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (notification.getStatus(user.getId()) == NotificationStatus.UNREAD) {
+            notification.markAsRead(user.getId());
             notificationRepository.save(notification);
         }
 

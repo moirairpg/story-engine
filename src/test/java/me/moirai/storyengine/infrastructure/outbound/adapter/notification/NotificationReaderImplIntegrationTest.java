@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.AbstractIntegrationTest;
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationReader;
@@ -31,7 +32,7 @@ public class NotificationReaderImplIntegrationTest extends AbstractIntegrationTe
         var publicId = UUID.randomUUID();
 
         // when
-        var result = reader.getNotificationByPublicId(publicId, 1L, false);
+        var result = reader.getNotificationByPublicId(publicId, "user1", Role.ADMIN);
 
         // then
         assertThat(result).isNotNull().isEmpty();
@@ -44,7 +45,7 @@ public class NotificationReaderImplIntegrationTest extends AbstractIntegrationTe
         var notification = insert(NotificationFixture.broadcast().build(), Notification.class);
 
         // when
-        var result = reader.getNotificationByPublicId(notification.getPublicId(), 1L, true);
+        var result = reader.getNotificationByPublicId(notification.getPublicId(), "user1", Role.ADMIN);
 
         // then
         assertThat(result).isNotEmpty();
@@ -58,7 +59,7 @@ public class NotificationReaderImplIntegrationTest extends AbstractIntegrationTe
         var notification = insert(NotificationFixture.broadcast().build(), Notification.class);
 
         // when
-        var result = reader.getNotificationByPublicId(notification.getPublicId(), 1L, false);
+        var result = reader.getNotificationByPublicId(notification.getPublicId(), "user1", Role.PLAYER);
 
         // then
         assertThat(result).isNotEmpty();
@@ -75,7 +76,7 @@ public class NotificationReaderImplIntegrationTest extends AbstractIntegrationTe
         var notification = insert(system, Notification.class);
 
         // when
-        var result = reader.getNotificationByPublicId(notification.getPublicId(), userId, false);
+        var result = reader.getNotificationByPublicId(notification.getPublicId(), "user1", Role.PLAYER);
 
         // then
         assertThat(result).isNotEmpty();
@@ -87,13 +88,12 @@ public class NotificationReaderImplIntegrationTest extends AbstractIntegrationTe
 
         // given
         var targetUserId = 1111L;
-        var otherUserId = 9999L;
         var system = NotificationFixture.system().build();
         ReflectionTestUtils.setField(system, "targetUserId", targetUserId);
         var notification = insert(system, Notification.class);
 
         // when
-        var result = reader.getNotificationByPublicId(notification.getPublicId(), otherUserId, false);
+        var result = reader.getNotificationByPublicId(notification.getPublicId(), "user2", Role.PLAYER);
 
         // then
         assertThat(result).isEmpty();
@@ -106,7 +106,7 @@ public class NotificationReaderImplIntegrationTest extends AbstractIntegrationTe
         var notification = insert(NotificationFixture.game().build(), Notification.class);
 
         // when
-        var result = reader.getNotificationByPublicId(notification.getPublicId(), 1L, false);
+        var result = reader.getNotificationByPublicId(notification.getPublicId(), "user1", Role.PLAYER);
 
         // then
         assertThat(result).isEmpty();

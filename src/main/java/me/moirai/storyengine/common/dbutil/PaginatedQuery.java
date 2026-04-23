@@ -117,8 +117,7 @@ public class PaginatedQuery {
                 throw new IllegalArgumentException("Sort field is required");
             }
 
-            var queryBuilder = QueryBuilder.builder()
-                    .select(selectClause)
+            var queryBuilder = QueryBuilder.select(selectClause)
                     .filters(filters)
                     .build();
 

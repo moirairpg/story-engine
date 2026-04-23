@@ -28,7 +28,7 @@ public class NotificationWebSocketController {
         var auth = (UsernamePasswordAuthenticationToken) principal;
         var moiraiPrincipal = (MoiraiPrincipal) auth.getPrincipal();
 
-        return queryRunner.run(new GetActiveBroadcastNotifications(moiraiPrincipal.id()));
+        return queryRunner.run(new GetActiveBroadcastNotifications(moiraiPrincipal.username()));
     }
 
     @SubscribeMapping("/notifications/system")
@@ -37,6 +37,6 @@ public class NotificationWebSocketController {
         var auth = (UsernamePasswordAuthenticationToken) principal;
         var moiraiPrincipal = (MoiraiPrincipal) auth.getPrincipal();
 
-        return queryRunner.run(new GetActiveSystemNotifications(moiraiPrincipal.id()));
+        return queryRunner.run(new GetActiveSystemNotifications(moiraiPrincipal.username()));
     }
 }

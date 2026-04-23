@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.domain.notification;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,10 +20,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
-import me.moirai.storyengine.common.domain.DomainEvent;
 import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
@@ -68,9 +65,6 @@ public class Notification extends Asset {
 
     @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<NotificationRead> reads = new ArrayList<>();
-
-    @Transient
-    private final List<DomainEvent> domainEvents = new ArrayList<>();
 
     protected Notification() {
         super();
@@ -125,14 +119,6 @@ public class Notification extends Asset {
 
     public Map<String, Object> getMetadata() {
         return metadata;
-    }
-
-    public List<DomainEvent> getDomainEvents() {
-        return Collections.unmodifiableList(domainEvents);
-    }
-
-    public void addEvent(DomainEvent event) {
-        domainEvents.add(event);
     }
 
     public void updateMessage(String message) {

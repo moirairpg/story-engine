@@ -1,6 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.notification;
 
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,7 +7,11 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.dbutil.Filter;
+import me.moirai.storyengine.common.dbutil.Filters;
+import me.moirai.storyengine.common.dbutil.QueryBuilder;
 import me.moirai.storyengine.common.enums.NotificationStatus;
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -21,69 +24,65 @@ import tools.jackson.databind.json.JsonMapper;
 public class NotificationReaderImpl implements NotificationReader {
 
     //@formatter:off
-    private static final String SELECT_BY_PUBLIC_ID_ADMIN = """
+    private static final String SELECT = """
             SELECT n.public_id,
                    n.message,
                    n.type,
                    n.level,
-                   n.target_user_id,
-                   n.adventure_id,
+                   u.username,
+                   a.public_id AS adventure_id,
                    n.is_interactable,
                    n.metadata,
                    n.creation_date,
                    n.last_update_date,
                    CASE WHEN nr.id IS NOT NULL THEN 'READ' ELSE 'UNREAD' END AS status
               FROM notification n
-              LEFT JOIN notification_read nr ON nr.notification_id = n.id
-                        AND nr.user_id = :requesterId
-             WHERE n.public_id = :publicId
-            """;
-
-    private static final String SELECT_BY_PUBLIC_ID_USER = """
-            SELECT n.public_id,
-                   n.message,
-                   n.type,
-                   n.level,
-                   n.target_user_id,
-                   n.adventure_id,
-                   n.is_interactable,
-                   n.metadata,
-                   n.creation_date,
-                   n.last_update_date,
-                   CASE WHEN nr.id IS NOT NULL THEN 'READ' ELSE 'UNREAD' END AS status
-              FROM notification n
-              LEFT JOIN notification_read nr ON nr.notification_id = n.id
-                        AND nr.user_id = :requesterId
-             WHERE n.public_id = :publicId
-               AND n.type <> 'GAME'
-               AND (n.target_user_id IS NULL OR n.target_user_id = :requesterId)
-            """;
+              LEFT JOIN adventure a ON n.adventure_id = a.id
+              LEFT JOIN moirai_user u ON n.target_user_id = u.id
+              JOIN moirai_user req ON req.username = :requesterUsername
+              LEFT JOIN notification_read nr ON nr.notification_id = n.id AND nr.user_id = req.id
+              """;
     //@formatter:on
 
     private final JdbcClient jdbcClient;
     private final JsonMapper jsonMapper;
 
-    public NotificationReaderImpl(JdbcClient jdbcClient, JsonMapper jsonMapper) {
+    public NotificationReaderImpl(
+            JdbcClient jdbcClient,
+            JsonMapper jsonMapper) {
+
         this.jdbcClient = jdbcClient;
         this.jsonMapper = jsonMapper;
     }
 
     @Override
-    public Optional<NotificationDetails> getNotificationByPublicId(UUID publicId, Long requesterId, boolean isAdmin) {
+    public Optional<NotificationDetails> getNotificationByPublicId(
+            UUID publicId,
+            String requesterUsername,
+            Role requesterRole) {
 
-        var sql = isAdmin ? SELECT_BY_PUBLIC_ID_ADMIN : SELECT_BY_PUBLIC_ID_USER;
+        var queryBuilder = QueryBuilder.select(SELECT)
+                .filter(Filters.equals("n.public_id", "publicId", publicId));
 
-        return jdbcClient.sql(sql)
-                .param("publicId", publicId)
-                .param("requesterId", requesterId)
+        if (!requesterRole.equals(Role.ADMIN)) {
+            queryBuilder.filter(new Filter("n.type <> 'GAME'"))
+                    .filter(new Filter("(n.target_user_id IS NULL OR n.target_user_id = req.id)"));
+        }
+
+        var builtQuery = queryBuilder.build();
+        var params = builtQuery.parameters();
+        params.put("requesterUsername", requesterUsername);
+
+        return jdbcClient.sql(builtQuery.sql())
+                .params(params)
                 .query((rs, _) -> new NotificationDetails(
-                        UUID.fromString(rs.getString("public_id")),
+                        rs.getObject("public_id", UUID.class),
                         rs.getString("message"),
                         NotificationType.valueOf(rs.getString("type")),
                         Functions.mapOrNull(rs.getString("level"), NotificationLevel::valueOf),
                         NotificationStatus.valueOf(rs.getString("status")),
-                        Functions.mapOrNull(rs.getBigDecimal("target_user_id"), BigDecimal::longValue),
-                        Functions.mapOrNull(rs.getBigDecimal("adventure_id"), BigDecimal::longValue),
+                        rs.getString("username"),
+                        rs.getObject("adventure_id", UUID.class),
                         rs.getBoolean("is_interactable"),
                         Functions.mapOrNull(rs.getString("metadata"),
                                 s -> jsonMapper.readValue(s, new TypeReference<Map<String, Object>>() {

@@ -8,7 +8,6 @@ import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 public record UpdateNotification(
         UUID notificationId,
         String message,
-        NotificationLevel level,
-        Long requesterId)
+        NotificationLevel level)
         implements Command<NotificationDetails> {
 }

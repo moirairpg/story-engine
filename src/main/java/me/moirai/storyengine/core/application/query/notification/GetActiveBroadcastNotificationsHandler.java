@@ -20,6 +20,6 @@ public class GetActiveBroadcastNotificationsHandler
 
     @Override
     public List<NotificationDetails> execute(GetActiveBroadcastNotifications query) {
-        return reader.getActiveBroadcasts(query.requesterId());
+        return reader.getActiveBroadcasts(query.username());
     }
 }

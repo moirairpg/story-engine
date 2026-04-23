@@ -6,5 +6,5 @@ import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 
 public interface ActiveBroadcastNotificationReader {
 
-    List<NotificationDetails> getActiveBroadcasts(Long requesterId);
+    List<NotificationDetails> getActiveBroadcasts(String username);
 }

@@ -28,14 +28,14 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUserRoleR
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUserUsernameRequest;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @Tag(name = "Users", description = "Endpoints for managing Discord Users that are registered on MoirAI")
-public class UserDetailsController extends SecurityContextAware {
+public class UserDetailsRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
 
-    public UserDetailsController(
+    public UserDetailsRestController(
             QueryRunner queryRunner,
             CommandRunner commandRunner) {
 

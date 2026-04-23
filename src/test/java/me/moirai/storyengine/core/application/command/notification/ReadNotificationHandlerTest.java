@@ -15,18 +15,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
+import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadNotificationHandlerTest {
 
     @Mock
     private NotificationRepository notificationRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private ReadNotificationHandler handler;
@@ -36,9 +40,10 @@ public class ReadNotificationHandlerTest {
 
         // given
         var notification = NotificationFixture.broadcastWithId();
-        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, 1L);
+        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, "some_user");
 
         when(notificationRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(notification));
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(UserFixture.adminWithId()));
 
         // when
         handler.execute(command);
@@ -53,9 +58,10 @@ public class ReadNotificationHandlerTest {
         // given
         var notification = NotificationFixture.broadcastWithId();
         notification.markAsRead(1L);
-        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, 1L);
+        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, "some_user");
 
         when(notificationRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(notification));
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(UserFixture.adminWithId()));
 
         // when
         handler.execute(command);
@@ -68,7 +74,7 @@ public class ReadNotificationHandlerTest {
     public void shouldThrowWhenNotificationNotFound() {
 
         // given
-        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, 1L);
+        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, "some_user");
 
         when(notificationRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -81,19 +87,19 @@ public class ReadNotificationHandlerTest {
 
         // given
         var notification = NotificationFixture.urgentBroadcastWithId();
-        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, 1L);
+        var command = new ReadNotification(NotificationFixture.PUBLIC_ID, "some_user");
 
         when(notificationRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(notification));
 
         // then
-        assertThrows(BusinessRuleViolationException.class, () -> handler.execute(command));
+        assertThrows(NotFoundException.class, () -> handler.execute(command));
     }
 
     @Test
     public void shouldThrowWhenNotificationIdIsNull() {
 
         // given
-        var command = new ReadNotification(null, 1L);
+        var command = new ReadNotification(null, "some_user");
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));

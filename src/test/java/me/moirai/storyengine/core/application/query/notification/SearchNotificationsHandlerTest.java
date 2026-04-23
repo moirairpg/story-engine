@@ -19,9 +19,9 @@ import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
+import me.moirai.storyengine.core.port.inbound.notification.NotificationSummary;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationSearchReader;
-import me.moirai.storyengine.core.port.outbound.notification.NotificationSearchRow;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchNotificationsHandlerTest {
@@ -36,7 +36,7 @@ public class SearchNotificationsHandlerTest {
     public void shouldReturnPaginatedResultWhenSearchIsExecuted() {
 
         // given
-        var row = new NotificationSearchRow(
+        var row = new NotificationSummary(
                 UUID.randomUUID(),
                 "Message",
                 NotificationType.BROADCAST,
@@ -46,7 +46,7 @@ public class SearchNotificationsHandlerTest {
 
         var rows = new PaginatedResult<>(List.of(row), 1L, 1L, 1, 1);
 
-        var query = new SearchNotifications(null, null, null, null, 1L, false, null, null, 1, 10);
+        var query = new SearchNotifications(null, null, null, null, null, null, 1, 10);
 
         when(reader.search(any(SearchNotifications.class))).thenReturn(rows);
 
@@ -62,8 +62,8 @@ public class SearchNotificationsHandlerTest {
     public void shouldReturnEmptyPageWhenNoResultsMatch() {
 
         // given
-        var rows = new PaginatedResult<NotificationSearchRow>(List.of(), 0L, 0L, 1, 1);
-        var query = new SearchNotifications(null, null, null, null, 1L, false, null, null, 1, 10);
+        var rows = new PaginatedResult<NotificationSummary>(List.of(), 0L, 0L, 1, 1);
+        var query = new SearchNotifications(null, null, null, null, null, null, 1, 10);
 
         when(reader.search(any(SearchNotifications.class))).thenReturn(rows);
 

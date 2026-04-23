@@ -42,8 +42,7 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
     @Override
     public CursorResult<MessageSummary> search(SearchAdventureMessages query) {
 
-        var built = QueryBuilder.builder()
-                .select(SELECT_SQL)
+        var builtQuery = QueryBuilder.select(SELECT_SQL)
                 .filter(Filters.equals("a.public_id", "adventurePublicId", query.adventureId()))
                 .filter(Filters.in("m.status", "status", List.of(MessageStatus.ACTIVE.name(), MessageStatus.CHRONICLED.name())))
                 .filter(Filters.lowerThan("m.public_id", "lastMessageId", query.lastMessageId()))
@@ -51,8 +50,8 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
                 .limit(query.size())
                 .build();
 
-        var data = jdbcClient.sql(built.sql())
-                .params(built.parameters())
+        var data = jdbcClient.sql(builtQuery.sql())
+                .params(builtQuery.parameters())
                 .query(toMessageSummary())
                 .list();
 

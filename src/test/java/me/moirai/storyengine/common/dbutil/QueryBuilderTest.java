@@ -14,8 +14,7 @@ public class QueryBuilderTest {
     public void shouldProduceSelectWithNoWhereWhenAllFiltersAreEmpty() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Filters.containsIgnoreCase("w.name", "name", null))
                 .filter(Filters.equals("w.owner_id", "ownerId", null))
                 .build();
@@ -31,8 +30,7 @@ public class QueryBuilderTest {
     public void shouldProduceSelectWithWhereWhenSingleFilterIsPresent() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Filters.equals("w.public_id", "id", "abc-123"))
                 .build();
 
@@ -47,8 +45,7 @@ public class QueryBuilderTest {
     public void shouldProduceSelectWithMultipleFiltersJoinedByAnd() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Filters.containsIgnoreCase("w.name", "name", "forest"))
                 .filter(Filters.equals("w.visibility", "visibility", "PUBLIC"))
                 .build();
@@ -65,8 +62,7 @@ public class QueryBuilderTest {
     public void shouldSkipEmptyOptionalFilters() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Optional.empty())
                 .filter(Filters.equals("w.visibility", "visibility", "PUBLIC"))
                 .build();
@@ -82,8 +78,7 @@ public class QueryBuilderTest {
     public void shouldContainOnlyNonNullBindingsInParametersMap() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Filters.containsIgnoreCase("w.name", "name", "forest"))
                 .filter(Filters.equals("w.visibility", "visibility", "PUBLIC"))
                 .build();
@@ -101,8 +96,7 @@ public class QueryBuilderTest {
     public void shouldReturnEmptyParametersMapWhenAllFiltersAreSkipped() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Filters.equals("w.name", "name", null))
                 .build();
 
@@ -117,8 +111,7 @@ public class QueryBuilderTest {
     public void shouldNotAddEntryToParametersMapForFiltersWithNoParamName() {
 
         // Given
-        var query = QueryBuilder.builder()
-                .select(BASE_SELECT)
+        var query = QueryBuilder.select(BASE_SELECT)
                 .filter(Filters.isTrue("w.active"))
                 .build();
 

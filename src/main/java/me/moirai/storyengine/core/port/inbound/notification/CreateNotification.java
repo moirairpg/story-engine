@@ -12,7 +12,6 @@ public record CreateNotification(
         NotificationType type,
         NotificationLevel level,
         List<String> targetUsernames,
-        Long adventureId,
         boolean isInteractable,
         Map<String, Object> metadata)
         implements Command<List<NotificationDetails>> {

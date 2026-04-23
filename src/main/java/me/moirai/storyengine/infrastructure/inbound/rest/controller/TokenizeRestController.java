@@ -16,11 +16,11 @@ import me.moirai.storyengine.core.port.inbound.tokenize.TokenizeResult;
 @RestController
 @RequestMapping("/tokenize")
 @Tag(name = "Tokenize", description = "Endpoints for MoirAI tokenization")
-public class TokenizeController extends SecurityContextAware {
+public class TokenizeRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
 
-    public TokenizeController(QueryRunner queryRunner) {
+    public TokenizeRestController(QueryRunner queryRunner) {
         this.queryRunner = queryRunner;
     }
 

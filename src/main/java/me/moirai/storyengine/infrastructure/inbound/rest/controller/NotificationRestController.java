@@ -39,14 +39,14 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.CreateNotificat
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateNotificationRequest;
 
 @RestController
-@RequestMapping("/notification")
+@RequestMapping("/notifications")
 @Tag(name = "Notifications", description = "Endpoints for managing MoirAI Notifications")
-public class NotificationController extends SecurityContextAware {
+public class NotificationRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
 
-    public NotificationController(
+    public NotificationRestController(
             QueryRunner queryRunner,
             CommandRunner commandRunner) {
 
@@ -60,26 +60,34 @@ public class NotificationController extends SecurityContextAware {
     public NotificationDetails getNotification(@PathVariable UUID notificationId) {
 
         var user = getAuthenticatedUser();
-        return queryRunner.run(new GetNotification(notificationId, user.id(), user.isAdmin()));
+        return queryRunner.run(new GetNotification(
+                notificationId,
+                user.username(),
+                user.role()));
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
     public PaginatedResult<NotificationSummary> searchNotifications(
             @RequestParam(required = false) NotificationType type,
             @RequestParam(required = false) NotificationLevel level,
             @RequestParam(required = false) NotificationStatus status,
-            @RequestParam(required = false) UUID receiverId,
-            @RequestParam(required = false) NotificationSortField sortingField,
-            @RequestParam(required = false) SortDirection direction,
+            @RequestParam(name = "receiver_id", required = false) UUID receiverId,
+            @RequestParam(name = "sorting_field", required = false) NotificationSortField sortingField,
+            @RequestParam(name = "sorting_direction", required = false) SortDirection direction,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
 
-        var user = getAuthenticatedUser();
         return queryRunner.run(new SearchNotifications(
-                type, level, status, receiverId,
-                user.id(), user.isAdmin(),
-                sortingField, direction, page, size));
+                type,
+                level,
+                status,
+                receiverId,
+                sortingField,
+                direction,
+                page,
+                size));
     }
 
     @PostMapping
@@ -91,7 +99,6 @@ public class NotificationController extends SecurityContextAware {
                 request.type(),
                 request.level(),
                 request.targetUsernames(),
-                null,
                 request.isInteractable(),
                 request.metadata()));
     }
@@ -106,8 +113,7 @@ public class NotificationController extends SecurityContextAware {
         return commandRunner.run(new UpdateNotification(
                 notificationId,
                 request.message(),
-                request.level(),
-                getAuthenticatedUser().id()));
+                request.level()));
     }
 
     @DeleteMapping("/{notificationId}")
@@ -118,11 +124,11 @@ public class NotificationController extends SecurityContextAware {
     }
 
     @PostMapping("/{notificationId}/read")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     @Authorize(operation = AuthorizationOperation.VIEW_NOTIFICATION, fields = "#notificationId")
     public void readNotification(@PathVariable UUID notificationId) {
 
         var user = getAuthenticatedUser();
-        commandRunner.run(new ReadNotification(notificationId, user.id()));
+        commandRunner.run(new ReadNotification(notificationId, user.username()));
     }
 }

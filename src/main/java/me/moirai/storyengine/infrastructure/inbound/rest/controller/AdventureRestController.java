@@ -76,14 +76,14 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchMod
 import me.moirai.storyengine.infrastructure.inbound.rest.request.enums.SearchModeration;
 
 @RestController
-@RequestMapping("/adventure")
+@RequestMapping("/adventures")
 @Tag(name = "Adventures", description = "Endpoints for managing MoirAI Adventures")
-public class AdventureController extends SecurityContextAware {
+public class AdventureRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
 
-    public AdventureController(
+    public AdventureRestController(
             QueryRunner queryRunner,
             CommandRunner commandRunner) {
 
@@ -322,7 +322,7 @@ public class AdventureController extends SecurityContextAware {
         return commandRunner.run(new Say(adventureId, request.content()));
     }
 
-    @DeleteMapping("/{adventureId}/message/{messageId}")
+    @DeleteMapping("/{adventureId}/messages/{messageId}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void deleteMessage(
@@ -332,7 +332,7 @@ public class AdventureController extends SecurityContextAware {
         commandRunner.run(new DeleteMessage(adventureId, messageId));
     }
 
-    @PostMapping("/{adventureId}/message/{messageId}/retry")
+    @PostMapping("/{adventureId}/messages/{messageId}/retry")
     @ResponseStatus(code = HttpStatus.OK)
     @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public MessageResult retryFromMessage(
@@ -342,7 +342,7 @@ public class AdventureController extends SecurityContextAware {
         return commandRunner.run(new RetryFromMessage(adventureId, messageId));
     }
 
-    @PatchMapping("/{adventureId}/message/{messageId}")
+    @PatchMapping("/{adventureId}/messages/{messageId}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void editMessage(

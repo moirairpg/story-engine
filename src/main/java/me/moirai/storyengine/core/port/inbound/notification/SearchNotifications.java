@@ -14,8 +14,6 @@ public record SearchNotifications(
         NotificationLevel level,
         NotificationStatus status,
         UUID receiverId,
-        Long requesterId,
-        boolean isAdmin,
         NotificationSortField sortingField,
         SortDirection direction,
         Integer page,

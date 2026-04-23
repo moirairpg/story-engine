@@ -13,11 +13,11 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.ImageGeneration
 
 @RestController
 @RequestMapping("/image-generations")
-public class ImageGenerationController {
+public class ImageGenerationRestController {
 
     private final CommandRunner commandRunner;
 
-    public ImageGenerationController(CommandRunner commandRunner) {
+    public ImageGenerationRestController(CommandRunner commandRunner) {
         this.commandRunner = commandRunner;
     }
 

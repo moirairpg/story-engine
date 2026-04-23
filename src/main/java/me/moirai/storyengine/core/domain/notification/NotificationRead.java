@@ -11,12 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.domain.Asset;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
 @Table(name = "notification_read")
-public class NotificationRead extends Asset {
+public class NotificationRead {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

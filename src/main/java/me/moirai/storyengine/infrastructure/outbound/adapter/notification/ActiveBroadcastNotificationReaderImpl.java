@@ -1,12 +1,12 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.notification;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -22,17 +22,18 @@ public class ActiveBroadcastNotificationReaderImpl implements ActiveBroadcastNot
                    n.message,
                    n.type,
                    n.level,
-                   n.target_user_id,
-                   n.adventure_id,
+                   a.public_id AS adventure_id,
                    n.is_interactable,
                    n.creation_date,
                    n.last_update_date
               FROM notification n
+              LEFT JOIN adventure a ON n.adventure_id = a.id
+              JOIN moirai_user req ON req.username = :username
              WHERE n.type = 'BROADCAST'
                AND NOT EXISTS (
                    SELECT 1 FROM notification_read nr
                     WHERE nr.notification_id = n.id
-                      AND nr.user_id = :requesterId
+                      AND nr.user_id = req.id
                )
             """;
     //@formatter:on
@@ -44,17 +45,17 @@ public class ActiveBroadcastNotificationReaderImpl implements ActiveBroadcastNot
     }
 
     @Override
-    public List<NotificationDetails> getActiveBroadcasts(Long requesterId) {
+    public List<NotificationDetails> getActiveBroadcasts(String username) {
         return jdbcClient.sql(SELECT_BROADCASTS)
-                .param("requesterId", requesterId)
+                .param("username", username)
                 .query((rs, _) -> new NotificationDetails(
-                        UUID.fromString(rs.getString("public_id")),
+                        rs.getObject("public_id", UUID.class),
                         rs.getString("message"),
                         NotificationType.valueOf(rs.getString("type")),
                         Functions.mapOrNull(rs.getString("level"), NotificationLevel::valueOf),
+                        NotificationStatus.UNREAD,
                         null,
-                        Functions.mapOrNull(rs.getBigDecimal("target_user_id"), BigDecimal::longValue),
-                        Functions.mapOrNull(rs.getBigDecimal("adventure_id"), BigDecimal::longValue),
+                        rs.getObject("adventure_id", UUID.class),
                         rs.getBoolean("is_interactable"),
                         null,
                         rs.getTimestamp("creation_date").toInstant(),

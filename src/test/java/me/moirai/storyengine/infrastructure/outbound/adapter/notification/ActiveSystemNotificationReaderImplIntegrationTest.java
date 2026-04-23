@@ -17,6 +17,7 @@ import me.moirai.storyengine.core.port.outbound.notification.ActiveSystemNotific
 
 public class ActiveSystemNotificationReaderImplIntegrationTest extends AbstractIntegrationTest {
 
+    private static final String USERNAME = "some_user";
     private static final Long USER_ID = 1111L;
 
     @Autowired
@@ -36,7 +37,7 @@ public class ActiveSystemNotificationReaderImplIntegrationTest extends AbstractI
         insert(system, Notification.class);
 
         // when
-        var result = reader.getActiveUnreadSystemNotifications(USER_ID);
+        var result = reader.getActiveUnreadSystemNotifications(USERNAME);
 
         // then
         assertThat(result).hasSize(1);
@@ -58,7 +59,7 @@ public class ActiveSystemNotificationReaderImplIntegrationTest extends AbstractI
         insert(read, NotificationRead.class);
 
         // when
-        var result = reader.getActiveUnreadSystemNotifications(USER_ID);
+        var result = reader.getActiveUnreadSystemNotifications(USERNAME);
 
         // then
         assertThat(result).isEmpty();
@@ -73,7 +74,7 @@ public class ActiveSystemNotificationReaderImplIntegrationTest extends AbstractI
         insert(system, Notification.class);
 
         // when
-        var result = reader.getActiveUnreadSystemNotifications(USER_ID);
+        var result = reader.getActiveUnreadSystemNotifications(USERNAME);
 
         // then
         assertThat(result).isEmpty();

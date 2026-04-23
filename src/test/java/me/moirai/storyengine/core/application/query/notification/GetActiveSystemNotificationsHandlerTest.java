@@ -1,7 +1,6 @@
 package me.moirai.storyengine.core.application.query.notification;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -30,9 +29,9 @@ public class GetActiveSystemNotificationsHandlerTest {
 
         // given
         var notifications = List.of(NotificationDetailsFixture.system());
-        var query = new GetActiveSystemNotifications(1L);
+        var query = new GetActiveSystemNotifications("some_user");
 
-        when(reader.getActiveUnreadSystemNotifications(any(Long.class))).thenReturn(notifications);
+        when(reader.getActiveUnreadSystemNotifications("some_user")).thenReturn(notifications);
 
         // when
         var result = handler.execute(query);

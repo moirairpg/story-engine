@@ -58,4 +58,9 @@ public class AdventureRepositoryImpl implements AdventureRepository {
 
         return jpaRepository.findByPublicId(publicId);
     }
+
+    @Override
+    public Optional<Adventure> findById(Long id) {
+        return jpaRepository.findById(id);
+    }
 }

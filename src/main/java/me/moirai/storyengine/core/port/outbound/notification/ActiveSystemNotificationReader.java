@@ -6,5 +6,5 @@ import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 
 public interface ActiveSystemNotificationReader {
 
-    List<NotificationDetails> getActiveUnreadSystemNotifications(Long userId);
+    List<NotificationDetails> getActiveUnreadSystemNotifications(String username);
 }

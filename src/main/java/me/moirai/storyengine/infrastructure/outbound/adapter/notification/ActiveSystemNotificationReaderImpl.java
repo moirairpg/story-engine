@@ -1,6 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.notification;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,18 +22,20 @@ public class ActiveSystemNotificationReaderImpl implements ActiveSystemNotificat
                    n.message,
                    n.type,
                    n.level,
-                   n.target_user_id,
-                   n.adventure_id,
+                   u.username,
+                   a.public_id AS adventure_id,
                    n.is_interactable,
                    n.creation_date,
                    n.last_update_date
               FROM notification n
+              LEFT JOIN adventure a ON n.adventure_id = a.id
+              JOIN moirai_user u ON n.target_user_id = u.id
              WHERE n.type = 'SYSTEM'
-               AND n.target_user_id = :userId
+               AND u.username = :username
                AND NOT EXISTS (
                    SELECT 1 FROM notification_read nr
                     WHERE nr.notification_id = n.id
-                      AND nr.user_id = :userId
+                      AND nr.user_id = u.id
                )
             """;
     //@formatter:on
@@ -46,17 +47,17 @@ public class ActiveSystemNotificationReaderImpl implements ActiveSystemNotificat
     }
 
     @Override
-    public List<NotificationDetails> getActiveUnreadSystemNotifications(Long userId) {
+    public List<NotificationDetails> getActiveUnreadSystemNotifications(String username) {
         return jdbcClient.sql(SELECT_UNREAD_SYSTEM)
-                .param("userId", userId)
+                .param("username", username)
                 .query((rs, _) -> new NotificationDetails(
-                        UUID.fromString(rs.getString("public_id")),
+                        rs.getObject("public_id", UUID.class),
                         rs.getString("message"),
                         NotificationType.valueOf(rs.getString("type")),
                         Functions.mapOrNull(rs.getString("level"), NotificationLevel::valueOf),
                         NotificationStatus.UNREAD,
-                        Functions.mapOrNull(rs.getBigDecimal("target_user_id"), BigDecimal::longValue),
-                        Functions.mapOrNull(rs.getBigDecimal("adventure_id"), BigDecimal::longValue),
+                        rs.getString("username"),
+                        rs.getObject("adventure_id", UUID.class),
                         rs.getBoolean("is_interactable"),
                         null,
                         rs.getTimestamp("creation_date").toInstant(),

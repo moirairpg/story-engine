@@ -16,13 +16,13 @@ import me.moirai.storyengine.core.port.inbound.model.AiModelResult;
 import me.moirai.storyengine.core.port.inbound.model.SearchModels;
 
 @RestController
-@RequestMapping("/model")
+@RequestMapping("/models")
 @Tag(name = "AI Models", description = "Endpoints for managing MoirAI AI Models")
-public class ModelController extends SecurityContextAware {
+public class ModelRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
 
-    public ModelController(QueryRunner queryRunner) {
+    public ModelRestController(QueryRunner queryRunner) {
         this.queryRunner = queryRunner;
     }
 

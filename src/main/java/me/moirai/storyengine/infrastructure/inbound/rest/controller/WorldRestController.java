@@ -47,14 +47,14 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateWorldRequ
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UploadImageRequest;
 
 @RestController
-@RequestMapping("/world")
+@RequestMapping("/worlds")
 @Tag(name = "Worlds", description = "Endpoints for managing MoirAI Worlds")
-public class WorldController extends SecurityContextAware {
+public class WorldRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
 
-    public WorldController(
+    public WorldRestController(
             QueryRunner queryRunner,
             CommandRunner commandRunner) {
 

@@ -24,24 +24,24 @@ import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.LorebookEntrySummary;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookSortField;
-import me.moirai.storyengine.core.port.inbound.adventure.CreateAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
-import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
-import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureLorebookEntries;
-import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventureLorebookEntry;
-import me.moirai.storyengine.infrastructure.inbound.rest.request.AdventureLorebookEntryRequest;
+import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.DeleteWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.GetWorldLorebookEntryById;
+import me.moirai.storyengine.core.port.inbound.world.SearchWorldLorebookEntries;
+import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
+import me.moirai.storyengine.core.port.inbound.world.WorldLorebookSortField;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.WorldLorebookEntryRequest;
 
 @RestController
-@RequestMapping("/adventure/{adventureId}/lorebook")
-@Tag(name = "Adventure Lorebooks", description = "Endpoints for managing MoirAI Adventure Lorebooks")
-public class AdventureLorebookController extends SecurityContextAware {
+@RequestMapping("/worlds/{worldId}/lorebook")
+@Tag(name = "World Lorebooks", description = "Endpoints for managing MoirAI World Lorebooks")
+public class WorldLorebookRestController extends SecurityContextAware {
 
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
 
-    public AdventureLorebookController(
+    public WorldLorebookRestController(
             QueryRunner queryRunner,
             CommandRunner commandRunner) {
 
@@ -52,15 +52,15 @@ public class AdventureLorebookController extends SecurityContextAware {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PaginatedResult<LorebookEntrySummary> search(
-            @PathVariable UUID adventureId,
+            @PathVariable UUID worldId,
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "sorting_field", required = false) AdventureLorebookSortField sortingField,
+            @RequestParam(name = "sorting_field", required = false) WorldLorebookSortField sortingField,
             @RequestParam(name = "direction", required = false) SortDirection direction,
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
 
-        return queryRunner.run(new SearchAdventureLorebookEntries(
-                adventureId,
+        return queryRunner.run(new SearchWorldLorebookEntries(
+                worldId,
                 name,
                 sortingField,
                 direction,
@@ -70,64 +70,61 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
-    public AdventureLorebookEntryDetails getLorebookEntryById(
-            @PathVariable(required = true) UUID adventureId,
+    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "#worldId")
+    public WorldLorebookEntryDetails getLorebookEntryById(
+            @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId) {
 
-        var query = new GetAdventureLorebookEntryById(
+        var query = new GetWorldLorebookEntryById(
                 entryId,
-                adventureId);
+                worldId);
 
         return queryRunner.run(query);
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
-    public AdventureLorebookEntryDetails createLorebookEntry(
-            @PathVariable(required = true) UUID adventureId,
-            @Valid @RequestBody AdventureLorebookEntryRequest request) {
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
+    public WorldLorebookEntryDetails createLorebookEntry(
+            @PathVariable(required = true) UUID worldId,
+            @Valid @RequestBody WorldLorebookEntryRequest request) {
 
-        var command = new CreateAdventureLorebookEntry(
-                adventureId,
+        var command = new CreateWorldLorebookEntry(
+                worldId,
                 request.name(),
-                request.description(),
-                request.playerId());
+                request.description());
 
         return commandRunner.run(command);
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
-    public AdventureLorebookEntryDetails updateLorebookEntry(
-            @PathVariable(required = true) UUID adventureId,
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
+    public WorldLorebookEntryDetails updateLorebookEntry(
+            @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId,
-            @Valid @RequestBody AdventureLorebookEntryRequest request) {
+            @Valid @RequestBody WorldLorebookEntryRequest request) {
 
-        var command = new UpdateAdventureLorebookEntry(
+        var command = new UpdateWorldLorebookEntry(
                 entryId,
-                adventureId,
+                worldId,
                 request.name(),
-                request.description(),
-                request.playerId());
+                request.description());
 
         return commandRunner.run(command);
     }
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
+    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public void deleteLorebookEntry(
-            @PathVariable(required = true) UUID adventureId,
+            @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId) {
 
-        var command = new DeleteAdventureLorebookEntry(
+        var command = new DeleteWorldLorebookEntry(
                 entryId,
-                adventureId);
+                worldId);
 
         commandRunner.run(command);
     }
-
 }

@@ -29,9 +29,9 @@ public class GetActiveBroadcastNotificationsHandlerTest {
 
         // given
         var broadcasts = List.of(NotificationDetailsFixture.broadcast());
-        var query = new GetActiveBroadcastNotifications(1L);
+        var query = new GetActiveBroadcastNotifications("some_user");
 
-        when(reader.getActiveBroadcasts(1L)).thenReturn(broadcasts);
+        when(reader.getActiveBroadcasts("some_user")).thenReturn(broadcasts);
 
         // when
         var result = handler.execute(query);

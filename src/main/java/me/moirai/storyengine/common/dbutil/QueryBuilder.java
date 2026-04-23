@@ -16,7 +16,8 @@ public class QueryBuilder {
     private final SortDirection sortDirection;
     private final Integer limit;
 
-    private QueryBuilder(String selectClause, List<Filter> filters, String sortField, SortDirection sortDirection, Integer limit) {
+    private QueryBuilder(String selectClause, List<Filter> filters, String sortField, SortDirection sortDirection,
+            Integer limit) {
         this.selectClause = selectClause;
         this.filters = filters;
         this.sortField = sortField;
@@ -76,8 +77,8 @@ public class QueryBuilder {
         return selectClause;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder select(String selectClause) {
+        return new Builder(selectClause);
     }
 
     public static class Builder {
@@ -88,13 +89,17 @@ public class QueryBuilder {
         private SortDirection sortDirection;
         private Integer limit;
 
-        public Builder select(String selectClause) {
+        private Builder(String selectClause) {
             this.selectClause = selectClause;
-            return this;
         }
 
         public Builder filter(Optional<Filter> filter) {
             filter.ifPresent(filters::add);
+            return this;
+        }
+
+        public Builder filter(Filter filter) {
+            filters.add(filter);
             return this;
         }
 

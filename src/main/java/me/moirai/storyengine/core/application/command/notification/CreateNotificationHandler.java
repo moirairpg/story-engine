@@ -8,7 +8,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.NotificationStatus;
-import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
+import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationCreated;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -23,6 +24,7 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
 
     private static final String MESSAGE_REQUIRED = "Notification message cannot be null or empty";
     private static final String SYSTEM_REQUIRES_TARGET = "SYSTEM notifications must have at least one target user";
+    private static final String BROADCAST_REQUIRES_NO_TARGET = "BROADCAST notifications cannot have target users";
     private static final String GAME_NOT_ALLOWED = "GAME notifications cannot be created via this command";
     private static final String UNKNOWN_USERS = "Unknown usernames: ";
 
@@ -56,23 +58,47 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
 
             throw new IllegalArgumentException(SYSTEM_REQUIRES_TARGET);
         }
+
+        if (command.type() == NotificationType.BROADCAST
+                && (command.targetUsernames() != null && !command.targetUsernames().isEmpty())) {
+
+            throw new IllegalArgumentException(BROADCAST_REQUIRES_NO_TARGET);
+        }
     }
 
     @Override
     public List<NotificationDetails> execute(CreateNotification command) {
 
         if (command.type() == NotificationType.BROADCAST) {
-            return List.of(createOne(command, null));
+            var notification = createNotification(command, null);
+            return List.of(toResult(null, notification));
         }
 
         var resolvedUsers = resolveUsers(command.targetUsernames());
+        return resolvedUsers.stream()
+                .map(user -> {
+                    var notification = createNotification(command, user);
+                    return toResult(user, notification);
+                })
+                .toList();
+    }
 
-        var results = new ArrayList<NotificationDetails>();
-        for (var user : resolvedUsers) {
-            results.add(createOne(command, user));
-        }
+    private NotificationDetails toResult(
+            User user,
+            Notification notification) {
 
-        return List.copyOf(results);
+        return new NotificationDetails(
+                notification.getPublicId(),
+                notification.getMessage(),
+                notification.getType(),
+                notification.getLevel(),
+                NotificationStatus.UNREAD,
+                Functions.mapOrNull(user, User::getUsername),
+                null,
+                notification.isInteractable(),
+                notification.getMetadata(),
+                notification.getCreationDate(),
+                notification.getLastUpdateDate());
     }
 
     private List<User> resolveUsers(List<String> usernames) {
@@ -86,45 +112,27 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
         }
 
         if (!missing.isEmpty()) {
-            throw new BusinessRuleViolationException(UNKNOWN_USERS + String.join(", ", missing));
+            throw new NotFoundException(UNKNOWN_USERS + String.join(", ", missing));
         }
 
         return resolved;
     }
 
-    private NotificationDetails createOne(CreateNotification command, User targetUser) {
+    private Notification createNotification(
+            CreateNotification command,
+            User user) {
 
-        var notificationBuilder = Notification.builder()
+        var notification = notificationRepository.save(Notification.builder()
                 .message(command.message())
                 .type(command.type())
                 .level(command.level())
-                .adventureId(command.adventureId())
                 .isInteractable(command.isInteractable())
-                .metadata(command.metadata());
-
-        if (targetUser != null) {
-            notificationBuilder.targetUserId(targetUser.getId());
-        }
-
-        var notification = notificationRepository.save(notificationBuilder.build());
+                .metadata(command.metadata())
+                .targetUserId(Functions.mapOrNull(user, User::getId))
+                .build());
 
         eventPublisher.publishEvent(new NotificationCreated(notification.getPublicId()));
 
-        return mapResult(notification);
-    }
-
-    private NotificationDetails mapResult(Notification notification) {
-        return new NotificationDetails(
-                notification.getPublicId(),
-                notification.getMessage(),
-                notification.getType(),
-                notification.getLevel(),
-                NotificationStatus.UNREAD,
-                notification.getTargetUserId(),
-                notification.getAdventureId(),
-                notification.isInteractable(),
-                notification.getMetadata(),
-                notification.getCreationDate(),
-                notification.getLastUpdateDate());
+        return notification;
     }
 }

@@ -20,6 +20,6 @@ public class GetActiveSystemNotificationsHandler
 
     @Override
     public List<NotificationDetails> execute(GetActiveSystemNotifications query) {
-        return reader.getActiveUnreadSystemNotifications(query.userId());
+        return reader.getActiveUnreadSystemNotifications(query.username());
     }
 }

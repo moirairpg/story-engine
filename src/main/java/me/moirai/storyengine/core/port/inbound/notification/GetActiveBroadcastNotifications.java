@@ -4,5 +4,5 @@ import java.util.List;
 
 import me.moirai.storyengine.common.cqs.query.Query;
 
-public record GetActiveBroadcastNotifications(Long requesterId) implements Query<List<NotificationDetails>> {
+public record GetActiveBroadcastNotifications(String username) implements Query<List<NotificationDetails>> {
 }

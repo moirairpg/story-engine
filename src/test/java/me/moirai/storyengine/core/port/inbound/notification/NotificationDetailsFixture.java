@@ -33,7 +33,7 @@ public class NotificationDetailsFixture {
                 NotificationType.SYSTEM,
                 NotificationLevel.INFO,
                 NotificationStatus.UNREAD,
-                1111L,
+                "some_user",
                 null,
                 false,
                 null,

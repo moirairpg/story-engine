@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotification;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetailsFixture;
@@ -33,9 +34,12 @@ public class GetNotificationHandlerTest {
 
         // given
         var details = NotificationDetailsFixture.broadcast();
-        var query = new GetNotification(UUID.randomUUID(), 1L, true);
+        var query = new GetNotification(
+                UUID.randomUUID(),
+                "user1",
+                Role.ADMIN);
 
-        when(reader.getNotificationByPublicId(any(UUID.class), any(Long.class), any(Boolean.class)))
+        when(reader.getNotificationByPublicId(any(UUID.class), any(String.class), any(Role.class)))
                 .thenReturn(Optional.of(details));
 
         // when
@@ -49,9 +53,9 @@ public class GetNotificationHandlerTest {
     public void shouldThrowWhenNotificationNotFound() {
 
         // given
-        var query = new GetNotification(UUID.randomUUID(), 1L, false);
+        var query = new GetNotification(UUID.randomUUID(), "user1", Role.ADMIN);
 
-        when(reader.getNotificationByPublicId(any(UUID.class), any(Long.class), any(Boolean.class)))
+        when(reader.getNotificationByPublicId(any(UUID.class), any(String.class), any(Role.class)))
                 .thenReturn(Optional.empty());
 
         // then
@@ -62,7 +66,7 @@ public class GetNotificationHandlerTest {
     public void shouldThrowWhenNotificationIdIsNull() {
 
         // given
-        var query = new GetNotification(null, 1L, false);
+        var query = new GetNotification(null, "user1", Role.ADMIN);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));

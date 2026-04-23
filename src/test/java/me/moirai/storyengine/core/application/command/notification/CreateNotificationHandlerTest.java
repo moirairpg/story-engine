@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
-import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.notification.NotificationCreated;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
@@ -53,7 +53,10 @@ public class CreateNotificationHandlerTest {
                 "Hello",
                 NotificationType.BROADCAST,
                 NotificationLevel.INFO,
-                null, null, false, null);
+                null,
+                false,
+                null);
+
         var saved = NotificationFixture.broadcastWithId();
 
         when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
@@ -77,7 +80,10 @@ public class CreateNotificationHandlerTest {
                 "Hello",
                 NotificationType.SYSTEM,
                 NotificationLevel.INFO,
-                List.of("john.doe", "jane.doe"), null, false, null);
+                List.of("john.doe", "jane.doe"),
+                false,
+                null);
+
         var user = UserFixture.playerWithId();
         var saved = NotificationFixture.systemWithId();
 
@@ -103,13 +109,15 @@ public class CreateNotificationHandlerTest {
                 "Hello",
                 NotificationType.SYSTEM,
                 NotificationLevel.INFO,
-                List.of("john.doe", "ghost.user"), null, false, null);
+                List.of("john.doe", "ghost.user"),
+                false,
+                null);
 
         when(userRepository.findByUsername(eq("john.doe"))).thenReturn(Optional.of(UserFixture.playerWithId()));
         when(userRepository.findByUsername(eq("ghost.user"))).thenReturn(Optional.empty());
 
         // then
-        assertThrows(BusinessRuleViolationException.class, () -> handler.execute(command));
+        assertThrows(NotFoundException.class, () -> handler.execute(command));
     }
 
     @Test
@@ -120,7 +128,9 @@ public class CreateNotificationHandlerTest {
                 " ",
                 NotificationType.BROADCAST,
                 NotificationLevel.INFO,
-                null, null, false, null);
+                null,
+                false,
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.validate(command));
@@ -134,7 +144,9 @@ public class CreateNotificationHandlerTest {
                 "Hello",
                 NotificationType.GAME,
                 null,
-                null, null, false, null);
+                null,
+                false,
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.validate(command));
@@ -148,7 +160,9 @@ public class CreateNotificationHandlerTest {
                 "Hello",
                 NotificationType.SYSTEM,
                 NotificationLevel.INFO,
-                List.of(), null, false, null);
+                List.of(),
+                false,
+                null);
 
         // then
         assertThrows(IllegalArgumentException.class, () -> handler.validate(command));

@@ -20,18 +20,6 @@ public class SearchNotificationsHandler
     @Override
     public PaginatedResult<NotificationSummary> execute(SearchNotifications query) {
 
-        var rows = reader.search(query);
-
-        var summaries = rows.data().stream()
-                .map(row -> new NotificationSummary(
-                        row.publicId(),
-                        row.message(),
-                        row.type(),
-                        row.level(),
-                        row.status(),
-                        row.creationDate()))
-                .toList();
-
-        return new PaginatedResult<>(summaries, rows.items(), rows.totalItems(), rows.page(), rows.totalPages());
+        return reader.search(query);
     }
 }

@@ -1,11 +1,15 @@
 package me.moirai.storyengine.core.application.command.notification;
 
+import java.util.Optional;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
+import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.UpdateNotification;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
 public class UpdateNotificationHandler extends AbstractCommandHandler<UpdateNotification, NotificationDetails> {
@@ -14,9 +18,14 @@ public class UpdateNotificationHandler extends AbstractCommandHandler<UpdateNoti
     private static final String ID_REQUIRED = "Notification ID cannot be null";
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public UpdateNotificationHandler(NotificationRepository notificationRepository) {
+    public UpdateNotificationHandler(
+            NotificationRepository notificationRepository,
+            UserRepository userRepository) {
+
         this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -37,15 +46,25 @@ public class UpdateNotificationHandler extends AbstractCommandHandler<UpdateNoti
         notification.updateLevel(command.level());
 
         var saved = notificationRepository.save(notification);
+        var user = Optional.ofNullable(notification.getTargetUserId())
+                .flatMap(userRepository::findById)
+                .orElse(null);
+
+        NotificationStatus status = null;
+        String targetUsername = null;
+        if (user != null) {
+            status = notification.getStatus(user.getId());
+            targetUsername = user.getUsername();
+        }
 
         return new NotificationDetails(
                 saved.getPublicId(),
                 saved.getMessage(),
                 saved.getType(),
                 saved.getLevel(),
-                saved.getStatus(command.requesterId()),
-                saved.getTargetUserId(),
-                saved.getAdventureId(),
+                status,
+                targetUsername,
+                null,
                 saved.isInteractable(),
                 saved.getMetadata(),
                 saved.getCreationDate(),
