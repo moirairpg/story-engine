@@ -62,7 +62,7 @@ jobs:
       - name: Merge main into patch branch
         run: |
           git fetch origin main
-          if ! git merge origin/main --no-ff -m "patch: merge main into ${{ env.PATCH_BRANCH }}"; then
+          if ! git merge origin/main --no-ff -m "close patch: merge main into ${{ env.PATCH_BRANCH }}"; then
             echo "::error::Merge conflicts detected. Resolve conflicts manually before closing this patch."
             git merge --abort
             exit 1
@@ -72,14 +72,14 @@ jobs:
         run: |
           git checkout main
           git pull origin main
-          git merge ${{ env.PATCH_BRANCH }} --no-ff -m "patch: merge ${{ env.PATCH_BRANCH }} into main"
+          git merge ${{ env.PATCH_BRANCH }} --no-ff -m "close patch: merge ${{ env.PATCH_BRANCH }} into main"
 
       - name: Normalize main version
         run: |
           mvn versions:set -DnewVersion=${{ env.PATCH_VERSION }} -DgenerateBackupPoms=false
           git add pom.xml
           if ! git diff --cached --quiet; then
-            git commit -m "patch: set version ${{ env.PATCH_VERSION }}"
+            git commit -m "close patch: set version ${{ env.PATCH_VERSION }}"
           fi
           git push origin main
 
@@ -87,7 +87,7 @@ jobs:
         run: |
           git checkout develop
           git pull origin develop
-          if ! git merge origin/main --no-ff -m "patch: merge main into develop after ${{ env.PATCH_BRANCH }}"; then
+          if ! git merge origin/main --no-ff -m "close patch: merge main into develop after ${{ env.PATCH_BRANCH }}"; then
             echo "::error::Merge conflicts detected. Resolve conflicts manually before closing this patch."
             git merge --abort
             exit 1
@@ -98,7 +98,7 @@ jobs:
           mvn versions:set -DnewVersion=${{ env.DEVELOP_VERSION }} -DgenerateBackupPoms=false
           git add pom.xml
           if ! git diff --cached --quiet; then
-            git commit -m "patch: restore develop version to ${{ env.DEVELOP_VERSION }}"
+            git commit -m "close patch: restore develop version to ${{ env.DEVELOP_VERSION }}"
           fi
           git push origin develop
 

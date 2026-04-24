@@ -68,5 +68,5 @@ jobs:
         run: |
           mvn versions:set -DnewVersion=${{ env.PATCH_VERSION }}-PATCH-SNAPSHOT -DgenerateBackupPoms=false
           git add pom.xml
-          git commit -m "patch: set version ${{ env.PATCH_VERSION }}-PATCH-SNAPSHOT"
+          git commit -m "create patch: set version ${{ env.PATCH_VERSION }}-PATCH-SNAPSHOT"
           git push origin patch/${{ env.PATCH_VERSION }}

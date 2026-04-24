@@ -61,5 +61,5 @@ jobs:
           FEATURE_VERSION="${NUMERIC_VERSION}-${{ inputs.feature_name }}-SNAPSHOT"
           mvn versions:set -DnewVersion=$FEATURE_VERSION -DgenerateBackupPoms=false
           git add pom.xml
-          git commit -m "feature: set version $FEATURE_VERSION"
+          git commit -m "create feature: set version $FEATURE_VERSION"
           git push origin feature/${{ inputs.feature_name }}

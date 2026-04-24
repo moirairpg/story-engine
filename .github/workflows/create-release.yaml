@@ -61,7 +61,7 @@ jobs:
         run: |
           git checkout main
           git pull origin main
-          git merge develop --no-ff -m "release: merge develop into main for ${{ env.TAG_NAME }}"
+          git merge develop --no-ff -m "create release: merge develop into main for ${{ env.TAG_NAME }}"
           git push origin main
 
       - name: Set RC-SNAPSHOT version on main
@@ -69,17 +69,17 @@ jobs:
           mvn versions:set -DnewVersion=${{ env.RC_VERSION }} -DgenerateBackupPoms=false
           sed -i "s/storyengine-[^ ]*\.jar/storyengine-${{ env.RC_VERSION }}.jar/g" README.md
           git add pom.xml README.md
-          git commit -m "release: set version ${{ env.RC_VERSION }}"
+          git commit -m "create release: set version ${{ env.RC_VERSION }}"
           git push origin main
 
       - name: Merge main back into develop and bump version
         run: |
           git checkout develop
-          git merge main --no-ff -m "release: merge main back into develop after ${{ env.TAG_NAME }}"
+          git merge main --no-ff -m "create release: merge main back into develop after ${{ env.TAG_NAME }}"
           mvn versions:set -DnewVersion=${{ env.NEXT_SNAPSHOT }} -DgenerateBackupPoms=false
           sed -i "s/storyengine-[^ ]*\.jar/storyengine-${{ env.NEXT_SNAPSHOT }}.jar/g" README.md
           git add pom.xml README.md
-          git commit -m "release: bump version to ${{ env.NEXT_SNAPSHOT }}"
+          git commit -m "create release: bump version to ${{ env.NEXT_SNAPSHOT }}"
           git push origin develop
 
       - name: Create release branch and finalize version
@@ -89,7 +89,7 @@ jobs:
           mvn versions:set -DnewVersion=${{ env.NUMERIC_VERSION }} -DgenerateBackupPoms=false
           sed -i "s/storyengine-[^ ]*\.jar/storyengine-${{ env.NUMERIC_VERSION }}.jar/g" README.md
           git add pom.xml README.md
-          git commit -m "release: set version ${{ env.NUMERIC_VERSION }}"
+          git commit -m "create release: set version ${{ env.NUMERIC_VERSION }}"
 
       - name: Tag and publish release
         env:
