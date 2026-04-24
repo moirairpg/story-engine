@@ -2,6 +2,7 @@ package me.moirai.storyengine;
 
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -11,16 +12,19 @@ import org.springframework.web.client.RestClient;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import io.qdrant.client.QdrantClient;
+import io.qdrant.client.QdrantGrpcClient;
 import me.moirai.storyengine.common.testutil.DbTestHelper;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 import me.moirai.storyengine.infrastructure.config.DiscordApiConfig;
 import me.moirai.storyengine.infrastructure.config.OpenAiApiConfig;
 import me.moirai.storyengine.infrastructure.config.QdrantConfig;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
@@ -60,10 +64,28 @@ public abstract class AbstractIntegrationTest {
     private QdrantClient qdrantClient;
 
     @MockitoBean
+    private QdrantGrpcClient qdrantGrpcClient;
+
+    @MockitoBean
     private RestClient discordClient;
 
     @MockitoBean
     private RestClient openAiClient;
+
+    @MockitoBean
+    private S3Client s3Client;
+
+    @MockitoBean
+    private StoragePort storagePort;
+
+    @MockitoBean
+    private ApplicationRunner initStorageBucket;
+
+    @MockitoBean
+    private ApplicationRunner initLorebookCollection;
+
+    @MockitoBean
+    private ApplicationRunner initChronicleCollection;
 
     private static final String POSTGRES_IMAGE_NAME = "postgres:18-alpine";
 

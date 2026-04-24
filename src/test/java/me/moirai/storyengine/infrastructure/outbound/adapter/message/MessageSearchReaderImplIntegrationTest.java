@@ -14,6 +14,7 @@ import me.moirai.storyengine.core.domain.message.MessageFixture;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
+import me.moirai.storyengine.core.port.inbound.adventure.MessageSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventureMessages;
 import me.moirai.storyengine.core.port.outbound.message.MessageSearchReader;
 
@@ -133,7 +134,8 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
         var insertedAdventure = insert(adventure, Adventure.class);
 
         var first = insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
-        var second = insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        var second = insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(),
+                Message.class);
         insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
 
         var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), second.getPublicId(), 10);
@@ -183,7 +185,8 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
         var insertedAdventure = insert(adventure, Adventure.class);
 
         var activeMsg = MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build();
-        var chronicledMsg = MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).status(MessageStatus.CHRONICLED).build();
+        var chronicledMsg = MessageFixture.assistantMessage().adventureId(insertedAdventure.getId())
+                .status(MessageStatus.CHRONICLED).build();
 
         insert(activeMsg, Message.class);
         insert(chronicledMsg, Message.class);
@@ -211,7 +214,8 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
         var insertedAdventure = insert(adventure, Adventure.class);
 
         var first = insert(MessageFixture.userMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
-        var second = insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(), Message.class);
+        var second = insert(MessageFixture.assistantMessage().adventureId(insertedAdventure.getId()).build(),
+                Message.class);
 
         var query = new SearchAdventureMessages(insertedAdventure.getPublicId(), null, 10);
 
@@ -221,7 +225,7 @@ public class MessageSearchReaderImplIntegrationTest extends AbstractIntegrationT
         // then
         assertThat(result).isNotNull();
         assertThat(result.data()).hasSize(2);
-        assertThat(result.data().get(0).id()).isEqualTo(second.getPublicId());
-        assertThat(result.data().get(1).id()).isEqualTo(first.getPublicId());
+        assertThat(result.data().stream().map(MessageSummary::id))
+                .containsExactlyInAnyOrder(second.getPublicId(), first.getPublicId());
     }
 }

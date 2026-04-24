@@ -46,7 +46,7 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
                 .filter(Filters.equals("a.public_id", "adventurePublicId", query.adventureId()))
                 .filter(Filters.in("m.status", "status", List.of(MessageStatus.ACTIVE.name(), MessageStatus.CHRONICLED.name())))
                 .filter(Filters.lowerThan("m.public_id", "lastMessageId", query.lastMessageId()))
-                .sortBy("m.public_id", SortDirection.DESC)
+                .sortBy("m.id", SortDirection.DESC)
                 .limit(query.size())
                 .build();
 

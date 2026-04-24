@@ -61,7 +61,7 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
         assertThat(result.get().worldId()).isEqualTo(world.getPublicId());
         assertThat(result.get().narratorName()).isEqualTo(adventure.getNarratorName());
         assertThat(result.get().narratorPersonality()).isEqualTo(adventure.getNarratorPersonality());
-        assertThat(result.get().visibility()).isEqualTo(adventure.getVisibility().name());
+        assertThat(result.get().visibility()).isEqualTo(adventure.getVisibility());
         assertThat(result.get().isMultiplayer()).isTrue();
         assertThat(result.get().creationDate()).isNotNull();
         assertThat(result.get().lastUpdateDate()).isNotNull();
@@ -91,7 +91,7 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
 
         var saved = insert(adventure, Adventure.class);
         saved.updateUiImagePosition(0.3, 0.7);
-        insert(saved, Adventure.class);
+        update(saved, saved.getId(), Adventure.class);
 
         // When
         var result = reader.getAdventureById(saved.getPublicId());

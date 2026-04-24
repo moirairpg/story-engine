@@ -252,7 +252,7 @@ public class DbTestHelper {
                 if (field.get(value) != null)
                     continue;
 
-                field.set(value, Generators.timeBasedEpochGenerator().generate());
+                field.set(value, Generators.timeBasedEpochRandomGenerator().generate());
             }
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);

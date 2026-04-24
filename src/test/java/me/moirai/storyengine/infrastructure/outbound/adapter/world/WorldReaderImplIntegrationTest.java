@@ -65,7 +65,7 @@ public class WorldReaderImplIntegrationTest extends AbstractIntegrationTest {
         // Given
         var world = insert(WorldFixture.publicWorld().build(), World.class);
         world.updateUiImagePosition(0.3, 0.7);
-        insert(world, World.class);
+        update(world, world.getId(), World.class);
 
         // When
         var result = reader.getWorldById(world.getPublicId());

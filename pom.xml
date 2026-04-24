@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.5</version>
+        <version>4.0.6</version>
         <relativePath />
     </parent>
 
@@ -16,22 +16,24 @@
     <artifactId>storyengine</artifactId>
     <version>3.1.0-SNAPSHOT</version>
     <name>MoirAI Story Engine</name>
-    <description>MoirAI — AI-powered RPG engine</description>
+    <description>MoirAI Story Engine — AI-powered RPG engine</description>
 
     <properties>
-        <github.global.server>github</github.global.server>
         <java.version>25</java.version>
-        <testcontainers.version>2.0.3</testcontainers.version>
+        <github.global.server>github</github.global.server>
+        <skipUnitTests>false</skipUnitTests>
+        <skipIntegrationTests>false</skipIntegrationTests>
+
+        <testcontainers.version>2.0.5</testcontainers.version>
         <springdoc.version>3.0.2</springdoc.version>
         <tokenizer.version>1.1.0</tokenizer.version>
         <uuid-generator.version>5.2.0</uuid-generator.version>
         <apache.commons.lang.version>3.20.0</apache.commons.lang.version>
         <apache.commons.collections.version>4.5.0</apache.commons.collections.version>
-        <wiremock.version>3.9.1</wiremock.version>
+        <wiremock.version>3.13.2</wiremock.version>
         <jacoco.version>0.8.14</jacoco.version>
-        <qdrant.version>1.13.0</qdrant.version>
-        <skipUnitTests>false</skipUnitTests>
-        <skipIntegrationTests>false</skipIntegrationTests>
+        <qdrant.version>1.17.0</qdrant.version>
+        <grpc.version>1.80.0</grpc.version>
         <awssdk.version>2.42.34</awssdk.version>
         <tika.version>3.3.0</tika.version>
     </properties>
@@ -39,10 +41,6 @@
     <dependencies>
 
         <!-- Spring Framework -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
@@ -58,10 +56,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -139,17 +133,12 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.65.1</version>
+            <version>${grpc.version}</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.65.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>32.1.3-android</version>
+            <version>${grpc.version}</version>
         </dependency>
 
         <!-- Libraries -->
@@ -166,15 +155,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>${apache.commons.collections.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -260,13 +240,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>@{argLine} -Dnet.bytebuddy.experimental=true</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
@@ -297,12 +270,22 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>@{argLine} -Dnet.bytebuddy.experimental=true</argLine>
-                    <excludes>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                    </excludes>
-                    <skip>${skipUnitTests}</skip>
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>@{argLine} -Dnet.bytebuddy.experimental=true</argLine>
+                            <excludes>
+                                <exclude>**/*IntegrationTest.java</exclude>
+                            </excludes>
+                            <skip>${skipUnitTests}</skip>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>integration-tests</id>
                         <phase>test</phase>
@@ -314,6 +297,7 @@
                             <includes>
                                 <include>**/*IntegrationTest.java</include>
                             </includes>
+                            <excludes combine.self="override"></excludes>
                             <skip>${skipIntegrationTests}</skip>
                         </configuration>
                     </execution>

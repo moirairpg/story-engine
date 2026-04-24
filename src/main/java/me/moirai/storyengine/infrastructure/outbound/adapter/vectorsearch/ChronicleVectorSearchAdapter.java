@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import io.grpc.StatusRuntimeException;
 import io.qdrant.client.QdrantGrpcClient;
 import io.qdrant.client.grpc.Points.DeletePoints;
-import io.qdrant.client.grpc.Points.Filter;
+import io.qdrant.client.grpc.Common.Filter;
 import io.qdrant.client.grpc.Points.PointStruct;
 import io.qdrant.client.grpc.Points.PointsSelector;
 import io.qdrant.client.grpc.Points.SearchPoints;

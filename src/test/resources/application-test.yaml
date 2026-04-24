@@ -22,9 +22,19 @@ moirai:
       redirect-url: http://dummy_value
     api-base-url: https://discord.com/api
     api-token: dummy_value
+  storage:
+    endpoint: http://localhost:9000
+    access-key: dummy
+    secret-key: dummy
+    bucket: dummy
+    region: us-east-1
   security:
     allowed-origins: http://localhost
     allowed-headers: Content-Type
+    redirect-path:
+      success: http://localhost/success
+      fail: http://localhost/fail
+      logout: http://localhost/logout
 
 spring:
   main.banner-mode: 'off'
