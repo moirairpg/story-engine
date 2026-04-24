@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.inbound.websocket;
+package me.moirai.storyengine.infrastructure.inbound.websocket.controller;
 
 import java.security.Principal;
 import java.util.List;

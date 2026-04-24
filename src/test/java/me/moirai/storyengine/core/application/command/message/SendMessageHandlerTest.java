@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,13 +21,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.message.Message;
@@ -74,12 +70,7 @@ public class SendMessageHandlerTest {
     private SendMessageHandler handler;
 
     @BeforeEach
-    void setupSecurityContext() {
-
-        var principal = new MoiraiPrincipal(UUID.randomUUID(), 99999L, "discordId",
-                "user", "user@test.com", "token", "refresh", null, null);
-        var authentication = new UsernamePasswordAuthenticationToken(principal, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    void setUp() {
 
         handler = new SendMessageHandler(
                 adventureRepository,
@@ -95,16 +86,11 @@ public class SendMessageHandlerTest {
                 3);
     }
 
-    @AfterEach
-    void clearSecurityContext() {
-        SecurityContextHolder.clearContext();
-    }
-
     @Test
     public void shouldThrowWhenAdventureNotFound() {
 
         // given
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
 
         // when / then
@@ -126,7 +112,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -158,7 +144,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -194,7 +180,7 @@ public class SendMessageHandlerTest {
         var lorebookEntry = adventure.addLorebookEntry("Dragon", "A fearsome dragon", null);
         ReflectionTestUtils.setField(lorebookEntry, "publicId", entryId);
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -226,7 +212,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -259,7 +245,7 @@ public class SendMessageHandlerTest {
                 .build();
 
         var entryId = UUID.randomUUID();
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -280,7 +266,7 @@ public class SendMessageHandlerTest {
     public void shouldThrowExceptionWhenAdventureIdIsNull() {
 
         // given
-        var command = new SendMessage(null, "Hello!");
+        var command = new SendMessage(null, "Hello!", "user");
 
         // when / then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -290,7 +276,7 @@ public class SendMessageHandlerTest {
     public void shouldThrowExceptionWhenContentIsBlank() {
 
         // given
-        var command = new SendMessage(UUID.randomUUID(), "");
+        var command = new SendMessage(UUID.randomUUID(), "", "user");
 
         // when / then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
@@ -313,7 +299,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -347,7 +333,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -392,7 +378,7 @@ public class SendMessageHandlerTest {
                 .content("MoirAI said: You see a tavern.")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -431,7 +417,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -467,7 +453,7 @@ public class SendMessageHandlerTest {
                 .outputText("MoirAI said: some text.")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -503,7 +489,7 @@ public class SendMessageHandlerTest {
                 .outputText("As MoirAI, She walks forward.")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -543,7 +529,7 @@ public class SendMessageHandlerTest {
                 .content("The dragon was defeated.")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -579,7 +565,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -614,7 +600,7 @@ public class SendMessageHandlerTest {
                 .outputText("She walks forward. And then she")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
@@ -648,7 +634,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var command = new SendMessage(UUID.randomUUID(), "Hello!");
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);

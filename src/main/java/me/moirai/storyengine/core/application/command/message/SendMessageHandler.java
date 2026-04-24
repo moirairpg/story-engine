@@ -22,7 +22,6 @@ import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.common.security.authentication.MoiraiSecurityContext;
 import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.chronicle.MessageWindowOverflowEvent;
@@ -98,11 +97,9 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         var adventure = adventureRepository.findByPublicId(command.adventureId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
-        var username = MoiraiSecurityContext.getAuthenticatedUser().username();
-
-        var characterName = adventure.getLorebookEntryByPlayerId(username)
+        var characterName = adventure.getLorebookEntryByPlayerId(command.username())
                 .map(e -> e.getName())
-                .orElse(username);
+                .orElse(command.username());
 
         var playerMessage = Message.builder()
                 .adventureId(adventure.getId())

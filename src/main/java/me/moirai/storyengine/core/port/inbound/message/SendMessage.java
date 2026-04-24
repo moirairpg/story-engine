@@ -6,6 +6,7 @@ import me.moirai.storyengine.common.cqs.command.Command;
 
 public record SendMessage(
         UUID adventureId,
-        String content)
+        String content,
+        String username)
         implements Command<MessageResult> {
 }

@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.inbound.websocket;
+package me.moirai.storyengine.infrastructure.inbound.websocket.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,11 +16,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
+import me.moirai.storyengine.infrastructure.inbound.websocket.request.WebSocketMessageRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class AdventureWebSocketControllerTest {
@@ -41,17 +44,21 @@ public class AdventureWebSocketControllerTest {
         var adventureId = UUID.randomUUID();
         var request = new WebSocketMessageRequest("hello");
         var result = new MessageResult(UUID.randomUUID(), "reply", AiRole.ASSISTANT, Instant.now());
+        var moiraiPrincipal = new MoiraiPrincipal(UUID.randomUUID(), 99999L, "discordId",
+                "alice", "alice@test.com", "token", "refresh", null, null);
+        var principal = new UsernamePasswordAuthenticationToken(moiraiPrincipal, null);
 
         when(commandRunner.run(any(SendMessage.class))).thenReturn(result);
 
         // when
-        controller.handleMessage(adventureId, request);
+        controller.handleMessage(adventureId, request, principal);
 
         // then
         var commandCaptor = ArgumentCaptor.forClass(SendMessage.class);
         verify(commandRunner).run(commandCaptor.capture());
         assertThat(commandCaptor.getValue().adventureId()).isEqualTo(adventureId);
         assertThat(commandCaptor.getValue().content()).isEqualTo("hello");
+        assertThat(commandCaptor.getValue().username()).isEqualTo("alice");
         verify(messagingTemplate).convertAndSend(eq("/topic/adventures/" + adventureId), eq(result));
     }
 }
