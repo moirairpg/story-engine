@@ -24,7 +24,7 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
-import me.moirai.storyengine.core.domain.chronicle.MessageWindowOverflowEvent;
+import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.StartAdventure;
@@ -134,7 +134,7 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
 
         messageRepository.save(aiMessage);
 
-        eventPublisher.publishEvent(new MessageWindowOverflowEvent(adventure.getPublicId()));
+        eventPublisher.publishEvent(new AdventureMessageWindowOverflowedEvent(adventure.getPublicId()));
 
         return new MessageResult(
                 aiMessage.getPublicId(),

@@ -28,7 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.core.domain.chronicle.MessageWindowOverflowEvent;
+import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
@@ -244,7 +244,9 @@ public class RetryHandlerTest {
         handler.handle(command);
 
         // then
-        verify(eventPublisher).publishEvent(any(MessageWindowOverflowEvent.class));
+        var captor = ArgumentCaptor.forClass(AdventureMessageWindowOverflowedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue().adventurePublicId()).isEqualTo(adventure.getPublicId());
     }
 
     @Test

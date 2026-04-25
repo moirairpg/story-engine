@@ -1,12 +1,14 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.message;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.dbutil.Filter;
 import me.moirai.storyengine.common.dbutil.Filters;
 import me.moirai.storyengine.common.dbutil.QueryBuilder;
 import me.moirai.storyengine.common.dto.CursorResult;
@@ -44,8 +46,9 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
 
         var builtQuery = QueryBuilder.select(SELECT_SQL)
                 .filter(Filters.equals("a.public_id", "adventurePublicId", query.adventureId()))
-                .filter(Filters.in("m.status", "status", List.of(MessageStatus.ACTIVE.name(), MessageStatus.CHRONICLED.name())))
-                .filter(Filters.lowerThan("m.public_id", "lastMessageId", query.lastMessageId()))
+                .filter(Filters.in("m.status", "status",
+                        List.of(MessageStatus.ACTIVE.name(), MessageStatus.CHRONICLED.name())))
+                .filter(cursorFilter(query.lastMessageId()))
                 .sortBy("m.id", SortDirection.DESC)
                 .limit(query.size())
                 .build();
@@ -66,5 +69,17 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
                 MessageStatus.valueOf(rs.getString("status")),
                 rs.getString("created_by"),
                 rs.getTimestamp("creation_date").toInstant());
+    }
+
+    private static Optional<Filter> cursorFilter(UUID lastMessageId) {
+
+        if (lastMessageId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new Filter(
+                "m.id < (SELECT id FROM message WHERE public_id = :lastMessageId)",
+                "lastMessageId",
+                lastMessageId));
     }
 }

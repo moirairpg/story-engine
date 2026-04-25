@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
@@ -164,5 +166,37 @@ public class RetryFromMessageHandlerTest {
         assertThat(result).isNotNull();
         assertThat(result.content()).isEqualTo("AI retried response.");
         assertThat(result.role()).isEqualTo(AiRole.ASSISTANT);
+    }
+
+    @Test
+    public void shouldPublishOverflowEvent() {
+
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var lastMessage = MessageFixture.assistantMessage().build();
+        var savedMessage = MessageFixture.assistantMessage().build();
+        ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
+
+        var generationResult = TextGenerationResult.builder().outputText("AI retried response.").build();
+        var command = new RetryFromMessage(UUID.randomUUID(), UUID.randomUUID());
+
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(messageRepository.getLastActive(anyLong())).thenReturn(Optional.of(lastMessage));
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+        when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
+
+        // when
+        handler.handle(command);
+
+        // then
+        var captor = ArgumentCaptor.forClass(AdventureMessageWindowOverflowedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue().adventurePublicId()).isEqualTo(adventure.getPublicId());
     }
 }

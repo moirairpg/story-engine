@@ -1,5 +1,6 @@
 package me.moirai.storyengine.core.application.command.notification;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,8 +23,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.core.application.event.notification.NotificationCreated;
 import me.moirai.storyengine.core.domain.notification.Notification;
-import me.moirai.storyengine.core.domain.notification.NotificationCreated;
 import me.moirai.storyengine.core.domain.notification.NotificationFixture;
 import me.moirai.storyengine.core.domain.notification.NotificationLevel;
 import me.moirai.storyengine.core.domain.notification.NotificationType;
@@ -130,7 +132,9 @@ public class CreateNotificationHandlerTest {
         handler.execute(command);
 
         // then
-        verify(eventPublisher, times(1)).publishEvent(any(NotificationCreated.class));
+        var captor = ArgumentCaptor.forClass(NotificationCreated.class);
+        verify(eventPublisher, times(1)).publishEvent(captor.capture());
+        assertThat(captor.getValue().publicId()).isEqualTo(saved.getPublicId());
     }
 
     @Test

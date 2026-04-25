@@ -25,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.message.Message;
@@ -651,5 +652,38 @@ public class SendMessageHandlerTest {
         // then
         verify(textCompletionPort, times(2)).generateTextFrom(captor.capture());
         assertThat(captor.getAllValues().get(1).instructions()).isNull();
+    }
+
+    @Test
+    public void shouldPublishOverflowEvent() {
+
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
+
+        var savedMessage = MessageFixture.assistantMessage().build();
+        ReflectionTestUtils.setField(savedMessage, "publicId", UUID.randomUUID());
+
+        var generationResult = TextGenerationResult.builder()
+                .outputText("AI response")
+                .build();
+
+        var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
+
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
+        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+        when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
+
+        // when
+        handler.handle(command);
+
+        // then
+        var captor = ArgumentCaptor.forClass(AdventureMessageWindowOverflowedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue().adventurePublicId()).isEqualTo(adventure.getPublicId());
     }
 }
