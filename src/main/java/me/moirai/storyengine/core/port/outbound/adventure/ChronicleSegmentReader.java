@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.port.outbound.chronicle;
+package me.moirai.storyengine.core.port.outbound.adventure;
 
 import java.util.List;
 import java.util.UUID;

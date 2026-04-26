@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.fasterxml.uuid.Generators;
+
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.PermissionLevel;
@@ -22,7 +24,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(UUID.randomUUID());
+        builder.worldId(Generators.timeBasedEpochGenerator().generate());
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
         builder.modelConfiguration(ModelConfigurationFixture.gpt4Mini());
@@ -39,7 +41,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(UUID.randomUUID());
+        builder.worldId(Generators.timeBasedEpochGenerator().generate());
         builder.narrator("Aria", "A helpful guide");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PRIVATE"));
@@ -57,7 +59,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(UUID.randomUUID());
+        builder.worldId(Generators.timeBasedEpochGenerator().generate());
         builder.narrator("Aria", "A helpful guide");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));
@@ -75,7 +77,7 @@ public class AdventureFixture {
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
-        builder.worldId(UUID.randomUUID());
+        builder.worldId(Generators.timeBasedEpochGenerator().generate());
         builder.narrator("Aria", "A helpful guide");
         builder.moderation(Moderation.STRICT);
         builder.visibility(Visibility.fromString("PUBLIC"));

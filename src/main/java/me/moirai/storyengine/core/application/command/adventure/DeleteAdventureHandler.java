@@ -5,7 +5,6 @@ import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
@@ -20,7 +19,6 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
 
     private final AdventureRepository repository;
     private final MessageRepository messageRepository;
-    private final ChronicleSegmentRepository chronicleSegmentRepository;
     private final LorebookVectorSearchPort lorebookVectorSearchPort;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
     private final StoragePort storagePort;
@@ -29,7 +27,6 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
     public DeleteAdventureHandler(
             AdventureRepository repository,
             MessageRepository messageRepository,
-            ChronicleSegmentRepository chronicleSegmentRepository,
             LorebookVectorSearchPort lorebookVectorSearchPort,
             ChronicleVectorSearchPort chronicleVectorSearchPort,
             StoragePort storagePort,
@@ -37,7 +34,6 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
 
         this.repository = repository;
         this.messageRepository = messageRepository;
-        this.chronicleSegmentRepository = chronicleSegmentRepository;
         this.lorebookVectorSearchPort = lorebookVectorSearchPort;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
         this.storagePort = storagePort;
@@ -63,7 +59,6 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
         }
 
         messageRepository.deleteAllByAdventurePublicId(command.adventureId());
-        chronicleSegmentRepository.deleteAllByAdventurePublicId(command.adventureId());
         lorebookVectorSearchPort.deleteAllByAdventureId(command.adventureId());
         chronicleVectorSearchPort.deleteAllByAdventureId(command.adventureId());
         notificationRepository.deleteAllGameNotificationsByAdventureId(adventure.getId());

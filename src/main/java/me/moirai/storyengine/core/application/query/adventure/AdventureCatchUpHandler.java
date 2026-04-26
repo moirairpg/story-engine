@@ -10,7 +10,7 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureCatchUp;
 import me.moirai.storyengine.core.port.inbound.adventure.CatchUpResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
+import me.moirai.storyengine.core.port.outbound.adventure.ChronicleSegmentReader;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;

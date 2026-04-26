@@ -31,7 +31,6 @@ import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
 import me.moirai.storyengine.core.port.inbound.message.Go;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
@@ -62,9 +61,6 @@ public class GoHandlerTest {
     private ChronicleVectorSearchPort chronicleVectorSearchPort;
 
     @Mock
-    private ChronicleSegmentRepository chronicleSegmentRepository;
-
-    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     private GoHandler handler;
@@ -80,7 +76,6 @@ public class GoHandlerTest {
                 embeddingPort,
                 vectorSearchPort,
                 chronicleVectorSearchPort,
-                chronicleSegmentRepository,
                 eventPublisher,
                 10,
                 5,

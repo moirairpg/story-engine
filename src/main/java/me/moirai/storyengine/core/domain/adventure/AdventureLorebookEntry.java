@@ -2,13 +2,14 @@ package me.moirai.storyengine.core.domain.adventure;
 
 import java.util.UUID;
 
+import com.fasterxml.uuid.Generators;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
 
 @Entity
@@ -19,7 +20,6 @@ public class AdventureLorebookEntry extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @RandomUuid
     @Column(name = "public_id")
     private UUID publicId;
 
@@ -38,6 +38,8 @@ public class AdventureLorebookEntry extends Asset {
     private AdventureLorebookEntry(Builder builder) {
 
         super();
+
+        this.publicId = Generators.timeBasedEpochGenerator().generate();
         this.name = builder.name;
         this.description = builder.description;
         this.playerId = builder.playerId;

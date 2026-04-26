@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.outbound.adapter.chronicle;
+package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
+import me.moirai.storyengine.core.domain.adventure.ChronicleSegment;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegmentFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
+import me.moirai.storyengine.core.port.outbound.adventure.ChronicleSegmentReader;
 
 public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrationTest {
 
@@ -58,7 +58,12 @@ public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrati
     public void shouldReturnSegmentsByIds() {
 
         // Given
-        var segment = insert(ChronicleSegmentFixture.chronicleSegment().build(), ChronicleSegment.class);
+        var adventure = AdventureFixture.publicSingleplayerAdventure().build();
+        insert(adventure, Adventure.class);
+
+        var segment = insert(ChronicleSegmentFixture.chronicleSegment()
+                .adventureId(adventure.getId())
+                .build(), ChronicleSegment.class);
 
         // When
         var result = reader.getAllByIds(List.of(segment.getPublicId()));
@@ -73,7 +78,14 @@ public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrati
     public void shouldReturnEmptyListForUnknownIds() {
 
         // Given
-        insert(ChronicleSegmentFixture.chronicleSegment().build(), ChronicleSegment.class);
+        var adventure = AdventureFixture.publicSingleplayerAdventure().build();
+        insert(adventure, Adventure.class);
+
+        var chronicle = ChronicleSegmentFixture.chronicleSegment()
+                .adventureId(adventure.getId())
+                .build();
+
+        insert(chronicle, ChronicleSegment.class);
         var unknownId = UUID.randomUUID();
 
         // When
@@ -93,8 +105,10 @@ public class ChronicleSegmentReaderImplIntegrationTest extends AbstractIntegrati
                 .build();
         var insertedAdventure = insert(adventure, Adventure.class);
 
-        var first = insert(ChronicleSegmentFixture.chronicleSegment().adventureId(insertedAdventure.getId()).content("First event").build(), ChronicleSegment.class);
-        var second = insert(ChronicleSegmentFixture.chronicleSegment().adventureId(insertedAdventure.getId()).content("Second event").build(), ChronicleSegment.class);
+        var first = insert(ChronicleSegmentFixture.chronicleSegment().adventureId(insertedAdventure.getId())
+                .content("First event").build(), ChronicleSegment.class);
+        var second = insert(ChronicleSegmentFixture.chronicleSegment().adventureId(insertedAdventure.getId())
+                .content("Second event").build(), ChronicleSegment.class);
 
         // When
         var result = reader.getAllOrdered(insertedAdventure.getPublicId());

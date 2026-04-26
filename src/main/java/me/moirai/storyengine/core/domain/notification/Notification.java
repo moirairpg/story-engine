@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.uuid.Generators;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +23,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
 import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
@@ -36,7 +37,6 @@ public class Notification extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @RandomUuid
     @Column(name = "public_id")
     private UUID publicId;
 
@@ -72,7 +72,10 @@ public class Notification extends Asset {
     }
 
     private Notification(Builder builder) {
+
         super();
+
+        this.publicId = Generators.timeBasedEpochGenerator().generate();
         this.message = builder.message;
         this.type = builder.type;
         this.level = builder.level;

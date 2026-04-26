@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.domain.chronicle;
 
+import me.moirai.storyengine.core.domain.adventure.ChronicleSegment;
+
 public class ChronicleSegmentFixture {
 
     public static ChronicleSegment.Builder chronicleSegment() {

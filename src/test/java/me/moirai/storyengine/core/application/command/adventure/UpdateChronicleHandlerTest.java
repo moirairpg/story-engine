@@ -1,10 +1,11 @@
-package me.moirai.storyengine.core.application.command.chronicle;
+package me.moirai.storyengine.core.application.command.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,13 +23,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.chronicle.ChronicleSegmentFixture;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
 import me.moirai.storyengine.core.port.inbound.chronicle.UpdateChronicle;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
@@ -57,9 +57,6 @@ public class UpdateChronicleHandlerTest {
     private EmbeddingPort embeddingPort;
 
     @Mock
-    private ChronicleSegmentRepository chronicleSegmentRepository;
-
-    @Mock
     private ChronicleVectorSearchPort chronicleVectorSearchPort;
 
     private UpdateChronicleHandler handler;
@@ -72,7 +69,6 @@ public class UpdateChronicleHandlerTest {
                 messageRepository,
                 textCompletionPort,
                 embeddingPort,
-                chronicleSegmentRepository,
                 chronicleVectorSearchPort,
                 5);
     }
@@ -104,7 +100,6 @@ public class UpdateChronicleHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
         var command = new UpdateChronicle(UUID.randomUUID());
 
@@ -120,7 +115,7 @@ public class UpdateChronicleHandlerTest {
         // then
         assertThat(result).isNull();
         verify(textCompletionPort, never()).generateTextFrom(any());
-        verify(chronicleSegmentRepository, never()).save(any());
+        verify(adventureRepository, never()).save(any());
     }
 
     @Test
@@ -129,24 +124,23 @@ public class UpdateChronicleHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
         var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        ReflectionTestUtils.setField(savedSegment, "publicId", UUID.randomUUID());
+        adventure.addChronicleSegment(savedSegment.getContent());
 
         var command = new UpdateChronicle(UUID.randomUUID());
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(overflowingMessages(7));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
-        when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
+        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
 
         // when
         handler.handle(command);
 
         // then
-        verify(chronicleSegmentRepository).save(any(ChronicleSegment.class));
+        verify(adventureRepository).save(any(Adventure.class));
     }
 
     @Test
@@ -155,11 +149,9 @@ public class UpdateChronicleHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var segmentPublicId = UUID.randomUUID();
         var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        ReflectionTestUtils.setField(savedSegment, "publicId", segmentPublicId);
+        adventure.addChronicleSegment(savedSegment.getContent());
 
         var command = new UpdateChronicle(UUID.randomUUID());
         var vector = new float[] { 0.1f, 0.2f };
@@ -167,14 +159,14 @@ public class UpdateChronicleHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(overflowingMessages(7));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
-        when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
+        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
         when(embeddingPort.embed(anyString())).thenReturn(vector);
 
         // when
         handler.handle(command);
 
         // then
-        verify(chronicleVectorSearchPort).upsert(adventure.getPublicId(), segmentPublicId, vector);
+        verify(adventureRepository, times(1)).save(adventure);
     }
 
     @Test
@@ -183,17 +175,16 @@ public class UpdateChronicleHandlerTest {
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-        ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
         var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        ReflectionTestUtils.setField(savedSegment, "publicId", UUID.randomUUID());
+        adventure.addChronicleSegment(savedSegment.getContent());
 
         var command = new UpdateChronicle(UUID.randomUUID());
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(overflowingMessages(7));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
-        when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
+        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
 
         var captor = ArgumentCaptor.forClass(List.class);
@@ -215,7 +206,7 @@ public class UpdateChronicleHandlerTest {
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
         var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        ReflectionTestUtils.setField(savedSegment, "publicId", UUID.randomUUID());
+        adventure.addChronicleSegment(savedSegment.getContent());
 
         var command = new UpdateChronicle(UUID.randomUUID());
         var messages = overflowingMessages(8);
@@ -223,7 +214,7 @@ public class UpdateChronicleHandlerTest {
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageReader.getAllActiveByAdventureId(any(UUID.class))).thenReturn(messages);
         when(textCompletionPort.generateTextFrom(any())).thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
-        when(chronicleSegmentRepository.save(any(ChronicleSegment.class))).thenReturn(savedSegment);
+        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
 
         var captor = ArgumentCaptor.forClass(List.class);

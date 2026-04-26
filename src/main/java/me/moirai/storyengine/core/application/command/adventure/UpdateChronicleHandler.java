@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.application.command.chronicle;
+package me.moirai.storyengine.core.application.command.adventure;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.port.inbound.chronicle.UpdateChronicle;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
@@ -35,7 +33,6 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
     private final MessageRepository messageRepository;
     private final TextCompletionPort textCompletionPort;
     private final EmbeddingPort embeddingPort;
-    private final ChronicleSegmentRepository chronicleSegmentRepository;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
     private final int messageWindowSize;
 
@@ -45,7 +42,6 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
             MessageRepository messageRepository,
             TextCompletionPort textCompletionPort,
             EmbeddingPort embeddingPort,
-            ChronicleSegmentRepository chronicleSegmentRepository,
             ChronicleVectorSearchPort chronicleVectorSearchPort,
             @Value("${moirai.adventure.message-window-size}") int messageWindowSize) {
 
@@ -54,7 +50,6 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
         this.messageRepository = messageRepository;
         this.textCompletionPort = textCompletionPort;
         this.embeddingPort = embeddingPort;
-        this.chronicleSegmentRepository = chronicleSegmentRepository;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
         this.messageWindowSize = messageWindowSize;
     }
@@ -95,11 +90,7 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
                 modelConfig.getTemperature());
 
         var segmentContent = textCompletionPort.generateTextFrom(request).getOutputText();
-
-        var savedSegment = chronicleSegmentRepository.save(ChronicleSegment.builder()
-                .adventureId(adventure.getId())
-                .content(segmentContent)
-                .build());
+        var savedSegment = adventure.addChronicleSegment(segmentContent);
 
         var vector = embeddingPort.embed(segmentContent);
         chronicleVectorSearchPort.upsert(adventure.getPublicId(), savedSegment.getPublicId(), vector);
@@ -109,6 +100,7 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
                 .toList();
 
         messageRepository.markAsChronicled(chronicleIds);
+        adventureRepository.save(adventure);
 
         return null;
     }

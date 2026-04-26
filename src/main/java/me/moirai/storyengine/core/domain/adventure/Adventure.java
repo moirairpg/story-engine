@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.uuid.Generators;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -25,15 +27,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Narrator;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 
 @Entity
 @Table(name = "adventure")
@@ -43,7 +44,6 @@ public class Adventure extends ShareableAsset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @RandomUuid
     @Column(name = "public_id")
     private UUID publicId;
 
@@ -92,6 +92,10 @@ public class Adventure extends ShareableAsset {
     @JoinColumn(name = "adventure_id")
     private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "adventure_id")
+    private List<ChronicleSegment> chronicleSegments = new ArrayList<>();
+
     @Override
     protected List<Permission> permissions() {
         return permissions;
@@ -101,6 +105,7 @@ public class Adventure extends ShareableAsset {
 
         super(builder.visibility);
 
+        this.publicId = Generators.timeBasedEpochGenerator().generate();
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
@@ -192,6 +197,10 @@ public class Adventure extends ShareableAsset {
 
     public List<AdventureLorebookEntry> getLorebook() {
         return Collections.unmodifiableList(lorebook);
+    }
+
+    public List<ChronicleSegment> getChronicleSegments() {
+        return Collections.unmodifiableList(chronicleSegments);
     }
 
     public static Builder builder() {
@@ -331,6 +340,16 @@ public class Adventure extends ShareableAsset {
         return lorebook.stream()
                 .filter(e -> playerId.equals(e.getPlayerId()))
                 .findFirst();
+    }
+
+    public ChronicleSegment addChronicleSegment(String content) {
+        var segment = ChronicleSegment.builder()
+                .adventureId(this.id)
+                .content(content)
+                .build();
+
+        this.chronicleSegments.add(segment);
+        return segment;
     }
 
     public static final class Builder {

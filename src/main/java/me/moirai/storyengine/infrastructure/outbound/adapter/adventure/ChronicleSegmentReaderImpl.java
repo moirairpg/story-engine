@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.outbound.adapter.chronicle;
+package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import java.util.List;
 import java.util.UUID;
@@ -7,8 +7,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentData;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentReader;
+import me.moirai.storyengine.core.port.outbound.adventure.ChronicleSegmentData;
+import me.moirai.storyengine.core.port.outbound.adventure.ChronicleSegmentReader;
 
 @Repository
 public class ChronicleSegmentReaderImpl implements ChronicleSegmentReader {

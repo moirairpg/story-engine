@@ -27,12 +27,10 @@ import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.chronicle.ChronicleSegment;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
@@ -63,9 +61,6 @@ public class SendMessageHandlerTest {
     private ChronicleVectorSearchPort chronicleVectorSearchPort;
 
     @Mock
-    private ChronicleSegmentRepository chronicleSegmentRepository;
-
-    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     private SendMessageHandler handler;
@@ -80,7 +75,6 @@ public class SendMessageHandlerTest {
                 embeddingPort,
                 vectorSearchPort,
                 chronicleVectorSearchPort,
-                chronicleSegmentRepository,
                 eventPublisher,
                 10,
                 5,
@@ -524,12 +518,7 @@ public class SendMessageHandlerTest {
                 .outputText("AI response")
                 .build();
 
-        var segmentId = UUID.randomUUID();
-        var segment = ChronicleSegment.builder()
-                .adventureId(AdventureFixture.NUMERIC_ID)
-                .content("The dragon was defeated.")
-                .build();
-
+        var segment = adventure.addChronicleSegment("The dragon was defeated.");
         var command = new SendMessage(UUID.randomUUID(), "Hello!", "user");
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
@@ -537,8 +526,7 @@ public class SendMessageHandlerTest {
         when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
-        when(chronicleVectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of(segmentId));
-        when(chronicleSegmentRepository.getAllByIds(List.of(segmentId))).thenReturn(List.of(segment));
+        when(chronicleVectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of(segment.getPublicId()));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
 
         var captor = ArgumentCaptor.forClass(TextGenerationRequest.class);

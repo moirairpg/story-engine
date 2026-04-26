@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,13 +22,12 @@ import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.chronicle.ChronicleSegmentRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
@@ -47,7 +45,6 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
     private final EmbeddingPort embeddingPort;
     private final LorebookVectorSearchPort vectorSearchPort;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
-    private final ChronicleSegmentRepository chronicleSegmentRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final int messageWindowSize;
     private final int lorebookTopK;
@@ -60,7 +57,6 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
             EmbeddingPort embeddingPort,
             LorebookVectorSearchPort vectorSearchPort,
             ChronicleVectorSearchPort chronicleVectorSearchPort,
-            ChronicleSegmentRepository chronicleSegmentRepository,
             ApplicationEventPublisher eventPublisher,
             @Value("${moirai.adventure.message-window-size}") int messageWindowSize,
             @Value("${moirai.rag.lorebook.top-k}") int lorebookTopK,
@@ -72,7 +68,6 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         this.embeddingPort = embeddingPort;
         this.vectorSearchPort = vectorSearchPort;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
-        this.chronicleSegmentRepository = chronicleSegmentRepository;
         this.eventPublisher = eventPublisher;
         this.messageWindowSize = messageWindowSize;
         this.lorebookTopK = lorebookTopK;
@@ -169,7 +164,7 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
         var queryVector = embeddingPort.embed(queryText);
 
         context.addAll(retrieveLorebookContext(adventure, queryVector));
-        context.addAll(retrieveChronicleContext(adventure.getPublicId(), queryVector));
+        context.addAll(retrieveChronicleContext(adventure, queryVector));
 
         context.addAll(interleaveBumps(
                 history.stream().map(this::toChatMessage).toList(),
@@ -206,17 +201,16 @@ public class SendMessageHandler extends AbstractCommandHandler<SendMessage, Mess
                 .toList();
     }
 
-    private List<ChatMessage> retrieveChronicleContext(UUID adventurePublicId, float[] queryVector) {
+    private List<ChatMessage> retrieveChronicleContext(Adventure adventure, float[] queryVector) {
 
-        var segmentIds = chronicleVectorSearchPort.search(adventurePublicId, queryVector, chronicleTopK);
+        var segmentIds = chronicleVectorSearchPort.search(adventure.getPublicId(), queryVector, chronicleTopK);
 
         if (segmentIds.isEmpty()) {
             return List.of();
         }
 
-        var segments = chronicleSegmentRepository.getAllByIds(segmentIds);
-
-        return segments.stream()
+        return adventure.getChronicleSegments().stream()
+                .filter(s -> segmentIds.contains(s.getPublicId()))
                 .map(s -> ChatMessage.asSystem(s.getContent()))
                 .toList();
     }

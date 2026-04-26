@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.uuid.Generators;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -23,13 +25,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Narrator;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 
 @Entity
 @Table(name = "world")
@@ -39,7 +40,6 @@ public class World extends ShareableAsset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @RandomUuid
     @Column(name = "public_id")
     private UUID publicId;
 
@@ -81,6 +81,7 @@ public class World extends ShareableAsset {
 
         super(builder.visibility);
 
+        this.publicId = Generators.timeBasedEpochGenerator().generate();
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;

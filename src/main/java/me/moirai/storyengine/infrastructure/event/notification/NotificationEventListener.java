@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.outbound.websocket;
+package me.moirai.storyengine.infrastructure.event.notification;
 
 import java.util.Collections;
 import java.util.List;

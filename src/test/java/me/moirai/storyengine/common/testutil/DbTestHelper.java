@@ -18,8 +18,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.uuid.Generators;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -40,7 +38,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import me.moirai.storyengine.common.annotation.RandomUuid;
 
 @Component
 public class DbTestHelper {
@@ -55,7 +52,6 @@ public class DbTestHelper {
     public <T> T insert(Object value, Class<T> type) {
 
         validateEntity(type);
-        applyUuidGeneration(value, type);
         applyEntityListeners(value, type);
 
         var tableName = resolveTableName(type);
@@ -89,7 +85,6 @@ public class DbTestHelper {
     public <T> void update(Object value, Long primaryKeyValue, Class<T> type) {
 
         validateEntity(type);
-        applyUuidGeneration(value, type);
         applyEntityListeners(value, type);
 
         var tableName = resolveTableName(type);
@@ -242,23 +237,6 @@ public class DbTestHelper {
         }
     }
 
-    private void applyUuidGeneration(Object value, Class<?> type) {
-        try {
-            for (var field : collectFields(type)) {
-                if (!field.isAnnotationPresent(RandomUuid.class))
-                    continue;
-
-                field.setAccessible(true);
-                if (field.get(value) != null)
-                    continue;
-
-                field.set(value, Generators.timeBasedEpochGenerator().generate());
-            }
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     private void insertOneToManyChildren(Object parent, Class<?> parentType, Long parentId) {
         try {
             for (var field : collectOneToManyFields(parentType)) {
@@ -271,7 +249,6 @@ public class DbTestHelper {
 
                 for (var child : collection) {
                     var childType = child.getClass();
-                    applyUuidGeneration(child, childType);
                     applyEntityListeners(child, childType);
 
                     var tableName = resolveTableName(childType);

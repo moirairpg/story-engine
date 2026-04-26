@@ -2,6 +2,8 @@ package me.moirai.storyengine.core.domain.message;
 
 import java.util.UUID;
 
+import com.fasterxml.uuid.Generators;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import me.moirai.storyengine.common.annotation.RandomUuid;
 import me.moirai.storyengine.common.domain.Asset;
 import me.moirai.storyengine.common.enums.AiRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
@@ -23,7 +24,6 @@ public class Message extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @RandomUuid
     @Column(name = "public_id")
     private UUID publicId;
 
@@ -46,7 +46,10 @@ public class Message extends Asset {
     }
 
     private Message(Builder builder) {
+
         super();
+
+        this.publicId = Generators.timeBasedEpochGenerator().generate();
         this.adventureId = builder.adventureId;
         this.role = builder.role;
         this.content = builder.content;
