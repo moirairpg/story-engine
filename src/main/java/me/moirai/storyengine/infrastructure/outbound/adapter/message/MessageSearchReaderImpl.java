@@ -12,7 +12,7 @@ import me.moirai.storyengine.common.dbutil.Filter;
 import me.moirai.storyengine.common.dbutil.Filters;
 import me.moirai.storyengine.common.dbutil.QueryBuilder;
 import me.moirai.storyengine.common.dto.CursorResult;
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
 import me.moirai.storyengine.core.port.inbound.adventure.MessageSummary;
@@ -64,7 +64,7 @@ public class MessageSearchReaderImpl implements MessageSearchReader {
     private RowMapper<MessageSummary> toMessageSummary() {
         return (rs, _) -> new MessageSummary(
                 UUID.fromString(rs.getString("public_id")),
-                AiRole.valueOf(rs.getString("role")),
+                MessageAuthorRole.valueOf(rs.getString("role")),
                 rs.getString("content"),
                 MessageStatus.valueOf(rs.getString("status")),
                 rs.getString("created_by"),

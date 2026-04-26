@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest;
 import me.moirai.storyengine.core.port.outbound.generation.TextGenerationResult;
@@ -59,7 +59,7 @@ public class TextCompletionAdapter implements TextCompletionPort {
                 .build();
     }
 
-    private String toApiRole(AiRole role) {
+    private String toApiRole(MessageAuthorRole role) {
         return switch (role) {
             case SYSTEM -> "developer";
             case USER -> "user";

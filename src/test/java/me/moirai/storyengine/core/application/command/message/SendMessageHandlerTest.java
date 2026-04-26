@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -364,12 +364,12 @@ public class SendMessageHandlerTest {
 
         var userMessage = Message.builder()
                 .adventureId(AdventureFixture.NUMERIC_ID)
-                .role(AiRole.USER)
+                .role(MessageAuthorRole.USER)
                 .content("Aldric said: I look around.")
                 .build();
         var assistantMessage = Message.builder()
                 .adventureId(AdventureFixture.NUMERIC_ID)
-                .role(AiRole.ASSISTANT)
+                .role(MessageAuthorRole.ASSISTANT)
                 .content("MoirAI said: You see a tavern.")
                 .build();
 

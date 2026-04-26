@@ -26,8 +26,8 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public void markAsChronicled(List<UUID> publicIds) {
-        jpaRepository.markAsChronicled(publicIds);
+    public List<Message> saveAll(List<Message> messagesToChronicle) {
+        return jpaRepository.saveAll(messagesToChronicle);
     }
 
     @Override
@@ -65,5 +65,10 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public void deleteAllByAdventurePublicId(UUID adventurePublicId) {
         jpaRepository.deleteAllByAdventurePublicId(adventurePublicId);
+    }
+
+    @Override
+    public List<Message> findAllActiveByAdventurePublicId(UUID adventurePublicId) {
+        return jpaRepository.findAllActiveByAdventurePublicId(adventurePublicId);
     }
 }

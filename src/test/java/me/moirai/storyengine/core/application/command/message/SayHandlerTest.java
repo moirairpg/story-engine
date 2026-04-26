@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.message.Message;
@@ -96,7 +96,7 @@ public class SayHandlerTest {
 
         // then
         verify(messageRepository).save(captor.capture());
-        assertThat(captor.getValue().getRole()).isEqualTo(AiRole.ASSISTANT);
+        assertThat(captor.getValue().getRole()).isEqualTo(MessageAuthorRole.ASSISTANT);
     }
 
     @Test
@@ -121,6 +121,6 @@ public class SayHandlerTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.content()).isEqualTo("Hello world");
-        assertThat(result.role()).isEqualTo(AiRole.ASSISTANT);
+        assertThat(result.role()).isEqualTo(MessageAuthorRole.ASSISTANT);
     }
 }

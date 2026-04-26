@@ -1,6 +1,6 @@
 package me.moirai.storyengine.core.domain.message;
 
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 
 public class MessageFixture {
 
@@ -8,7 +8,7 @@ public class MessageFixture {
 
         return Message.builder()
                 .adventureId(1L)
-                .role(AiRole.USER)
+                .role(MessageAuthorRole.USER)
                 .content("Hello, adventurer!");
     }
 
@@ -16,7 +16,7 @@ public class MessageFixture {
 
         return Message.builder()
                 .adventureId(1L)
-                .role(AiRole.ASSISTANT)
+                .role(MessageAuthorRole.ASSISTANT)
                 .content("Greetings, brave hero!");
     }
 }

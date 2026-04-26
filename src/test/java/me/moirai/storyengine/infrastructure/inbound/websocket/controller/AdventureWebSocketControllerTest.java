@@ -19,7 +19,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
 import me.moirai.storyengine.core.port.inbound.message.SendMessage;
@@ -43,7 +43,7 @@ public class AdventureWebSocketControllerTest {
         // given
         var adventureId = UUID.randomUUID();
         var request = new WebSocketMessageRequest("hello");
-        var result = new MessageResult(UUID.randomUUID(), "reply", AiRole.ASSISTANT, Instant.now());
+        var result = new MessageResult(UUID.randomUUID(), "reply", MessageAuthorRole.ASSISTANT, Instant.now());
         var moiraiPrincipal = new MoiraiPrincipal(UUID.randomUUID(), 99999L, "discordId",
                 "alice", "alice@test.com", "token", "refresh", null, null);
         var principal = new UsernamePasswordAuthenticationToken(moiraiPrincipal, null);

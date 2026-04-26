@@ -7,19 +7,10 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import me.moirai.storyengine.core.domain.message.Message;
 
 public interface MessageJpaRepository extends JpaRepository<Message, Long> {
-
-    @Modifying
-    @Query("""
-            UPDATE Message m
-               SET m.status = me.moirai.storyengine.core.domain.message.MessageStatus.CHRONICLED
-             WHERE m.publicId IN :publicIds
-            """)
-    void markAsChronicled(@Param("publicIds") List<UUID> publicIds);
 
     @Query("""
             SELECT m FROM Message m
@@ -28,7 +19,7 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
              ORDER BY m.creationDate DESC
              LIMIT 1
             """)
-    Optional<Message> findLastActive(@Param("adventureId") Long adventureId);
+    Optional<Message> findLastActive(Long adventureId);
 
     @Query("""
             SELECT m FROM Message m
@@ -37,7 +28,7 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
              ORDER BY m.creationDate DESC
              LIMIT :limit
             """)
-    List<Message> findWindowActive(@Param("adventureId") Long adventureId, @Param("limit") int limit);
+    List<Message> findWindowActive(Long adventureId, int limit);
 
     @Modifying
     @Query("""
@@ -46,11 +37,11 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
                    SELECT MAX(m2.id)
                      FROM Message m2
                     WHERE m2.adventureId = :adventureId
-                      AND m2.role = me.moirai.storyengine.common.enums.AiRole.ASSISTANT
+                      AND m2.role = me.moirai.storyengine.common.enums.MessageAuthorRole.ASSISTANT
                       AND m2.status = me.moirai.storyengine.core.domain.message.MessageStatus.ACTIVE
                    )
             """)
-    void deleteLastAssistantMessage(@Param("adventureId") Long adventureId);
+    void deleteLastAssistantMessage(Long adventureId);
 
     @Modifying
     @Query("""
@@ -60,9 +51,7 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
                    SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
                )
             """)
-    void deleteByPublicId(
-            @Param("adventurePublicId") UUID adventurePublicId,
-            @Param("messagePublicId") UUID messagePublicId);
+    void deleteByPublicId(UUID adventurePublicId, UUID messagePublicId);
 
     @Modifying
     @Query("""
@@ -73,10 +62,7 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
                    SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
                )
             """)
-    void updateContent(
-            @Param("adventurePublicId") UUID adventurePublicId,
-            @Param("messagePublicId") UUID messagePublicId,
-            @Param("content") String content);
+    void updateContent(UUID adventurePublicId, UUID messagePublicId, String content);
 
     @Modifying
     @Query("""
@@ -88,9 +74,7 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
                        SELECT m2.id FROM Message m2 WHERE m2.publicId = :messagePublicId
                    )
             """)
-    void deleteNewerThanByPublicId(
-            @Param("adventurePublicId") UUID adventurePublicId,
-            @Param("messagePublicId") UUID messagePublicId);
+    void deleteNewerThanByPublicId(UUID adventurePublicId, UUID messagePublicId);
 
     @Modifying
     @Query("""
@@ -99,5 +83,15 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
                    SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
                    )
             """)
-    void deleteAllByAdventurePublicId(@Param("adventurePublicId") UUID adventurePublicId);
+    void deleteAllByAdventurePublicId(UUID adventurePublicId);
+
+    @Query("""
+            SELECT m FROM Message m
+             WHERE m.adventureId = (
+                   SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
+                   )
+               AND m.status = me.moirai.storyengine.core.domain.message.MessageStatus.ACTIVE
+             ORDER BY m.creationDate ASC
+            """)
+    List<Message> findAllActiveByAdventurePublicId(UUID adventurePublicId);
 }

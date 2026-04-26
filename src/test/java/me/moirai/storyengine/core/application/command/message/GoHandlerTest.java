@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
@@ -149,7 +149,7 @@ public class GoHandlerTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.content()).isEqualTo("AI continues.");
-        assertThat(result.role()).isEqualTo(AiRole.ASSISTANT);
+        assertThat(result.role()).isEqualTo(MessageAuthorRole.ASSISTANT);
     }
 
     @Test

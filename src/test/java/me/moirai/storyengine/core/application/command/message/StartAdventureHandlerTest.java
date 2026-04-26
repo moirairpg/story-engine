@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -128,7 +128,7 @@ public class StartAdventureHandlerTest {
 
         // then
         verify(messageRepository, org.mockito.Mockito.times(2)).save(captor.capture());
-        assertThat(captor.getAllValues().get(0).getRole()).isEqualTo(AiRole.ASSISTANT);
+        assertThat(captor.getAllValues().get(0).getRole()).isEqualTo(MessageAuthorRole.ASSISTANT);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class StartAdventureHandlerTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.content()).isEqualTo("AI response");
-        assertThat(result.role()).isEqualTo(AiRole.ASSISTANT);
+        assertThat(result.role()).isEqualTo(MessageAuthorRole.ASSISTANT);
     }
 
     @Test

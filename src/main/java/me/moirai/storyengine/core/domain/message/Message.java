@@ -13,7 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import me.moirai.storyengine.common.domain.Asset;
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
@@ -32,7 +32,7 @@ public class Message extends Asset {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private AiRole role;
+    private MessageAuthorRole role;
 
     @Column(name = "content")
     private String content;
@@ -72,7 +72,7 @@ public class Message extends Asset {
         return adventureId;
     }
 
-    public AiRole getRole() {
+    public MessageAuthorRole getRole() {
         return role;
     }
 
@@ -84,10 +84,14 @@ public class Message extends Asset {
         return status;
     }
 
+    public void markAsChronicled() {
+        this.status = MessageStatus.CHRONICLED;
+    }
+
     public static final class Builder {
 
         private Long adventureId;
-        private AiRole role;
+        private MessageAuthorRole role;
         private String content;
         private MessageStatus status = MessageStatus.ACTIVE;
 
@@ -99,7 +103,7 @@ public class Message extends Asset {
             return this;
         }
 
-        public Builder role(AiRole role) {
+        public Builder role(MessageAuthorRole role) {
             this.role = role;
             return this;
         }

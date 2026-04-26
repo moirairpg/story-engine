@@ -4,7 +4,7 @@ import static me.moirai.storyengine.common.util.DefaultStringProcessors.addChatP
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
@@ -45,7 +45,7 @@ public class SayHandler extends AbstractCommandHandler<Say, MessageResult> {
 
         var message = Message.builder()
                 .adventureId(adventure.getId())
-                .role(AiRole.ASSISTANT)
+                .role(MessageAuthorRole.ASSISTANT)
                 .content(addChatPrefix(adventure.getNarratorName()).apply(command.content()))
                 .build();
 

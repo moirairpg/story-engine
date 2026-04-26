@@ -3,7 +3,7 @@ package me.moirai.storyengine.common.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum AiRole {
+public enum MessageAuthorRole {
 
         SYSTEM,
         ASSISTANT,
@@ -15,7 +15,7 @@ public enum AiRole {
         }
 
         @JsonCreator
-        public static AiRole fromValue(String value) {
+        public static MessageAuthorRole fromValue(String value) {
             return valueOf(value.toUpperCase());
         }
     }

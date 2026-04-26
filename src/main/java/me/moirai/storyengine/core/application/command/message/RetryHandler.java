@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
@@ -92,7 +92,7 @@ public class RetryHandler extends AbstractCommandHandler<Retry, MessageResult> {
         var lastMessage = messageRepository.getLastActive(adventure.getId())
                 .orElseThrow(() -> new BusinessRuleViolationException("Cannot retry: adventure has no messages"));
 
-        if (lastMessage.getRole() != AiRole.ASSISTANT) {
+        if (lastMessage.getRole() != MessageAuthorRole.ASSISTANT) {
             throw new BusinessRuleViolationException("Cannot retry: last message is not an AI response");
         }
 
@@ -133,7 +133,7 @@ public class RetryHandler extends AbstractCommandHandler<Retry, MessageResult> {
 
         var aiMessage = Message.builder()
                 .adventureId(adventure.getId())
-                .role(AiRole.ASSISTANT)
+                .role(MessageAuthorRole.ASSISTANT)
                 .content(addChatPrefix(adventure.getNarratorName()).apply(cleanedResponse))
                 .build();
 

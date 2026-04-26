@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.enums.AiRole;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
@@ -125,7 +125,7 @@ public class GoHandler extends AbstractCommandHandler<Go, MessageResult> {
 
         var aiMessage = Message.builder()
                 .adventureId(adventure.getId())
-                .role(AiRole.ASSISTANT)
+                .role(MessageAuthorRole.ASSISTANT)
                 .content(addChatPrefix(adventure.getNarratorName()).apply(cleanedResponse))
                 .build();
 
