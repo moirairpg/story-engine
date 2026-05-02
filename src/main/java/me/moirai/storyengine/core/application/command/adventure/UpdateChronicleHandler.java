@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.chronicle.UpdateChronicle;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.generation.ChatMessage;
@@ -32,7 +31,7 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
     private final TextCompletionPort textCompletionPort;
     private final EmbeddingPort embeddingPort;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
-    private final int messageWindowSize;
+    private final int chronicledMessageWindow;
 
     public UpdateChronicleHandler(
             AdventureRepository adventureRepository,
@@ -47,7 +46,7 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
         this.textCompletionPort = textCompletionPort;
         this.embeddingPort = embeddingPort;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
-        this.messageWindowSize = messageWindowSize;
+        this.chronicledMessageWindow = messageWindowSize + 1;
     }
 
     @Override
@@ -64,13 +63,8 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
         var adventure = adventureRepository.findByPublicId(command.adventurePublicId())
                 .orElseThrow(() -> new NotFoundException("Adventure not found"));
 
-        var allActive = messageRepository.findAllActiveByAdventurePublicId(adventure.getPublicId());
-
-        if (allActive.size() <= messageWindowSize) {
-            return null;
-        }
-
-        var messagesToChronicle = allActive.subList(0, allActive.size() - messageWindowSize);
+        var messagesToChronicle = messageRepository.findLatestChronicledByAdventureId(
+                adventure.getId(), chronicledMessageWindow);
 
         var chronicleInput = messagesToChronicle.stream()
                 .map(m -> m.getRole().name() + ": " + m.getContent())
@@ -91,9 +85,6 @@ public class UpdateChronicleHandler extends AbstractCommandHandler<UpdateChronic
         var vector = embeddingPort.embed(segmentContent);
         chronicleVectorSearchPort.upsert(adventure.getPublicId(), savedSegment.getPublicId(), vector);
 
-        messagesToChronicle.forEach(Message::markAsChronicled);
-
-        messageRepository.saveAll(messagesToChronicle);
         adventureRepository.save(adventure);
 
         return null;

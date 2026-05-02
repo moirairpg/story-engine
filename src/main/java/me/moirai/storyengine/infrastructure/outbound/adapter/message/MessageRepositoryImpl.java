@@ -1,7 +1,5 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.message;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,13 +34,6 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public List<Message> findActiveByAdventureId(Long adventureId, int limit) {
-        var results = new ArrayList<>(jpaRepository.findWindowActive(adventureId, limit));
-        Collections.reverse(results);
-        return Collections.unmodifiableList(results);
-    }
-
-    @Override
     public void deleteLastAssistantMessage(Long adventureId) {
         jpaRepository.deleteLastAssistantMessage(adventureId);
     }
@@ -68,7 +59,12 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAllActiveByAdventurePublicId(UUID adventurePublicId) {
-        return jpaRepository.findAllActiveByAdventurePublicId(adventurePublicId);
+    public List<Message> findAllActiveByAdventureId(Long adventureId) {
+        return jpaRepository.findAllActiveByAdventureId(adventureId);
+    }
+
+    @Override
+    public List<Message> findLatestChronicledByAdventureId(Long adventureId, int limit) {
+        return jpaRepository.findLatestChronicledByAdventureId(adventureId, limit);
     }
 }

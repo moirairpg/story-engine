@@ -21,15 +21,6 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
             """)
     Optional<Message> findLastActive(Long adventureId);
 
-    @Query("""
-            SELECT m FROM Message m
-             WHERE m.adventureId = :adventureId
-               AND m.status = me.moirai.storyengine.core.domain.message.MessageStatus.ACTIVE
-             ORDER BY m.creationDate DESC
-             LIMIT :limit
-            """)
-    List<Message> findWindowActive(Long adventureId, int limit);
-
     @Modifying
     @Query("""
             DELETE FROM Message m
@@ -87,11 +78,18 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
 
     @Query("""
             SELECT m FROM Message m
-             WHERE m.adventureId = (
-                   SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
-                   )
+             WHERE m.adventureId = :adventureId
                AND m.status = me.moirai.storyengine.core.domain.message.MessageStatus.ACTIVE
-             ORDER BY m.creationDate ASC
+             ORDER BY m.creationDate ASC, m.id ASC
             """)
-    List<Message> findAllActiveByAdventurePublicId(UUID adventurePublicId);
+    List<Message> findAllActiveByAdventureId(Long adventureId);
+
+    @Query("""
+            SELECT m FROM Message m
+             WHERE m.adventureId = :adventureId
+               AND m.status = me.moirai.storyengine.core.domain.message.MessageStatus.CHRONICLED
+             ORDER BY m.creationDate DESC, m.id DESC
+             LIMIT :limit
+            """)
+    List<Message> findLatestChronicledByAdventureId(Long adventureId, int limit);
 }

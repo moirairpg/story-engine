@@ -43,7 +43,7 @@ moirai:
       collection-name: chronicle
       vector-size: 1536
   adventure:
-    message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:20}
+    message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:100}
   security:
     allowed-origins: ${ALLOWED_ORIGINS}
     allowed-headers: ${ALLOWED_HEADERS}

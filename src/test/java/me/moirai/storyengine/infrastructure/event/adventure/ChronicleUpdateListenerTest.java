@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
-import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
+import me.moirai.storyengine.core.application.event.adventure.ChatMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.port.inbound.chronicle.UpdateChronicle;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,7 +30,7 @@ class ChronicleUpdateListenerTest {
 
         // given
         var adventurePublicId = UUID.randomUUID();
-        var event = new AdventureMessageWindowOverflowedEvent(adventurePublicId);
+        var event = new ChatMessageWindowOverflowedEvent(adventurePublicId);
 
         var captor = ArgumentCaptor.forClass(UpdateChronicle.class);
 

@@ -14,8 +14,6 @@ public interface MessageRepository {
 
     Optional<Message> getLastActive(Long adventureId);
 
-    List<Message> findActiveByAdventureId(Long adventureId, int limit);
-
     void deleteLastAssistantMessage(Long adventureId);
 
     void deleteByPublicId(UUID adventurePublicId, UUID messagePublicId);
@@ -26,5 +24,7 @@ public interface MessageRepository {
 
     void deleteAllByAdventurePublicId(UUID adventurePublicId);
 
-    List<Message> findAllActiveByAdventurePublicId(UUID adventurePublicId);
+    List<Message> findAllActiveByAdventureId(Long adventureId);
+
+    List<Message> findLatestChronicledByAdventureId(Long adventureId, int limit);
 }
