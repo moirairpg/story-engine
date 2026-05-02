@@ -7,14 +7,20 @@ import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchReader;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @QueryHandler
 public class SearchAdventuresHandler extends AbstractQueryHandler<SearchAdventures, PaginatedResult<AdventureSummary>> {
 
     private final AdventureSearchReader reader;
+    private final StoragePort storagePort;
 
-    public SearchAdventuresHandler(AdventureSearchReader reader) {
+    public SearchAdventuresHandler(
+            AdventureSearchReader reader,
+            StoragePort storagePort) {
+
         this.reader = reader;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -35,7 +41,7 @@ public class SearchAdventuresHandler extends AbstractQueryHandler<SearchAdventur
                             row.narratorName(),
                             row.visibility(),
                             row.creationDate(),
-                            row.imageUrl(),
+                            storagePort.resolveUrl(row.imageKey()),
                             canWrite);
                 })
                 .toList();

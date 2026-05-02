@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.world.WorldSearchReader;
 import me.moirai.storyengine.core.port.outbound.world.WorldSearchRow;
 
@@ -25,6 +26,9 @@ public class SearchWorldsHandlerTest {
 
     @Mock
     private WorldSearchReader reader;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private SearchWorldsHandler handler;

@@ -25,13 +25,18 @@ import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureDetailsRow;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureByIdHandlerTest {
 
     @Mock
     private AdventureReader reader;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private GetAdventureByIdHandler handler;
@@ -77,7 +82,7 @@ public class GetAdventureByIdHandlerTest {
 
         var contextAttributes = new ContextAttributesDto(null, null, null, null, 0);
 
-        var expectedDetails = new AdventureDetails(
+        var expectedDetails = new AdventureDetailsRow(
                 AdventureFixture.PUBLIC_ID,
                 "Name",
                 "desc",

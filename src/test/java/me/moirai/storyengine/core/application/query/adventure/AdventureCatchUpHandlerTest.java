@@ -18,16 +18,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
+import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureCatchUp;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureDetailsRow;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
 import me.moirai.storyengine.core.port.outbound.adventure.ChronicleSegmentData;
 import me.moirai.storyengine.core.port.outbound.adventure.ChronicleSegmentReader;
@@ -55,7 +55,8 @@ public class AdventureCatchUpHandlerTest {
 
     @BeforeEach
     void setup() {
-        handler = new AdventureCatchUpHandler(adventureReader, chronicleSegmentReader, messageReader, textCompletionPort);
+        handler = new AdventureCatchUpHandler(adventureReader, chronicleSegmentReader, messageReader,
+                textCompletionPort);
     }
 
     @Test
@@ -84,7 +85,7 @@ public class AdventureCatchUpHandlerTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var adventure = buildAdventureDetails(adventureId);
+        var adventure = buildAdventureDetailsRow(adventureId);
         var query = new AdventureCatchUp(adventureId);
 
         when(adventureReader.getAdventureById(adventureId)).thenReturn(Optional.of(adventure));
@@ -104,7 +105,7 @@ public class AdventureCatchUpHandlerTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var adventure = buildAdventureDetails(adventureId);
+        var adventure = buildAdventureDetailsRow(adventureId);
         var query = new AdventureCatchUp(adventureId);
 
         var segment = new ChronicleSegmentData(UUID.randomUUID(), 1L, "The hero slew the dragon.", null);
@@ -128,10 +129,11 @@ public class AdventureCatchUpHandlerTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var adventure = buildAdventureDetails(adventureId);
+        var adventure = buildAdventureDetailsRow(adventureId);
         var query = new AdventureCatchUp(adventureId);
 
-        var message = new MessageData(UUID.randomUUID(), 1L, "user", MessageAuthorRole.USER, "I look around.", null, MessageStatus.ACTIVE);
+        var message = new MessageData(UUID.randomUUID(), 1L, "user", MessageAuthorRole.USER, "I look around.", null,
+                MessageStatus.ACTIVE);
         var generationResult = TextGenerationResult.builder().outputText("You looked around.").build();
 
         when(adventureReader.getAdventureById(adventureId)).thenReturn(Optional.of(adventure));
@@ -152,11 +154,12 @@ public class AdventureCatchUpHandlerTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var adventure = buildAdventureDetails(adventureId);
+        var adventure = buildAdventureDetailsRow(adventureId);
         var query = new AdventureCatchUp(adventureId);
 
         var segment = new ChronicleSegmentData(UUID.randomUUID(), 1L, "Chronicle: hero began journey.", null);
-        var message = new MessageData(UUID.randomUUID(), 1L, "user", MessageAuthorRole.USER, "I arrive at the city.", null, MessageStatus.ACTIVE);
+        var message = new MessageData(UUID.randomUUID(), 1L, "user", MessageAuthorRole.USER, "I arrive at the city.",
+                null, MessageStatus.ACTIVE);
         var generationResult = TextGenerationResult.builder().outputText("Combined recap.").build();
 
         when(adventureReader.getAdventureById(adventureId)).thenReturn(Optional.of(adventure));
@@ -172,10 +175,10 @@ public class AdventureCatchUpHandlerTest {
         verify(textCompletionPort).generateTextFrom(any());
     }
 
-    private AdventureDetails buildAdventureDetails(UUID adventureId) {
+    private AdventureDetailsRow buildAdventureDetailsRow(UUID adventureId) {
         var modelConfig = new ModelConfigurationDto(ArtificialIntelligenceModel.GPT54_MINI, 1000, 0.7);
         var contextAttributes = new ContextAttributesDto(null, null, null, null, 0);
-        return new AdventureDetails(
+        return new AdventureDetailsRow(
                 adventureId,
                 "Test Adventure",
                 "Description",

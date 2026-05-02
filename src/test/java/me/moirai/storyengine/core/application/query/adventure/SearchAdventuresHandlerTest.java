@@ -19,12 +19,16 @@ import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.adventure.SearchAdventures;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchReader;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureSearchRow;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchAdventuresHandlerTest {
 
     @Mock
     private AdventureSearchReader reader;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private SearchAdventuresHandler handler;

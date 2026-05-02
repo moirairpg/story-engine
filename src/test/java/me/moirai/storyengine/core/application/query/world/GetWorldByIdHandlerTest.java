@@ -20,6 +20,8 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
 import me.moirai.storyengine.core.port.inbound.world.GetWorldById;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
+import me.moirai.storyengine.core.port.outbound.world.WorldDetailsRow;
 import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +29,9 @@ public class GetWorldByIdHandlerTest {
 
     @Mock
     private WorldReader reader;
+
+    @Mock
+    private StoragePort storagePort;
 
     @InjectMocks
     private GetWorldByIdHandler handler;
@@ -45,7 +50,7 @@ public class GetWorldByIdHandlerTest {
     public void getWorldById() {
 
         // Given
-        var expectedDetails = new WorldDetails(
+        var expectedDetails = new WorldDetailsRow(
                 WorldFixture.PUBLIC_ID,
                 "MoirAI",
                 "desc",
