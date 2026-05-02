@@ -22,7 +22,7 @@ public interface MessageRepository {
 
     void deleteNewerThanByPublicId(UUID adventurePublicId, UUID messagePublicId);
 
-    void deleteAllByAdventurePublicId(UUID adventurePublicId);
+    void deleteAllByAdventureId(Long adventureId);
 
     List<Message> findAllActiveByAdventureId(Long adventureId);
 

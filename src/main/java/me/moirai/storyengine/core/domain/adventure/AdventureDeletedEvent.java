@@ -1,18 +1,16 @@
 package me.moirai.storyengine.core.domain.adventure;
 
-import java.util.UUID;
-
 import me.moirai.storyengine.common.domain.DomainEvent;
 
 public final class AdventureDeletedEvent implements DomainEvent {
 
-    private final UUID adventurePublicId;
+    private final Long adventureId;
 
-    AdventureDeletedEvent(UUID adventurePublicId) {
-        this.adventurePublicId = adventurePublicId;
+    AdventureDeletedEvent(Long adventureId) {
+        this.adventureId = adventureId;
     }
 
-    public UUID getAdventureId() {
-        return adventurePublicId;
+    public Long getAdventureId() {
+        return adventureId;
     }
 }

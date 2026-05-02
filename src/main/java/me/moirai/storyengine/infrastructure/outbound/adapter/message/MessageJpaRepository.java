@@ -70,11 +70,9 @@ public interface MessageJpaRepository extends JpaRepository<Message, Long> {
     @Modifying
     @Query("""
             DELETE FROM Message m
-             WHERE m.adventureId = (
-                   SELECT a.id FROM Adventure a WHERE a.publicId = :adventurePublicId
-                   )
+             WHERE m.adventureId = :adventureId
             """)
-    void deleteAllByAdventurePublicId(UUID adventurePublicId);
+    void deleteAllByAdventureId(Long adventureId);
 
     @Query("""
             SELECT m FROM Message m

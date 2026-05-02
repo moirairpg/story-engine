@@ -54,8 +54,8 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public void deleteAllByAdventurePublicId(UUID adventurePublicId) {
-        jpaRepository.deleteAllByAdventurePublicId(adventurePublicId);
+    public void deleteAllByAdventureId(Long adventureId) {
+        jpaRepository.deleteAllByAdventureId(adventureId);
     }
 
     @Override

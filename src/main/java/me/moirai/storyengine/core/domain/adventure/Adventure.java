@@ -134,7 +134,7 @@ public class Adventure extends ShareableAsset {
     }
 
     public void communicateAdventureDeleted() {
-        domainEvents.add(new AdventureDeletedEvent(this.publicId));
+        domainEvents.add(new AdventureDeletedEvent(this.id));
     }
 
     public Long getId() {
