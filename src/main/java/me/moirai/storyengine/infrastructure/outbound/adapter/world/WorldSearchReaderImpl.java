@@ -14,7 +14,6 @@ import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.WorldSortField;
-import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.world.WorldSearchReader;
 import me.moirai.storyengine.core.port.outbound.world.WorldSearchRow;
 
@@ -36,11 +35,9 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
     //@formatter:on
 
     private final JdbcClient jdbcClient;
-    private final StoragePort storagePort;
 
-    public WorldSearchReaderImpl(JdbcClient jdbcClient, StoragePort storagePort) {
+    public WorldSearchReaderImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
-        this.storagePort = storagePort;
     }
 
     @Override
@@ -102,7 +99,7 @@ public class WorldSearchReaderImpl implements WorldSearchReader {
                 rs.getString("description"),
                 rs.getString("visibility"),
                 rs.getTimestamp("creation_date").toInstant(),
-                storagePort.resolveUrl(rs.getString("image_key")),
+                rs.getString("image_key"),
                 rs.getString("user_permission"));
     }
 }

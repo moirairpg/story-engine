@@ -6,15 +6,21 @@ import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.core.port.inbound.world.SearchWorlds;
 import me.moirai.storyengine.core.port.inbound.world.WorldSummary;
+import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.world.WorldSearchReader;
 
 @QueryHandler
 public class SearchWorldsHandler extends AbstractQueryHandler<SearchWorlds, PaginatedResult<WorldSummary>> {
 
     private final WorldSearchReader reader;
+    private final StoragePort storagePort;
 
-    public SearchWorldsHandler(WorldSearchReader reader) {
+    public SearchWorldsHandler(
+            WorldSearchReader reader,
+            StoragePort storagePort) {
+
         this.reader = reader;
+        this.storagePort = storagePort;
     }
 
     @Override
@@ -33,7 +39,7 @@ public class SearchWorldsHandler extends AbstractQueryHandler<SearchWorlds, Pagi
                             row.description(),
                             row.visibility(),
                             row.creationDate(),
-                            row.imageUrl(),
+                            storagePort.resolveUrl(row.imageKey()),
                             canWrite);
                 })
                 .toList();

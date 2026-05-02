@@ -1,5 +1,6 @@
 package me.moirai.storyengine.core.port.outbound.notification;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,6 +13,8 @@ public interface NotificationRepository {
     Optional<Notification> findByPublicId(UUID publicId);
 
     void deleteByPublicId(UUID publicId);
+
+    void deleteAllByPublicId(List<UUID> publicId);
 
     void deleteAllGameNotificationsByAdventureId(Long adventureId);
 }

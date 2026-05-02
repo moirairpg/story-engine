@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import me.moirai.storyengine.AbstractIntegrationTest;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
+import me.moirai.storyengine.core.port.outbound.world.WorldDetailsRow;
 import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
 public class WorldReaderImplIntegrationTest extends AbstractIntegrationTest {
@@ -45,7 +45,7 @@ public class WorldReaderImplIntegrationTest extends AbstractIntegrationTest {
         var world = insert(WorldFixture.publicWorld().build(), World.class);
 
         // When
-        Optional<WorldDetails> result = reader.getWorldById(world.getPublicId());
+        Optional<WorldDetailsRow> result = reader.getWorldById(world.getPublicId());
 
         // Then
         assertThat(result).isNotNull().isNotEmpty();

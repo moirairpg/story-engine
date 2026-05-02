@@ -25,8 +25,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.message.ChatMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
 import me.moirai.storyengine.core.port.inbound.message.RetryFromMessage;
@@ -146,7 +146,8 @@ public class RetryFromMessageHandlerTest {
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.getLastActive(anyLong())).thenReturn(Optional.of(lastMessage));
-        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findAllActiveByAdventureId(anyLong())).thenReturn(List.of());
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
@@ -178,9 +179,13 @@ public class RetryFromMessageHandlerTest {
         var generationResult = TextGenerationResult.builder().outputText("AI retried response.").build();
         var command = new RetryFromMessage(UUID.randomUUID(), UUID.randomUUID());
 
+        var fullHistory = java.util.stream.IntStream.range(0, 10)
+                .mapToObj(i -> MessageFixture.userMessage().build())
+                .toList();
+
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.getLastActive(anyLong())).thenReturn(Optional.of(lastMessage));
-        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findAllActiveByAdventureId(anyLong())).thenReturn(fullHistory);
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
@@ -190,7 +195,7 @@ public class RetryFromMessageHandlerTest {
         handler.handle(command);
 
         // then
-        var captor = ArgumentCaptor.forClass(AdventureMessageWindowOverflowedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChatMessageWindowOverflowedEvent.class);
         verify(eventPublisher).publishEvent(captor.capture());
         assertThat(captor.getValue().adventurePublicId()).isEqualTo(adventure.getPublicId());
     }

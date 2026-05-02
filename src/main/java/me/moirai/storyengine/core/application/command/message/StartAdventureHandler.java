@@ -22,7 +22,6 @@ import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
@@ -95,7 +94,7 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
 
         messageRepository.save(startMessage);
 
-        var history = messageRepository.findActiveByAdventureId(adventure.getId(), messageWindowSize);
+        var history = messageRepository.findAllActiveByAdventureId(adventure.getId());
 
         var personality = Optional.ofNullable(adventure.getNarratorPersonality())
                 .map(p -> replacePersonaNamePlaceholderWith(adventure.getNarratorName()).apply(p))
@@ -121,15 +120,22 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
 
         var cleanedResponse = responseProcessor.process(generationResult.getOutputText());
 
-        var aiMessage = Message.builder()
+        var aiMessage = messageRepository.save(Message.builder()
                 .adventureId(adventure.getId())
                 .role(MessageAuthorRole.ASSISTANT)
                 .content(addChatPrefix(adventure.getNarratorName()).apply(cleanedResponse))
-                .build();
+                .build());
 
-        messageRepository.save(aiMessage);
+        if (history.size() >= messageWindowSize) {
+            history.forEach(Message::markAsChronicled);
+            messageRepository.saveAll(history);
 
-        eventPublisher.publishEvent(new AdventureMessageWindowOverflowedEvent(adventure.getPublicId()));
+            aiMessage.markAsChronicled();
+            messageRepository.save(aiMessage);
+
+            aiMessage.communicateChatWindowOverflow(adventure.getPublicId());
+            aiMessage.drainEvents().forEach(eventPublisher::publishEvent);
+        }
 
         return new MessageResult(
                 aiMessage.getPublicId(),
@@ -145,6 +151,8 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
 
         var context = new ArrayList<ChatMessage>();
         var contextAttributes = adventure.getContextAttributes();
+
+        history = topUpHistory(adventure.getId(), history);
 
         var queryVector = embeddingPort.embed(currentMessage);
 
@@ -169,6 +177,20 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
         }
 
         return Collections.unmodifiableList(context);
+    }
+
+    private List<Message> topUpHistory(Long adventureId, List<Message> active) {
+
+        var deficit = messageWindowSize - active.size();
+        if (deficit <= 0) {
+            return active;
+        }
+
+        var backfill = messageRepository.findLatestChronicledByAdventureId(adventureId, deficit).reversed();
+        var combined = new ArrayList<Message>(backfill.size() + active.size());
+        combined.addAll(backfill);
+        combined.addAll(active);
+        return Collections.unmodifiableList(combined);
     }
 
     private List<ChatMessage> retrieveLorebookContext(Adventure adventure, float[] queryVector) {
@@ -226,7 +248,8 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
         return switch (message.getRole()) {
             case USER -> ChatMessage.asUser(message.getContent());
             case ASSISTANT -> ChatMessage.asAssistant(message.getContent());
-            default -> throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
+            default ->
+                throw new BusinessRuleViolationException("Unexpected role in message history: " + message.getRole());
         };
     }
 }

@@ -1,12 +1,12 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
+import org.springframework.context.ApplicationEventPublisher;
+
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
-import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
@@ -18,26 +18,23 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
     private final AdventureRepository repository;
-    private final MessageRepository messageRepository;
     private final LorebookVectorSearchPort lorebookVectorSearchPort;
     private final ChronicleVectorSearchPort chronicleVectorSearchPort;
     private final StoragePort storagePort;
-    private final NotificationRepository notificationRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public DeleteAdventureHandler(
             AdventureRepository repository,
-            MessageRepository messageRepository,
             LorebookVectorSearchPort lorebookVectorSearchPort,
             ChronicleVectorSearchPort chronicleVectorSearchPort,
             StoragePort storagePort,
-            NotificationRepository notificationRepository) {
+            ApplicationEventPublisher eventPublisher) {
 
         this.repository = repository;
-        this.messageRepository = messageRepository;
         this.lorebookVectorSearchPort = lorebookVectorSearchPort;
         this.chronicleVectorSearchPort = chronicleVectorSearchPort;
         this.storagePort = storagePort;
-        this.notificationRepository = notificationRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -58,10 +55,11 @@ public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventu
             storagePort.delete(adventure.getImageKey());
         }
 
-        messageRepository.deleteAllByAdventurePublicId(command.adventureId());
+        adventure.communicateAdventureDeleted();
+        adventure.drainEvents().forEach(eventPublisher::publishEvent);
+
         lorebookVectorSearchPort.deleteAllByAdventureId(command.adventureId());
         chronicleVectorSearchPort.deleteAllByAdventureId(command.adventureId());
-        notificationRepository.deleteAllGameNotificationsByAdventureId(adventure.getId());
         repository.deleteByPublicId(command.adventureId());
 
         return null;

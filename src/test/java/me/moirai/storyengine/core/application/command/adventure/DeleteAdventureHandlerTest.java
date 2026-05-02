@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.NotFoundException;
@@ -21,8 +22,6 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.message.MessageRepository;
-import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
@@ -34,9 +33,6 @@ public class DeleteAdventureHandlerTest {
     private AdventureRepository repository;
 
     @Mock
-    private MessageRepository messageRepository;
-
-    @Mock
     private LorebookVectorSearchPort lorebookVectorSearchPort;
 
     @Mock
@@ -46,7 +42,7 @@ public class DeleteAdventureHandlerTest {
     private StoragePort storagePort;
 
     @Mock
-    private NotificationRepository notificationRepository;
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private DeleteAdventureHandler handler;
@@ -93,7 +89,6 @@ public class DeleteAdventureHandlerTest {
         handler.handle(command);
 
         // then
-        verify(messageRepository).deleteAllByAdventurePublicId(AdventureFixture.PUBLIC_ID);
         verify(lorebookVectorSearchPort).deleteAllByAdventureId(AdventureFixture.PUBLIC_ID);
         verify(chronicleVectorSearchPort).deleteAllByAdventureId(AdventureFixture.PUBLIC_ID);
         verify(repository).deleteByPublicId(AdventureFixture.PUBLIC_ID);
@@ -130,21 +125,5 @@ public class DeleteAdventureHandlerTest {
 
         // then
         verify(storagePort, never()).delete(any());
-    }
-
-    @Test
-    public void shouldDeleteGameNotificationsWhenAdventureIsDeleted() {
-
-        // given
-        var adventure = adventureWithId();
-        var command = new DeleteAdventure(AdventureFixture.PUBLIC_ID);
-
-        when(repository.findByPublicId(AdventureFixture.PUBLIC_ID)).thenReturn(Optional.of(adventure));
-
-        // when
-        handler.handle(command);
-
-        // then
-        verify(notificationRepository).deleteAllGameNotificationsByAdventureId(AdventureFixture.NUMERIC_ID);
     }
 }

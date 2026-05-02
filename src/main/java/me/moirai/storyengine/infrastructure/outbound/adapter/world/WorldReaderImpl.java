@@ -12,9 +12,8 @@ import org.springframework.stereotype.Repository;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.util.Functions;
-import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
 import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
-import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
+import me.moirai.storyengine.core.port.outbound.world.WorldDetailsRow;
 import me.moirai.storyengine.core.port.outbound.world.WorldReader;
 
 @Repository
@@ -59,22 +58,20 @@ public class WorldReaderImpl implements WorldReader {
     //@formatter:on
 
     private final JdbcClient jdbcClient;
-    private final StoragePort storagePort;
 
-    public WorldReaderImpl(JdbcClient jdbcClient, StoragePort storagePort) {
+    public WorldReaderImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
-        this.storagePort = storagePort;
     }
 
     @Override
-    public Optional<WorldDetails> getWorldById(UUID publicId) {
+    public Optional<WorldDetailsRow> getWorldById(UUID publicId) {
         return jdbcClient.sql(SELECT_BY_ID)
                 .param("publicId", publicId)
                 .query(toWorldDetails())
                 .optional();
     }
 
-    private RowMapper<WorldDetails> toWorldDetails() {
+    private RowMapper<WorldDetailsRow> toWorldDetails() {
         return (rs, _) -> {
             var numericId = rs.getLong("numeric_id");
             var permissions = new HashSet<>(jdbcClient.sql(SELECT_PERMISSIONS)
@@ -94,7 +91,7 @@ public class WorldReaderImpl implements WorldReader {
                             r.getTimestamp("last_update_date").toInstant()))
                     .list());
 
-            return new WorldDetails(
+            return new WorldDetailsRow(
                     UUID.fromString(rs.getString("public_id")),
                     rs.getString("name"),
                     rs.getString("description"),
@@ -102,7 +99,7 @@ public class WorldReaderImpl implements WorldReader {
                     rs.getString("narrator_name"),
                     rs.getString("narrator_personality"),
                     rs.getString("visibility"),
-                    storagePort.resolveUrl(rs.getString("image_key")),
+                    rs.getString("image_key"),
                     permissions,
                     lorebook,
                     rs.getTimestamp("creation_date").toInstant(),

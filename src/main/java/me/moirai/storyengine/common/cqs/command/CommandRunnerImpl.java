@@ -45,7 +45,7 @@ public class CommandRunnerImpl implements CommandRunner {
 
         boolean isHandlerAlreadyRegisteredForCommand = handlersByCommand.containsKey(commandType);
         if (isHandlerAlreadyRegisteredForCommand) {
-            throw new IllegalArgumentException(HANDLER_ALREADY_REGISTERED);
+            throw new IllegalArgumentException(String.format(HANDLER_ALREADY_REGISTERED, commandType.getSimpleName()));
         }
 
         handlersByCommand.putIfAbsent(commandType, handler);

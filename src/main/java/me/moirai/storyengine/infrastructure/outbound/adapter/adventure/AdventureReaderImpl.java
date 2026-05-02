@@ -15,12 +15,11 @@ import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.PermissionLevel;
 import me.moirai.storyengine.common.enums.Visibility;
 import me.moirai.storyengine.common.util.Functions;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.ContextAttributesDto;
 import me.moirai.storyengine.core.port.inbound.adventure.ModelConfigurationDto;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureDetailsRow;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
-import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @Repository
 public class AdventureReaderImpl implements AdventureReader {
@@ -77,22 +76,20 @@ public class AdventureReaderImpl implements AdventureReader {
     //@formatter:on
 
     private final JdbcClient jdbcClient;
-    private final StoragePort storagePort;
 
-    public AdventureReaderImpl(JdbcClient jdbcClient, StoragePort storagePort) {
+    public AdventureReaderImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
-        this.storagePort = storagePort;
     }
 
     @Override
-    public Optional<AdventureDetails> getAdventureById(UUID publicId) {
+    public Optional<AdventureDetailsRow> getAdventureById(UUID publicId) {
         return jdbcClient.sql(SELECT_BY_ID)
                 .param("publicId", publicId)
                 .query(toAdventureDetails())
                 .optional();
     }
 
-    private RowMapper<AdventureDetails> toAdventureDetails() {
+    private RowMapper<AdventureDetailsRow> toAdventureDetails() {
         return (rs, _) -> {
             var adventureId = rs.getLong("id");
 
@@ -127,7 +124,7 @@ public class AdventureReaderImpl implements AdventureReader {
                             r.getTimestamp("last_update_date").toInstant()))
                     .list());
 
-            return new AdventureDetails(
+            return new AdventureDetailsRow(
                     UUID.fromString(rs.getString("public_id")),
                     rs.getString("name"),
                     rs.getString("description"),
@@ -138,7 +135,7 @@ public class AdventureReaderImpl implements AdventureReader {
                     Visibility.valueOf(rs.getString("visibility")),
                     Moderation.valueOf(rs.getString("moderation")),
                     rs.getBoolean("is_multiplayer"),
-                    storagePort.resolveUrl(rs.getString("image_key")),
+                    rs.getString("image_key"),
                     rs.getTimestamp("creation_date").toInstant(),
                     rs.getTimestamp("last_update_date").toInstant(),
                     modelConfiguration,

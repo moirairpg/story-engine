@@ -3,9 +3,9 @@ package me.moirai.storyengine.core.application.command.adventure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -26,7 +27,6 @@ import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
-import me.moirai.storyengine.core.domain.chronicle.ChronicleSegmentFixture;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageStatus;
 import me.moirai.storyengine.core.port.inbound.chronicle.UpdateChronicle;
@@ -90,7 +90,7 @@ public class UpdateChronicleHandlerTest {
     }
 
     @Test
-    public void shouldReturnNullImmediatelyWhenNoMessagesSpillOverWindow() {
+    public void shouldGenerateAndSaveChronicleSegmentFromChronicledMessages() {
 
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
@@ -99,34 +99,7 @@ public class UpdateChronicleHandlerTest {
         var command = new UpdateChronicle(UUID.randomUUID());
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageRepository.findAllActiveByAdventurePublicId(any(UUID.class))).thenReturn(List.of(
-                messageData(MessageAuthorRole.USER),
-                messageData(MessageAuthorRole.ASSISTANT),
-                messageData(MessageAuthorRole.USER)));
-
-        // when
-        var result = handler.handle(command);
-
-        // then
-        assertThat(result).isNull();
-        verify(textCompletionPort, never()).generateTextFrom(any());
-        verify(adventureRepository, never()).save(any());
-    }
-
-    @Test
-    public void shouldSaveChronicleSegmentWhenMessagesSpillOverWindow() {
-
-        // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-
-        var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        adventure.addChronicleSegment(savedSegment.getContent());
-
-        var command = new UpdateChronicle(UUID.randomUUID());
-
-        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageRepository.findAllActiveByAdventurePublicId(any(UUID.class))).thenReturn(overflowingMessages(7));
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(chronicledMessages(6));
         when(textCompletionPort.generateTextFrom(any()))
                 .thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
         when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
@@ -136,90 +109,62 @@ public class UpdateChronicleHandlerTest {
         handler.handle(command);
 
         // then
-        verify(adventureRepository).save(any(Adventure.class));
-        verify(messageRepository, times(1)).saveAll(anyList());
+        verify(adventureRepository, times(1)).save(any(Adventure.class));
+        verify(textCompletionPort, times(1)).generateTextFrom(any());
     }
 
     @Test
-    public void shouldUpsertVectorForSavedSegment() {
-
-        // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-
-        var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        adventure.addChronicleSegment(savedSegment.getContent());
-
-        var command = new UpdateChronicle(UUID.randomUUID());
-        var vector = new float[] { 0.1f, 0.2f };
-
-        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageRepository.findAllActiveByAdventurePublicId(any(UUID.class))).thenReturn(overflowingMessages(7));
-        when(textCompletionPort.generateTextFrom(any()))
-                .thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
-        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
-        when(embeddingPort.embed(anyString())).thenReturn(vector);
-
-        // when
-        handler.handle(command);
-
-        // then
-        verify(adventureRepository, times(1)).save(adventure);
-        verify(messageRepository, times(1)).saveAll(anyList());
-    }
-
-    @Test
-    public void shouldMarkChronicledMessagesAsChronicled() {
-
-        // given
-        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
-
-        var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        adventure.addChronicleSegment(savedSegment.getContent());
-
-        var command = new UpdateChronicle(UUID.randomUUID());
-
-        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageRepository.findAllActiveByAdventurePublicId(any(UUID.class))).thenReturn(overflowingMessages(7));
-        when(textCompletionPort.generateTextFrom(any()))
-                .thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
-        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
-        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
-
-        // when
-        handler.handle(command);
-
-        // then
-        verify(messageRepository, times(1)).saveAll(anyList());
-    }
-
-    @Test
-    public void shouldOnlyChronicleMessagesOutsideWindow() {
+    public void shouldUpsertVectorForGeneratedSegment() {
 
         // given
         var adventure = AdventureFixture.privateSingleplayerAdventure().build();
         ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
         ReflectionTestUtils.setField(adventure, "publicId", AdventureFixture.PUBLIC_ID);
 
-        var savedSegment = ChronicleSegmentFixture.chronicleSegment().build();
-        adventure.addChronicleSegment(savedSegment.getContent());
-
         var command = new UpdateChronicle(UUID.randomUUID());
-        var messages = overflowingMessages(8);
+        var vector = new float[] { 0.1f, 0.2f };
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
-        when(messageRepository.findAllActiveByAdventurePublicId(any(UUID.class))).thenReturn(messages);
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(chronicledMessages(6));
         when(textCompletionPort.generateTextFrom(any()))
                 .thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
         when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
-        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+        when(embeddingPort.embed(anyString())).thenReturn(vector);
+
+        var vectorCaptor = ArgumentCaptor.forClass(float[].class);
 
         // when
         handler.handle(command);
 
         // then
-        verify(messageRepository, times(1)).saveAll(anyList());
+        verify(chronicleVectorSearchPort, times(1)).upsert(any(UUID.class), any(UUID.class), vectorCaptor.capture());
+        assertThat(vectorCaptor.getValue()).isEqualTo(vector);
+    }
+
+    @Test
+    public void shouldRequestChronicledMessagesUsingWindowPlusOne() {
+
+        // given
+        var adventure = AdventureFixture.privateSingleplayerAdventure().build();
+        ReflectionTestUtils.setField(adventure, "id", AdventureFixture.NUMERIC_ID);
+
+        var command = new UpdateChronicle(UUID.randomUUID());
+
+        when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(chronicledMessages(6));
+        when(textCompletionPort.generateTextFrom(any()))
+                .thenReturn(TextGenerationResult.builder().outputText("Chronicle summary").build());
+        when(adventureRepository.save(any(Adventure.class))).thenReturn(adventure);
+        when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
+
+        var limitCaptor = ArgumentCaptor.forClass(Integer.class);
+
+        // when
+        handler.handle(command);
+
+        // then
+        verify(messageRepository).findLatestChronicledByAdventureId(anyLong(), limitCaptor.capture());
+        assertThat(limitCaptor.getValue()).isEqualTo(6);
     }
 
     private Message messageData(MessageAuthorRole role) {
@@ -227,11 +172,11 @@ public class UpdateChronicleHandlerTest {
                 .adventureId(1L)
                 .role(role)
                 .content("Some content")
-                .status(MessageStatus.ACTIVE)
+                .status(MessageStatus.CHRONICLED)
                 .build();
     }
 
-    private List<Message> overflowingMessages(int count) {
+    private List<Message> chronicledMessages(int count) {
         return IntStream.range(0, count)
                 .mapToObj(i -> messageData(i % 2 == 0 ? MessageAuthorRole.USER : MessageAuthorRole.ASSISTANT))
                 .toList();

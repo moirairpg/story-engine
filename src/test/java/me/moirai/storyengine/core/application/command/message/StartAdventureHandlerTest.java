@@ -24,8 +24,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.core.application.event.adventure.AdventureMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.message.ChatMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.domain.message.MessageFixture;
 import me.moirai.storyengine.core.port.inbound.message.StartAdventure;
@@ -116,7 +116,8 @@ public class StartAdventureHandlerTest {
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findAllActiveByAdventureId(anyLong())).thenReturn(List.of());
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -147,7 +148,8 @@ public class StartAdventureHandlerTest {
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findAllActiveByAdventureId(anyLong())).thenReturn(List.of());
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -175,9 +177,13 @@ public class StartAdventureHandlerTest {
         var generationResult = TextGenerationResult.builder().outputText("AI response").build();
         var command = new StartAdventure(UUID.randomUUID());
 
+        var fullHistory = java.util.stream.IntStream.range(0, 10)
+                .mapToObj(i -> MessageFixture.assistantMessage().build())
+                .toList();
+
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findAllActiveByAdventureId(anyLong())).thenReturn(fullHistory);
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);
@@ -186,7 +192,7 @@ public class StartAdventureHandlerTest {
         handler.handle(command);
 
         // then
-        var captor = ArgumentCaptor.forClass(AdventureMessageWindowOverflowedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChatMessageWindowOverflowedEvent.class);
         verify(eventPublisher).publishEvent(captor.capture());
         assertThat(captor.getValue().adventurePublicId()).isEqualTo(adventure.getPublicId());
     }
@@ -207,7 +213,8 @@ public class StartAdventureHandlerTest {
 
         when(adventureRepository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(adventure));
         when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-        when(messageRepository.findActiveByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
+        when(messageRepository.findAllActiveByAdventureId(anyLong())).thenReturn(List.of());
+        when(messageRepository.findLatestChronicledByAdventureId(anyLong(), anyInt())).thenReturn(List.of());
         when(embeddingPort.embed(anyString())).thenReturn(new float[] { 0.1f, 0.2f });
         when(vectorSearchPort.search(any(UUID.class), any(float[].class), anyInt())).thenReturn(List.of());
         when(textCompletionPort.generateTextFrom(any())).thenReturn(generationResult);

@@ -27,6 +27,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import me.moirai.storyengine.common.domain.DomainEvent;
 import me.moirai.storyengine.common.domain.Narrator;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.domain.ShareableAsset;
@@ -96,6 +98,9 @@ public class Adventure extends ShareableAsset {
     @JoinColumn(name = "adventure_id")
     private List<ChronicleSegment> chronicleSegments = new ArrayList<>();
 
+    @Transient
+    private List<DomainEvent> domainEvents = new ArrayList<>();
+
     @Override
     protected List<Permission> permissions() {
         return permissions;
@@ -120,6 +125,16 @@ public class Adventure extends ShareableAsset {
 
     protected Adventure() {
         super();
+    }
+
+    public List<DomainEvent> drainEvents() {
+        var snapshot = List.copyOf(domainEvents);
+        domainEvents.clear();
+        return snapshot;
+    }
+
+    public void communicateAdventureDeleted() {
+        domainEvents.add(new AdventureDeletedEvent(this.id));
     }
 
     public Long getId() {

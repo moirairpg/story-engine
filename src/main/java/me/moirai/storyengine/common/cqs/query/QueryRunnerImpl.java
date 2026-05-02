@@ -45,7 +45,7 @@ public class QueryRunnerImpl implements QueryRunner {
 
         boolean isHandlerAlreadyRegisteredForQuery = handlersByQuery.containsKey(queryType);
         if (isHandlerAlreadyRegisteredForQuery) {
-            throw new IllegalArgumentException(HANDLER_ALREADY_REGISTERED);
+            throw new IllegalArgumentException(String.format(HANDLER_ALREADY_REGISTERED, queryType.getSimpleName()));
         }
 
         handlersByQuery.putIfAbsent(queryType, handler);

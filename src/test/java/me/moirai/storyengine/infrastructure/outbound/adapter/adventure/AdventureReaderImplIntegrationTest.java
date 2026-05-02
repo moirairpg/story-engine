@@ -14,7 +14,7 @@ import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldFixture;
-import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
+import me.moirai.storyengine.core.port.outbound.adventure.AdventureDetailsRow;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
 
 public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest {
@@ -52,7 +52,7 @@ public class AdventureReaderImplIntegrationTest extends AbstractIntegrationTest 
         insert(adventure, Adventure.class);
 
         // When
-        Optional<AdventureDetails> result = reader.getAdventureById(adventure.getPublicId());
+        Optional<AdventureDetailsRow> result = reader.getAdventureById(adventure.getPublicId());
 
         // Then
         assertThat(result).isNotNull().isNotEmpty();
