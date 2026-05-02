@@ -22,7 +22,6 @@ import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.StringProcessor;
-import me.moirai.storyengine.core.application.event.adventure.ChatMessageWindowOverflowedEvent;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.message.Message;
 import me.moirai.storyengine.core.port.inbound.message.MessageResult;
@@ -134,7 +133,8 @@ public class StartAdventureHandler extends AbstractCommandHandler<StartAdventure
             aiMessage.markAsChronicled();
             messageRepository.save(aiMessage);
 
-            eventPublisher.publishEvent(new ChatMessageWindowOverflowedEvent(adventure.getPublicId()));
+            aiMessage.communicateChatWindowOverflow(adventure.getPublicId());
+            aiMessage.drainEvents().forEach(eventPublisher::publishEvent);
         }
 
         return new MessageResult(

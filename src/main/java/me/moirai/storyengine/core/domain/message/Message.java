@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.domain.message;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.uuid.Generators;
@@ -12,7 +14,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import me.moirai.storyengine.common.domain.Asset;
+import me.moirai.storyengine.common.domain.DomainEvent;
 import me.moirai.storyengine.common.enums.MessageAuthorRole;
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
@@ -41,6 +45,9 @@ public class Message extends Asset {
     @Column(name = "status")
     private MessageStatus status;
 
+    @Transient
+    private List<DomainEvent> domainEvents = new ArrayList<>();
+
     protected Message() {
         super();
     }
@@ -54,6 +61,16 @@ public class Message extends Asset {
         this.role = builder.role;
         this.content = builder.content;
         this.status = builder.status;
+    }
+
+    public List<DomainEvent> drainEvents() {
+        var snapshot = List.copyOf(domainEvents);
+        domainEvents.clear();
+        return snapshot;
+    }
+
+    public void communicateChatWindowOverflow(UUID adventurePublicId) {
+        domainEvents.add(new ChatMessageWindowOverflowedEvent(adventurePublicId));
     }
 
     public static Builder builder() {

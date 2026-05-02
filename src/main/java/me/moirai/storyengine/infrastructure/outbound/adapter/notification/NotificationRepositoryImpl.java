@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.notification;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +31,11 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     @Override
     public void deleteByPublicId(UUID publicId) {
         jpaRepository.deleteByPublicId(publicId);
+    }
+
+    @Override
+    public void deleteAllByPublicId(List<UUID> publicId) {
+        jpaRepository.deleteAllByPublicId(publicId);
     }
 
     @Override

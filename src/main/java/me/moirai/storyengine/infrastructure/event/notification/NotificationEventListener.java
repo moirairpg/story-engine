@@ -11,11 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.util.Functions;
-import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.application.event.notification.NotificationCreated;
+import me.moirai.storyengine.core.domain.adventure.Adventure;
+import me.moirai.storyengine.core.domain.adventure.AdventureDeletedEvent;
 import me.moirai.storyengine.core.domain.notification.Notification;
+import me.moirai.storyengine.core.port.inbound.notification.DeleteNotificationsByAdventure;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
@@ -31,17 +34,20 @@ public class NotificationEventListener {
     private final UserRepository userRepository;
     private final AdventureRepository adventureRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final CommandRunner commandRunner;
 
     public NotificationEventListener(
             NotificationRepository notificationRepository,
             UserRepository userRepository,
             AdventureRepository adventureRepository,
-            SimpMessagingTemplate messagingTemplate) {
+            SimpMessagingTemplate messagingTemplate,
+            CommandRunner commandRunner) {
 
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
         this.adventureRepository = adventureRepository;
         this.messagingTemplate = messagingTemplate;
+        this.commandRunner = commandRunner;
     }
 
     @Async
@@ -57,6 +63,13 @@ public class NotificationEventListener {
             case SYSTEM -> sendSystemNotification(notification);
             case GAME -> sendAdventureNotification(notification);
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void onAdventureDeleted(AdventureDeletedEvent event) {
+
+        commandRunner.run(new DeleteNotificationsByAdventure(event.getAdventureId()));
     }
 
     private void sendAdventureNotification(Notification notification) {

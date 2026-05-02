@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.notification;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +19,8 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, L
     @Modifying
     @Query("DELETE FROM Notification n WHERE n.type = 'GAME' AND n.adventureId = :adventureId")
     void deleteAllGameNotificationsByAdventureId(Long adventureId);
+
+    @Modifying
+    @Query("DELETE FROM Notification n WHERE n.publicId IN :publicIds")
+    void deleteAllByPublicId(List<UUID> publicId);
 }
