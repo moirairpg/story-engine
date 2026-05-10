@@ -22,6 +22,8 @@ public class QdrantConfig {
     private final int vectorSize;
     private final String chronicleCollectionName;
     private final int chronicleVectorSize;
+    private final String playerCharacterCollectionName;
+    private final int playerCharacterVectorSize;
 
     public QdrantConfig(
             @Value("${moirai.qdrant.host}") String host,
@@ -29,7 +31,9 @@ public class QdrantConfig {
             @Value("${moirai.rag.lorebook.collection-name}") String collectionName,
             @Value("${moirai.rag.lorebook.vector-size}") int vectorSize,
             @Value("${moirai.rag.chronicle.collection-name}") String chronicleCollectionName,
-            @Value("${moirai.rag.chronicle.vector-size}") int chronicleVectorSize) {
+            @Value("${moirai.rag.chronicle.vector-size}") int chronicleVectorSize,
+            @Value("${moirai.rag.player-character.collection-name}") String playerCharacterCollectionName,
+            @Value("${moirai.rag.player-character.vector-size}") int playerCharacterVectorSize) {
 
         this.host = host;
         this.port = port;
@@ -37,6 +41,8 @@ public class QdrantConfig {
         this.vectorSize = vectorSize;
         this.chronicleCollectionName = chronicleCollectionName;
         this.chronicleVectorSize = chronicleVectorSize;
+        this.playerCharacterCollectionName = playerCharacterCollectionName;
+        this.playerCharacterVectorSize = playerCharacterVectorSize;
     }
 
     @Bean
@@ -88,6 +94,32 @@ public class QdrantConfig {
                         .setVectorsConfig(VectorsConfig.newBuilder()
                                 .setParams(VectorParams.newBuilder()
                                         .setSize(chronicleVectorSize)
+                                        .setDistance(Distance.Cosine)
+                                        .build())
+                                .build())
+                        .build());
+            }
+        };
+    }
+
+    @Bean
+    ApplicationRunner initPlayerCharacterCollection(QdrantGrpcClient qdrantClient) {
+
+        return args -> {
+            var collections = CollectionsGrpc.newBlockingStub(qdrantClient.channel());
+            var exists = collections.collectionExists(
+                    CollectionExistsRequest.newBuilder()
+                            .setCollectionName(playerCharacterCollectionName)
+                            .build())
+                    .getResult()
+                    .getExists();
+
+            if (!exists) {
+                collections.create(CreateCollection.newBuilder()
+                        .setCollectionName(playerCharacterCollectionName)
+                        .setVectorsConfig(VectorsConfig.newBuilder()
+                                .setParams(VectorParams.newBuilder()
+                                        .setSize(playerCharacterVectorSize)
                                         .setDistance(Distance.Cosine)
                                         .build())
                                 .build())

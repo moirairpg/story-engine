@@ -42,6 +42,10 @@ moirai:
       top-k: 10
       collection-name: chronicle
       vector-size: 1536
+    player-character:
+      top-k: 5
+      collection-name: player-character
+      vector-size: 1536
   adventure:
     message-window-size: ${ADVENTURE_MESSAGE_WINDOW_SIZE:100}
   security:

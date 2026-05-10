@@ -5,7 +5,7 @@ import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.adventure.LorebookVectorSearchPort;
 
 @CommandHandler
 public class DeleteAdventureLorebookEntryHandler extends AbstractCommandHandler<DeleteAdventureLorebookEntry, Void> {

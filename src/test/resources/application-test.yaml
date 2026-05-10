@@ -15,6 +15,10 @@ moirai:
       top-k: 3
       collection-name: chronicle
       vector-size: 1536
+    player-character:
+      top-k: 5
+      collection-name: player-character
+      vector-size: 1536
   discord:
     oauth:
       client-id: dummy_value

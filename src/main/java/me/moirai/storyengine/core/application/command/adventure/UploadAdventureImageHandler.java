@@ -32,6 +32,7 @@ public class UploadAdventureImageHandler extends AbstractCommandHandler<UploadAd
             storagePort.delete(adventure.getImageKey());
         }
 
+        // TODO transfer control over image keys to domain layer in all places that use images
         var imageId = Generators.timeBasedEpochGenerator().generate();
         var key = "adventures/" + command.adventureId() + "/" + imageId + "." + command.fileExtension();
         storagePort.upload(key, command.imageBytes(), command.contentType());

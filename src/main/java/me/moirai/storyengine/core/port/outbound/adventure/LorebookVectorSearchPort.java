@@ -1,9 +1,11 @@
-package me.moirai.storyengine.core.port.outbound.vectorsearch;
+package me.moirai.storyengine.core.port.outbound.adventure;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface LorebookVectorSearchPort {
+import me.moirai.storyengine.core.port.outbound.VectorSearchPortBase;
+
+public interface LorebookVectorSearchPort extends VectorSearchPortBase {
 
     void upsert(UUID adventureId, UUID entryId, float[] vector);
 

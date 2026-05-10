@@ -1,4 +1,4 @@
-package me.moirai.storyengine.infrastructure.outbound.adapter.vectorsearch;
+package me.moirai.storyengine.infrastructure.outbound.adapter.adventure;
 
 import static io.qdrant.client.ValueFactory.value;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +26,7 @@ import io.qdrant.client.grpc.Points.UpsertPoints;
 import io.qdrant.client.grpc.PointsGrpc.PointsBlockingStub;
 
 @ExtendWith(MockitoExtension.class)
-class LorebookVectorSearchAdapterTest {
+class ChronicleVectorSearchAdapterTest {
 
     @Mock(answer = Answers.RETURNS_MOCKS)
     private QdrantGrpcClient grpcClient;
@@ -35,12 +35,12 @@ class LorebookVectorSearchAdapterTest {
     private PointsBlockingStub pointsStub;
 
     @InjectMocks
-    private LorebookVectorSearchAdapter adapter;
+    private ChronicleVectorSearchAdapter adapter;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(adapter, "qdrantClient", pointsStub);
-        ReflectionTestUtils.setField(adapter, "collectionName", "lorebook");
+        ReflectionTestUtils.setField(adapter, "collectionName", "chronicle");
     }
 
     @Test
@@ -48,11 +48,11 @@ class LorebookVectorSearchAdapterTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var entryId = UUID.randomUUID();
+        var segmentId = UUID.randomUUID();
         var vector = new float[] { 0.1f, 0.2f, 0.3f };
 
         // when
-        adapter.upsert(adventureId, entryId, vector);
+        adapter.upsert(adventureId, segmentId, vector);
 
         // then
         verify(pointsStub).upsert(any(UpsertPoints.class));
@@ -62,10 +62,10 @@ class LorebookVectorSearchAdapterTest {
     void shouldDeletePointWhenCalledWithEntryId() {
 
         // given
-        var entryId = UUID.randomUUID();
+        var adventureId = UUID.randomUUID();
 
         // when
-        adapter.delete(entryId);
+        adapter.deleteAllByAdventureId(adventureId);
 
         // then
         verify(pointsStub).delete(any(DeletePoints.class));
@@ -76,11 +76,11 @@ class LorebookVectorSearchAdapterTest {
 
         // given
         var adventureId = UUID.randomUUID();
-        var entryId = UUID.randomUUID();
+        var segmentId = UUID.randomUUID();
         var vector = new float[] { 0.1f, 0.2f, 0.3f };
 
         var scoredPoint = ScoredPoint.newBuilder()
-                .putPayload("entryId", value(entryId.toString()))
+                .putPayload("segmentId", value(segmentId.toString()))
                 .build();
 
         when(pointsStub.search(any(SearchPoints.class)))
@@ -91,7 +91,7 @@ class LorebookVectorSearchAdapterTest {
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(entryId);
+        assertThat(result.get(0)).isEqualTo(segmentId);
     }
 
     @Test

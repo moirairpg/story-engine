@@ -14,13 +14,14 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import me.moirai.storyengine.common.testutil.DbTestHelper;
+import me.moirai.storyengine.core.port.outbound.adventure.ChronicleVectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.adventure.LorebookVectorSearchPort;
+import me.moirai.storyengine.core.port.outbound.character.PlayerCharacterVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextCompletionPort;
 import me.moirai.storyengine.core.port.outbound.generation.TextModerationPort;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.ChronicleVectorSearchPort;
-import me.moirai.storyengine.core.port.outbound.vectorsearch.LorebookVectorSearchPort;
 import me.moirai.storyengine.infrastructure.config.DiscordApiConfig;
 import me.moirai.storyengine.infrastructure.config.OpenAiApiConfig;
 import me.moirai.storyengine.infrastructure.config.QdrantConfig;
@@ -50,6 +51,9 @@ public abstract class AbstractIntegrationTest {
 
     @MockitoBean
     private ChronicleVectorSearchPort chronicleVectorSearchPort;
+
+    @MockitoBean
+    private PlayerCharacterVectorSearchPort playerCharacterVectorSearchPort;
 
     @MockitoBean
     private OpenAiApiConfig openAiApiConfig;
@@ -86,6 +90,9 @@ public abstract class AbstractIntegrationTest {
 
     @MockitoBean
     private ApplicationRunner initChronicleCollection;
+
+    @MockitoBean
+    private ApplicationRunner initPlayerCharacterCollection;
 
     private static final String POSTGRES_IMAGE_NAME = "postgres:18-alpine";
 

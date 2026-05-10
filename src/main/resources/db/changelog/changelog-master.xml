@@ -92,4 +92,5 @@
   <include file="db/changelog/migrations/1776807616_create_table_notification_read.sql" />
   <include file="db/changelog/migrations/1776979935_create_table_notification_recipient.sql" />
   <include file="db/changelog/migrations/1777229540_alter_table_chronicle_segment_add_adventure_fk.sql" />
+  <include file="db/changelog/migrations/1778008769_create_table_player_character.sql" />
 </databaseChangeLog>
