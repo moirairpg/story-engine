@@ -5,5 +5,10 @@ import java.util.UUID;
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.enums.Role;
 
-public record UpdateUserRole(UUID userId, Role role) implements Command<Void> {
+public record UpdateUser(
+        UUID userId,
+        Role role,
+        boolean isActive,
+        String bio,
+        UUID requesterId) implements Command<Void> {
 }

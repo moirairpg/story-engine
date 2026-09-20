@@ -5,15 +5,10 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.enums.Role;
 
-public record UserDetailsResult(
+public record UserSummary(
         UUID publicId,
-        Long id,
-        String discordId,
-        String discordUsername,
         String username,
-        String avatarUrl,
         Role role,
         boolean isActive,
-        String bio,
         Instant creationDate) {
 }

@@ -42,13 +42,13 @@ public class GetUserDetailsByIdHandlerTest {
 
         // Given
         var userId = UUID.randomUUID();
-        var token = "someToken";
-        var query = new GetUserDetailsById(userId, token);
-        var userData = new UserData(userId, 12345L, "1234", Role.PLAYER, Instant.now());
-        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", "natalis", null, null, null, null, null);
+        var query = new GetUserDetailsById(userId);
+        var userData = new UserData(userId, 12345L, "1234", "john.natalis", Role.PLAYER, true, null,
+                Instant.now());
+        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", null, null, null, null, null);
 
         when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
-        when(discordUserDetailsPort.getUserById(anyString(), anyString())).thenReturn(Optional.of(userDetails));
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
 
         // When
         var result = handler.handle(query);
@@ -56,31 +56,8 @@ public class GetUserDetailsByIdHandlerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.discordId()).isEqualTo(userData.discordId());
-        assertThat(result.nickname()).isEqualTo("natalis");
-        assertThat(result.username()).isEqualTo("john.natalis");
-    }
-
-    @Test
-    public void retrieveUser_whenUserIsFound_andNicknameIsNull_thenReturnUserDataWithUsernameAsNickname() {
-
-        // Given
-        var userId = UUID.randomUUID();
-        var token = "someToken";
-        var query = new GetUserDetailsById(userId, token);
-        var userData = new UserData(userId, 12345L, "1234", Role.PLAYER, Instant.now());
-        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", null, null, null, null, null, null);
-
-        when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
-        when(discordUserDetailsPort.getUserById(anyString(), anyString())).thenReturn(Optional.of(userDetails));
-
-        // When
-        var result = handler.execute(query);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.discordId()).isEqualTo(userData.discordId());
-        assertThat(result.nickname()).isEqualTo("john.natalis");
-        assertThat(result.username()).isEqualTo("john.natalis");
+        assertThat(result.discordUsername()).isEqualTo("john.natalis");
+        assertThat(result.username()).isEqualTo(userData.username());
     }
 
     @Test
@@ -89,8 +66,7 @@ public class GetUserDetailsByIdHandlerTest {
         // Given
         var expectedMessage = "The User with the requested ID is not registered in MoirAI";
         var userId = UUID.randomUUID();
-        var token = "someToken";
-        var query = new GetUserDetailsById(userId, token);
+        var query = new GetUserDetailsById(userId);
 
         when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -106,12 +82,12 @@ public class GetUserDetailsByIdHandlerTest {
         // Given
         var expectedMessage = "The Discord User with the requested ID does not exist";
         var userId = UUID.randomUUID();
-        var token = "someToken";
-        var query = new GetUserDetailsById(userId, token);
-        var userData = new UserData(userId, 12345L, "1234", Role.PLAYER, Instant.now());
+        var query = new GetUserDetailsById(userId);
+        var userData = new UserData(userId, 12345L, "1234", "john.natalis", Role.PLAYER, true, null,
+                Instant.now());
 
         when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
-        when(discordUserDetailsPort.getUserById(anyString(), anyString())).thenReturn(Optional.empty());
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(RestException.class)
@@ -124,7 +100,7 @@ public class GetUserDetailsByIdHandlerTest {
 
         // Given
         var expectedMessage = "User ID cannot be null";
-        var query = new GetUserDetailsById(null, null);
+        var query = new GetUserDetailsById(null);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)

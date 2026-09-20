@@ -7,11 +7,11 @@ import me.moirai.storyengine.common.security.authorization.AuthorizationOperatio
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
 
 @Component
-public class ManageUserAuthorizer implements OperationAuthorizer {
+public class UpdateUserAuthorizer implements OperationAuthorizer {
 
     @Override
     public AuthorizationOperation getOperation() {
-        return AuthorizationOperation.MANAGE_USER;
+        return AuthorizationOperation.UPDATE_USER;
     }
 
     @Override

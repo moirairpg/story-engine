@@ -3,6 +3,7 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,5 +52,24 @@ public class UserReaderImplIntegrationTest extends AbstractDatabaseIntegrationTe
         assertThat(result.get().discordId()).isEqualTo(user.getDiscordId());
         assertThat(result.get().publicId()).isEqualTo(user.getPublicId());
         assertThat(result.get().role()).isEqualTo(user.getRole());
+        assertThat(result.get().username()).isEqualTo(user.getUsername());
+        assertThat(result.get().isActive()).isTrue();
+    }
+
+    @Test
+    public void getUserByDiscordId_whenUserIsDeactivated_thenReturnInactive() {
+
+        // Given
+        var user = UserFixture.player().build();
+        user.updateActiveState(false, UUID.randomUUID());
+
+        var stored = insert(user, User.class);
+
+        // When
+        var result = reader.getUserByDiscordId(stored.getDiscordId());
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get().isActive()).isFalse();
     }
 }

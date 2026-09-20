@@ -2,8 +2,6 @@ package me.moirai.storyengine.core.application.query.user;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-import java.util.Optional;
-
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
@@ -44,20 +42,19 @@ public class GetUserDetailsByIdHandler extends AbstractQueryHandler<GetUserDetai
         var moiraiUserDetails = userReader.getUserById(useCase.userId())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
-        var discordUserDetails = discordUserDetailsPort.getUserById(moiraiUserDetails.discordId(), useCase.discordToken())
+        var discordUserDetails = discordUserDetailsPort.getUserById(moiraiUserDetails.discordId())
                 .orElseThrow(() -> new RestException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
-
-        var nickname = Optional.ofNullable(discordUserDetails.globalNickname())
-                .orElse(discordUserDetails.username());
 
         return new UserDetailsResult(
                 moiraiUserDetails.publicId(),
                 moiraiUserDetails.id(),
                 moiraiUserDetails.discordId(),
                 discordUserDetails.username(),
-                nickname,
+                moiraiUserDetails.username(),
                 discordUserDetails.avatarUrl(),
                 moiraiUserDetails.role(),
+                moiraiUserDetails.isActive(),
+                moiraiUserDetails.bio(),
                 moiraiUserDetails.creationDate());
     }
 }

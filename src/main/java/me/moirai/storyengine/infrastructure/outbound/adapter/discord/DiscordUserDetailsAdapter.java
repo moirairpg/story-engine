@@ -17,26 +17,29 @@ import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
 @Component
 public class DiscordUserDetailsAdapter implements DiscordUserDetailsPort {
 
-    private static final String BEARER = "Bearer %s";
+    private static final String BOT = "Bot %s";
 
     private final String usersUri;
+    private final String botToken;
     private final RestClient discordClient;
 
     public DiscordUserDetailsAdapter(
             @Value("${moirai.discord.api.users-uri}") String usersUri,
+            @Value("${moirai.discord.api.bot-token}") String botToken,
             RestClient discordClient) {
 
         this.usersUri = usersUri;
+        this.botToken = botToken;
         this.discordClient = discordClient;
     }
 
     @Override
-    public Optional<DiscordUserDataResponse> getUserById(String userDiscordId, String token) {
+    public Optional<DiscordUserDataResponse> getUserById(String userDiscordId) {
 
         return Optional.ofNullable(discordClient.get()
                 .uri(format(usersUri, userDiscordId))
                 .headers(headers -> {
-                    headers.add(AUTHORIZATION, format(BEARER, token));
+                    headers.add(AUTHORIZATION, format(BOT, botToken));
                     headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
                 })
                 .retrieve()

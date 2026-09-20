@@ -108,4 +108,5 @@
   <include file="db/changelog/migrations/1786914307_alter_table_character_add_xp.sql" />
   <include file="db/changelog/migrations/1786929145_update_tables_player_character_message_add_xp.sql" />
   <include file="db/changelog/migrations/1786929145_update_table_player_character_add_level_and_unspent_points.sql" />
+  <include file="db/changelog/migrations/1789847093_alter_table_moirai_user_add_bio_and_active_state.sql" />
 </databaseChangeLog>

@@ -14,18 +14,18 @@ import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
-import me.moirai.storyengine.infrastructure.security.authorization.user.ManageUserAuthorizer;
+import me.moirai.storyengine.infrastructure.security.authorization.user.UpdateUserAuthorizer;
 
 @ExtendWith(MockitoExtension.class)
-class ManageUserAuthorizerTest {
+class UpdateUserAuthorizerTest {
 
     @InjectMocks
-    private ManageUserAuthorizer authorizer;
+    private UpdateUserAuthorizer authorizer;
 
     @Test
-    void shouldReturnManageUserOperation() {
+    void shouldReturnUpdateUserOperation() {
 
-        assertThat(authorizer.getOperation()).isEqualTo(AuthorizationOperation.MANAGE_USER);
+        assertThat(authorizer.getOperation()).isEqualTo(AuthorizationOperation.UPDATE_USER);
     }
 
     @Test
@@ -42,7 +42,7 @@ class ManageUserAuthorizerTest {
     }
 
     @Test
-    void shouldAuthorizeWhenRequesterManagesTheirOwnAccount() {
+    void shouldAuthorizeWhenRequesterUpdatesTheirOwnAccount() {
 
         // Given
         var userId = UUID.randomUUID();

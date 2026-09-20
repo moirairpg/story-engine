@@ -4,8 +4,5 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.query.Query;
 
-public record GetUserDetailsById(
-        UUID userId,
-        String discordToken)
-        implements Query<UserDetailsResult> {
+public record GetUserDetailsById(UUID userId) implements Query<UserDetailsResult> {
 }

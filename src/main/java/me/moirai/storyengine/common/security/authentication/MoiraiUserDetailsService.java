@@ -44,6 +44,10 @@ public class MoiraiUserDetailsService implements UserDetailsService {
             var moiraiUser = userReader.getUserByDiscordId(discordUser.id())
                     .orElseThrow(() -> new NotFoundException("User not found"));
 
+            if (!moiraiUser.isActive()) {
+                throw new AuthenticationFailedException("Deactivated user requested authentication");
+            }
+
             return new MoiraiPrincipal(
                     moiraiUser.publicId(),
                     moiraiUser.id(),

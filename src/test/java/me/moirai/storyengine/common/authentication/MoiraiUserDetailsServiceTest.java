@@ -1,6 +1,7 @@
 package me.moirai.storyengine.common.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Role;
+import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
@@ -40,20 +42,19 @@ public class MoiraiUserDetailsServiceTest {
         // Given
         var token = "AUTH_TOKEN / REFRESH_TOKEN";
         var username = "john.doe";
-        var nickname = "JohnDoe";
         var publicId = UUID.randomUUID();
 
         var response = new DiscordUserDataResponse(
                 "12345",
                 username,
-                nickname,
                 null,
                 null,
                 "email@email.com",
                 null,
                 null);
 
-        var userData = new UserData(publicId, 1L, "12345", Role.PLAYER, Instant.now());
+        var userData = new UserData(publicId, 1L, "12345", "john.doe", Role.PLAYER, true, null,
+                Instant.now());
 
         when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(response);
         when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
@@ -68,5 +69,32 @@ public class MoiraiUserDetailsServiceTest {
         assertThat(principal.email()).isEqualTo(response.email());
         assertThat(principal.authorizationToken()).isEqualTo("AUTH_TOKEN");
         assertThat(principal.refreshToken()).isEqualTo("REFRESH_TOKEN");
+    }
+
+    @Test
+    public void authenticateUser_whenUserIsDeactivated_thenThrowAuthenticationFailed() {
+
+        // Given
+        var token = "AUTH_TOKEN / REFRESH_TOKEN";
+        var publicId = UUID.randomUUID();
+
+        var response = new DiscordUserDataResponse(
+                "12345",
+                "john.doe",
+                null,
+                null,
+                "email@email.com",
+                null,
+                null);
+
+        var userData = new UserData(publicId, 1L, "12345", "john.doe", Role.PLAYER, false, null,
+                Instant.now());
+
+        when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(response);
+        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
+
+        // Then
+        assertThatThrownBy(() -> service.loadUserByUsername(token))
+                .isInstanceOf(AuthenticationFailedException.class);
     }
 }

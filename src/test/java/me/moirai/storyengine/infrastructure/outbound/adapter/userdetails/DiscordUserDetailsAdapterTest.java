@@ -1,6 +1,10 @@
 package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +18,8 @@ import me.moirai.storyengine.infrastructure.outbound.adapter.discord.DiscordUser
 
 public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
 
+    private static final String BOT_TOKEN = "botToken";
+
     private DiscordUserDetailsAdapter adapter;
 
     @BeforeEach
@@ -23,7 +29,7 @@ public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
                 .baseUrl("http://localhost:" + PORT)
                 .build();
 
-        adapter = new DiscordUserDetailsAdapter("/users/%s", restClient);
+        adapter = new DiscordUserDetailsAdapter("/users/%s", BOT_TOKEN, restClient);
     }
 
     @Test
@@ -31,16 +37,32 @@ public class DiscordUserDetailsAdapterTest extends AbstractWebMockTest {
 
         // Given
         var userId = "USRID";
-        var token = "TOKEN";
-        var response = new DiscordUserDataResponse(userId, "username", "displayName", null, null, "email@email.com", null, null);
+        var response = new DiscordUserDataResponse(userId, "username", null, null, "email@email.com", null, null);
 
         prepareWebserverFor(response, 200);
 
         // When
-        var result = adapter.getUserById(userId, token);
+        var result = adapter.getUserById(userId);
 
         // Then
         assertThat(result).isNotNull().isNotEmpty();
         assertThat(result.get().id()).isEqualTo(userId);
+    }
+
+    @Test
+    void getUserById_whenCalled_thenAuthenticatesAsTheBot() throws JsonProcessingException {
+
+        // Given
+        var userId = "USRID";
+        var response = new DiscordUserDataResponse(userId, "username", null, null, "email@email.com", null, null);
+
+        prepareWebserverFor(response, 200);
+
+        // When
+        adapter.getUserById(userId);
+
+        // Then
+        wireMockServer.verify(getRequestedFor(urlEqualTo("/users/" + userId))
+                .withHeader(AUTHORIZATION, equalTo("Bot " + BOT_TOKEN)));
     }
 }

@@ -1,7 +1,5 @@
 package me.moirai.storyengine.core.application.query.user;
 
-import java.util.Optional;
-
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
@@ -34,17 +32,16 @@ public class GetAuthenticatedUserDetailsHandler extends AbstractQueryHandler<Get
         var moiraiUserDetails = userReader.getUserByDiscordId(discordUserDetails.id())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
-        var nickname = Optional.ofNullable(discordUserDetails.globalNickname())
-                .orElse(discordUserDetails.username());
-
         return new UserDetailsResult(
                 moiraiUserDetails.publicId(),
                 moiraiUserDetails.id(),
                 moiraiUserDetails.discordId(),
                 discordUserDetails.username(),
-                nickname,
+                moiraiUserDetails.username(),
                 discordUserDetails.avatarUrl(),
                 moiraiUserDetails.role(),
+                moiraiUserDetails.isActive(),
+                moiraiUserDetails.bio(),
                 moiraiUserDetails.creationDate());
     }
 }

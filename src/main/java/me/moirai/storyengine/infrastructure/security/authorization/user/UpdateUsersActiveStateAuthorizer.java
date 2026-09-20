@@ -7,19 +7,15 @@ import me.moirai.storyengine.common.security.authorization.AuthorizationOperatio
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
 
 @Component
-public class ManageUserAuthorizer implements OperationAuthorizer {
+public class UpdateUsersActiveStateAuthorizer implements OperationAuthorizer {
 
     @Override
     public AuthorizationOperation getOperation() {
-        return AuthorizationOperation.MANAGE_USER;
+        return AuthorizationOperation.UPDATE_USERS_ACTIVE_STATE;
     }
 
     @Override
     public boolean authorize(AuthorizationContext context) {
-
-        var userId = context.getFieldAsUuid("userId");
-        var principal = context.getPrincipal();
-
-        return principal.publicId().equals(userId) || principal.isAdmin();
+        return context.getPrincipal().isAdmin();
     }
 }

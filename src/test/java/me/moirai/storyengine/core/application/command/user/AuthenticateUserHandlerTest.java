@@ -69,7 +69,6 @@ public class AuthenticateUserHandlerTest {
         var discordUserData = new DiscordUserDataResponse(
                 user.getDiscordId(),
                 "someUsername",
-                "someNickname",
                 null,
                 null,
                 "some@email.com",
@@ -110,7 +109,6 @@ public class AuthenticateUserHandlerTest {
         var discordUserData = new DiscordUserDataResponse(
                 user.getDiscordId(),
                 "someUsername",
-                "someNickname",
                 null,
                 null,
                 "some@email.com",

@@ -21,5 +21,7 @@ public interface UserJpaRepository
 
         List<User> findAllByUsernameIn(Collection<String> usernames);
 
+        List<User> findAllByPublicIdIn(Collection<UUID> publicIds);
+
         void deleteByDiscordId(String discordId);
 }
