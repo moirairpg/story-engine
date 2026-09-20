@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,14 +27,19 @@ import me.moirai.storyengine.common.enums.SortDirection;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUsers;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUsersResult;
 import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
 import me.moirai.storyengine.core.port.inbound.userdetails.SearchUsers;
 import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUser;
+import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUsersActiveState;
 import me.moirai.storyengine.core.port.inbound.userdetails.UpdateUserUsername;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserSortField;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserSummary;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.DeleteUsersRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUserRequest;
+import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUsersActiveStateRequest;
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UpdateUserUsernameRequest;
 
 @RestController
@@ -118,6 +124,25 @@ public class UserDetailsRestController extends SecurityContextAware {
                 request.isActive(),
                 request.bio(),
                 authenticatedUserId()));
+    }
+
+    @PatchMapping("/active-status")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.UPDATE_USERS_ACTIVE_STATE)
+    public void updateUsersActiveState(@Valid @RequestBody UpdateUsersActiveStateRequest request) {
+
+        commandRunner.run(new UpdateUsersActiveState(
+                request.userIds(),
+                request.isActive(),
+                authenticatedUserId()));
+    }
+
+    @PostMapping("/deletion")
+    @ResponseStatus(code = HttpStatus.OK)
+    @Authorize(operation = AuthorizationOperation.DELETE_USERS)
+    public DeleteUsersResult deleteUsers(@Valid @RequestBody DeleteUsersRequest request) {
+
+        return commandRunner.run(new DeleteUsers(request.userIds(), authenticatedUserId()));
     }
 
 }

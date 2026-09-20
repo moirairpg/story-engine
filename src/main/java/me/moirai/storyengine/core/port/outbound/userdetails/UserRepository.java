@@ -21,6 +21,8 @@ public interface UserRepository {
 
     List<User> findAllByUsernameIn(Collection<String> usernames);
 
+    List<User> findAllByPublicIdIn(Collection<UUID> publicIds);
+
     User save(User user);
 
     void delete(User user);

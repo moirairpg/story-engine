@@ -45,6 +45,11 @@ public class UserDomainRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> findAllByPublicIdIn(Collection<UUID> publicIds) {
+        return jpaRepository.findAllByPublicIdIn(publicIds);
+    }
+
+    @Override
     public User save(User user) {
         return jpaRepository.save(user);
     }
