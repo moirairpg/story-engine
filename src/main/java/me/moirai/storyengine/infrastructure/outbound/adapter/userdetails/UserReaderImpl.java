@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import me.moirai.storyengine.common.dbutil.Filter;
+import me.moirai.storyengine.common.dbutil.QueryBuilder;
 import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
@@ -15,24 +17,16 @@ import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 public class UserReaderImpl implements UserReader {
 
     //@formatter:off
-    private static final String SELECT_BY_DISCORD_ID = """
+    private static final String SELECT_USER = """
             SELECT u.public_id,
                    u.id,
                    u.discord_id,
+                   u.username,
                    u.role,
+                   u.is_active,
+                   u.bio,
                    u.creation_date
               FROM moirai_user u
-             WHERE u.discord_id = :discordId
-            """;
-
-    private static final String SELECT_BY_PUBLIC_ID = """
-            SELECT u.public_id,
-                   u.id,
-                   u.discord_id,
-                   u.role,
-                   u.creation_date
-              FROM moirai_user u
-             WHERE u.public_id = :publicId
             """;
     //@formatter:on
 
@@ -44,16 +38,26 @@ public class UserReaderImpl implements UserReader {
 
     @Override
     public Optional<UserData> getUserByDiscordId(String discordId) {
-        return jdbcClient.sql(SELECT_BY_DISCORD_ID)
-                .param("discordId", discordId)
+
+        var query = QueryBuilder.select(SELECT_USER)
+                .filter(new Filter("u.discord_id = :discordId", "discordId", discordId))
+                .build();
+
+        return jdbcClient.sql(query.sql())
+                .params(query.parameters())
                 .query(toUserData())
                 .optional();
     }
 
     @Override
     public Optional<UserData> getUserById(UUID id) {
-        return jdbcClient.sql(SELECT_BY_PUBLIC_ID)
-                .param("publicId", id)
+
+        var query = QueryBuilder.select(SELECT_USER)
+                .filter(new Filter("u.public_id = :publicId", "publicId", id))
+                .build();
+
+        return jdbcClient.sql(query.sql())
+                .params(query.parameters())
                 .query(toUserData())
                 .optional();
     }
@@ -63,7 +67,10 @@ public class UserReaderImpl implements UserReader {
                 UUID.fromString(rs.getString("public_id")),
                 rs.getLong("id"),
                 rs.getString("discord_id"),
+                rs.getString("username"),
                 Role.valueOf(rs.getString("role")),
+                rs.getBoolean("is_active"),
+                rs.getString("bio"),
                 rs.getTimestamp("creation_date").toInstant());
     }
 }

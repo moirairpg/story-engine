@@ -17,6 +17,7 @@
     },
     {
       "name": "discord-users-me",
+      "priority": 1,
       "request": {
         "method": "GET",
         "urlPath": "/users/@me"
@@ -31,6 +32,27 @@
       }
     },
     {
+      "name": "discord-users-by-id",
+      "priority": 5,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/users/[^/]+",
+        "headers": {
+          "Authorization": {
+            "matches": "Bot .+"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"id\":\"560204799925288962\",\"avatar\":\"d2a62c3ce9abbd98fe29469d540fda51\",\"username\":\"{{request.pathSegments.[1]}}\",\"email\":\"{{request.pathSegments.[1]}}@dev.local\"}",
+        "transformers": ["response-template"]
+      }
+    },
+    {
       "name": "discord-token-revoke",
       "request": {
         "method": "POST",
@@ -38,6 +60,21 @@
       },
       "response": {
         "status": 200
+      }
+    },
+    {
+      "name": "discord-unmatched",
+      "priority": 10,
+      "request": {
+        "urlPattern": ".*"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"error\":{\"message\":\"No stub matched {{request.method}} {{request.url}}\",\"type\":\"stub_not_matched\",\"code\":\"404\"}}",
+        "transformers": ["response-template"]
       }
     }
   ]

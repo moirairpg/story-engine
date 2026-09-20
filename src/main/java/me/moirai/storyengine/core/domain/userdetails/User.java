@@ -18,10 +18,16 @@ import jakarta.persistence.Transient;
 import me.moirai.storyengine.common.domain.Asset;
 import me.moirai.storyengine.common.domain.DomainEvent;
 import me.moirai.storyengine.common.enums.Role;
+import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 
 @Entity
 @Table(name = "moirai_user")
 public class User extends Asset {
+
+    private static final int MAX_BIO_LENGTH = 2000;
+    private static final String BIO_TOO_LONG = "Bio cannot be longer than 2000 characters";
+    private static final String CANNOT_CHANGE_OWN_ROLE = "A user cannot change their own role";
+    private static final String CANNOT_CHANGE_OWN_ACTIVE_STATE = "A user cannot change their own active state";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +46,12 @@ public class User extends Asset {
     @Column(name = "role")
     private Role role;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
+    @Column(name = "bio")
+    private String bio;
+
     @Transient
     private List<DomainEvent> domainEvents = new ArrayList<>();
 
@@ -51,6 +63,7 @@ public class User extends Asset {
         this.discordId = builder.discordId;
         this.username = builder.username;
         this.role = builder.role;
+        this.isActive = true;
     }
 
     protected User() {
@@ -94,12 +107,43 @@ public class User extends Asset {
         return role;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
     public void updateUsername(String username) {
         this.username = username;
     }
 
-    public void updateRole(Role role) {
+    public void updateRole(Role role, UUID requesterId) {
+
+        if (role != this.role && publicId.equals(requesterId)) {
+            throw new BusinessRuleViolationException(CANNOT_CHANGE_OWN_ROLE);
+        }
+
         this.role = role;
+    }
+
+    public void updateActiveState(boolean isActive, UUID requesterId) {
+
+        if (isActive != this.isActive && publicId.equals(requesterId)) {
+            throw new BusinessRuleViolationException(CANNOT_CHANGE_OWN_ACTIVE_STATE);
+        }
+
+        this.isActive = isActive;
+    }
+
+    public void updateBio(String bio) {
+
+        if (bio != null && bio.length() > MAX_BIO_LENGTH) {
+            throw new BusinessRuleViolationException(BIO_TOO_LONG);
+        }
+
+        this.bio = bio;
     }
 
     public static final class Builder {

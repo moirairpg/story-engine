@@ -18,6 +18,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
 
@@ -64,11 +65,17 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
 
         var tokenCluster = String.format("%s / %s", sessionCookieValue, refreshCookieValue);
-        var userDetails = userDetailsService.loadUserByUsername(tokenCluster);
-        var user = (MoiraiPrincipal) userDetails;
-        var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            var userDetails = userDetailsService.loadUserByUsername(tokenCluster);
+            var user = (MoiraiPrincipal) userDetails;
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (AuthenticationFailedException e) {
+            response.setStatus(HTTP_UNAUTHORIZED);
+            return;
+        }
 
         filterChain.doFilter(request, response);
     }

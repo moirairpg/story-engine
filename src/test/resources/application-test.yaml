@@ -24,6 +24,8 @@ moirai:
       client-id: dummy_value
       client-secret: dummy_value
       redirect-url: http://dummy_value
+    api:
+      bot-token: dummy_value
     api-base-url: https://discord.com/api
     api-token: dummy_value
   storage:

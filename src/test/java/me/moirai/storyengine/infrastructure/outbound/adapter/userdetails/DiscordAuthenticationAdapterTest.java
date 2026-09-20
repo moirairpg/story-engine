@@ -110,7 +110,6 @@ public class DiscordAuthenticationAdapterTest extends AbstractWebMockTest {
         var response = new DiscordUserDataResponse(
                 null,
                 "username",
-                "displayName",
                 null,
                 null,
                 "email@email.com",

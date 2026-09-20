@@ -44,8 +44,9 @@ public class GetAuthenticatedUserDetailsHandlerTest {
 
         // given
         var query = new GetAuthenticatedUserDetails(DISCORD_TOKEN);
-        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john.doe", "John Doe", "avatar123", null, "john@example.com", null, null);
-        var userData = new UserData(PUBLIC_ID, NUMERIC_ID, DISCORD_ID, Role.PLAYER, Instant.now());
+        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john.doe", "avatar123", null, "john@example.com", null, null);
+        var userData = new UserData(PUBLIC_ID, NUMERIC_ID, DISCORD_ID, "john.doe", Role.PLAYER, true,
+                "A wandering bard.", Instant.now());
 
         when(discordAuthenticationPort.getLoggedUser(DISCORD_TOKEN)).thenReturn(discordResponse);
         when(userReader.getUserByDiscordId(DISCORD_ID)).thenReturn(Optional.of(userData));
@@ -58,28 +59,10 @@ public class GetAuthenticatedUserDetailsHandlerTest {
         assertThat(result.publicId()).isEqualTo(PUBLIC_ID);
         assertThat(result.id()).isEqualTo(NUMERIC_ID);
         assertThat(result.discordId()).isEqualTo(DISCORD_ID);
+        assertThat(result.discordUsername()).isEqualTo("john.doe");
         assertThat(result.username()).isEqualTo("john.doe");
-        assertThat(result.nickname()).isEqualTo("John Doe");
         assertThat(result.role()).isEqualTo(Role.PLAYER);
-    }
-
-    @Test
-    public void shouldFallbackToUsernameWhenGlobalNicknameIsNull() {
-
-        // given
-        var query = new GetAuthenticatedUserDetails(DISCORD_TOKEN);
-        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john.doe", null, "avatar123", null, "john@example.com", null, null);
-        var userData = new UserData(PUBLIC_ID, NUMERIC_ID, DISCORD_ID, Role.PLAYER, Instant.now());
-
-        when(discordAuthenticationPort.getLoggedUser(DISCORD_TOKEN)).thenReturn(discordResponse);
-        when(userReader.getUserByDiscordId(DISCORD_ID)).thenReturn(Optional.of(userData));
-
-        // when
-        var result = handler.handle(query);
-
-        // then
-        assertThat(result).isNotNull();
-        assertThat(result.nickname()).isEqualTo("john.doe");
+        assertThat(result.bio()).isEqualTo("A wandering bard.");
     }
 
     @Test
@@ -87,7 +70,7 @@ public class GetAuthenticatedUserDetailsHandlerTest {
 
         // given
         var query = new GetAuthenticatedUserDetails(DISCORD_TOKEN);
-        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john.doe", "John Doe", "avatar123", null, "john@example.com", null, null);
+        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john.doe", "avatar123", null, "john@example.com", null, null);
 
         when(discordAuthenticationPort.getLoggedUser(DISCORD_TOKEN)).thenReturn(discordResponse);
         when(userReader.getUserByDiscordId(DISCORD_ID)).thenReturn(Optional.empty());

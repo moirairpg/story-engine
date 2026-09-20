@@ -9,7 +9,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.response.DiscordErrorRe
 public record DiscordUserDataResponse(
         @JsonProperty("id") String id,
         @JsonProperty("username") String username,
-        @JsonProperty("global_name") String globalNickname,
         @JsonProperty("avatar") String avatar,
         @JsonProperty("avatar_id") String avatarId,
         @JsonProperty("email") String email,

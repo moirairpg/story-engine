@@ -17,6 +17,7 @@ moirai:
       redirect-url: ${DISCORD_BOT_REDIRECT_URL}
     api:
       base-url: ${DISCORD_API_BASE_URL:https://discord.com/api}
+      bot-token: ${DISCORD_BOT_TOKEN}
       token-uri: /oauth2/token
       token-revoke-uri: /oauth2/token/revoke
       users-uri: /users/%s
