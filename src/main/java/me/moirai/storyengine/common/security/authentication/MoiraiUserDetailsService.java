@@ -5,24 +5,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
-import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetAuthenticatedUserDetails;
 
 @Service
 public class MoiraiUserDetailsService implements UserDetailsService {
 
-    private final DiscordAuthenticationPort discordAuthenticationPort;
-    private final UserReader userReader;
+    private static final String DEACTIVATED_USER = "Deactivated user requested authentication";
+    private static final String INVALID_USER = "Invalid user requested authentication";
 
-    public MoiraiUserDetailsService(
-            DiscordAuthenticationPort discordAuthenticationPort,
-            UserReader userReader) {
+    private final QueryRunner queryRunner;
 
-        this.discordAuthenticationPort = discordAuthenticationPort;
-        this.userReader = userReader;
+    public MoiraiUserDetailsService(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
     }
 
     @Override
@@ -30,36 +27,29 @@ public class MoiraiUserDetailsService implements UserDetailsService {
 
         var authorizationToken = tokenCluster.split(" / ")[0];
         var refreshToken = tokenCluster.split(" / ")[1];
-        var loggedUser = discordAuthenticationPort.getLoggedUser(authorizationToken);
 
-        return getUserDetails(loggedUser, authorizationToken, refreshToken);
+        return getUserDetails(authorizationToken, refreshToken);
     }
 
-    private MoiraiPrincipal getUserDetails(
-            DiscordUserDataResponse discordUser,
-            String authorizationToken,
-            String refreshToken) {
+    private MoiraiPrincipal getUserDetails(String authorizationToken, String refreshToken) {
 
         try {
-            var moiraiUser = userReader.getUserByDiscordId(discordUser.id())
-                    .orElseThrow(() -> new NotFoundException("User not found"));
+            var user = queryRunner.run(new GetAuthenticatedUserDetails(authorizationToken));
 
-            if (!moiraiUser.isActive()) {
-                throw new AuthenticationFailedException("Deactivated user requested authentication");
+            if (!user.isActive()) {
+                throw new AuthenticationFailedException(DEACTIVATED_USER);
             }
 
             return new MoiraiPrincipal(
-                    moiraiUser.publicId(),
-                    moiraiUser.id(),
-                    moiraiUser.discordId(),
-                    discordUser.username(),
-                    discordUser.email(),
+                    user.publicId(),
+                    user.id(),
+                    user.username(),
                     authorizationToken,
                     refreshToken,
-                    moiraiUser.role(),
+                    user.role(),
                     null);
         } catch (NotFoundException e) {
-            throw new AuthenticationFailedException("Invalid user requested authentication", e);
+            throw new AuthenticationFailedException(INVALID_USER, e);
         }
     }
 }

@@ -37,6 +37,7 @@ public class PlayerCharacterSearchReaderImplIntegrationTest extends AbstractData
         // given
         var user = insert(UserFixture.player()
                 .username("joao.das.couves")
+                .displayName("João das Couves")
                 .discordId(String.valueOf(123L))
                 .build(), User.class);
 
@@ -57,6 +58,7 @@ public class PlayerCharacterSearchReaderImplIntegrationTest extends AbstractData
         assertThat(result.data()).hasSize(10);
         assertThat(result.data().get(0).id()).isNotNull();
         assertThat(result.data().get(0).ownerUsername()).isEqualTo("joao.das.couves");
+        assertThat(result.data().get(0).ownerDisplayName()).isEqualTo("João das Couves");
         assertThat(result.data().get(0).name()).isEqualTo("Conan the Barbarian");
         assertThat(result.data().get(0).characterClass()).isEqualTo(CharacterClass.BARBARIAN);
     }
@@ -380,6 +382,7 @@ public class PlayerCharacterSearchReaderImplIntegrationTest extends AbstractData
         // given
         var user = insert(UserFixture.player()
                 .username("joao.das.couves")
+                .displayName("João das Couves")
                 .discordId(String.valueOf(123L))
                 .build(), User.class);
 
@@ -392,6 +395,7 @@ public class PlayerCharacterSearchReaderImplIntegrationTest extends AbstractData
         // then
         assertThat(result).hasSize(2);
         assertThat(result.get(0).ownerUsername()).isEqualTo("joao.das.couves");
+        assertThat(result.get(0).ownerDisplayName()).isEqualTo("João das Couves");
     }
 
     @Test

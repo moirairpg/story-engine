@@ -1,22 +1,15 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.request;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import me.moirai.storyengine.infrastructure.inbound.rest.validation.Moderated;
 
-public class CreateUserRequest {
+public record CreateUserRequest(
+        @Moderated
+        @NotEmpty(message = "cannot be empty")
+        @Size(min = 2, max = 32, message = "must be between 2 and 32 characters") String username,
 
-    @NotEmpty(message = "cannot be empty")
-    @NotNull(message = "cannot be null")
-    private String discordId;
-
-    public CreateUserRequest() {
-    }
-
-    public String getDiscordId() {
-        return discordId;
-    }
-
-    public void setDiscordId(String discordId) {
-        this.discordId = discordId;
-    }
+        @Moderated
+        @NotEmpty(message = "cannot be empty")
+        @Size(min = 2, max = 32, message = "must be between 2 and 32 characters") String displayName) {
 }

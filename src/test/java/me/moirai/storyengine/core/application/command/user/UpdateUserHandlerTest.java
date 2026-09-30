@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +26,9 @@ import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 @ExtendWith(MockitoExtension.class)
 public class UpdateUserHandlerTest {
 
-    private static final UUID REQUESTER_ID = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
+    private static final String USERNAME = "john.doe";
+    private static final String DISPLAY_NAME = "John Doe";
+    private static final String REQUESTER_USERNAME = "requesting.admin";
 
     @Mock
     private UserRepository repository;
@@ -36,35 +37,12 @@ public class UpdateUserHandlerTest {
     private UpdateUserHandler handler;
 
     @Test
-    public void shouldThrowExceptionWhenUserIdIsNull() {
-
-        // given
-        var command = new UpdateUser(null, Role.ADMIN, true, null, REQUESTER_ID);
-
-        // then
-        assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenRoleIsNull() {
-
-        // given
-        var command = new UpdateUser(UUID.randomUUID(), null, true, null, REQUESTER_ID);
-
-        // then
-        assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     public void shouldThrowExceptionWhenUserIsNotFound() {
 
         // given
-        var userId = UUID.randomUUID();
-        var command = new UpdateUser(userId, Role.ADMIN, true, null, REQUESTER_ID);
+        var command = new UpdateUser("ghost", Role.ADMIN, true, null, DISPLAY_NAME, REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(userId)).thenReturn(Optional.empty());
+        when(repository.findByUsername("ghost")).thenReturn(Optional.empty());
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
@@ -75,11 +53,11 @@ public class UpdateUserHandlerTest {
     public void shouldApplyEveryFieldWhenTheAccountIsUpdated() {
 
         // given
-        var userId = UUID.randomUUID();
         var user = UserFixture.playerWithId();
-        var command = new UpdateUser(userId, Role.ADMIN, false, "A wandering bard.", REQUESTER_ID);
+        var command = new UpdateUser(USERNAME, Role.ADMIN, false, "A wandering bard.", "Merlin the Grey",
+                REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(userId)).thenReturn(Optional.of(user));
+        when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
 
         // when
         handler.handle(command);
@@ -90,19 +68,19 @@ public class UpdateUserHandlerTest {
         assertThat(user.getRole()).isEqualTo(Role.ADMIN);
         assertThat(user.isActive()).isFalse();
         assertThat(user.getBio()).isEqualTo("A wandering bard.");
+        assertThat(user.getDisplayName()).isEqualTo("Merlin the Grey");
     }
 
     @Test
     public void shouldReactivateTheAccountWhenActiveStateIsTrue() {
 
         // given
-        var userId = UUID.randomUUID();
         var user = UserFixture.playerWithId();
-        user.updateActiveState(false, REQUESTER_ID);
+        user.updateActiveState(false, REQUESTER_USERNAME);
 
-        var command = new UpdateUser(userId, Role.PLAYER, true, null, REQUESTER_ID);
+        var command = new UpdateUser(USERNAME, Role.PLAYER, true, null, DISPLAY_NAME, REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(userId)).thenReturn(Optional.of(user));
+        when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
 
         // when
         handler.handle(command);
@@ -115,13 +93,12 @@ public class UpdateUserHandlerTest {
     public void shouldClearTheBioWhenTheSubmittedBioIsNull() {
 
         // given
-        var userId = UUID.randomUUID();
         var user = UserFixture.playerWithId();
         user.updateBio("A wandering bard.");
 
-        var command = new UpdateUser(userId, Role.PLAYER, true, null, REQUESTER_ID);
+        var command = new UpdateUser(USERNAME, Role.PLAYER, true, null, DISPLAY_NAME, REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(userId)).thenReturn(Optional.of(user));
+        when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
 
         // when
         handler.handle(command);
@@ -135,9 +112,9 @@ public class UpdateUserHandlerTest {
 
         // given
         var user = UserFixture.playerWithId();
-        var command = new UpdateUser(user.getPublicId(), Role.ADMIN, true, null, user.getPublicId());
+        var command = new UpdateUser(user.getUsername(), Role.ADMIN, true, null, DISPLAY_NAME, user.getUsername());
 
-        when(repository.findByPublicId(user.getPublicId())).thenReturn(Optional.of(user));
+        when(repository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
@@ -151,9 +128,9 @@ public class UpdateUserHandlerTest {
 
         // given
         var user = UserFixture.playerWithId();
-        var command = new UpdateUser(user.getPublicId(), Role.PLAYER, false, null, user.getPublicId());
+        var command = new UpdateUser(user.getUsername(), Role.PLAYER, false, null, DISPLAY_NAME, user.getUsername());
 
-        when(repository.findByPublicId(user.getPublicId())).thenReturn(Optional.of(user));
+        when(repository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
@@ -167,10 +144,10 @@ public class UpdateUserHandlerTest {
 
         // given
         var user = UserFixture.playerWithId();
-        var command = new UpdateUser(user.getPublicId(), user.getRole(), user.isActive(),
-                "A wandering bard.", user.getPublicId());
+        var command = new UpdateUser(user.getUsername(), user.getRole(), user.isActive(),
+                "A wandering bard.", user.getDisplayName(), user.getUsername());
 
-        when(repository.findByPublicId(user.getPublicId())).thenReturn(Optional.of(user));
+        when(repository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
         // when
         handler.handle(command);
@@ -185,10 +162,9 @@ public class UpdateUserHandlerTest {
     public void shouldNotSaveWhenTheBioIsRejected() {
 
         // given
-        var userId = UUID.randomUUID();
-        var command = new UpdateUser(userId, Role.PLAYER, true, "a".repeat(2001), REQUESTER_ID);
+        var command = new UpdateUser(USERNAME, Role.PLAYER, true, "a".repeat(2001), DISPLAY_NAME, REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(userId)).thenReturn(Optional.of(UserFixture.playerWithId()));
+        when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(UserFixture.playerWithId()));
 
         // then
         assertThatThrownBy(() -> handler.handle(command))

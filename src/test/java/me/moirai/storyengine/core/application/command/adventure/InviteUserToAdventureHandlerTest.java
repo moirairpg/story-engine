@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
@@ -93,14 +92,42 @@ public class InviteUserToAdventureHandlerTest {
     }
 
     @Test
-    public void shouldThrowWhenNoUsernamesAreProvided() {
+    public void shouldInviteInDatabaseCasingAndNotReportNotFoundWhenNameIsTypedInAnotherCase() {
 
         // given
-        var command = new InviteUserToAdventure(AdventureFixture.PUBLIC_ID, List.of(), AdventureFixture.OWNER_ID);
+        var adventure = AdventureFixture.privateAdventureWithId();
+        var command = new InviteUserToAdventure(
+                adventure.getPublicId(), List.of("mERLIN"), AdventureFixture.OWNER_ID);
+
+        when(adventureRepository.findByPublicId(any())).thenReturn(java.util.Optional.of(adventure));
+        when(userRepository.findAllByUsernameIn(anyList()))
+                .thenReturn(List.of(userWith(10L, "Merlin")));
+
+        // when
+        var result = handler.execute(command);
 
         // then
-        assertThatThrownBy(() -> handler.validate(command))
-                .isInstanceOf(BusinessRuleViolationException.class);
+        assertThat(result.invited()).containsExactly("Merlin");
+        assertThat(result.notFound()).isEmpty();
+    }
+
+    @Test
+    public void shouldReportUnknownNameAsTypedWhenItMatchesNoAccount() {
+
+        // given
+        var adventure = AdventureFixture.privateAdventureWithId();
+        var command = new InviteUserToAdventure(
+                adventure.getPublicId(), List.of("alice", "Ghost.Player"), AdventureFixture.OWNER_ID);
+
+        when(adventureRepository.findByPublicId(any())).thenReturn(java.util.Optional.of(adventure));
+        when(userRepository.findAllByUsernameIn(anyList()))
+                .thenReturn(List.of(userWith(10L, "alice")));
+
+        // when
+        var result = handler.execute(command);
+
+        // then
+        assertThat(result.notFound()).containsExactly("Ghost.Player");
     }
 
     @Test

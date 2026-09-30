@@ -48,7 +48,8 @@ public class RefreshSessionTokenHandlerTest {
                 1234L,
                 "token",
                 "type",
-                "scope");
+                "scope",
+                false);
 
         when(discordAuthenticationPort.refreshSessionToken(any())).thenReturn(authResponse);
 

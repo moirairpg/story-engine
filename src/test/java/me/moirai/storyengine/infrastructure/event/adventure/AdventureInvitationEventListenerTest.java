@@ -1,5 +1,6 @@
 package me.moirai.storyengine.infrastructure.event.adventure;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -52,7 +54,7 @@ public class AdventureInvitationEventListenerTest {
         // given
         var invitationId = UUID.randomUUID();
         var row = new PendingInvitationRow(
-                invitationId, UUID.randomUUID(), "Dragon Hunt", "alice", "bob", Instant.now());
+                invitationId, UUID.randomUUID(), "Dragon Hunt", "Alice Liddell", "bob", Instant.now());
 
         when(invitationReader.getPendingByPublicId(any())).thenReturn(Optional.of(row));
 
@@ -62,6 +64,28 @@ public class AdventureInvitationEventListenerTest {
         // then
         verify(messagingTemplate).convertAndSendToUser(
                 eq("bob"), eq("/queue/notifications/system"), any(NotificationDetails.class));
+    }
+
+    @Test
+    public void shouldNameTheInviterByDisplayNameAndCarryNoNameInTheMetadataWhenPending() {
+
+        // given
+        var invitationId = UUID.randomUUID();
+        var row = new PendingInvitationRow(
+                invitationId, UUID.randomUUID(), "Dragon Hunt", "Alice Liddell", "bob", Instant.now());
+        var captor = ArgumentCaptor.forClass(NotificationDetails.class);
+
+        when(invitationReader.getPendingByPublicId(any())).thenReturn(Optional.of(row));
+
+        // when
+        listener.onUserInvitedToAdventure(eventFor(invitationId));
+
+        // then
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("bob"), eq("/queue/notifications/system"), captor.capture());
+
+        assertThat(captor.getValue().message()).isEqualTo("Alice Liddell invited you to join Dragon Hunt");
+        assertThat(captor.getValue().metadata()).containsOnlyKeys("kind", "adventureName");
     }
 
     @Test

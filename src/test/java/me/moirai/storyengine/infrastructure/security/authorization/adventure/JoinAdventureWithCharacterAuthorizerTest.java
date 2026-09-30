@@ -125,7 +125,7 @@ public class JoinAdventureWithCharacterAuthorizerTest {
 
     private MoiraiPrincipal principal(String username) {
         return new MoiraiPrincipal(
-                UUID.randomUUID(), 1L, "discordId", username, "caller@test.com", "token", "refresh", Role.PLAYER, null);
+                UUID.randomUUID(), 1L, username, "token", "refresh", Role.PLAYER, null);
     }
 
     private AuthorizationContext contextWith(MoiraiPrincipal principal) {

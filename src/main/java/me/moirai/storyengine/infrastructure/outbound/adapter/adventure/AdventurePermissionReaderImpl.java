@@ -16,14 +16,16 @@ public class AdventurePermissionReaderImpl implements AdventurePermissionReader 
 
     //@formatter:off
     private static final String SELECT_MEMBERS_BY_ADVENTURE = """
-            SELECT u.public_id   AS user_id,
-                   u.username    AS username,
-                   ap.permission AS permission
+            SELECT u.public_id    AS user_id,
+                   u.username     AS username,
+                   u.display_name AS display_name,
+                   ap.permission  AS permission
               FROM adventure_permissions ap
                    JOIN adventure a   ON a.id = ap.adventure_id
                    JOIN moirai_user u ON u.id = ap.user_id
              WHERE a.public_id = :adventurePublicId
           ORDER BY CASE WHEN ap.permission = 'OWNER' THEN 0 ELSE 1 END,
+                   u.display_name,
                    u.username
             """;
     //@formatter:on
@@ -48,6 +50,7 @@ public class AdventurePermissionReaderImpl implements AdventurePermissionReader 
         return (rs, _) -> new AssetMember(
                 rs.getObject("user_id", UUID.class),
                 rs.getString("username"),
+                rs.getString("display_name"),
                 PermissionLevel.valueOf(rs.getString("permission")));
     }
 }

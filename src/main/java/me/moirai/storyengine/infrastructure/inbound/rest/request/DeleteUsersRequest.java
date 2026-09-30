@@ -1,7 +1,9 @@
 package me.moirai.storyengine.infrastructure.inbound.rest.request;
 
 import java.util.List;
-import java.util.UUID;
 
-public record DeleteUsersRequest(List<UUID> userIds) {
+import jakarta.validation.constraints.NotEmpty;
+
+public record DeleteUsersRequest(
+        @NotEmpty(message = "cannot be empty") List<String> usernames) {
 }

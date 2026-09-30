@@ -31,8 +31,8 @@ public class StompChannelInterceptorTest {
     void shouldAcceptConnectFrameWhenPrincipalPresent() {
 
         // given
-        var principal = new MoiraiPrincipal(UUID.randomUUID(), 1L, "discordId", "user",
-                "user@test.com", "token", "refresh", null, null);
+        var principal = new MoiraiPrincipal(UUID.randomUUID(), 1L, "user",
+                "token", "refresh", null, null);
         var auth = new UsernamePasswordAuthenticationToken(principal, null);
         var accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
         accessor.setUser(auth);
@@ -175,7 +175,7 @@ public class StompChannelInterceptorTest {
     }
 
     private MoiraiPrincipal principal() {
-        return new MoiraiPrincipal(UUID.randomUUID(), 99999L, "discordId",
-                "alice", "alice@test.com", "token", "refresh", null, null);
+        return new MoiraiPrincipal(UUID.randomUUID(), 99999L,
+                "alice", "token", "refresh", null, null);
     }
 }

@@ -7,6 +7,7 @@ import me.moirai.storyengine.common.enums.CharacterClass;
 public record PlayerCharacterSummaryRow(
         UUID id,
         String ownerUsername,
+        String ownerDisplayName,
         String name,
         CharacterClass characterClass,
         String background,

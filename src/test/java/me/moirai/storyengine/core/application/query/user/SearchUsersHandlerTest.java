@@ -33,8 +33,8 @@ public class SearchUsersHandlerTest {
     public void shouldReturnTheReaderResultWhenTheSearchRuns() {
 
         // given
-        var query = new SearchUsers(null, null, null, null, null, null, null, 1, 10);
-        var summary = new UserSummary(UUID.randomUUID(), "john.doe", Role.PLAYER, true, Instant.now());
+        var query = new SearchUsers(null, null, null, null, null, null, null, null, 1, 10);
+        var summary = new UserSummary(UUID.randomUUID(), "john.doe", "John Doe", Role.PLAYER, true, Instant.now());
         var expected = PaginatedResult.of(List.of(summary), 1L, 1, 10);
 
         when(reader.search(query)).thenReturn(expected);
@@ -53,7 +53,7 @@ public class SearchUsersHandlerTest {
         // given
         var registeredFrom = Instant.parse("2026-01-01T00:00:00Z");
         var registeredTo = Instant.parse("2026-09-19T23:59:59Z");
-        var query = new SearchUsers("john", Role.ADMIN, false, registeredFrom, registeredTo, null, null, 2, 5);
+        var query = new SearchUsers("john", "John", Role.ADMIN, false, registeredFrom, registeredTo, null, null, 2, 5);
 
         when(reader.search(query)).thenReturn(PaginatedResult.of(List.of(), 0L, 2, 5));
 
@@ -68,7 +68,7 @@ public class SearchUsersHandlerTest {
     public void shouldReturnAnEmptyPageWhenNoUsersMatch() {
 
         // given
-        var query = new SearchUsers("nobody", null, null, null, null, null, null, 1, 10);
+        var query = new SearchUsers("nobody", null, null, null, null, null, null, null, 1, 10);
 
         when(reader.search(query)).thenReturn(PaginatedResult.of(List.of(), 0L, 1, 10));
 

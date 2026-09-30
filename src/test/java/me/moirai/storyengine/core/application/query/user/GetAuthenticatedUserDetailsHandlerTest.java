@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.port.inbound.userdetails.GetAuthenticatedUserDetails;
-import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,8 +44,8 @@ public class GetAuthenticatedUserDetailsHandlerTest {
 
         // given
         var query = new GetAuthenticatedUserDetails(DISCORD_TOKEN);
-        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john.doe", "avatar123", null, "john@example.com", null, null);
-        var userData = new UserData(PUBLIC_ID, NUMERIC_ID, DISCORD_ID, "john.doe", Role.PLAYER, true,
+        var discordResponse = new DiscordUserDataResponse(DISCORD_ID, "john_discord", "avatar123", null, "john@example.com", null, null);
+        var userData = new UserData(PUBLIC_ID, NUMERIC_ID, DISCORD_ID, "john.doe", "John Doe", Role.PLAYER, true,
                 "A wandering bard.", Instant.now());
 
         when(discordAuthenticationPort.getLoggedUser(DISCORD_TOKEN)).thenReturn(discordResponse);
@@ -58,9 +58,9 @@ public class GetAuthenticatedUserDetailsHandlerTest {
         assertThat(result).isNotNull();
         assertThat(result.publicId()).isEqualTo(PUBLIC_ID);
         assertThat(result.id()).isEqualTo(NUMERIC_ID);
-        assertThat(result.discordId()).isEqualTo(DISCORD_ID);
-        assertThat(result.discordUsername()).isEqualTo("john.doe");
+        assertThat(result.discordUsername()).isEqualTo("john_discord");
         assertThat(result.username()).isEqualTo("john.doe");
+        assertThat(result.displayName()).isEqualTo("John Doe");
         assertThat(result.role()).isEqualTo(Role.PLAYER);
         assertThat(result.bio()).isEqualTo("A wandering bard.");
     }

@@ -27,7 +27,7 @@ MoirAI Story Engine currently supports OpenAI's GPT-5 model family.
 To run MoirAI Story Engine locally, you will need JDK 25, Maven, a PostgreSQL database, and a Qdrant instance. A `docker-compose.yaml.sample` is provided for convenience to spin up the required infrastructure. You will also need a Discord Developer account with an OAuth2 app set up for user authentication.
 
 ### Discord OAuth2 setup
-MoirAI uses Discord exclusively for user authentication. To set it up, create a Discord application in the Discord Developer dashboard and configure an OAuth2 redirect URI. By default, MoirAI Story Engine expects the redirect URI to be `localhost:8080/auth/code` — adjust this if you are running on a different host or port.
+MoirAI uses Discord exclusively for user authentication. To set it up, create a Discord application in the Discord Developer dashboard and configure two OAuth2 redirect URIs, one for signing in and one for signing up. By default, MoirAI Story Engine expects them to be `localhost:8080/auth/signin/code` and `localhost:8080/auth/signup/code` — adjust these if you are running on a different host or port.
 
 ### API keys
 You will need your Discord OAuth2 client ID and secret, as well as your OpenAI API key.
@@ -37,7 +37,8 @@ You will need your Discord OAuth2 client ID and secret, as well as your OpenAI A
 2. Set up the required environment variables:
     - `DISCORD_BOT_CLIENT_ID` — your Discord OAuth2 client ID
     - `DISCORD_BOT_CLIENT_SECRET` — your Discord OAuth2 client secret
-    - `DISCORD_BOT_REDIRECT_URL` — your Discord OAuth2 redirect URI
+    - `DISCORD_BOT_SIGNIN_REDIRECT_URL` — your Discord OAuth2 redirect URI for signing in
+    - `DISCORD_BOT_SIGNUP_REDIRECT_URL` — your Discord OAuth2 redirect URI for signing up
     - `OPENAI_API_TOKEN` — your OpenAI API key
     - `POSTGRES_HOST`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` — your PostgreSQL connection details
     - `QDRANT_HOST`, `QDRANT_PORT` — your Qdrant instance details

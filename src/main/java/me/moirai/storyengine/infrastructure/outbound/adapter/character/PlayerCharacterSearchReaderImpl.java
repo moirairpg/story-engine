@@ -23,7 +23,8 @@ public class PlayerCharacterSearchReaderImpl implements PlayerCharacterSearchRea
 
     private static final String SELECT_SQL = """
             SELECT  pc.public_id,
-                    owner.username AS owner_username,
+                    owner.username     AS owner_username,
+                    owner.display_name AS owner_display_name,
                     pc.name,
                     pc.character_class,
                     pc.background,
@@ -36,7 +37,8 @@ public class PlayerCharacterSearchReaderImpl implements PlayerCharacterSearchRea
 
     private static final String LIST_BY_NAME_SQL = """
             SELECT  pc.public_id,
-                    owner.username AS owner_username,
+                    owner.username     AS owner_username,
+                    owner.display_name AS owner_display_name,
                     pc.name,
                     pc.character_class,
                     pc.background,
@@ -113,6 +115,7 @@ public class PlayerCharacterSearchReaderImpl implements PlayerCharacterSearchRea
         return (rs, _) -> new PlayerCharacterSummaryRow(
                 rs.getObject("public_id", UUID.class),
                 rs.getString("owner_username"),
+                rs.getString("owner_display_name"),
                 rs.getString("name"),
                 Functions.mapOrNull(rs.getString("character_class"), CharacterClass::valueOf),
                 rs.getString("background"),

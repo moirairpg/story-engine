@@ -12,6 +12,7 @@ import me.moirai.storyengine.common.util.Functions;
 public record PlayerCharacterDetailsRow(
         UUID id,
         String ownerUsername,
+        String ownerDisplayName,
         String name,
         CharacterClass characterClass,
         String personality,

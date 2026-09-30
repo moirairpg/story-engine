@@ -99,6 +99,7 @@ public class NotificationBasicDataReaderImplIntegrationTest extends AbstractData
         return User.builder()
                 .discordId("discord-" + username)
                 .username(username)
+                .displayName(username)
                 .role(Role.PLAYER)
                 .build();
     }

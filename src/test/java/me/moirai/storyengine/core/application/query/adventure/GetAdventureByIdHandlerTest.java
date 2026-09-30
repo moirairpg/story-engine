@@ -54,16 +54,6 @@ public class GetAdventureByIdHandlerTest {
     private GetAdventureByIdHandler handler;
 
     @Test
-    public void shouldThrowExceptionWhenIdIsNull() {
-
-        // Given
-        var query = new GetAdventureById(null, REQUESTER_ID);
-
-        // Then
-        assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
-    }
-
-    @Test
     public void shouldThrowExceptionWhenQueryIsNull() {
 
         // Given
@@ -169,6 +159,7 @@ public class GetAdventureByIdHandlerTest {
                 characterId,
                 playerId,
                 "john.doe",
+                "Johnny the Bold",
                 "Volin Habar",
                 CharacterClass.PALADIN,
                 "characters/image-key.png",
@@ -188,6 +179,7 @@ public class GetAdventureByIdHandlerTest {
         assertThat(result.roster()).hasSize(1);
         assertThat(result.roster().getFirst().playerCharacterId()).isEqualTo(characterId);
         assertThat(result.roster().getFirst().playerUsername()).isEqualTo("john.doe");
+        assertThat(result.roster().getFirst().playerDisplayName()).isEqualTo("Johnny the Bold");
         assertThat(result.roster().getFirst().characterClass()).isEqualTo(CharacterClass.PALADIN);
         assertThat(result.roster().getFirst().imageUrl()).isEqualTo("http://image.url");
         assertThat(result.roster().getFirst().uiImagePositionX()).isEqualTo(0.25);

@@ -1,13 +1,16 @@
 package me.moirai.storyengine.core.application.query.user;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.userdetails.SearchUsers;
 import me.moirai.storyengine.core.port.inbound.userdetails.UserSummary;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserSearchReader;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.SEARCH_USERS)
 public class SearchUsersHandler extends AbstractQueryHandler<SearchUsers, PaginatedResult<UserSummary>> {
 
     private final UserSearchReader reader;

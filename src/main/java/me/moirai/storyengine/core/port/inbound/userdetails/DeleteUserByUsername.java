@@ -1,8 +1,6 @@
 package me.moirai.storyengine.core.port.inbound.userdetails;
 
-import java.util.UUID;
-
 import me.moirai.storyengine.common.cqs.command.Command;
 
-public record DeleteUserById(UUID userId) implements Command<Void> {
+public record DeleteUserByUsername(String username) implements Command<Void> {
 }

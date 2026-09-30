@@ -66,7 +66,34 @@ public class WorldPermissionReaderImplIntegrationTest extends AbstractDatabaseIn
     }
 
     @Test
-    public void getAllByWorldPublicId_whenWorldHasSeveralNonOwners_thenOrderThemByUsername() {
+    public void getAllByWorldPublicId_whenWorldHasSeveralNonOwners_thenOrderThemByDisplayName() {
+
+        // Given
+        var owner = insert(UserFixture.player().username("owner").displayName("Owner")
+                .discordId("world-display-owner").build(), User.class);
+        var zoe = insert(UserFixture.player().username("zoe").displayName("Abigail")
+                .discordId("world-display-zoe").build(), User.class);
+        var adam = insert(UserFixture.player().username("adam").displayName("Zachary")
+                .discordId("world-display-adam").build(), User.class);
+
+        var world = WorldFixture.privateWorld()
+                .permissions(new Permission(owner.getId(), PermissionLevel.OWNER))
+                .permissions(new Permission(zoe.getId(), PermissionLevel.READ))
+                .permissions(new Permission(adam.getId(), PermissionLevel.WRITE))
+                .build();
+
+        insert(world, World.class);
+
+        // When
+        var result = reader.getAllByWorldPublicId(world.getPublicId());
+
+        // Then
+        assertThat(result).extracting(AssetMember::username).containsExactly("owner", "zoe", "adam");
+        assertThat(result).extracting(AssetMember::displayName).containsExactly("Owner", "Abigail", "Zachary");
+    }
+
+    @Test
+    public void getAllByWorldPublicId_whenNonOwnersShareADisplayName_thenOrderThemByUsername() {
 
         // Given
         var owner = insert(UserFixture.player().username("owner").discordId("world-order-owner").build(), User.class);

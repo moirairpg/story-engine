@@ -100,7 +100,8 @@ public class DiscordAuthenticationAdapter implements DiscordAuthenticationPort {
                 response.expiresIn(),
                 response.refreshToken(),
                 response.scope(),
-                response.tokenType());
+                response.tokenType(),
+                false);
     }
 
     private ResponseSpec postForAuthentication(String url, Object request) {

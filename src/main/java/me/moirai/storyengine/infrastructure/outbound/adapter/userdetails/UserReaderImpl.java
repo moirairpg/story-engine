@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import me.moirai.storyengine.common.dbutil.Filter;
 import me.moirai.storyengine.common.dbutil.QueryBuilder;
 import me.moirai.storyengine.common.enums.Role;
-import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 @Repository
@@ -22,6 +22,7 @@ public class UserReaderImpl implements UserReader {
                    u.id,
                    u.discord_id,
                    u.username,
+                   u.display_name,
                    u.role,
                    u.is_active,
                    u.bio,
@@ -50,10 +51,10 @@ public class UserReaderImpl implements UserReader {
     }
 
     @Override
-    public Optional<UserData> getUserById(UUID id) {
+    public Optional<UserData> getUserByUsername(String username) {
 
         var query = QueryBuilder.select(SELECT_USER)
-                .filter(new Filter("u.public_id = :publicId", "publicId", id))
+                .filter(new Filter("LOWER(u.username) = LOWER(:username)", "username", username))
                 .build();
 
         return jdbcClient.sql(query.sql())
@@ -68,6 +69,7 @@ public class UserReaderImpl implements UserReader {
                 rs.getLong("id"),
                 rs.getString("discord_id"),
                 rs.getString("username"),
+                rs.getString("display_name"),
                 Role.valueOf(rs.getString("role")),
                 rs.getBoolean("is_active"),
                 rs.getString("bio"),

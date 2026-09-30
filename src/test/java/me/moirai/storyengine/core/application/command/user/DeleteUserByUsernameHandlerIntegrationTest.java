@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,10 @@ import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.enums.NotificationLevel;
 import me.moirai.storyengine.common.enums.NotificationType;
 import me.moirai.storyengine.common.enums.PermissionLevel;
+import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.enums.Visibility;
+import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
+import me.moirai.storyengine.common.security.authentication.MoiraiSecurityContext;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.ContextAttributesFixture;
 import me.moirai.storyengine.core.domain.adventure.ModelConfigurationFixture;
@@ -27,13 +31,13 @@ import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
 import me.moirai.storyengine.core.domain.world.World;
-import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserByUsername;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
-public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegrationTest {
+public class DeleteUserByUsernameHandlerIntegrationTest extends AbstractDatabaseIntegrationTest {
 
     @Autowired
-    private DeleteUserByIdHandler handler;
+    private DeleteUserByUsernameHandler handler;
 
     @Autowired
     private JdbcClient jdbcClient;
@@ -51,6 +55,13 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
 
         doomedUser = insertUser("11111", "doomed.player");
         survivingUser = insertUser("22222", "surviving.player");
+
+        MoiraiSecurityContext.set(admin());
+    }
+
+    @AfterEach
+    public void after() {
+        MoiraiSecurityContext.clear();
     }
 
     @Test
@@ -61,7 +72,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         insertCharacter(survivingUser, "Surviving Hero");
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countWhere("player_character", "player_id", doomedUser.getId())).isZero();
@@ -76,7 +87,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         var otherAdventure = insertAdventureOwnedBy(survivingUser);
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("adventure", ownedAdventure.getId())).isZero();
@@ -90,7 +101,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         var ownedAdventure = insertAdventureOwnedBy(doomedUser);
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countWhere("adventure_permissions", "adventure_id", ownedAdventure.getId())).isZero();
@@ -105,7 +116,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         grantPermission("adventure_permissions", "adventure_id", sharedAdventure.getId(), doomedUser.getId());
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("adventure", sharedAdventure.getId())).isOne();
@@ -121,7 +132,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         var otherWorld = insertWorldOwnedBy(survivingUser);
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("world", ownedWorld.getId())).isZero();
@@ -138,7 +149,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         update(ownedWorld, ownedWorld.getId(), World.class);
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         verify(storagePort).delete("worlds/doomed.png");
@@ -152,7 +163,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         grantPermission("world_permissions", "world_id", sharedWorld.getId(), doomedUser.getId());
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("world", sharedWorld.getId())).isOne();
@@ -166,7 +177,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         var notification = insertSystemNotificationFor(doomedUser.getId());
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("notification", notification.getId())).isZero();
@@ -182,7 +193,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         markAsRead(notification, survivingUser.getId());
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("notification", notification.getId())).isOne();
@@ -214,7 +225,7 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         markAsRead(sharedNotification, doomedUser.getId());
 
         // when
-        handler.handle(new DeleteUserById(doomedUser.getPublicId()));
+        handler.handle(new DeleteUserByUsername(doomedUser.getUsername()));
 
         // then
         assertThat(countById("adventure", sharedAdventure.getId())).isOne();
@@ -227,6 +238,11 @@ public class DeleteUserByIdHandlerIntegrationTest extends AbstractDatabaseIntegr
         assertThat(countWhere("adventure_invitation", "inviter_id", doomedUser.getId())).isZero();
         assertThat(countWhere("notification_recipient", "user_id", doomedUser.getId())).isZero();
         assertThat(countWhere("notification_read", "user_id", doomedUser.getId())).isZero();
+    }
+
+    private MoiraiPrincipal admin() {
+        return new MoiraiPrincipal(
+                UUID.randomUUID(), 1L, "requesting.admin", "token", "refresh", Role.ADMIN, null);
     }
 
     private User insertUser(String discordId, String username) {

@@ -2,11 +2,10 @@ package me.moirai.storyengine.common.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -15,49 +14,33 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.exception.AuthenticationFailedException;
+import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
-import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordAuthenticationPort;
-import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
-import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetAuthenticatedUserDetails;
+import me.moirai.storyengine.core.port.inbound.userdetails.UserDetailsResult;
 
 @ExtendWith(MockitoExtension.class)
 public class MoiraiUserDetailsServiceTest {
 
     @Mock
-    private DiscordAuthenticationPort discordAuthenticationPort;
-
-    @Mock
-    private UserReader userReader;
+    private QueryRunner queryRunner;
 
     @InjectMocks
     private MoiraiUserDetailsService service;
 
     @Test
-    public void authenticateUser_whenUserExists_thenReturnPrincipal() {
+    public void authenticateUser_whenUserExists_thenReturnPrincipalCarryingTheStoredHandle() {
 
         // Given
         var token = "AUTH_TOKEN / REFRESH_TOKEN";
-        var username = "john.doe";
         var publicId = UUID.randomUUID();
+        var user = userDetails(publicId, true);
 
-        var response = new DiscordUserDataResponse(
-                "12345",
-                username,
-                null,
-                null,
-                "email@email.com",
-                null,
-                null);
-
-        var userData = new UserData(publicId, 1L, "12345", "john.doe", Role.PLAYER, true, null,
-                Instant.now());
-
-        when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(response);
-        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
+        when(queryRunner.run(any(GetAuthenticatedUserDetails.class))).thenReturn(user);
 
         // When
         var userDetails = service.loadUserByUsername(token);
@@ -65,8 +48,10 @@ public class MoiraiUserDetailsServiceTest {
         // Then
         var principal = (MoiraiPrincipal) userDetails;
         assertThat(principal).isNotNull();
-        assertThat(principal.getUsername()).isEqualTo(response.username());
-        assertThat(principal.email()).isEqualTo(response.email());
+        assertThat(principal.publicId()).isEqualTo(publicId);
+        assertThat(principal.id()).isEqualTo(1L);
+        assertThat(principal.getUsername()).isEqualTo("john.doe");
+        assertThat(principal.role()).isEqualTo(Role.PLAYER);
         assertThat(principal.authorizationToken()).isEqualTo("AUTH_TOKEN");
         assertThat(principal.refreshToken()).isEqualTo("REFRESH_TOKEN");
     }
@@ -76,25 +61,41 @@ public class MoiraiUserDetailsServiceTest {
 
         // Given
         var token = "AUTH_TOKEN / REFRESH_TOKEN";
-        var publicId = UUID.randomUUID();
+        var user = userDetails(UUID.randomUUID(), false);
 
-        var response = new DiscordUserDataResponse(
-                "12345",
-                "john.doe",
-                null,
-                null,
-                "email@email.com",
-                null,
-                null);
-
-        var userData = new UserData(publicId, 1L, "12345", "john.doe", Role.PLAYER, false, null,
-                Instant.now());
-
-        when(discordAuthenticationPort.getLoggedUser(anyString())).thenReturn(response);
-        when(userReader.getUserByDiscordId(anyString())).thenReturn(Optional.of(userData));
+        when(queryRunner.run(any(GetAuthenticatedUserDetails.class))).thenReturn(user);
 
         // Then
         assertThatThrownBy(() -> service.loadUserByUsername(token))
                 .isInstanceOf(AuthenticationFailedException.class);
+    }
+
+    @Test
+    public void authenticateUser_whenNoMoiraiUserExists_thenThrowAuthenticationFailed() {
+
+        // Given
+        var token = "AUTH_TOKEN / REFRESH_TOKEN";
+
+        when(queryRunner.run(any(GetAuthenticatedUserDetails.class)))
+                .thenThrow(new NotFoundException("The User with the requested ID is not registered in MoirAI"));
+
+        // Then
+        assertThatThrownBy(() -> service.loadUserByUsername(token))
+                .isInstanceOf(AuthenticationFailedException.class);
+    }
+
+    private UserDetailsResult userDetails(UUID publicId, boolean isActive) {
+
+        return new UserDetailsResult(
+                publicId,
+                1L,
+                "john_discord",
+                "john.doe",
+                "John Doe",
+                null,
+                Role.PLAYER,
+                isActive,
+                null,
+                Instant.now());
     }
 }

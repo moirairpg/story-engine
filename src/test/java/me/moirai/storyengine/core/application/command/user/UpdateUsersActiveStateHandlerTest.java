@@ -3,21 +3,19 @@ package me.moirai.storyengine.core.application.command.user;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
@@ -29,7 +27,7 @@ import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 @ExtendWith(MockitoExtension.class)
 public class UpdateUsersActiveStateHandlerTest {
 
-    private static final UUID REQUESTER_ID = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
+    private static final String REQUESTER_USERNAME = "requesting.admin";
 
     @Mock
     private UserRepository repository;
@@ -41,9 +39,9 @@ public class UpdateUsersActiveStateHandlerTest {
     public void shouldChangeNothingWhenTheSelectionIsEmpty() {
 
         // given
-        var command = new UpdateUsersActiveState(List.of(), false, REQUESTER_ID);
+        var command = new UpdateUsersActiveState(List.of(), false, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of());
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of());
 
         // when
         handler.handle(command);
@@ -56,9 +54,9 @@ public class UpdateUsersActiveStateHandlerTest {
     public void shouldChangeNothingWhenTheSelectionIsNull() {
 
         // given
-        var command = new UpdateUsersActiveState(null, false, REQUESTER_ID);
+        var command = new UpdateUsersActiveState(null, false, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of());
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of());
 
         // when
         handler.handle(command);
@@ -71,10 +69,11 @@ public class UpdateUsersActiveStateHandlerTest {
     public void shouldThrowExceptionWhenAnyRequestedUserIsNotFound() {
 
         // given
-        var found = userWith(UUID.randomUUID());
-        var command = new UpdateUsersActiveState(List.of(found.getPublicId(), UUID.randomUUID()), false, REQUESTER_ID);
+        var found = userWith("found.player");
+        var command = new UpdateUsersActiveState(List.of(found.getUsername(), "ghost.player"), false,
+                REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of(found));
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of(found));
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
@@ -87,12 +86,12 @@ public class UpdateUsersActiveStateHandlerTest {
     public void shouldDeactivateEveryUserInTheSelectionWhenTheStateIsFalse() {
 
         // given
-        var first = userWith(UUID.randomUUID());
-        var second = userWith(UUID.randomUUID());
+        var first = userWith("first.player");
+        var second = userWith("second.player");
         var command = new UpdateUsersActiveState(
-                List.of(first.getPublicId(), second.getPublicId()), false, REQUESTER_ID);
+                List.of(first.getUsername(), second.getUsername()), false, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of(first, second));
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of(first, second));
 
         // when
         handler.handle(command);
@@ -109,15 +108,15 @@ public class UpdateUsersActiveStateHandlerTest {
     public void shouldReactivateEveryUserInTheSelectionWhenTheStateIsTrue() {
 
         // given
-        var first = userWith(UUID.randomUUID());
-        var second = userWith(UUID.randomUUID());
-        first.updateActiveState(false, REQUESTER_ID);
-        second.updateActiveState(false, REQUESTER_ID);
+        var first = userWith("first.player");
+        var second = userWith("second.player");
+        first.updateActiveState(false, REQUESTER_USERNAME);
+        second.updateActiveState(false, REQUESTER_USERNAME);
 
         var command = new UpdateUsersActiveState(
-                List.of(first.getPublicId(), second.getPublicId()), true, REQUESTER_ID);
+                List.of(first.getUsername(), second.getUsername()), true, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of(first, second));
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of(first, second));
 
         // when
         handler.handle(command);
@@ -131,14 +130,14 @@ public class UpdateUsersActiveStateHandlerTest {
     public void shouldLeaveUsersAlreadyInTheTargetStateUntouchedWhenTheSelectionIsMixed() {
 
         // given
-        var active = userWith(UUID.randomUUID());
-        var inactive = userWith(UUID.randomUUID());
-        inactive.updateActiveState(false, REQUESTER_ID);
+        var active = userWith("active.player");
+        var inactive = userWith("inactive.player");
+        inactive.updateActiveState(false, REQUESTER_USERNAME);
 
         var command = new UpdateUsersActiveState(
-                List.of(active.getPublicId(), inactive.getPublicId()), false, REQUESTER_ID);
+                List.of(active.getUsername(), inactive.getUsername()), false, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of(active, inactive));
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of(active, inactive));
 
         // when
         handler.handle(command);
@@ -149,30 +148,31 @@ public class UpdateUsersActiveStateHandlerTest {
     }
 
     @Test
-    public void shouldDeduplicateWhenTheSameIdIsSubmittedTwice() {
+    public void shouldNotReportAMissingUserWhenTwoCasingsOfOneHandleAreSubmitted() {
 
         // given
-        var user = userWith(UUID.randomUUID());
-        var command = new UpdateUsersActiveState(
-                List.of(user.getPublicId(), user.getPublicId()), false, REQUESTER_ID);
+        var user = userWith("Merlin");
+        var command = new UpdateUsersActiveState(List.of("Merlin", "merlin"), false, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of(user));
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of(user));
 
         // when
         handler.handle(command);
 
         // then
         assertThat(user.isActive()).isFalse();
+
+        verify(repository).save(user);
     }
 
     @Test
     public void shouldNotSaveWhenTheRequesterChangesTheirOwnActiveState() {
 
         // given
-        var self = userWith(REQUESTER_ID);
-        var command = new UpdateUsersActiveState(List.of(REQUESTER_ID), false, REQUESTER_ID);
+        var self = userWith(REQUESTER_USERNAME);
+        var command = new UpdateUsersActiveState(List.of(REQUESTER_USERNAME), false, REQUESTER_USERNAME);
 
-        when(repository.findAllByPublicIdIn(anyCollection())).thenReturn(List.of(self));
+        when(repository.findAllByUsernameIn(anyList())).thenReturn(List.of(self));
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
@@ -191,11 +191,8 @@ public class UpdateUsersActiveStateHandlerTest {
         verifyNoInteractions(repository);
     }
 
-    private User userWith(UUID publicId) {
+    private User userWith(String username) {
 
-        var user = UserFixture.player().build();
-        ReflectionTestUtils.setField(user, "publicId", publicId);
-
-        return user;
+        return UserFixture.player().username(username).build();
     }
 }

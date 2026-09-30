@@ -8,6 +8,7 @@ public record AdventureMembershipSummary(
         UUID playerCharacterId,
         UUID playerId,
         String playerUsername,
+        String playerDisplayName,
         String name,
         CharacterClass characterClass,
         String imageUrl,

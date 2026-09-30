@@ -160,9 +160,7 @@ class ViewNotificationAuthorizerTest {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
                 1L,
-                "discordId",
                 username,
-                username + "@test.com",
                 "token",
                 "refresh",
                 role,

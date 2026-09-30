@@ -125,7 +125,7 @@ public class RemoveCharacterFromAdventureAuthorizerTest {
 
     private MoiraiPrincipal principal(Role role) {
         return new MoiraiPrincipal(
-                CALLER_ID, 1L, "discordId", "caller", "caller@test.com", "token", "refresh", role, null);
+                CALLER_ID, 1L, "caller", "token", "refresh", role, null);
     }
 
     private AuthorizationContext contextWith(MoiraiPrincipal principal) {

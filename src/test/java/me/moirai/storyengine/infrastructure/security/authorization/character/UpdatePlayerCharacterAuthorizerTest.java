@@ -96,9 +96,7 @@ public class UpdatePlayerCharacterAuthorizerTest {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
                 1L,
-                "discordId",
                 "user",
-                "user@test.com",
                 "token",
                 "refresh",
                 role,

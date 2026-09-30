@@ -1,14 +1,13 @@
 package me.moirai.storyengine.core.port.inbound.userdetails;
 
-import java.util.UUID;
-
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.enums.Role;
 
 public record UpdateUser(
-        UUID userId,
+        String username,
         Role role,
         boolean isActive,
         String bio,
-        UUID requesterId) implements Command<Void> {
+        String displayName,
+        String requesterUsername) implements Command<Void> {
 }

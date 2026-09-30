@@ -3,7 +3,6 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import me.moirai.storyengine.AbstractDatabaseIntegrationTest;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 public class UserReaderImplIntegrationTest extends AbstractDatabaseIntegrationTest {
@@ -61,7 +60,7 @@ public class UserReaderImplIntegrationTest extends AbstractDatabaseIntegrationTe
 
         // Given
         var user = UserFixture.player().build();
-        user.updateActiveState(false, UUID.randomUUID());
+        user.updateActiveState(false, "someone.else");
 
         var stored = insert(user, User.class);
 
@@ -71,5 +70,33 @@ public class UserReaderImplIntegrationTest extends AbstractDatabaseIntegrationTe
         // Then
         assertThat(result).isNotEmpty();
         assertThat(result.get().isActive()).isFalse();
+    }
+
+    @Test
+    public void getUserByUsername_whenHandleIsInAnotherCase_thenReturnUserWithDisplayName() {
+
+        // Given
+        insert(UserFixture.player().username("Merlin").displayName("Merlin the Grey").build(), User.class);
+
+        // When
+        var result = reader.getUserByUsername("mERLIN");
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get().username()).isEqualTo("Merlin");
+        assertThat(result.get().displayName()).isEqualTo("Merlin the Grey");
+    }
+
+    @Test
+    public void getUserByUsername_whenHandleIsUnknown_thenReturnEmpty() {
+
+        // Given
+        insert(UserFixture.player().username("Merlin").build(), User.class);
+
+        // When
+        var result = reader.getUserByUsername("morgana");
+
+        // Then
+        assertThat(result).isEmpty();
     }
 }

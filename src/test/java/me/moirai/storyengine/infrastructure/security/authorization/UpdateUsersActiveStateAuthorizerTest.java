@@ -58,9 +58,7 @@ class UpdateUsersActiveStateAuthorizerTest {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
                 1L,
-                "12345",
                 "user",
-                "user@test.com",
                 "token",
                 "refresh",
                 role,

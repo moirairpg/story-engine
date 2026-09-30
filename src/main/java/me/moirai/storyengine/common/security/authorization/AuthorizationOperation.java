@@ -27,6 +27,7 @@ public enum AuthorizationOperation {
     SEARCH_USERS,
     MANAGE_USER,
     UPDATE_USER,
+    UPDATE_USER_DETAILS,
     UPDATE_USERS_ACTIVE_STATE,
     DELETE_USERS,
     UPDATE_USER_USERNAME,

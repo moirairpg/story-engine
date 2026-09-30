@@ -2,7 +2,7 @@ package me.moirai.storyengine.core.application.command.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,11 +23,11 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.domain.userdetails.UserDeletedEvent;
 import me.moirai.storyengine.core.domain.userdetails.UserFixture;
-import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserByUsername;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class DeleteUserByIdHandlerTest {
+public class DeleteUserByUsernameHandlerTest {
 
     @Mock
     private UserRepository repository;
@@ -36,26 +36,15 @@ public class DeleteUserByIdHandlerTest {
     private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
-    private DeleteUserByIdHandler handler;
-
-    @Test
-    public void deleteUser_whenIdIsNull_thenThrowException() {
-
-        // Given
-        DeleteUserById command = new DeleteUserById(null);
-
-        // Then
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> handler.handle(command));
-    }
+    private DeleteUserByUsernameHandler handler;
 
     @Test
     public void deleteUser_whenUserNotFound_thenThrowException() {
 
         // Given
-        DeleteUserById command = new DeleteUserById(UUID.randomUUID());
+        DeleteUserByUsername command = new DeleteUserByUsername("ghost");
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.empty());
+        when(repository.findByUsername(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(NotFoundException.class)
@@ -66,10 +55,10 @@ public class DeleteUserByIdHandlerTest {
     public void deleteUser_whenValidRequest_thenUserIsDeleted() {
 
         // Given
-        DeleteUserById command = new DeleteUserById(UUID.randomUUID());
+        DeleteUserByUsername command = new DeleteUserByUsername("john.doe");
         User user = UserFixture.player().build();
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(user));
+        when(repository.findByUsername("john.doe")).thenReturn(Optional.of(user));
 
         // When
         handler.handle(command);
@@ -82,14 +71,14 @@ public class DeleteUserByIdHandlerTest {
     public void shouldPublishUserDeletedEventCarryingTheUserIdentityWhenTheUserIsDeleted() {
 
         // given
-        var command = new DeleteUserById(UUID.randomUUID());
+        var command = new DeleteUserByUsername("john.doe");
         var user = UserFixture.player().build();
         var publicId = UUID.randomUUID();
 
         ReflectionTestUtils.setField(user, "id", 42L);
         ReflectionTestUtils.setField(user, "publicId", publicId);
 
-        when(repository.findByPublicId(any(UUID.class))).thenReturn(Optional.of(user));
+        when(repository.findByUsername("john.doe")).thenReturn(Optional.of(user));
 
         // when
         handler.handle(command);

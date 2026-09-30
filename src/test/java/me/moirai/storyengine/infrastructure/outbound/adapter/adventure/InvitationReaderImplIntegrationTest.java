@@ -51,7 +51,7 @@ public class InvitationReaderImplIntegrationTest extends AbstractDatabaseIntegra
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().inviterUsername()).isEqualTo("alice");
+        assertThat(result.get().inviterDisplayName()).isEqualTo("alice the Great");
         assertThat(result.get().recipientUsername()).isEqualTo("bob");
     }
 
@@ -114,6 +114,7 @@ public class InvitationReaderImplIntegrationTest extends AbstractDatabaseIntegra
         // then
         assertThat(result).isPresent();
         assertThat(result.get().adventureName()).isEqualTo(adventure.getName());
+        assertThat(result.get().inviterDisplayName()).isEqualTo("alice the Great");
     }
 
     @Test
@@ -157,8 +158,8 @@ public class InvitationReaderImplIntegrationTest extends AbstractDatabaseIntegra
 
         // then
         assertThat(result).hasSize(2)
-                .extracting(row -> row.inviterUsername())
-                .containsExactlyInAnyOrder("alice", "carol");
+                .extracting(row -> row.inviterDisplayName())
+                .containsExactlyInAnyOrder("alice the Great", "carol the Great");
     }
 
     @Test
@@ -178,6 +179,7 @@ public class InvitationReaderImplIntegrationTest extends AbstractDatabaseIntegra
 
         return insert(UserFixture.player()
                 .username(username)
+                .displayName(username + " the Great")
                 .discordId(discordId)
                 .build(), User.class);
     }

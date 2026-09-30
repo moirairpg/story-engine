@@ -35,6 +35,7 @@ public class GetPlayerCharacterByIdHandler
         return new PlayerCharacterDetails(
                 row.id(),
                 row.ownerUsername(),
+                row.ownerDisplayName(),
                 row.name(),
                 row.characterClass(),
                 row.personality(),

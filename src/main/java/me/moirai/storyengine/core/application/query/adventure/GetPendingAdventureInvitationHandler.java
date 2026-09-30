@@ -26,7 +26,7 @@ public class GetPendingAdventureInvitationHandler
                         row.invitationId(),
                         row.adventureId(),
                         row.adventureName(),
-                        row.inviterUsername(),
+                        row.inviterDisplayName(),
                         row.creationDate()))
                 .orElseThrow(() -> new NotFoundException("No pending invitation for this adventure"));
     }

@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.fasterxml.uuid.Generators;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -39,8 +40,11 @@ public class User extends Asset {
     @Column(name = "discord_id")
     private String discordId;
 
-    @Column(name = "username")
-    private String username;
+    @Embedded
+    private Username username;
+
+    @Embedded
+    private DisplayName displayName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -61,7 +65,8 @@ public class User extends Asset {
 
         this.publicId = Generators.timeBasedEpochGenerator().generate();
         this.discordId = builder.discordId;
-        this.username = builder.username;
+        this.username = Username.of(builder.username);
+        this.displayName = DisplayName.of(builder.displayName);
         this.role = builder.role;
         this.isActive = true;
     }
@@ -84,7 +89,7 @@ public class User extends Asset {
     }
 
     public void communicateUserDeleted() {
-        domainEvents.add(new UserDeletedEvent(this.id, this.publicId, this.username));
+        domainEvents.add(new UserDeletedEvent(this.id, this.publicId, this.username.getName()));
     }
 
     public Long getId() {
@@ -100,7 +105,11 @@ public class User extends Asset {
     }
 
     public String getUsername() {
-        return username;
+        return username.getName();
+    }
+
+    public String getDisplayName() {
+        return displayName.getName();
     }
 
     public Role getRole() {
@@ -116,21 +125,25 @@ public class User extends Asset {
     }
 
     public void updateUsername(String username) {
-        this.username = username;
+        this.username = Username.of(username);
     }
 
-    public void updateRole(Role role, UUID requesterId) {
+    public void updateDisplayName(String displayName) {
+        this.displayName = DisplayName.of(displayName);
+    }
 
-        if (role != this.role && publicId.equals(requesterId)) {
+    public void updateRole(Role role, String requesterUsername) {
+
+        if (role != this.role && username.getName().equals(requesterUsername)) {
             throw new BusinessRuleViolationException(CANNOT_CHANGE_OWN_ROLE);
         }
 
         this.role = role;
     }
 
-    public void updateActiveState(boolean isActive, UUID requesterId) {
+    public void updateActiveState(boolean isActive, String requesterUsername) {
 
-        if (isActive != this.isActive && publicId.equals(requesterId)) {
+        if (isActive != this.isActive && username.getName().equals(requesterUsername)) {
             throw new BusinessRuleViolationException(CANNOT_CHANGE_OWN_ACTIVE_STATE);
         }
 
@@ -150,6 +163,7 @@ public class User extends Asset {
 
         private String discordId;
         private String username;
+        private String displayName;
         private Role role;
 
         private Builder() {
@@ -164,6 +178,12 @@ public class User extends Asset {
         public Builder username(String username) {
 
             this.username = username;
+            return this;
+        }
+
+        public Builder displayName(String displayName) {
+
+            this.displayName = displayName;
             return this;
         }
 

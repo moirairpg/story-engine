@@ -262,9 +262,7 @@ public class ViewPlayerCharacterAuthorizerTest {
         return new MoiraiPrincipal(
                 CALLER_ID,
                 1L,
-                "discordId",
                 username,
-                "caller@test.com",
                 "token",
                 "refresh",
                 role,

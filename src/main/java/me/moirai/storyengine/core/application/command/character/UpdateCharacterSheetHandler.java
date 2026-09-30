@@ -57,14 +57,19 @@ public class UpdateCharacterSheetHandler
 
         var isOwner = owner.getUsername().equals(command.requesterUsername());
 
-        return mapResult(saved, owner.getUsername(), isOwner);
+        return mapResult(saved, owner.getUsername(), owner.getDisplayName(), isOwner);
     }
 
-    private PlayerCharacterDetails mapResult(PlayerCharacter character, String ownerUsername, boolean isOwner) {
+    private PlayerCharacterDetails mapResult(
+            PlayerCharacter character,
+            String ownerUsername,
+            String ownerDisplayName,
+            boolean isOwner) {
 
         return new PlayerCharacterDetails(
                 character.getPublicId(),
                 ownerUsername,
+                ownerDisplayName,
                 character.getName(),
                 character.getCharacterClass(),
                 character.getPersonality(),

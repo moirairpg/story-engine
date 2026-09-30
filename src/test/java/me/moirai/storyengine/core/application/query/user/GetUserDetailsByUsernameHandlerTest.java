@@ -2,7 +2,6 @@ package me.moirai.storyengine.core.application.query.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -19,14 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.exception.RestException;
-import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsById;
-import me.moirai.storyengine.core.port.inbound.userdetails.UserData;
+import me.moirai.storyengine.core.port.inbound.userdetails.GetUserDetailsByUsername;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDataResponse;
 import me.moirai.storyengine.core.port.outbound.discord.DiscordUserDetailsPort;
+import me.moirai.storyengine.core.port.outbound.userdetails.UserData;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserReader;
 
 @ExtendWith(MockitoExtension.class)
-public class GetUserDetailsByIdHandlerTest {
+public class GetUserDetailsByUsernameHandlerTest {
 
     @Mock
     private UserReader userReader;
@@ -35,19 +34,18 @@ public class GetUserDetailsByIdHandlerTest {
     private DiscordUserDetailsPort discordUserDetailsPort;
 
     @InjectMocks
-    private GetUserDetailsByIdHandler handler;
+    private GetUserDetailsByUsernameHandler handler;
 
     @Test
     public void retrieveUser_whenUserIsFound_thenReturnUserData() {
 
         // Given
-        var userId = UUID.randomUUID();
-        var query = new GetUserDetailsById(userId);
-        var userData = new UserData(userId, 12345L, "1234", "john.natalis", Role.PLAYER, true, null,
-                Instant.now());
-        var userDetails = new DiscordUserDataResponse("1234", "john.natalis", null, null, null, null, null);
+        var query = new GetUserDetailsByUsername("john.natalis");
+        var userData = new UserData(UUID.randomUUID(), 12345L, "1234", "john.natalis", "John Natalis", Role.PLAYER,
+                true, null, Instant.now());
+        var userDetails = new DiscordUserDataResponse("1234", "john_discord", null, null, null, null, null);
 
-        when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
+        when(userReader.getUserByUsername("john.natalis")).thenReturn(Optional.of(userData));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
 
         // When
@@ -55,20 +53,19 @@ public class GetUserDetailsByIdHandlerTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.discordId()).isEqualTo(userData.discordId());
-        assertThat(result.discordUsername()).isEqualTo("john.natalis");
+        assertThat(result.discordUsername()).isEqualTo("john_discord");
         assertThat(result.username()).isEqualTo(userData.username());
+        assertThat(result.displayName()).isEqualTo("John Natalis");
     }
 
     @Test
     public void retrieveUser_whenUserNotExistsInMoirai_thenThrowException() {
 
         // Given
-        var expectedMessage = "The User with the requested ID is not registered in MoirAI";
-        var userId = UUID.randomUUID();
-        var query = new GetUserDetailsById(userId);
+        var expectedMessage = "The User with the requested username is not registered in MoirAI";
+        var query = new GetUserDetailsByUsername("ghost");
 
-        when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.empty());
+        when(userReader.getUserByUsername(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(NotFoundException.class)
@@ -81,30 +78,16 @@ public class GetUserDetailsByIdHandlerTest {
 
         // Given
         var expectedMessage = "The Discord User with the requested ID does not exist";
-        var userId = UUID.randomUUID();
-        var query = new GetUserDetailsById(userId);
-        var userData = new UserData(userId, 12345L, "1234", "john.natalis", Role.PLAYER, true, null,
-                Instant.now());
+        var query = new GetUserDetailsByUsername("john.natalis");
+        var userData = new UserData(UUID.randomUUID(), 12345L, "1234", "john.natalis", "John Natalis", Role.PLAYER,
+                true, null, Instant.now());
 
-        when(userReader.getUserById(any(UUID.class))).thenReturn(Optional.of(userData));
+        when(userReader.getUserByUsername(anyString())).thenReturn(Optional.of(userData));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(RestException.class)
                 .isThrownBy(() -> handler.execute(query))
-                .withMessage(expectedMessage);
-    }
-
-    @Test
-    public void retrieveUser_whenUserIdIsNull_thenThrowException() {
-
-        // Given
-        var expectedMessage = "User ID cannot be null";
-        var query = new GetUserDetailsById(null);
-
-        // Then
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> handler.handle(query))
                 .withMessage(expectedMessage);
     }
 }

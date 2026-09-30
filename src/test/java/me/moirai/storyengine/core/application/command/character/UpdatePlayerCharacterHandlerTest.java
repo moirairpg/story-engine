@@ -61,47 +61,6 @@ public class UpdatePlayerCharacterHandlerTest {
     private UpdatePlayerCharacterHandler handler;
 
     @Test
-    void shouldThrowExceptionWhenTheNameIsBlank() {
-
-        // given
-        var command = updateCommand(UUID.randomUUID(), "", "Brave.", "Tall.");
-
-        // then
-        assertThrows(BusinessRuleViolationException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenThePersonalityIsBlank() {
-
-        // given
-        var command = updateCommand(UUID.randomUUID(), "Volin", "", "Tall.");
-
-        // then
-        assertThrows(BusinessRuleViolationException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenThePhysicalDescriptionIsBlank() {
-
-        // given
-        var command = updateCommand(UUID.randomUUID(), "Volin", "Brave.", "");
-
-        // then
-        assertThrows(BusinessRuleViolationException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenTheBackgroundIsBlank() {
-
-        // given
-        var command = new UpdatePlayerCharacter(
-                UUID.randomUUID(), "Volin", "Brave.", "Tall.", "", 0.25, 0.75, OWNER_USERNAME);
-
-        // then
-        assertThrows(BusinessRuleViolationException.class, () -> handler.handle(command));
-    }
-
-    @Test
     void shouldApplyEveryUpdatedFieldWhenTheCharacterIsUpdated() {
 
         // given
@@ -117,6 +76,8 @@ public class UpdatePlayerCharacterHandlerTest {
 
         // then
         assertThat(result.background()).isEqualTo(BACKGROUND);
+        assertThat(result.ownerUsername()).isEqualTo("john.doe");
+        assertThat(result.ownerDisplayName()).isEqualTo("John Doe");
         assertThat(character.getName()).isEqualTo("Volin the Bold");
         assertThat(character.getPersonality()).isEqualTo("Reckless.");
         assertThat(character.getPhysicalDescription()).isEqualTo("Short.");

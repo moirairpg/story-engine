@@ -8,6 +8,7 @@ import me.moirai.storyengine.common.enums.Role;
 public record UserSummary(
         UUID publicId,
         String username,
+        String displayName,
         Role role,
         boolean isActive,
         Instant creationDate) {

@@ -64,14 +64,18 @@ public class CreatePlayerCharacterHandler
         var vector = embeddingPort.embed(character.narrativeDescription());
         vectorSearchPort.upsert(character.getPublicId(), vector);
 
-        return mapResult(character, owner.getUsername());
+        return mapResult(character, owner.getUsername(), owner.getDisplayName());
     }
 
-    private PlayerCharacterDetails mapResult(PlayerCharacter character, String ownerUsername) {
+    private PlayerCharacterDetails mapResult(
+            PlayerCharacter character,
+            String ownerUsername,
+            String ownerDisplayName) {
 
         return new PlayerCharacterDetails(
                 character.getPublicId(),
                 ownerUsername,
+                ownerDisplayName,
                 character.getName(),
                 character.getCharacterClass(),
                 character.getPersonality(),

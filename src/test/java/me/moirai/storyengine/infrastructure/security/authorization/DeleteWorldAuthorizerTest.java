@@ -143,9 +143,7 @@ class DeleteWorldAuthorizerTest {
         return new MoiraiPrincipal(
                 publicId,
                 1L,
-                "discordId",
                 "user",
-                "user@test.com",
                 "token",
                 "refresh",
                 null,
@@ -156,9 +154,7 @@ class DeleteWorldAuthorizerTest {
         return new MoiraiPrincipal(
                 publicId,
                 1L,
-                "discordId",
                 "user",
-                "user@test.com",
                 "token",
                 "refresh",
                 Role.ADMIN,

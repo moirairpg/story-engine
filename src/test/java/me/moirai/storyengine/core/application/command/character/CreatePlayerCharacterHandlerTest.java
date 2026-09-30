@@ -197,6 +197,7 @@ public class CreatePlayerCharacterHandlerTest {
 
         // then
         assertThat(result.ownerUsername()).isEqualTo("john.doe");
+        assertThat(result.ownerDisplayName()).isEqualTo("John Doe");
         assertThat(result.name()).isEqualTo("Volin Habar");
         assertThat(result.background()).isEqualTo("Orphaned.");
     }
