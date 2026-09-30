@@ -2,6 +2,7 @@ package me.moirai.storyengine.infrastructure.outbound.adapter.userdetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,13 +41,13 @@ public class UserDomainRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAllByUsernameIn(Collection<String> usernames) {
-        return jpaRepository.findAllByUsernameIn(usernames);
-    }
+    public List<User> findAllByUsernameIn(List<String> usernames) {
 
-    @Override
-    public List<User> findAllByPublicIdIn(Collection<UUID> publicIds) {
-        return jpaRepository.findAllByPublicIdIn(publicIds);
+        var normalizedUsernames = usernames.stream()
+                .map(username -> username.toLowerCase(Locale.ROOT))
+                .toList();
+
+        return jpaRepository.findAllByUsernameIn(normalizedUsernames);
     }
 
     @Override

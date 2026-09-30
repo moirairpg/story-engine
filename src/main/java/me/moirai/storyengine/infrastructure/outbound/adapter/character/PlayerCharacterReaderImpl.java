@@ -30,7 +30,8 @@ public class PlayerCharacterReaderImpl implements PlayerCharacterReader {
 
     private static final String SELECT_BY_PUBLIC_ID = """
             SELECT  pc.public_id,
-                    owner.username AS owner_username,
+                    owner.username     AS owner_username,
+                    owner.display_name AS owner_display_name,
                     pc.name,
                     pc.character_class,
                     pc.personality,
@@ -146,6 +147,7 @@ public class PlayerCharacterReaderImpl implements PlayerCharacterReader {
             return new PlayerCharacterDetailsRow(
                     rs.getObject("public_id", UUID.class),
                     rs.getString("owner_username"),
+                    rs.getString("owner_display_name"),
                     rs.getString("name"),
                     Functions.mapOrNull(rs.getString("character_class"), CharacterClass::valueOf),
                     rs.getString("personality"),

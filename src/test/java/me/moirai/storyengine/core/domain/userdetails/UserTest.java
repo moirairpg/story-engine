@@ -14,7 +14,7 @@ import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 public class UserTest {
 
     private static final Long NUMERIC_ID = 42L;
-    private static final UUID OTHER_USER_ID = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
+    private static final String OTHER_USERNAME = "someone.else";
 
     @Test
     public void shouldEmitUserDeletedEventWhenDeletionIsCommunicated() {
@@ -89,7 +89,7 @@ public class UserTest {
         var user = userWithId();
 
         // when
-        user.updateActiveState(false, OTHER_USER_ID);
+        user.updateActiveState(false, OTHER_USERNAME);
 
         // then
         assertThat(user.isActive()).isFalse();
@@ -100,10 +100,10 @@ public class UserTest {
 
         // given
         var user = userWithId();
-        user.updateActiveState(false, OTHER_USER_ID);
+        user.updateActiveState(false, OTHER_USERNAME);
 
         // when
-        user.updateActiveState(true, OTHER_USER_ID);
+        user.updateActiveState(true, OTHER_USERNAME);
 
         // then
         assertThat(user.isActive()).isTrue();
@@ -116,7 +116,7 @@ public class UserTest {
         var user = userWithId();
 
         // then
-        assertThatThrownBy(() -> user.updateActiveState(false, user.getPublicId()))
+        assertThatThrownBy(() -> user.updateActiveState(false, user.getUsername()))
                 .isInstanceOf(BusinessRuleViolationException.class);
     }
 
@@ -127,7 +127,7 @@ public class UserTest {
         var user = userWithId();
 
         // then
-        assertThatThrownBy(() -> user.updateRole(Role.ADMIN, user.getPublicId()))
+        assertThatThrownBy(() -> user.updateRole(Role.ADMIN, user.getUsername()))
                 .isInstanceOf(BusinessRuleViolationException.class);
     }
 
@@ -138,7 +138,7 @@ public class UserTest {
         var user = userWithId();
 
         // when
-        user.updateRole(Role.ADMIN, OTHER_USER_ID);
+        user.updateRole(Role.ADMIN, OTHER_USERNAME);
 
         // then
         assertThat(user.getRole()).isEqualTo(Role.ADMIN);
@@ -151,8 +151,8 @@ public class UserTest {
         var user = userWithId();
 
         // when
-        user.updateRole(user.getRole(), user.getPublicId());
-        user.updateActiveState(user.isActive(), user.getPublicId());
+        user.updateRole(user.getRole(), user.getUsername());
+        user.updateActiveState(user.isActive(), user.getUsername());
 
         // then
         assertThat(user.getRole()).isEqualTo(Role.PLAYER);

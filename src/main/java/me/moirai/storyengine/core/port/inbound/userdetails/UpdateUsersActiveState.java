@@ -1,17 +1,16 @@
 package me.moirai.storyengine.core.port.inbound.userdetails;
 
 import java.util.List;
-import java.util.UUID;
 
 import me.moirai.storyengine.common.cqs.command.Command;
 import me.moirai.storyengine.common.util.Functions;
 
 public record UpdateUsersActiveState(
-        List<UUID> userIds,
+        List<String> usernames,
         boolean isActive,
-        UUID requesterId) implements Command<Void> {
+        String requesterUsername) implements Command<Void> {
 
     public UpdateUsersActiveState {
-        userIds = Functions.mapOrDefault(userIds, List.of(), List::copyOf);
+        usernames = Functions.mapOrDefault(usernames, List.of(), List::copyOf);
     }
 }

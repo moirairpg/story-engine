@@ -19,9 +19,7 @@ public interface UserRepository {
 
     List<User> findAllById(Collection<Long> ids);
 
-    List<User> findAllByUsernameIn(Collection<String> usernames);
-
-    List<User> findAllByPublicIdIn(Collection<UUID> publicIds);
+    List<User> findAllByUsernameIn(List<String> usernames);
 
     User save(User user);
 

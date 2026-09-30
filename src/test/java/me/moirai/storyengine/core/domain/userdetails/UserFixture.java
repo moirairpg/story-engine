@@ -17,6 +17,7 @@ public class UserFixture {
         return User.builder()
                 .discordId("12345")
                 .username("john.doe")
+                .displayName("John Doe")
                 .role(PLAYER);
     }
 
@@ -25,6 +26,7 @@ public class UserFixture {
         return User.builder()
                 .discordId("12345")
                 .username("john.doe")
+                .displayName("John Doe")
                 .role(ADMIN);
     }
 

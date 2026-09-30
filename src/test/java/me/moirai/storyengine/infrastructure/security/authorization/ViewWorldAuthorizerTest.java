@@ -147,9 +147,7 @@ class ViewWorldAuthorizerTest {
         return new MoiraiPrincipal(
                 publicId,
                 1L,
-                "discordId",
                 "user",
-                "user@test.com",
                 "token",
                 "refresh",
                 null,

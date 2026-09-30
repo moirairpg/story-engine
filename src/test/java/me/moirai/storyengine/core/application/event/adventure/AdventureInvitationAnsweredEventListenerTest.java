@@ -77,7 +77,7 @@ public class AdventureInvitationAnsweredEventListenerTest {
     }
 
     private User responder() {
-        var user = UserFixture.player().username("bob").build();
+        var user = UserFixture.player().username("bob").displayName("Bob the Brave").build();
         ReflectionTestUtils.setField(user, "id", RESPONDER_ID);
         return user;
     }
@@ -108,8 +108,9 @@ public class AdventureInvitationAnsweredEventListenerTest {
         // then
         var captor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository).save(captor.capture());
-        assertThat(captor.getValue().getMessage()).contains("bob accepted");
+        assertThat(captor.getValue().getMessage()).contains("Bob the Brave accepted");
         assertThat(captor.getValue().getMetadata()).containsEntry("kind", "ADVENTURE_INVITE_RESPONSE");
+        assertThat(captor.getValue().getMetadata()).containsOnlyKeys("kind", "adventureId");
         verify(eventPublisher).publishEvent(any(NotificationCreatedEvent.class));
     }
 
@@ -127,7 +128,7 @@ public class AdventureInvitationAnsweredEventListenerTest {
         // then
         var captor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository).save(captor.capture());
-        assertThat(captor.getValue().getMessage()).contains("bob declined");
+        assertThat(captor.getValue().getMessage()).contains("Bob the Brave declined");
     }
 
     @Test

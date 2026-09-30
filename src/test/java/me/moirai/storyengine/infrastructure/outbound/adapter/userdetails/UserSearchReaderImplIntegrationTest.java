@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         insert(userWith("alice", "1001", Role.PLAYER), User.class);
         insert(userWith("bob", "1002", Role.ADMIN), User.class);
 
-        var query = new SearchUsers(null, null, null, null, null, null, null, 1, 10);
+        var query = new SearchUsers(null, null, null, null, null, null, null, null, 1, 10);
 
         // when
         var result = reader.search(query);
@@ -51,7 +50,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         insert(userWith("Alice.Cooper", "1001", Role.PLAYER), User.class);
         insert(userWith("bob", "1002", Role.PLAYER), User.class);
 
-        var query = new SearchUsers("LICE", null, null, null, null, null, null, 1, 10);
+        var query = new SearchUsers("LICE", null, null, null, null, null, null, null, 1, 10);
 
         // when
         var result = reader.search(query);
@@ -69,7 +68,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         insert(userWith("alice", "1001", Role.PLAYER), User.class);
         insert(userWith("bob", "1002", Role.ADMIN), User.class);
 
-        var query = new SearchUsers(null, Role.ADMIN, null, null, null, null, null, 1, 10);
+        var query = new SearchUsers(null, null, Role.ADMIN, null, null, null, null, null, 1, 10);
 
         // when
         var result = reader.search(query);
@@ -87,7 +86,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         insert(userWith("alice", "1001", Role.PLAYER), User.class);
         insert(deactivated(userWith("bob", "1002", Role.PLAYER)), User.class);
 
-        var query = new SearchUsers(null, null, false, null, null, null, null, 1, 10);
+        var query = new SearchUsers(null, null, null, false, null, null, null, null, 1, 10);
 
         // when
         var result = reader.search(query);
@@ -107,7 +106,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
 
         backdateCreationDate(oldUser, Instant.now().minus(30, ChronoUnit.DAYS));
 
-        var query = new SearchUsers(null, null, null, Instant.now().minus(1, ChronoUnit.DAYS), null,
+        var query = new SearchUsers(null, null, null, null, Instant.now().minus(1, ChronoUnit.DAYS), null,
                 null, null, 1, 10);
 
         // when
@@ -127,7 +126,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         insert(userWith("alice", "1001", Role.PLAYER), User.class);
         insert(userWith("bob", "1002", Role.PLAYER), User.class);
 
-        var query = new SearchUsers(null, null, null, null, null, UserSortField.USERNAME,
+        var query = new SearchUsers(null, null, null, null, null, null, UserSortField.USERNAME,
                 SortDirection.ASC, 1, 10);
 
         // when
@@ -146,7 +145,7 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         insert(userWith("bob", "1002", Role.PLAYER), User.class);
         insert(userWith("charlie", "1003", Role.PLAYER), User.class);
 
-        var query = new SearchUsers(null, null, null, null, null, UserSortField.USERNAME,
+        var query = new SearchUsers(null, null, null, null, null, null, UserSortField.USERNAME,
                 SortDirection.ASC, 2, 2);
 
         // when
@@ -158,18 +157,78 @@ public class UserSearchReaderImplIntegrationTest extends AbstractDatabaseIntegra
         assertThat(result.data()).hasSize(1);
     }
 
+    @Test
+    public void search_whenFilteredByPartialDisplayNameInAnotherCase_thenReturnMatchingOnly() {
+
+        // given
+        insert(userWith("alice", "Alice Cooper", "1001", Role.PLAYER), User.class);
+        insert(userWith("bob", "Bob Marley", "1002", Role.PLAYER), User.class);
+
+        var query = new SearchUsers(null, "COOP", null, null, null, null, null, null, 1, 10);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result.totalItems()).isEqualTo(1);
+        assertThat(result.data()).singleElement()
+                .extracting("displayName").isEqualTo("Alice Cooper");
+    }
+
+    @Test
+    public void search_whenSortedByDisplayNameAscending_thenReturnInThatOrder() {
+
+        // given
+        insert(userWith("alice", "Zelda", "1001", Role.PLAYER), User.class);
+        insert(userWith("bob", "Mallory", "1002", Role.PLAYER), User.class);
+        insert(userWith("charlie", "Arwen", "1003", Role.PLAYER), User.class);
+
+        var query = new SearchUsers(null, null, null, null, null, null, UserSortField.DISPLAY_NAME,
+                SortDirection.ASC, 1, 10);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result.data()).extracting("displayName")
+                .containsExactly("Arwen", "Mallory", "Zelda");
+    }
+
+    @Test
+    public void search_whenUsersExist_thenEachSummaryCarriesTheDisplayName() {
+
+        // given
+        insert(userWith("alice", "Alice Cooper", "1001", Role.PLAYER), User.class);
+
+        var query = new SearchUsers(null, null, null, null, null, null, null, null, 1, 10);
+
+        // when
+        var result = reader.search(query);
+
+        // then
+        assertThat(result.data()).singleElement()
+                .extracting("username", "displayName")
+                .containsExactly("alice", "Alice Cooper");
+    }
+
     private User userWith(String username, String discordId, Role role) {
+
+        return userWith(username, username, discordId, role);
+    }
+
+    private User userWith(String username, String displayName, String discordId, Role role) {
 
         return User.builder()
                 .discordId(discordId)
                 .username(username)
+                .displayName(displayName)
                 .role(role)
                 .build();
     }
 
     private User deactivated(User user) {
 
-        user.updateActiveState(false, UUID.randomUUID());
+        user.updateActiveState(false, "someone.else");
 
         return user;
     }

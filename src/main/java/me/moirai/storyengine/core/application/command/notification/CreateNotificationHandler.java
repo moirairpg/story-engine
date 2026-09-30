@@ -1,6 +1,8 @@
 package me.moirai.storyengine.core.application.command.notification;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -83,9 +85,15 @@ public class CreateNotificationHandler extends AbstractCommandHandler<CreateNoti
 
         var found = userRepository.findAllByUsernameIn(usernames);
 
-        if (found.size() != usernames.size()) {
-            var foundUsernames = found.stream().map(User::getUsername).toList();
-            var missing = usernames.stream().filter(u -> !foundUsernames.contains(u)).toList();
+        var foundUsernames = found.stream()
+                .map(user -> user.getUsername().toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+
+        var missing = usernames.stream()
+                .filter(username -> !foundUsernames.contains(username.toLowerCase(Locale.ROOT)))
+                .toList();
+
+        if (!missing.isEmpty()) {
             throw new NotFoundException(UNKNOWN_USERS + String.join(", ", missing));
         }
 

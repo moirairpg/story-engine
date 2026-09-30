@@ -29,10 +29,10 @@ class UpdateUserAuthorizerTest {
     }
 
     @Test
-    void shouldAuthorizeWhenRequesterIsAdminActingOnAnotherAccount() {
+    void shouldAuthorizeWhenRequesterIsAdmin() {
 
         // Given
-        var context = contextWith(UUID.randomUUID(), principalWith(UUID.randomUUID(), Role.ADMIN));
+        var context = contextWith(principalWith("merlin", Role.ADMIN));
 
         // When
         var result = authorizer.authorize(context);
@@ -42,24 +42,10 @@ class UpdateUserAuthorizerTest {
     }
 
     @Test
-    void shouldAuthorizeWhenRequesterUpdatesTheirOwnAccount() {
+    void shouldDenyWhenRequesterIsPlayer() {
 
         // Given
-        var userId = UUID.randomUUID();
-        var context = contextWith(userId, principalWith(userId, Role.PLAYER));
-
-        // When
-        var result = authorizer.authorize(context);
-
-        // Then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void shouldDenyWhenRequesterIsPlayerActingOnAnotherAccount() {
-
-        // Given
-        var context = contextWith(UUID.randomUUID(), principalWith(UUID.randomUUID(), Role.PLAYER));
+        var context = contextWith(principalWith("merlin", Role.PLAYER));
 
         // When
         var result = authorizer.authorize(context);
@@ -68,34 +54,18 @@ class UpdateUserAuthorizerTest {
         assertThat(result).isFalse();
     }
 
-    @Test
-    void shouldDenyWhenRequesterIsPlayerActingOnAnAdminAccount() {
-
-        // Given
-        var adminId = UUID.randomUUID();
-        var context = contextWith(adminId, principalWith(UUID.randomUUID(), Role.PLAYER));
-
-        // When
-        var result = authorizer.authorize(context);
-
-        // Then
-        assertThat(result).isFalse();
-    }
-
-    private MoiraiPrincipal principalWith(UUID publicId, Role role) {
+    private MoiraiPrincipal principalWith(String username, Role role) {
         return new MoiraiPrincipal(
-                publicId,
+                UUID.randomUUID(),
                 1L,
-                "12345",
-                "user",
-                "user@test.com",
+                username,
                 "token",
                 "refresh",
                 role,
                 null);
     }
 
-    private AuthorizationContext contextWith(UUID userId, MoiraiPrincipal principal) {
-        return new AuthorizationContext(principal, Map.of("userId", userId));
+    private AuthorizationContext contextWith(MoiraiPrincipal principal) {
+        return new AuthorizationContext(principal, Map.of());
     }
 }

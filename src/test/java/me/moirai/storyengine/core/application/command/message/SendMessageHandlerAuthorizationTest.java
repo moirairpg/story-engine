@@ -151,7 +151,6 @@ class SendMessageHandlerAuthorizationTest {
 
     private MoiraiPrincipal principal() {
         return new MoiraiPrincipal(
-                UUID.randomUUID(), 1L, "discordId", "caller", "caller@test.com",
-                "token", "refresh", Role.PLAYER, null);
+                UUID.randomUUID(), 1L, "caller", "token", "refresh", Role.PLAYER, null);
     }
 }

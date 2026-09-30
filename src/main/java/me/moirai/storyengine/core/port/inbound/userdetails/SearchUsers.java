@@ -9,6 +9,7 @@ import me.moirai.storyengine.common.enums.SortDirection;
 
 public record SearchUsers(
         String username,
+        String displayName,
         Role role,
         Boolean isActive,
         Instant registeredFrom,

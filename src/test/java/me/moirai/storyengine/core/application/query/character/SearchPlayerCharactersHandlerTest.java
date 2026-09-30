@@ -54,6 +54,7 @@ public class SearchPlayerCharactersHandlerTest {
         assertThat(result.data()).hasSize(10);
         assertThat(result.data().get(0).id()).isNotNull();
         assertThat(result.data().get(0).ownerUsername()).isEqualTo("joao.das.couves");
+        assertThat(result.data().get(0).ownerDisplayName()).isEqualTo("João das Couves");
         assertThat(result.data().get(0).name()).isEqualTo("Conan the Barbarian");
         assertThat(result.data().get(0).characterClass()).isEqualTo(CharacterClass.BARBARIAN);
         assertThat(result.data().get(0).background()).isEqualTo("Orphaned.");
@@ -86,6 +87,7 @@ public class SearchPlayerCharactersHandlerTest {
         return new PlayerCharacterSummaryRow(
                 UUID.randomUUID(),
                 "joao.das.couves",
+                "João das Couves",
                 "Conan the Barbarian",
                 CharacterClass.BARBARIAN,
                 "Orphaned.",

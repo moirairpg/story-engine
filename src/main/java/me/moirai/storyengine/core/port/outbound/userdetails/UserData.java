@@ -1,4 +1,4 @@
-package me.moirai.storyengine.core.port.inbound.userdetails;
+package me.moirai.storyengine.core.port.outbound.userdetails;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -10,6 +10,7 @@ public record UserData(
         Long id,
         String discordId,
         String username,
+        String displayName,
         Role role,
         boolean isActive,
         String bio,

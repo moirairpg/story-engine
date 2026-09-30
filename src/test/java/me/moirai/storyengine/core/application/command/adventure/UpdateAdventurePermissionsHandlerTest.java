@@ -76,6 +76,8 @@ public class UpdateAdventurePermissionsHandlerTest {
         assertThat(result).hasSize(2);
         assertThat(result).anyMatch(m -> m.username().equals("member") && m.level() == PermissionLevel.WRITE);
         assertThat(result).anyMatch(m -> m.level() == PermissionLevel.OWNER);
+        assertThat(result).anyMatch(m -> m.username().equals("member") && m.displayName().equals("The member"));
+        assertThat(result).anyMatch(m -> m.username().equals("owner") && m.displayName().equals("The owner"));
         assertThat(adventure.canWrite(MEMBER_ID)).isTrue();
     }
 
@@ -254,7 +256,7 @@ public class UpdateAdventurePermissionsHandlerTest {
 
     private User userWith(Long id, UUID publicId, String username) {
 
-        var user = UserFixture.player().username(username).build();
+        var user = UserFixture.player().username(username).displayName("The " + username).build();
         ReflectionTestUtils.setField(user, "id", id);
         ReflectionTestUtils.setField(user, "publicId", publicId);
 

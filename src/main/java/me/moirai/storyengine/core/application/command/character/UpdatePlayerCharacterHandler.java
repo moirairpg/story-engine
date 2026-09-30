@@ -1,12 +1,9 @@
 package me.moirai.storyengine.core.application.command.character;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import java.util.Map;
 
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
-import me.moirai.storyengine.common.exception.BusinessRuleViolationException;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.rules.CharacterSheetRules;
 import me.moirai.storyengine.core.domain.character.PlayerCharacter;
@@ -43,26 +40,6 @@ public class UpdatePlayerCharacterHandler
     }
 
     @Override
-    public void validate(UpdatePlayerCharacter command) {
-
-        if (isBlank(command.name())) {
-            throw new BusinessRuleViolationException("Character name cannot be null or empty");
-        }
-
-        if (isBlank(command.personality())) {
-            throw new BusinessRuleViolationException("Character personality cannot be null or empty");
-        }
-
-        if (isBlank(command.physicalDescription())) {
-            throw new BusinessRuleViolationException("Character physical description cannot be null or empty");
-        }
-
-        if (isBlank(command.background())) {
-            throw new BusinessRuleViolationException("Character background cannot be null or empty");
-        }
-    }
-
-    @Override
     public PlayerCharacterDetails execute(UpdatePlayerCharacter command) {
 
         var character = repository.findByPublicId(command.characterId())
@@ -84,14 +61,19 @@ public class UpdatePlayerCharacterHandler
 
         var isOwner = owner.getUsername().equals(command.requesterUsername());
 
-        return mapResult(saved, owner.getUsername(), isOwner);
+        return mapResult(saved, owner.getUsername(), owner.getDisplayName(), isOwner);
     }
 
-    private PlayerCharacterDetails mapResult(PlayerCharacter character, String ownerUsername, boolean isOwner) {
+    private PlayerCharacterDetails mapResult(
+            PlayerCharacter character,
+            String ownerUsername,
+            String ownerDisplayName,
+            boolean isOwner) {
 
         return new PlayerCharacterDetails(
                 character.getPublicId(),
                 ownerUsername,
+                ownerDisplayName,
                 character.getName(),
                 character.getCharacterClass(),
                 character.getPersonality(),

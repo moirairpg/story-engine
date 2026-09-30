@@ -8,9 +8,9 @@ import me.moirai.storyengine.common.enums.Role;
 public record UserDetailsResult(
         UUID publicId,
         Long id,
-        String discordId,
         String discordUsername,
         String username,
+        String displayName,
         String avatarUrl,
         Role role,
         boolean isActive,

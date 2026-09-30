@@ -99,9 +99,7 @@ public class ViewPlayerCharacterAdventuresAuthorizerTest {
         return new MoiraiPrincipal(
                 UUID.randomUUID(),
                 1L,
-                "discordId",
                 "user",
-                "user@test.com",
                 "token",
                 "refresh",
                 role,

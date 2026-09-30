@@ -213,6 +213,7 @@ public class DbTestHelperIntegrationTest extends AbstractDatabaseIntegrationTest
         var updated = User.builder()
                 .discordId("unique-discord-7")
                 .username("john.doe")
+                .displayName("John Doe")
                 .role(ADMIN)
                 .build();
 
@@ -237,7 +238,7 @@ public class DbTestHelperIntegrationTest extends AbstractDatabaseIntegrationTest
         var first = UserFixture.player().discordId("unique-discord-8a").build();
         insert(first, User.class);
 
-        var second = UserFixture.player().discordId("unique-discord-8b").build();
+        var second = UserFixture.player().discordId("unique-discord-8b").username("jane.doe").build();
         insert(second, User.class);
 
         var firstId = jdbcClient.sql("SELECT id FROM moirai_user WHERE discord_id = :discordId")
@@ -253,6 +254,7 @@ public class DbTestHelperIntegrationTest extends AbstractDatabaseIntegrationTest
         var updated = User.builder()
                 .discordId("unique-discord-8a")
                 .username("john.doe")
+                .displayName("John Doe")
                 .role(ADMIN)
                 .build();
 
@@ -275,7 +277,7 @@ public class DbTestHelperIntegrationTest extends AbstractDatabaseIntegrationTest
 
         // Given
         insert(UserFixture.player().discordId("unique-discord-9a").build(), User.class);
-        insert(UserFixture.admin().discordId("unique-discord-9b").build(), User.class);
+        insert(UserFixture.admin().discordId("unique-discord-9b").username("jane.doe").build(), User.class);
 
         // When
         clear(User.class);

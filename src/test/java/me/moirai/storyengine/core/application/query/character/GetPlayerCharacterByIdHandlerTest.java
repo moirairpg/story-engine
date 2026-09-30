@@ -31,6 +31,7 @@ import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 public class GetPlayerCharacterByIdHandlerTest {
 
     private static final String OWNER_USERNAME = "john.doe";
+    private static final String OWNER_DISPLAY_NAME = "Johnny the Bold";
     private static final String OTHER_USERNAME = "jane.doe";
 
     @Mock
@@ -69,6 +70,8 @@ public class GetPlayerCharacterByIdHandlerTest {
         assertThat(result.canManage()).isTrue();
         assertThat(result.isOwner()).isTrue();
         assertThat(result.background()).isEqualTo("Orphaned.");
+        assertThat(result.ownerUsername()).isEqualTo(OWNER_USERNAME);
+        assertThat(result.ownerDisplayName()).isEqualTo(OWNER_DISPLAY_NAME);
     }
 
     @Test
@@ -134,6 +137,7 @@ public class GetPlayerCharacterByIdHandlerTest {
         var row = new PlayerCharacterDetailsRow(
                 PlayerCharacterFixture.PUBLIC_ID,
                 OWNER_USERNAME,
+                OWNER_DISPLAY_NAME,
                 "Volin Habar",
                 null,
                 "Brave.",
@@ -167,6 +171,7 @@ public class GetPlayerCharacterByIdHandlerTest {
         return new PlayerCharacterDetailsRow(
                 PlayerCharacterFixture.PUBLIC_ID,
                 OWNER_USERNAME,
+                OWNER_DISPLAY_NAME,
                 "Volin Habar",
                 CharacterClass.PALADIN,
                 "Brave.",

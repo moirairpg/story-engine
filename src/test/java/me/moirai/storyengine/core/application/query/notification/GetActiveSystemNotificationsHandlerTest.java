@@ -62,7 +62,7 @@ public class GetActiveSystemNotificationsHandlerTest {
                 Instant.parse("2026-01-01T00:00:00Z"), Instant.parse("2026-01-01T00:00:00Z"));
 
         var invitationRow = new PendingInvitationRow(
-                UUID.randomUUID(), UUID.randomUUID(), "Dragon Hunt", "alice", "some_user",
+                UUID.randomUUID(), UUID.randomUUID(), "Dragon Hunt", "Alice Liddell", "some_user",
                 Instant.parse("2026-06-01T00:00:00Z"));
 
         var query = new GetActiveSystemNotifications("some_user");
@@ -87,7 +87,7 @@ public class GetActiveSystemNotificationsHandlerTest {
         var adventureId = UUID.randomUUID();
 
         var invitationRow = new PendingInvitationRow(
-                invitationId, adventureId, "Dragon Hunt", "alice", "some_user",
+                invitationId, adventureId, "Dragon Hunt", "Alice Liddell", "some_user",
                 Instant.parse("2026-06-01T00:00:00Z"));
 
         var query = new GetActiveSystemNotifications("some_user");
@@ -102,9 +102,11 @@ public class GetActiveSystemNotificationsHandlerTest {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().publicId()).isEqualTo(invitationId);
         assertThat(result.getFirst().isInteractable()).isTrue();
+        assertThat(result.getFirst().message()).isEqualTo("Alice Liddell invited you to join Dragon Hunt");
+        assertThat(result.getFirst().targetUsernames()).containsExactly("some_user");
+        assertThat(result.getFirst().metadata()).containsOnlyKeys("kind", "adventureName");
         assertThat(result.getFirst().metadata()).containsEntry("kind", "ADVENTURE_INVITE");
-        assertThat(result.getFirst().metadata()).containsEntry("adventureId", adventureId.toString());
-        assertThat(result.getFirst().metadata()).containsEntry("inviterUsername", "alice");
+        assertThat(result.getFirst().metadata()).containsEntry("adventureName", "Dragon Hunt");
     }
 
     @Test

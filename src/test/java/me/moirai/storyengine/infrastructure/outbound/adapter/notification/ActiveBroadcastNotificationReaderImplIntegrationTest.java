@@ -95,6 +95,7 @@ public class ActiveBroadcastNotificationReaderImplIntegrationTest extends Abstra
         return User.builder()
                 .discordId("discord-" + username)
                 .username(username)
+                .displayName(username)
                 .role(Role.PLAYER)
                 .build();
     }

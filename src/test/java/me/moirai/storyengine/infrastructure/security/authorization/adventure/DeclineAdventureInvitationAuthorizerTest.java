@@ -103,7 +103,7 @@ public class DeclineAdventureInvitationAuthorizerTest {
 
     private MoiraiPrincipal principal(Role role, String username) {
         return new MoiraiPrincipal(
-                UUID.randomUUID(), 1L, "discordId", username, "caller@test.com", "token", "refresh", role, null);
+                UUID.randomUUID(), 1L, username, "token", "refresh", role, null);
     }
 
     private AuthorizationContext contextWith(MoiraiPrincipal principal) {

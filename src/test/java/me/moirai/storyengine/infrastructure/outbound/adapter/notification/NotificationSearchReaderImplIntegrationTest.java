@@ -150,6 +150,7 @@ public class NotificationSearchReaderImplIntegrationTest extends AbstractDatabas
         return User.builder()
                 .discordId("discord-" + username)
                 .username(username)
+                .displayName(username)
                 .role(Role.PLAYER)
                 .build();
     }

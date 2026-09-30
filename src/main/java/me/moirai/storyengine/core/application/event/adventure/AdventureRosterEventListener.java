@@ -49,14 +49,13 @@ public class AdventureRosterEventListener {
     @EventListener
     public void onPlayerLeft(PlayerLeftAdventureEvent event) {
 
-        var username = resolveUsername(event.getPlayerId());
+        var displayName = resolveDisplayName(event.getPlayerId());
 
         publish(notifyManagers(
                 event.getAdventureId(),
                 event.getAdventurePublicId(),
-                username + " left " + event.getAdventureName(),
-                NotificationKind.ADVENTURE_MEMBER_LEFT,
-                username));
+                displayName + " left " + event.getAdventureName(),
+                NotificationKind.ADVENTURE_MEMBER_LEFT));
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -80,29 +79,27 @@ public class AdventureRosterEventListener {
     @EventListener
     public void onEnrolledCharacterDeleted(EnrolledCharacterDeletedEvent event) {
 
-        var username = resolveUsername(event.getPlayerId());
+        var displayName = resolveDisplayName(event.getPlayerId());
 
         publish(notifyManagers(
                 event.getAdventureId(),
                 event.getAdventurePublicId(),
-                username + " deleted their character in " + event.getAdventureName(),
-                NotificationKind.ADVENTURE_CHARACTER_DELETED,
-                username));
+                displayName + " deleted their character in " + event.getAdventureName(),
+                NotificationKind.ADVENTURE_CHARACTER_DELETED));
     }
 
-    private String resolveUsername(Long playerId) {
+    private String resolveDisplayName(Long playerId) {
 
         return userRepository.findById(playerId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND))
-                .getUsername();
+                .getDisplayName();
     }
 
     private Notification notifyManagers(
             Long adventureId,
             UUID adventurePublicId,
             String message,
-            NotificationKind kind,
-            String username) {
+            NotificationKind kind) {
 
         var managerUserIds = adventureRepository.findManagerUserIdsByAdventureId(adventureId);
 
@@ -114,8 +111,7 @@ public class AdventureRosterEventListener {
                 .isInteractable(false)
                 .metadata(Map.<String, Object>of(
                         "kind", kind.name(),
-                        "adventureId", adventurePublicId.toString(),
-                        "username", username))
+                        "adventureId", adventurePublicId.toString()))
                 .recipientUserIds(managerUserIds)
                 .build();
     }

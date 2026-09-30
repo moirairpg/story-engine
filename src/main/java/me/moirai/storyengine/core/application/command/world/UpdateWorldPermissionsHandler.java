@@ -71,7 +71,11 @@ public class UpdateWorldPermissionsHandler
                 .map(permission -> {
                     var user = usersById.get(permission.userId());
 
-                    return new AssetMember(user.getPublicId(), user.getUsername(), permission.level());
+                    return new AssetMember(
+                            user.getPublicId(),
+                            user.getUsername(),
+                            user.getDisplayName(),
+                            permission.level());
                 })
                 .toList();
     }

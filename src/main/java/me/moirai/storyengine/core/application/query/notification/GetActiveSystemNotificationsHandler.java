@@ -49,7 +49,7 @@ public class GetActiveSystemNotificationsHandler
 
         return new NotificationDetails(
                 row.invitationId(),
-                row.inviterUsername() + " invited you to join " + row.adventureName(),
+                row.inviterDisplayName() + " invited you to join " + row.adventureName(),
                 NotificationType.SYSTEM,
                 NotificationLevel.INFO,
                 List.of(row.recipientUsername()),
@@ -57,9 +57,7 @@ public class GetActiveSystemNotificationsHandler
                 true,
                 Map.of(
                         "kind", NotificationKind.ADVENTURE_INVITE.name(),
-                        "adventureId", row.adventureId().toString(),
-                        "adventureName", row.adventureName(),
-                        "inviterUsername", row.inviterUsername()),
+                        "adventureName", row.adventureName()),
                 row.creationDate(),
                 row.creationDate());
     }

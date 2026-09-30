@@ -34,7 +34,7 @@ public class GetAdventureMembersHandlerTest {
     void shouldReturnTheMembersTheReaderProvides() {
 
         // given
-        var members = List.of(new AssetMember(OWNER_ID, "owner", PermissionLevel.OWNER));
+        var members = List.of(new AssetMember(OWNER_ID, "owner", "The Owner", PermissionLevel.OWNER));
         when(reader.getAllByAdventurePublicId(any())).thenReturn(members);
 
         // when

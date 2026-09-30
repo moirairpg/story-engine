@@ -17,7 +17,6 @@ import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureById, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be viewed was not found";
-    private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
     private final AdventureReader reader;
     private final AdventureRosterReader adventureRosterReader;
@@ -34,14 +33,6 @@ public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureBy
     }
 
     @Override
-    public void validate(GetAdventureById command) {
-
-        if (command.adventureId() == null) {
-            throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
-        }
-    }
-
-    @Override
     public AdventureDetails execute(GetAdventureById query) {
 
         var adventure = reader.getAdventureById(query.adventureId())
@@ -52,6 +43,7 @@ public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureBy
                         row.playerCharacterId(),
                         row.playerId(),
                         row.playerUsername(),
+                        row.playerDisplayName(),
                         row.name(),
                         row.characterClass(),
                         storagePort.resolveUrl(row.imageKey()),

@@ -98,6 +98,7 @@ public class ActiveSystemNotificationReaderImplIntegrationTest extends AbstractD
         return User.builder()
                 .discordId("discord-" + username)
                 .username(username)
+                .displayName(username)
                 .role(Role.PLAYER)
                 .build();
     }

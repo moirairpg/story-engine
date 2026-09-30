@@ -70,7 +70,36 @@ public class AdventurePermissionReaderImplIntegrationTest extends AbstractDataba
     }
 
     @Test
-    public void getAllByAdventurePublicId_whenAdventureHasSeveralNonOwners_thenOrderThemByUsername() {
+    public void getAllByAdventurePublicId_whenAdventureHasSeveralNonOwners_thenOrderThemByDisplayName() {
+
+        // Given
+        var owner = insert(UserFixture.player().username("owner").displayName("Owner")
+                .discordId("adv-display-owner").build(), User.class);
+        var zoe = insert(UserFixture.player().username("zoe").displayName("Abigail")
+                .discordId("adv-display-zoe").build(), User.class);
+        var adam = insert(UserFixture.player().username("adam").displayName("Zachary")
+                .discordId("adv-display-adam").build(), User.class);
+        var world = insert(WorldFixture.publicWorld().build(), World.class);
+
+        var adventure = AdventureFixture.privateAdventure()
+                .worldId(world.getPublicId())
+                .permissions(new Permission(owner.getId(), PermissionLevel.OWNER))
+                .permissions(new Permission(zoe.getId(), PermissionLevel.READ))
+                .permissions(new Permission(adam.getId(), PermissionLevel.WRITE))
+                .build();
+
+        insert(adventure, Adventure.class);
+
+        // When
+        var result = reader.getAllByAdventurePublicId(adventure.getPublicId());
+
+        // Then
+        assertThat(result).extracting(AssetMember::username).containsExactly("owner", "zoe", "adam");
+        assertThat(result).extracting(AssetMember::displayName).containsExactly("Owner", "Abigail", "Zachary");
+    }
+
+    @Test
+    public void getAllByAdventurePublicId_whenNonOwnersShareADisplayName_thenOrderThemByUsername() {
 
         // Given
         var owner = insert(UserFixture.player().username("owner").discordId("adv-order-owner").build(), User.class);

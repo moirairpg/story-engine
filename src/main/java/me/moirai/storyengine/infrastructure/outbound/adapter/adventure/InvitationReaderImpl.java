@@ -18,12 +18,12 @@ public class InvitationReaderImpl implements InvitationReader {
 
     //@formatter:off
     private static final String SELECT_PENDING_BY_ADVENTURE_AND_RECIPIENT = """
-            SELECT ai.public_id     AS invitation_id,
-                   a.public_id      AS adventure_id,
-                   a.name           AS adventure_name,
-                   inviter.username AS inviter_username,
-                   u.username       AS recipient_username,
-                   ai.creation_date AS creation_date
+            SELECT ai.public_id         AS invitation_id,
+                   a.public_id          AS adventure_id,
+                   a.name               AS adventure_name,
+                   inviter.display_name AS inviter_display_name,
+                   u.username           AS recipient_username,
+                   ai.creation_date     AS creation_date
               FROM adventure_invitation ai
                    JOIN adventure a         ON a.id       = ai.adventure_id
                    JOIN moirai_user u       ON u.id       = ai.user_id
@@ -34,12 +34,12 @@ public class InvitationReaderImpl implements InvitationReader {
             """;
 
     private static final String SELECT_PENDING_BY_PUBLIC_ID = """
-            SELECT ai.public_id     AS invitation_id,
-                   a.public_id      AS adventure_id,
-                   a.name           AS adventure_name,
-                   inviter.username AS inviter_username,
-                   u.username       AS recipient_username,
-                   ai.creation_date AS creation_date
+            SELECT ai.public_id         AS invitation_id,
+                   a.public_id          AS adventure_id,
+                   a.name               AS adventure_name,
+                   inviter.display_name AS inviter_display_name,
+                   u.username           AS recipient_username,
+                   ai.creation_date     AS creation_date
               FROM adventure_invitation ai
                    JOIN adventure a         ON a.id       = ai.adventure_id
                    JOIN moirai_user u       ON u.id       = ai.user_id
@@ -57,12 +57,12 @@ public class InvitationReaderImpl implements InvitationReader {
             """;
 
     private static final String SELECT_ALL_PENDING_BY_RECIPIENT = """
-            SELECT ai.public_id     AS invitation_id,
-                   a.public_id      AS adventure_id,
-                   a.name           AS adventure_name,
-                   inviter.username AS inviter_username,
-                   u.username       AS recipient_username,
-                   ai.creation_date AS creation_date
+            SELECT ai.public_id         AS invitation_id,
+                   a.public_id          AS adventure_id,
+                   a.name               AS adventure_name,
+                   inviter.display_name AS inviter_display_name,
+                   u.username           AS recipient_username,
+                   ai.creation_date     AS creation_date
               FROM adventure_invitation ai
                    JOIN adventure a         ON a.id       = ai.adventure_id
                    JOIN moirai_user u       ON u.id       = ai.user_id
@@ -123,7 +123,7 @@ public class InvitationReaderImpl implements InvitationReader {
                 rs.getObject("invitation_id", UUID.class),
                 rs.getObject("adventure_id", UUID.class),
                 rs.getString("adventure_name"),
-                rs.getString("inviter_username"),
+                rs.getString("inviter_display_name"),
                 rs.getString("recipient_username"),
                 rs.getTimestamp("creation_date").toInstant());
     }

@@ -2,21 +2,24 @@ package me.moirai.storyengine.core.application.command.user;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
-import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserById;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
+import me.moirai.storyengine.core.port.inbound.userdetails.DeleteUserByUsername;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
-public class DeleteUserByIdHandler extends AbstractCommandHandler<DeleteUserById, Void> {
+@Authorize(operation = AuthorizationOperation.MANAGE_USER, fields = "#request.username")
+public class DeleteUserByUsernameHandler extends AbstractCommandHandler<DeleteUserByUsername, Void> {
 
-    private static final String USER_NOT_REGISTERED_IN_MOIRAI = "The User with the requested ID is not registered in MoirAI";
+    private static final String USER_NOT_REGISTERED_IN_MOIRAI = "The User with the requested username is not registered in MoirAI";
 
     private final UserRepository repository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public DeleteUserByIdHandler(
+    public DeleteUserByUsernameHandler(
             UserRepository repository,
             ApplicationEventPublisher eventPublisher) {
 
@@ -25,17 +28,9 @@ public class DeleteUserByIdHandler extends AbstractCommandHandler<DeleteUserById
     }
 
     @Override
-    public void validate(DeleteUserById useCase) {
+    public Void execute(DeleteUserByUsername useCase) {
 
-        if (useCase.userId() == null) {
-            throw new IllegalArgumentException("User ID cannot be null");
-        }
-    }
-
-    @Override
-    public Void execute(DeleteUserById useCase) {
-
-        var user = repository.findByPublicId(useCase.userId())
+        var user = repository.findByUsername(useCase.username())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
         user.communicateUserDeleted();

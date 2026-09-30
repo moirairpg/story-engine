@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 @ExtendWith(MockitoExtension.class)
 public class DeleteUsersHandlerTest {
 
-    private static final UUID REQUESTER_ID = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
+    private static final String REQUESTER_USERNAME = "Merlin";
 
     @Mock
     private UserRepository repository;
@@ -61,18 +60,18 @@ public class DeleteUsersHandlerTest {
     public void shouldDeleteEveryUserInTheSelectionWhenAllExist() {
 
         // given
-        var first = userWith(UUID.randomUUID());
-        var second = userWith(UUID.randomUUID());
-        var command = new DeleteUsers(List.of(first.getPublicId(), second.getPublicId()), REQUESTER_ID);
+        var first = userWith("first.player");
+        var second = userWith("second.player");
+        var command = new DeleteUsers(List.of(first.getUsername(), second.getUsername()), REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(first.getPublicId())).thenReturn(Optional.of(first));
-        when(repository.findByPublicId(second.getPublicId())).thenReturn(Optional.of(second));
+        when(repository.findByUsername(first.getUsername())).thenReturn(Optional.of(first));
+        when(repository.findByUsername(second.getUsername())).thenReturn(Optional.of(second));
 
         // when
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).isEmpty();
+        assertThat(result.failedUsernames()).isEmpty();
 
         verify(repository).delete(first);
         verify(repository).delete(second);
@@ -83,13 +82,13 @@ public class DeleteUsersHandlerTest {
     public void shouldDeleteNothingWhenTheSelectionIsEmpty() {
 
         // given
-        var command = new DeleteUsers(List.of(), REQUESTER_ID);
+        var command = new DeleteUsers(List.of(), REQUESTER_USERNAME);
 
         // when
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).isEmpty();
+        assertThat(result.failedUsernames()).isEmpty();
 
         verify(repository, never()).delete(any(User.class));
         verify(transactionManager, never()).getTransaction(any(TransactionDefinition.class));
@@ -99,13 +98,13 @@ public class DeleteUsersHandlerTest {
     public void shouldDeleteNothingWhenTheSelectionIsNull() {
 
         // given
-        var command = new DeleteUsers(null, REQUESTER_ID);
+        var command = new DeleteUsers(null, REQUESTER_USERNAME);
 
         // when
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).isEmpty();
+        assertThat(result.failedUsernames()).isEmpty();
 
         verify(repository, never()).delete(any(User.class));
     }
@@ -114,8 +113,7 @@ public class DeleteUsersHandlerTest {
     public void shouldDeleteNothingWhenTheRequesterIsInTheSelection() {
 
         // given
-        var other = UUID.randomUUID();
-        var command = new DeleteUsers(List.of(other, REQUESTER_ID), REQUESTER_ID);
+        var command = new DeleteUsers(List.of("other.player", REQUESTER_USERNAME), REQUESTER_USERNAME);
 
         // then
         assertThatThrownBy(() -> handler.handle(command))
@@ -126,21 +124,34 @@ public class DeleteUsersHandlerTest {
     }
 
     @Test
-    public void shouldReportTheFailureAndDeleteTheRestWhenOneUserIsUnknown() {
+    public void shouldDeleteNothingWhenTheRequesterIsInTheSelectionInAnotherCase() {
 
         // given
-        var known = userWith(UUID.randomUUID());
-        var unknown = UUID.randomUUID();
-        var command = new DeleteUsers(List.of(known.getPublicId(), unknown), REQUESTER_ID);
+        var command = new DeleteUsers(List.of("other.player", "mERLIN"), REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(known.getPublicId())).thenReturn(Optional.of(known));
-        when(repository.findByPublicId(unknown)).thenReturn(Optional.empty());
+        // then
+        assertThatThrownBy(() -> handler.handle(command))
+                .isInstanceOf(BusinessRuleViolationException.class);
+
+        verify(repository, never()).delete(any(User.class));
+        verify(transactionManager, never()).getTransaction(any(TransactionDefinition.class));
+    }
+
+    @Test
+    public void shouldReportTheUnknownHandleAsSentAndDeleteTheRestWhenOneUserIsUnknown() {
+
+        // given
+        var known = userWith("known.player");
+        var command = new DeleteUsers(List.of(known.getUsername(), "Ghost.Player"), REQUESTER_USERNAME);
+
+        when(repository.findByUsername(known.getUsername())).thenReturn(Optional.of(known));
+        when(repository.findByUsername("Ghost.Player")).thenReturn(Optional.empty());
 
         // when
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).containsExactly(unknown);
+        assertThat(result.failedUsernames()).containsExactly("Ghost.Player");
 
         verify(repository).delete(known);
     }
@@ -149,12 +160,12 @@ public class DeleteUsersHandlerTest {
     public void shouldReportTheFailureAndDeleteTheRestWhenOneDeletionThrows() {
 
         // given
-        var failing = userWith(UUID.randomUUID());
-        var succeeding = userWith(UUID.randomUUID());
-        var command = new DeleteUsers(List.of(failing.getPublicId(), succeeding.getPublicId()), REQUESTER_ID);
+        var failing = userWith("failing.player");
+        var succeeding = userWith("succeeding.player");
+        var command = new DeleteUsers(List.of(failing.getUsername(), succeeding.getUsername()), REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(failing.getPublicId())).thenReturn(Optional.of(failing));
-        when(repository.findByPublicId(succeeding.getPublicId())).thenReturn(Optional.of(succeeding));
+        when(repository.findByUsername(failing.getUsername())).thenReturn(Optional.of(failing));
+        when(repository.findByUsername(succeeding.getUsername())).thenReturn(Optional.of(succeeding));
 
         doThrow(new IllegalStateException("boom")).when(repository).delete(failing);
 
@@ -162,25 +173,43 @@ public class DeleteUsersHandlerTest {
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).containsExactly(failing.getPublicId());
+        assertThat(result.failedUsernames()).containsExactly(failing.getUsername());
 
         verify(repository).delete(succeeding);
     }
 
     @Test
-    public void shouldDeleteOnceWhenTheSameIdIsSubmittedTwice() {
+    public void shouldReportTheDatabaseCasingWhenADeletionRequestedInAnotherCaseFails() {
 
         // given
-        var user = userWith(UUID.randomUUID());
-        var command = new DeleteUsers(List.of(user.getPublicId(), user.getPublicId()), REQUESTER_ID);
+        var failing = userWith("Failing.Player");
+        var command = new DeleteUsers(List.of("fAILING.pLAYER"), REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(user.getPublicId())).thenReturn(Optional.of(user));
+        when(repository.findByUsername("fAILING.pLAYER")).thenReturn(Optional.of(failing));
+
+        doThrow(new IllegalStateException("boom")).when(repository).delete(failing);
 
         // when
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).isEmpty();
+        assertThat(result.failedUsernames()).containsExactly("Failing.Player");
+    }
+
+    @Test
+    public void shouldDeleteOnceWhenTheSameHandleIsSubmittedTwice() {
+
+        // given
+        var user = userWith("john.doe");
+        var command = new DeleteUsers(List.of("john.doe", "JOHN.DOE"), REQUESTER_USERNAME);
+
+        when(repository.findByUsername("john.doe")).thenReturn(Optional.of(user));
+
+        // when
+        var result = handler.handle(command);
+
+        // then
+        assertThat(result.failedUsernames()).isEmpty();
 
         verify(repository).delete(user);
     }
@@ -189,18 +218,16 @@ public class DeleteUsersHandlerTest {
     public void shouldReportFailuresInTheOrderTheyWereSubmittedWhenSeveralFail() {
 
         // given
-        var firstUnknown = UUID.randomUUID();
-        var secondUnknown = UUID.randomUUID();
-        var command = new DeleteUsers(List.of(firstUnknown, secondUnknown), REQUESTER_ID);
+        var command = new DeleteUsers(List.of("first.ghost", "second.ghost"), REQUESTER_USERNAME);
 
-        when(repository.findByPublicId(firstUnknown)).thenReturn(Optional.empty());
-        when(repository.findByPublicId(secondUnknown)).thenReturn(Optional.empty());
+        when(repository.findByUsername("first.ghost")).thenReturn(Optional.empty());
+        when(repository.findByUsername("second.ghost")).thenReturn(Optional.empty());
 
         // when
         var result = handler.handle(command);
 
         // then
-        assertThat(result.failedUserIds()).containsExactly(firstUnknown, secondUnknown);
+        assertThat(result.failedUsernames()).containsExactly("first.ghost", "second.ghost");
     }
 
     @Test
@@ -211,11 +238,10 @@ public class DeleteUsersHandlerTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    private User userWith(UUID publicId) {
+    private User userWith(String username) {
 
-        var user = UserFixture.player().build();
+        var user = UserFixture.player().username(username).build();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "publicId", publicId);
 
         return user;
     }

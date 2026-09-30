@@ -81,6 +81,8 @@ public class UpdateCharacterSheetHandlerTest {
                 .containsEntry(CharacterSkill.CONJURATION, 2);
         assertThat(result.signatureSkill()).containsEntry(SignatureSkill.SPELLWEAVE, 1);
         assertThat(result.background()).isEqualTo(character.getBackground());
+        assertThat(result.ownerUsername()).isEqualTo(OWNER_USERNAME);
+        assertThat(result.ownerDisplayName()).isEqualTo("John Doe");
 
         verify(vectorSearchPort).upsert(character.getPublicId(), VECTOR);
     }

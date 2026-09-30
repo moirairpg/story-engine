@@ -66,6 +66,26 @@ public class PlayerCharacterReaderImplIntegrationTest extends AbstractDatabaseIn
     }
 
     @Test
+    void shouldReturnTheOwnerDisplayNameWhenGettingTheCharacterById() {
+
+        // given
+        var owner = insert(UserFixture.player().displayName("Johnny the Bold").build(), User.class);
+        var character = PlayerCharacterFixture.samplePlayerCharacter()
+                .playerId(owner.getId())
+                .build();
+
+        insert(character, PlayerCharacter.class);
+
+        // when
+        var result = reader.getById(character.getPublicId());
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().ownerUsername()).isEqualTo("john.doe");
+        assertThat(result.get().ownerDisplayName()).isEqualTo("Johnny the Bold");
+    }
+
+    @Test
     void shouldReturnTheBackgroundWhenGettingTheCharacterById() {
 
         // given

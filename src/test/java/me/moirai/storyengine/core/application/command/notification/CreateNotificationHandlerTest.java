@@ -1,12 +1,13 @@
 package me.moirai.storyengine.core.application.command.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +68,7 @@ public class CreateNotificationHandlerTest {
 
         var saved = NotificationFixture.systemWithId();
 
-        when(userRepository.findAllByUsernameIn(anyCollection())).thenReturn(List.of(alice, bob, charlie));
+        when(userRepository.findAllByUsernameIn(anyList())).thenReturn(List.of(alice, bob, charlie));
         when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
 
         // when
@@ -97,7 +98,7 @@ public class CreateNotificationHandlerTest {
 
         var saved = NotificationFixture.systemWithId();
 
-        when(userRepository.findAllByUsernameIn(anyCollection())).thenReturn(List.of(alice, bob, charlie));
+        when(userRepository.findAllByUsernameIn(anyList())).thenReturn(List.of(alice, bob, charlie));
         when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
 
         // when
@@ -125,7 +126,7 @@ public class CreateNotificationHandlerTest {
 
         var saved = NotificationFixture.systemWithId();
 
-        when(userRepository.findAllByUsernameIn(anyCollection())).thenReturn(List.of(alice, bob, charlie));
+        when(userRepository.findAllByUsernameIn(anyList())).thenReturn(List.of(alice, bob, charlie));
         when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
 
         // when
@@ -197,11 +198,56 @@ public class CreateNotificationHandlerTest {
                 false,
                 null);
 
-        when(userRepository.findAllByUsernameIn(anyCollection()))
+        when(userRepository.findAllByUsernameIn(anyList()))
                 .thenReturn(List.of(UserFixture.playerWithId()));
 
         // then
         assertThrows(NotFoundException.class, () -> handler.execute(command));
+    }
+
+    @Test
+    public void shouldResolveAndNotReportUnknownWhenTargetIsSentInAnotherCase() {
+
+        // given
+        var command = new CreateNotification(
+                "Hello",
+                NotificationType.SYSTEM,
+                NotificationLevel.INFO,
+                List.of("ALICE"),
+                false,
+                null);
+
+        var alice = userWith(10L, "alice");
+        var saved = NotificationFixture.systemWithId();
+
+        when(userRepository.findAllByUsernameIn(anyList())).thenReturn(List.of(alice));
+        when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
+
+        // when
+        var result = handler.execute(command);
+
+        // then
+        assertThat(result.targetUsernames()).containsExactly("alice");
+    }
+
+    @Test
+    public void shouldReportUnknownTargetAsTypedWhenItMatchesNoAccount() {
+
+        // given
+        var command = new CreateNotification(
+                "Hello",
+                NotificationType.SYSTEM,
+                NotificationLevel.INFO,
+                List.of("alice", "Ghost.User"),
+                false,
+                null);
+
+        when(userRepository.findAllByUsernameIn(anyList())).thenReturn(List.of(userWith(10L, "alice")));
+
+        // then
+        assertThatThrownBy(() -> handler.execute(command))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Unknown usernames: Ghost.User");
     }
 
     @Test
@@ -233,6 +279,7 @@ public class CreateNotificationHandlerTest {
         var user = User.builder()
                 .discordId("discord-" + id)
                 .username(username)
+                .displayName(username)
                 .role(me.moirai.storyengine.common.enums.Role.PLAYER)
                 .build();
 

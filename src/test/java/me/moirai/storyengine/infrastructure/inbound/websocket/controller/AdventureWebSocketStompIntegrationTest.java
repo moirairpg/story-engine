@@ -171,8 +171,7 @@ class AdventureWebSocketStompIntegrationTest extends AbstractDatabaseIntegration
 
     private MoiraiPrincipal principal() {
         return new MoiraiPrincipal(
-                UUID.randomUUID(), 99999L, "discordId", "alice", "alice@test.com",
-                "token", "refresh", Role.PLAYER, null);
+                UUID.randomUUID(), 99999L, "alice", "token", "refresh", Role.PLAYER, null);
     }
 
     record WebSocketPayload(String content) {

@@ -5,5 +5,6 @@ public record AuthenticateUserResult(
         Long expiresIn,
         String refreshToken,
         String scope,
-        String tokenType) {
+        String tokenType,
+        boolean isRegistered) {
 }

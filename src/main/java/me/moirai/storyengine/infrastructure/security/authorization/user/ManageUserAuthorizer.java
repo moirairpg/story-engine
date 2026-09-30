@@ -17,9 +17,9 @@ public class ManageUserAuthorizer implements OperationAuthorizer {
     @Override
     public boolean authorize(AuthorizationContext context) {
 
-        var userId = context.getFieldAsUuid("userId");
+        var username = context.getFieldAsString("username");
         var principal = context.getPrincipal();
 
-        return principal.publicId().equals(userId) || principal.isAdmin();
+        return principal.username().equalsIgnoreCase(username) || principal.isAdmin();
     }
 }

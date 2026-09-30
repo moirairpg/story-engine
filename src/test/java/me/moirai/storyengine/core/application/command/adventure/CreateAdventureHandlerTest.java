@@ -68,8 +68,8 @@ public class CreateAdventureHandlerTest {
     @BeforeEach
     void setupSecurityContext() {
 
-        var principal = new MoiraiPrincipal(UUID.randomUUID(), AUTHENTICATED_USER_ID, "discordId",
-                "user", "user@test.com", "token", "refresh", null, null);
+        var principal = new MoiraiPrincipal(UUID.randomUUID(), AUTHENTICATED_USER_ID,
+                "user", "token", "refresh", null, null);
         var authentication = new UsernamePasswordAuthenticationToken(principal, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

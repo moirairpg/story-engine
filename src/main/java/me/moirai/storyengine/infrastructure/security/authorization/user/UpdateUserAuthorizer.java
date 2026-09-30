@@ -17,9 +17,6 @@ public class UpdateUserAuthorizer implements OperationAuthorizer {
     @Override
     public boolean authorize(AuthorizationContext context) {
 
-        var userId = context.getFieldAsUuid("userId");
-        var principal = context.getPrincipal();
-
-        return principal.publicId().equals(userId) || principal.isAdmin();
+        return context.getPrincipal().isAdmin();
     }
 }

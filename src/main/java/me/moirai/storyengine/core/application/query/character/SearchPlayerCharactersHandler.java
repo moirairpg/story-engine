@@ -29,6 +29,7 @@ public class SearchPlayerCharactersHandler
                 .map(row -> new PlayerCharacterSummary(
                         row.id(),
                         row.ownerUsername(),
+                        row.ownerDisplayName(),
                         row.name(),
                         row.characterClass(),
                         row.background(),

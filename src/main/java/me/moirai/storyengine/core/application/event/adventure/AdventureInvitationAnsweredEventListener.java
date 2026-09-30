@@ -51,16 +51,14 @@ public class AdventureInvitationAnsweredEventListener {
 
         var responseMetadata = Map.<String, Object>of(
                 "kind", NotificationKind.ADVENTURE_INVITE_RESPONSE.name(),
-                "adventureId", event.getAdventurePublicId().toString(),
-                "respondingUsername", responder.getUsername(),
-                "response", event.getResponse().name());
+                "adventureId", event.getAdventurePublicId().toString());
 
         var managerUserIds = adventureRepository.findManagerUserIdsByAdventureId(event.getAdventureId());
 
         var responseNotification = notificationRepository.save(Notification.builder()
                 .type(NotificationType.SYSTEM)
                 .level(NotificationLevel.INFO)
-                .message(responder.getUsername() + " " + action + " your invitation to " + event.getAdventureName())
+                .message(responder.getDisplayName() + " " + action + " your invitation to " + event.getAdventureName())
                 .adventureId(event.getAdventureId())
                 .isInteractable(false)
                 .metadata(responseMetadata)

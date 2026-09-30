@@ -105,6 +105,23 @@ public class AdventureRosterReaderImplIntegrationTest extends AbstractDatabaseIn
     }
 
     @Test
+    public void shouldCarryThePlayerDisplayNameWhenAdventureHasRoster() {
+
+        // given
+        var owner = insert(UserFixture.player().displayName("Johnny the Bold").build(), User.class);
+        var character = insertCharacter(owner, "Volin Habar");
+        var adventure = insertAdventure("Dragon Hunt", character);
+
+        // when
+        var result = reader.getAllByAdventurePublicId(adventure.getPublicId());
+
+        // then
+        assertThat(result).singleElement()
+                .extracting(AdventureMembershipSummaryRow::playerUsername, AdventureMembershipSummaryRow::playerDisplayName)
+                .containsExactly("john.doe", "Johnny the Bold");
+    }
+
+    @Test
     public void shouldReturnRawImageKeyWhenCharacterIsRegistered() {
 
         // given

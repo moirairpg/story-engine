@@ -7,6 +7,6 @@ public record PendingAdventureInvitationDetails(
         UUID invitationId,
         UUID adventureId,
         String adventureName,
-        String inviterUsername,
+        String inviterDisplayName,
         Instant creationDate) {
 }

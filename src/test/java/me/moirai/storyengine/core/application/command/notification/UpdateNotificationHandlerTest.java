@@ -126,6 +126,7 @@ public class UpdateNotificationHandlerTest {
         var user = User.builder()
                 .discordId("discord-" + id)
                 .username(username)
+                .displayName(username)
                 .role(Role.PLAYER)
                 .build();
 

@@ -35,9 +35,9 @@ public class GetAuthenticatedUserDetailsHandler extends AbstractQueryHandler<Get
         return new UserDetailsResult(
                 moiraiUserDetails.publicId(),
                 moiraiUserDetails.id(),
-                moiraiUserDetails.discordId(),
                 discordUserDetails.username(),
                 moiraiUserDetails.username(),
+                moiraiUserDetails.displayName(),
                 discordUserDetails.avatarUrl(),
                 moiraiUserDetails.role(),
                 moiraiUserDetails.isActive(),

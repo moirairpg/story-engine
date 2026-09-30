@@ -23,7 +23,8 @@ moirai:
     oauth:
       client-id: dummy_value
       client-secret: dummy_value
-      redirect-url: http://dummy_value
+      signin-redirect-url: http://dummy_value
+      signup-redirect-url: http://dummy_value
     api:
       bot-token: dummy_value
     api-base-url: https://discord.com/api
@@ -41,6 +42,8 @@ moirai:
       success: http://localhost/success
       fail: http://localhost/fail
       logout: http://localhost/logout
+      signup: http://localhost/signup
+      not-registered: http://localhost/?notice=not-registered
 
 spring:
   main.banner-mode: 'off'

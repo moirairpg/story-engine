@@ -4,4 +4,4 @@ import java.util.UUID;
 
 import me.moirai.storyengine.common.enums.PermissionLevel;
 
-public record AssetMember(UUID userId, String username, PermissionLevel level) {}
+public record AssetMember(UUID userId, String username, String displayName, PermissionLevel level) {}

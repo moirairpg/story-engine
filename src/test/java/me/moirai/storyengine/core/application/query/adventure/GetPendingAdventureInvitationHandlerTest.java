@@ -40,7 +40,7 @@ public class GetPendingAdventureInvitationHandlerTest {
 
         when(invitationReader.getPendingByAdventureAndRecipient(any(), anyString()))
                 .thenReturn(Optional.of(new PendingInvitationRow(
-                        invitationId, adventureId, "Dragon Hunt", "alice", "some_user", Instant.now())));
+                        invitationId, adventureId, "Dragon Hunt", "Alice Liddell", "some_user", Instant.now())));
 
         // when
         var result = handler.execute(query);
@@ -48,7 +48,7 @@ public class GetPendingAdventureInvitationHandlerTest {
         // then
         assertThat(result.invitationId()).isEqualTo(invitationId);
         assertThat(result.adventureName()).isEqualTo("Dragon Hunt");
-        assertThat(result.inviterUsername()).isEqualTo("alice");
+        assertThat(result.inviterDisplayName()).isEqualTo("Alice Liddell");
     }
 
     @Test

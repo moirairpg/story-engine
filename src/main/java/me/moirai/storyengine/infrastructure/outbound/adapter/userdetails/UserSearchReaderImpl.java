@@ -25,6 +25,7 @@ public class UserSearchReaderImpl implements UserSearchReader {
     private static final String SELECT_SQL = """
             SELECT u.public_id,
                    u.username,
+                   u.display_name,
                    u.role,
                    u.is_active,
                    u.creation_date
@@ -44,6 +45,7 @@ public class UserSearchReaderImpl implements UserSearchReader {
         var paginatedQuery = PaginatedQuery.builder()
                 .select(SELECT_SQL)
                 .filter(Filters.containsIgnoreCase("u.username", "username", query.username()))
+                .filter(Filters.containsIgnoreCase("u.display_name", "displayName", query.displayName()))
                 .filter(Filters.equals("u.role", "role", Functions.mapOrNull(query.role(), Role::name)))
                 .filter(Filters.equals("u.is_active", "isActive", query.isActive()))
                 .filter(Filters.greaterOrEqualThan("u.creation_date", "registeredFrom",
@@ -59,6 +61,7 @@ public class UserSearchReaderImpl implements UserSearchReader {
                 .query((rs, _) -> new UserSummary(
                         UUID.fromString(rs.getString("public_id")),
                         rs.getString("username"),
+                        rs.getString("display_name"),
                         Role.valueOf(rs.getString("role")),
                         rs.getBoolean("is_active"),
                         rs.getTimestamp("creation_date").toInstant()))
@@ -79,6 +82,7 @@ public class UserSearchReaderImpl implements UserSearchReader {
     private String resolveSortField(UserSortField field) {
         return switch (field) {
             case USERNAME -> "u.username";
+            case DISPLAY_NAME -> "u.display_name";
             case ROLE -> "u.role";
             case CREATION_DATE -> "u.creation_date";
             case null, default -> "u.creation_date";
