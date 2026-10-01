@@ -2,7 +2,6 @@ package me.moirai.storyengine.infrastructure.security.authorization.message;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
@@ -42,10 +41,13 @@ public class RetryNarrationAuthorizer implements OperationAuthorizer {
             return false;
         }
 
-        var authorizationData = adventureAuthorizationReader.getAuthorizationData(adventureId)
-                .orElseThrow(() -> new NotFoundException("Adventure not found"));
+        var authorizationData = adventureAuthorizationReader.getAuthorizationData(adventureId);
 
-        if (canManage(authorizationData, principal)) {
+        if (authorizationData.isEmpty()) {
+            return false;
+        }
+
+        if (canManage(authorizationData.get(), principal)) {
             return true;
         }
 

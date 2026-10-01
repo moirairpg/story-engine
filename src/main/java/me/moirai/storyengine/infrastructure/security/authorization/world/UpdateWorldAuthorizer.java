@@ -4,7 +4,6 @@ import static me.moirai.storyengine.common.enums.Role.ADMIN;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -32,10 +31,9 @@ public class UpdateWorldAuthorizer implements OperationAuthorizer {
         var worldId = context.getFieldAsUuid("worldId");
         var principal = context.getPrincipal();
 
-        var authData = reader.getAuthorizationData(worldId)
-                .orElseThrow(() -> new NotFoundException("World not found"));
-
-        return canWrite(authData, principal);
+        return reader.getAuthorizationData(worldId)
+                .map(authData -> canWrite(authData, principal))
+                .orElse(false);
     }
 
     private boolean canWrite(AssetPermissionsData authData, MoiraiPrincipal principal) {

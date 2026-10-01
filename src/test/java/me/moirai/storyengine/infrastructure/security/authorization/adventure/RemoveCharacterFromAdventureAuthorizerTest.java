@@ -123,6 +123,20 @@ public class RemoveCharacterFromAdventureAuthorizerTest {
         assertThat(isAuthorized).isTrue();
     }
 
+    @Test
+    void shouldNotAuthorizeWhenAdventureIsNotFound() {
+
+        // given
+        when(reader.getAuthorizationData(any())).thenReturn(Optional.empty());
+
+        // when
+        var isAuthorized = authorizer.authorize(contextWith(principal(Role.PLAYER)));
+
+        // then
+        assertThat(isAuthorized).isFalse();
+        verifyNoInteractions(playerCharacterReader);
+    }
+
     private MoiraiPrincipal principal(Role role) {
         return new MoiraiPrincipal(
                 CALLER_ID, 1L, "caller", "token", "refresh", role, null);

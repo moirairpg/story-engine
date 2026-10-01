@@ -2,7 +2,6 @@ package me.moirai.storyengine.infrastructure.security.authorization.message;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.security.authorization.OperationAuthorizer;
@@ -35,11 +34,13 @@ public class EditMessageAuthorizer implements OperationAuthorizer {
         var adventureId = context.getFieldAsUuid("adventureId");
         var messageId = context.getFieldAsUuid("messageId");
         var principal = context.getPrincipal();
+        var authorizationData = adventureAuthorizationReader.getAuthorizationData(adventureId);
 
-        var authorizationData = adventureAuthorizationReader.getAuthorizationData(adventureId)
-                .orElseThrow(() -> new NotFoundException("Adventure not found"));
+        if (authorizationData.isEmpty()) {
+            return false;
+        }
 
-        if (canManage(authorizationData, principal)) {
+        if (canManage(authorizationData.get(), principal)) {
             return true;
         }
 

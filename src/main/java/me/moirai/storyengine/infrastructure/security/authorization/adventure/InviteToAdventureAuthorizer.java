@@ -2,7 +2,6 @@ package me.moirai.storyengine.infrastructure.security.authorization.adventure;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -35,10 +34,9 @@ public class InviteToAdventureAuthorizer implements OperationAuthorizer {
 
         var adventureId = context.getFieldAsUuid("adventureId");
 
-        var authData = reader.getAuthorizationData(adventureId)
-                .orElseThrow(() -> new NotFoundException("Adventure not found"));
-
-        return canInvite(authData, principal);
+        return reader.getAuthorizationData(adventureId)
+                .map(authData -> canInvite(authData, principal))
+                .orElse(false);
     }
 
     private boolean canInvite(AssetPermissionsData authData, MoiraiPrincipal principal) {

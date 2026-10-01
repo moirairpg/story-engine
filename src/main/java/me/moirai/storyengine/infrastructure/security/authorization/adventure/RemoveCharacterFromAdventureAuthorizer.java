@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -41,11 +40,13 @@ public class RemoveCharacterFromAdventureAuthorizer implements OperationAuthoriz
         }
 
         var adventureId = context.getFieldAsUuid("adventureId");
+        var authData = reader.getAuthorizationData(adventureId);
 
-        var authData = reader.getAuthorizationData(adventureId)
-                .orElseThrow(() -> new NotFoundException("Adventure not found"));
+        if (authData.isEmpty()) {
+            return false;
+        }
 
-        if (canManage(authData, principal)) {
+        if (canManage(authData.get(), principal)) {
             return true;
         }
 
