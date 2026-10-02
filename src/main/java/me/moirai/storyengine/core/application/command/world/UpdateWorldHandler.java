@@ -4,9 +4,11 @@ import static me.moirai.storyengine.common.enums.PermissionLevel.OWNER;
 
 import java.util.stream.Collectors;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorld;
 import me.moirai.storyengine.core.port.inbound.world.WorldDetails;
@@ -16,6 +18,7 @@ import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#request.worldId")
 public class UpdateWorldHandler extends AbstractCommandHandler<UpdateWorld, WorldDetails> {
 
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";

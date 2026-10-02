@@ -21,14 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.CharacterClass;
 import me.moirai.storyengine.common.enums.PlayerCharacterSortField;
 import me.moirai.storyengine.common.enums.SortDirection;
-import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.ImageResult;
 import me.moirai.storyengine.core.port.inbound.adventure.CharacterAdventureSummary;
@@ -91,14 +89,12 @@ public class PlayerCharacterRestController extends SecurityContextAware {
 
     @GetMapping("/{characterId}")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_PLAYER_CHARACTER, fields = "#characterId")
     public PlayerCharacterDetails getById(@PathVariable UUID characterId) {
         return queryRunner.run(new GetPlayerCharacterById(characterId, authenticatedUsername()));
     }
 
     @GetMapping("/{characterId}/adventures")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_PLAYER_CHARACTER_ADVENTURES, fields = "#characterId")
     public List<CharacterAdventureSummary> getAdventures(@PathVariable UUID characterId) {
         return queryRunner.run(new GetPlayerCharacterAdventures(characterId));
     }
@@ -152,7 +148,6 @@ public class PlayerCharacterRestController extends SecurityContextAware {
 
     @PutMapping("/{characterId}")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_PLAYER_CHARACTER, fields = "#characterId")
     public PlayerCharacterDetails update(
             @PathVariable UUID characterId,
             @Valid @RequestBody UpdatePlayerCharacterRequest request) {
@@ -170,7 +165,6 @@ public class PlayerCharacterRestController extends SecurityContextAware {
 
     @PatchMapping("/{characterId}/sheet")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_CHARACTER_SHEET, fields = "#characterId")
     public PlayerCharacterDetails updateSheet(
             @PathVariable UUID characterId,
             @Valid @RequestBody UpdateCharacterSheetRequest request) {
@@ -186,14 +180,12 @@ public class PlayerCharacterRestController extends SecurityContextAware {
 
     @DeleteMapping("/{characterId}")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DELETE_PLAYER_CHARACTER, fields = "#characterId")
     public void delete(@PathVariable UUID characterId) {
         commandRunner.run(new DeletePlayerCharacter(characterId));
     }
 
     @PutMapping(value = "/{characterId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_PLAYER_CHARACTER, fields = "#characterId")
     public ImageResult uploadImage(
             @PathVariable UUID characterId,
             @Valid @ModelAttribute UploadImageRequest request) throws IOException {
@@ -207,7 +199,6 @@ public class PlayerCharacterRestController extends SecurityContextAware {
 
     @DeleteMapping("/{characterId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Authorize(operation = AuthorizationOperation.UPDATE_PLAYER_CHARACTER, fields = "#characterId")
     public void removeImage(@PathVariable UUID characterId) {
         commandRunner.run(new RemovePlayerCharacterImage(characterId));
     }

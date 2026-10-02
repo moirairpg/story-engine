@@ -1,13 +1,16 @@
 package me.moirai.storyengine.core.application.query.notification;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.dto.PaginatedResult;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationSummary;
 import me.moirai.storyengine.core.port.inbound.notification.SearchNotifications;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationSearchReader;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
 public class SearchNotificationsHandler
         extends AbstractQueryHandler<SearchNotifications, PaginatedResult<NotificationSummary>> {
 

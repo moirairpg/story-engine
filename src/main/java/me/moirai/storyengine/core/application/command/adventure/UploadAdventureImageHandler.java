@@ -1,14 +1,17 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.ImageResult;
 import me.moirai.storyengine.core.port.inbound.adventure.UploadAdventureImage;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#request.adventureId")
 public class UploadAdventureImageHandler extends AbstractCommandHandler<UploadAdventureImage, ImageResult> {
 
     private final AdventureRepository repository;

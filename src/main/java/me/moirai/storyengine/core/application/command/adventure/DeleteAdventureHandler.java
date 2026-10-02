@@ -2,9 +2,11 @@ package me.moirai.storyengine.core.application.command.adventure;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
@@ -15,6 +17,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 // part under review as possible bloat. Removing it means doing those three deletes inline again and
 // accepting that a rollback destroys data the database still considers live.
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.DELETE_ADVENTURE, fields = "#request.adventureId")
 public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventure, Void> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be deleted was not found";

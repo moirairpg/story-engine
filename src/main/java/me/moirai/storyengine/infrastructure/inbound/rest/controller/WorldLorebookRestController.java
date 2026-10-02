@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SortDirection;
-import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.LorebookEntrySummary;
 import me.moirai.storyengine.core.port.inbound.world.CreateWorldLorebookEntry;
@@ -70,7 +68,6 @@ public class WorldLorebookRestController extends SecurityContextAware {
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "#worldId")
     public WorldLorebookEntryDetails getLorebookEntryById(
             @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId) {
@@ -84,7 +81,6 @@ public class WorldLorebookRestController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public WorldLorebookEntryDetails createLorebookEntry(
             @PathVariable(required = true) UUID worldId,
             @Valid @RequestBody WorldLorebookEntryRequest request) {
@@ -99,7 +95,6 @@ public class WorldLorebookRestController extends SecurityContextAware {
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public WorldLorebookEntryDetails updateLorebookEntry(
             @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId,
@@ -116,7 +111,6 @@ public class WorldLorebookRestController extends SecurityContextAware {
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public void deleteLorebookEntry(
             @PathVariable(required = true) UUID worldId,
             @PathVariable(required = true) UUID entryId) {

@@ -2,9 +2,11 @@ package me.moirai.storyengine.core.application.command.notification;
 
 import java.util.List;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.inbound.notification.UpdateNotification;
@@ -12,6 +14,7 @@ import me.moirai.storyengine.core.port.outbound.notification.NotificationReposit
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
 public class UpdateNotificationHandler extends AbstractCommandHandler<UpdateNotification, NotificationDetails> {
 
     private static final String NOTIFICATION_NOT_FOUND = "Notification to be updated was not found";

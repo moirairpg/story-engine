@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureCatchUp;
 import me.moirai.storyengine.core.port.inbound.adventure.CatchUpResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureReader;
@@ -17,6 +19,7 @@ import me.moirai.storyengine.core.port.outbound.generation.TextGenerationRequest
 import me.moirai.storyengine.core.port.outbound.message.MessageReader;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#request.adventureId")
 public class AdventureCatchUpHandler
         extends AbstractQueryHandler<AdventureCatchUp, CatchUpResult> {
 

@@ -1,12 +1,15 @@
 package me.moirai.storyengine.core.application.command.notification;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.notification.DeleteNotification;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
 public class DeleteNotificationHandler extends AbstractCommandHandler<DeleteNotification, Void> {
 
     private static final String NOTIFICATION_NOT_FOUND = "Notification to be deleted was not found";

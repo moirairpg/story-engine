@@ -5,9 +5,11 @@ import static me.moirai.storyengine.common.enums.PermissionLevel.OWNER;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
@@ -22,6 +24,7 @@ import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#request.adventureId")
 public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventure, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";

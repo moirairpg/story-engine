@@ -17,12 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SortDirection;
-import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.common.enums.NotificationLevel;
 import me.moirai.storyengine.common.enums.NotificationType;
@@ -56,7 +54,6 @@ public class NotificationRestController extends SecurityContextAware {
 
     @GetMapping("/{notificationId}")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_NOTIFICATION, fields = "#notificationId")
     public NotificationDetails getNotification(@PathVariable UUID notificationId) {
 
         var user = getAuthenticatedUser();
@@ -68,7 +65,6 @@ public class NotificationRestController extends SecurityContextAware {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
     public PaginatedResult<NotificationSummary> searchNotifications(
             @RequestParam(required = false) NotificationType type,
             @RequestParam(required = false) NotificationLevel level,
@@ -89,7 +85,6 @@ public class NotificationRestController extends SecurityContextAware {
     }
 
     @PostMapping
-    @Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
     public ResponseEntity<NotificationDetails> createNotification(@RequestBody CreateNotificationRequest request) {
 
         var details = commandRunner.run(new CreateNotification(
@@ -110,7 +105,6 @@ public class NotificationRestController extends SecurityContextAware {
 
     @PatchMapping("/{notificationId}")
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
     public NotificationDetails updateNotification(
             @PathVariable UUID notificationId,
             @RequestBody UpdateNotificationRequest request) {
@@ -123,14 +117,12 @@ public class NotificationRestController extends SecurityContextAware {
 
     @DeleteMapping("/{notificationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
     public void deleteNotification(@PathVariable UUID notificationId) {
         commandRunner.run(new DeleteNotification(notificationId));
     }
 
     @PostMapping("/{notificationId}/read")
     @ResponseStatus(HttpStatus.CREATED)
-    @Authorize(operation = AuthorizationOperation.VIEW_NOTIFICATION, fields = "#notificationId")
     public void readNotification(@PathVariable UUID notificationId) {
 
         var user = getAuthenticatedUser();
