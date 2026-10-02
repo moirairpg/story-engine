@@ -4,7 +4,7 @@ public enum MoiraiCookie {
 
     SESSION_COOKIE("moirai_sstk", true),
     REFRESH_COOKIE("moirai_reftk", true),
-    EXPIRY_COOKIE("moirai_expiry", false);
+    EXPIRY_COOKIE("moirai_expiry", true);
 
     private final String name;
     private final boolean isHttpOnly;

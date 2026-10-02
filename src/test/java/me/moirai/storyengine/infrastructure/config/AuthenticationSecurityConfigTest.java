@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
+import me.moirai.storyengine.common.security.authentication.SessionRenewalService;
 import me.moirai.storyengine.common.security.authentication.filter.AuthenticationFilter;
 
 @TestConfiguration
@@ -22,12 +23,16 @@ public class AuthenticationSecurityConfigTest {
     @Mock
     private MoiraiUserDetailsService userDetailsService;
 
+    @Mock
+    private SessionRenewalService sessionRenewalService;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
                 .addFilterBefore(new AuthenticationFilter(
-                        IGNORED_PATHS, FAIL_PATH, LOGOUT_PATH, userDetailsService),
+                        IGNORED_PATHS, FAIL_PATH, LOGOUT_PATH,
+                        userDetailsService, sessionRenewalService),
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(IGNORED_PATHS).permitAll()

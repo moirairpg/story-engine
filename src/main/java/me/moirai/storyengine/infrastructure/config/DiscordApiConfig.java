@@ -1,5 +1,7 @@
 package me.moirai.storyengine.infrastructure.config;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.util.function.Predicate;
 
@@ -16,10 +18,9 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
+import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.infrastructure.outbound.adapter.discord.DiscordAuthenticationAdapter;
-import me.moirai.storyengine.infrastructure.outbound.adapter.generation.CompletionResponseError;
-import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class DiscordApiConfig {
@@ -37,14 +38,10 @@ public class DiscordApiConfig {
             .isSameCodeAs(HttpStatusCode.valueOf(401));
 
     private final String baseUrl;
-    private final JsonMapper jsonMapper;
 
-    public DiscordApiConfig(
-            @Value("${moirai.discord.api.base-url}") String baseUrl,
-            JsonMapper jsonMapper) {
+    public DiscordApiConfig(@Value("${moirai.discord.api.base-url}") String baseUrl) {
 
         this.baseUrl = baseUrl;
-        this.jsonMapper = jsonMapper;
     }
 
     @Bean
@@ -61,28 +58,23 @@ public class DiscordApiConfig {
 
     private void handleUnauthorized(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        var error = mapErrorResponse(response);
-        LOG.error(AUTHENTICATION_ERROR + " -> {}", error);
-        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
+        LOG.error(AUTHENTICATION_ERROR + " -> {}", readBody(response));
+        throw new AuthenticationFailedException(AUTHENTICATION_ERROR);
     }
 
     private void handleBadRequest(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        var error = mapErrorResponse(response);
-        LOG.error(BAD_REQUEST_ERROR + " -> {}", error);
-        throw new RestException(HttpStatus.BAD_REQUEST, error.getType(), error.getMessage(),
-                String.format(BAD_REQUEST_ERROR, error.getType(), error.getMessage()));
+        LOG.error(BAD_REQUEST_ERROR + " -> {}", readBody(response));
+        throw new RestException(HttpStatus.BAD_REQUEST, BAD_REQUEST_ERROR);
     }
 
     private void handleUnknownError(HttpRequest request, ClientHttpResponse response) throws IOException {
 
-        var error = mapErrorResponse(response);
-        LOG.error(UNKNOWN_ERROR + " -> {}", error);
-        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, error.getType(), error.getMessage(),
-                String.format(UNKNOWN_ERROR, error.getType(), error.getMessage()));
+        LOG.error(UNKNOWN_ERROR + " -> {}", readBody(response));
+        throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
     }
 
-    private CompletionResponseError mapErrorResponse(ClientHttpResponse response) throws IOException {
-        return jsonMapper.readValue(response.getBody(), CompletionResponseError.class);
+    private String readBody(ClientHttpResponse response) throws IOException {
+        return new String(response.getBody().readAllBytes(), UTF_8);
     }
 }

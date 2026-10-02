@@ -2,12 +2,18 @@ package me.moirai.storyengine.infrastructure.inbound.websocket.interceptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.security.Principal;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -15,12 +21,16 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import me.moirai.storyengine.common.exception.AuthenticationFailedException;
+import me.moirai.storyengine.common.exception.RestException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authentication.MoiraiSecurityContext;
+import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
 
 public class StompChannelInterceptorTest {
 
-    private final StompChannelInterceptor interceptor = new StompChannelInterceptor();
+    private final MoiraiUserDetailsService userDetailsService = mock(MoiraiUserDetailsService.class);
+    private final StompChannelInterceptor interceptor = new StompChannelInterceptor(userDetailsService);
 
     @AfterEach
     void tearDown() {
@@ -62,7 +72,7 @@ public class StompChannelInterceptorTest {
     void shouldReturnMessageUnmodifiedWhenFrameIsNotConnect() {
 
         // given
-        var accessor = StompHeaderAccessor.create(StompCommand.SEND);
+        var accessor = StompHeaderAccessor.create(StompCommand.UNSUBSCRIBE);
         var message = MessageBuilder.createMessage(new byte[0], accessor.getMessageHeaders());
 
         // when
@@ -70,6 +80,89 @@ public class StompChannelInterceptorTest {
 
         // then
         assertThat(result).isSameAs(message);
+    }
+
+    @Test
+    void shouldReauthenticateWithTheHandshakeTokensWhenSendFrameArrives() {
+
+        // given
+        var message = messageFrom(StompCommand.SEND, new UsernamePasswordAuthenticationToken(principal(), null));
+
+        // when
+        var result = interceptor.preSend(message, null);
+
+        // then
+        assertThat(result).isSameAs(message);
+        verify(userDetailsService).loadUserByUsername("token / refresh");
+    }
+
+    @Test
+    void shouldReauthenticateWithTheHandshakeTokensWhenSubscribeFrameArrives() {
+
+        // given
+        var message = messageFrom(StompCommand.SUBSCRIBE, new UsernamePasswordAuthenticationToken(principal(), null));
+
+        // when
+        var result = interceptor.preSend(message, null);
+
+        // then
+        assertThat(result).isSameAs(message);
+        verify(userDetailsService).loadUserByUsername("token / refresh");
+    }
+
+    @Test
+    void shouldThrowBadCredentialsExceptionWhenSessionIsNoLongerValid() {
+
+        // given
+        var message = messageFrom(StompCommand.SEND, new UsernamePasswordAuthenticationToken(principal(), null));
+
+        when(userDetailsService.loadUserByUsername(any()))
+                .thenThrow(new AuthenticationFailedException("Invalid user requested authentication"));
+
+        // when / then
+        assertThatThrownBy(() -> interceptor.preSend(message, null))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Unauthenticated WebSocket connection");
+    }
+
+    @Test
+    void shouldPropagateTheFailureWhenDiscordIsUnavailable() {
+
+        // given
+        var message = messageFrom(StompCommand.SEND, new UsernamePasswordAuthenticationToken(principal(), null));
+        var discordUnavailable = new RestException(HttpStatus.INTERNAL_SERVER_ERROR, "Discord is unavailable");
+
+        when(userDetailsService.loadUserByUsername(any())).thenThrow(discordUnavailable);
+
+        // when / then
+        assertThatThrownBy(() -> interceptor.preSend(message, null))
+                .isSameAs(discordUnavailable);
+    }
+
+    @Test
+    void shouldNotReauthenticateWhenConnectFrameArrives() {
+
+        // given
+        var message = messageFrom(StompCommand.CONNECT, new UsernamePasswordAuthenticationToken(principal(), null));
+
+        // when
+        interceptor.preSend(message, null);
+
+        // then
+        verify(userDetailsService, never()).loadUserByUsername(any());
+    }
+
+    @Test
+    void shouldNotReauthenticateWhenDisconnectFrameArrives() {
+
+        // given
+        var message = messageFrom(StompCommand.DISCONNECT, new UsernamePasswordAuthenticationToken(principal(), null));
+
+        // when
+        interceptor.preSend(message, null);
+
+        // then
+        verify(userDetailsService, never()).loadUserByUsername(any());
     }
 
     @Test
@@ -167,8 +260,12 @@ public class StompChannelInterceptorTest {
     }
 
     private Message<byte[]> messageFrom(Principal user) {
+        return messageFrom(StompCommand.SEND, user);
+    }
 
-        var accessor = StompHeaderAccessor.create(StompCommand.SEND);
+    private Message<byte[]> messageFrom(StompCommand command, Principal user) {
+
+        var accessor = StompHeaderAccessor.create(command);
         accessor.setUser(user);
 
         return MessageBuilder.createMessage(new byte[0], accessor.getMessageHeaders());

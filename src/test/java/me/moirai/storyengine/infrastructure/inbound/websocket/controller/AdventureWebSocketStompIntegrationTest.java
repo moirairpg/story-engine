@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -28,6 +30,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import me.moirai.storyengine.AbstractDatabaseIntegrationTest;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.enums.Role;
+import me.moirai.storyengine.common.exception.AuthenticationFailedException;
 import me.moirai.storyengine.common.security.authentication.MoiraiCookie;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authentication.MoiraiSecurityContext;
@@ -152,7 +155,41 @@ class AdventureWebSocketStompIntegrationTest extends AbstractDatabaseIntegration
                 .isInstanceOf(ExecutionException.class);
     }
 
+    @Test
+    void shouldCloseTheSessionWhenTheTokenIsNoLongerValidOnTheNextFrame() throws Exception {
+
+        // given
+        when(userDetailsService.loadUserByUsername(any()))
+                .thenReturn(principal())
+                .thenThrow(new AuthenticationFailedException("Invalid user requested authentication"));
+
+        var connectionLost = new CompletableFuture<Throwable>();
+
+        session = connect(SESSION_TOKEN, new StompSessionHandlerAdapter() {
+
+            @Override
+            public void handleTransportError(StompSession stompSession, Throwable exception) {
+                connectionLost.complete(exception);
+            }
+        });
+
+        // when
+        session.send("/app/adventures/" + ADVENTURE_ID + "/messages", new WebSocketPayload("hello"));
+
+        // then
+        connectionLost.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+        assertThat(session.isConnected()).isFalse();
+        verify(commandRunner, never()).run(any());
+    }
+
     private StompSession connect(String sessionToken) throws Exception {
+
+        return connect(sessionToken, new StompSessionHandlerAdapter() {
+        });
+    }
+
+    private StompSession connect(String sessionToken, StompSessionHandlerAdapter sessionHandler) throws Exception {
 
         var handshakeHeaders = new WebSocketHttpHeaders();
 
@@ -164,8 +201,7 @@ class AdventureWebSocketStompIntegrationTest extends AbstractDatabaseIntegration
                 .connectAsync(
                         "ws://localhost:" + port + "/ws",
                         handshakeHeaders,
-                        new StompSessionHandlerAdapter() {
-                        })
+                        sessionHandler)
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
