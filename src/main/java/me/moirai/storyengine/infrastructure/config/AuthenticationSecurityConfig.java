@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
+import me.moirai.storyengine.common.security.authentication.SessionRenewalService;
 import me.moirai.storyengine.common.security.authentication.filter.AuthenticationFilter;
 
 @Configuration
@@ -30,6 +31,7 @@ public class AuthenticationSecurityConfig {
     private final String authenticationFailedPath;
     private final String logoutPath;
     private final MoiraiUserDetailsService userDetailsService;
+    private final SessionRenewalService sessionRenewalService;
 
     public AuthenticationSecurityConfig(
             @Value("${moirai.security.unsecured-paths}") String[] unsecuredPaths,
@@ -37,7 +39,8 @@ public class AuthenticationSecurityConfig {
             @Value("${moirai.security.allowed-headers}") String[] allowedHeaders,
             @Value("${moirai.security.redirect-path.fail}") String authenticationFailedPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
-            MoiraiUserDetailsService userDetailsService) {
+            MoiraiUserDetailsService userDetailsService,
+            SessionRenewalService sessionRenewalService) {
 
         this.unsecuredPaths = unsecuredPaths;
         this.allowedOrigins = allowedOrigins;
@@ -45,6 +48,7 @@ public class AuthenticationSecurityConfig {
         this.authenticationFailedPath = authenticationFailedPath;
         this.logoutPath = logoutPath;
         this.userDetailsService = userDetailsService;
+        this.sessionRenewalService = sessionRenewalService;
     }
 
     @Bean
@@ -55,7 +59,8 @@ public class AuthenticationSecurityConfig {
                 .formLogin(form -> form.disable())
                 .logout(logout -> logout.disable())
                 .addFilterBefore(new AuthenticationFilter(
-                        unsecuredPaths, authenticationFailedPath, logoutPath, userDetailsService),
+                        unsecuredPaths, authenticationFailedPath, logoutPath,
+                        userDetailsService, sessionRenewalService),
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(unsecuredPaths).permitAll()
@@ -75,6 +80,7 @@ public class AuthenticationSecurityConfig {
         configuration.setAllowedOrigins(List.of(allowedOrigins));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of(allowedHeaders));
+        configuration.setExposedHeaders(List.of(AuthenticationFilter.SESSION_RENEWED_HEADER));
         configuration.setAllowCredentials(true);
 
         var source = new UrlBasedCorsConfigurationSource();

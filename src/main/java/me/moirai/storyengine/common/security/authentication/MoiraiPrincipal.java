@@ -57,4 +57,8 @@ public record MoiraiPrincipal(
     public boolean isAdmin() {
         return role == Role.ADMIN;
     }
+
+    public MoiraiPrincipal withTokens(String authorizationToken, String refreshToken) {
+        return new MoiraiPrincipal(publicId, id, username, authorizationToken, refreshToken, role, expiresAt);
+    }
 }
