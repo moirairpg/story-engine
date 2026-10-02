@@ -2,9 +2,11 @@ package me.moirai.storyengine.core.application.command.character;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.character.DeletePlayerCharacter;
 import me.moirai.storyengine.core.port.outbound.character.PlayerCharacterRepository;
 
@@ -14,6 +16,7 @@ import me.moirai.storyengine.core.port.outbound.character.PlayerCharacterReposit
 // vector, after commit), is the part under review as possible bloat. Removing it means doing both
 // deletes inline again and accepting that a rollback destroys data the database still considers live.
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.DELETE_PLAYER_CHARACTER, fields = "#request.characterId")
 public class DeletePlayerCharacterHandler extends AbstractCommandHandler<DeletePlayerCharacter, Void> {
 
     private final PlayerCharacterRepository repository;

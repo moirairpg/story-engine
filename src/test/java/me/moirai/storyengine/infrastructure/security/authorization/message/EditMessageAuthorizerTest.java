@@ -2,6 +2,7 @@ package me.moirai.storyengine.infrastructure.security.authorization.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -147,6 +148,20 @@ public class EditMessageAuthorizerTest {
 
         // then
         assertThat(isAuthorized).isTrue();
+    }
+
+    @Test
+    void shouldNotAuthorizeWhenAdventureIsNotFound() {
+
+        // given
+        when(adventureAuthorizationReader.getAuthorizationData(any())).thenReturn(Optional.empty());
+
+        // when
+        var isAuthorized = authorizer.authorize(contextWith(principal(Role.PLAYER)));
+
+        // then
+        assertThat(isAuthorized).isFalse();
+        verifyNoInteractions(messageAuthorizationReader);
     }
 
     private void givenPermissions(UUID ownerId, List<UUID> writers) {

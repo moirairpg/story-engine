@@ -2,9 +2,11 @@ package me.moirai.storyengine.core.application.command.world;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.world.DeleteWorld;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
@@ -14,6 +16,7 @@ import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 // and this indirection; the cost is that a rollback after the delete would destroy an image the
 // database still considers live.
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.DELETE_WORLD, fields = "#request.worldId")
 public class DeleteWorldHandler extends AbstractCommandHandler<DeleteWorld, Void> {
 
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";

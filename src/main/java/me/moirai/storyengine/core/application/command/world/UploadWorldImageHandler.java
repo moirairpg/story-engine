@@ -1,14 +1,17 @@
 package me.moirai.storyengine.core.application.command.world;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.ImageResult;
 import me.moirai.storyengine.core.port.inbound.world.UploadWorldImage;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#request.worldId")
 public class UploadWorldImageHandler extends AbstractCommandHandler<UploadWorldImage, ImageResult> {
 
     private final WorldRepository repository;

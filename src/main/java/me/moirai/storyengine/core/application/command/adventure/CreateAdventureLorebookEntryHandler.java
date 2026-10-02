@@ -4,9 +4,11 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 
 import java.util.Comparator;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
@@ -16,6 +18,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.LorebookVectorSearchPo
 import me.moirai.storyengine.core.port.outbound.generation.EmbeddingPort;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#request.adventureId")
 public class CreateAdventureLorebookEntryHandler
         extends AbstractCommandHandler<CreateAdventureLorebookEntry, AdventureLorebookEntryDetails> {
 

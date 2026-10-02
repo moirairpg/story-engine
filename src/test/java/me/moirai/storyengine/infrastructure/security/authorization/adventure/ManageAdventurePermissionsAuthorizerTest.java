@@ -1,7 +1,6 @@
 package me.moirai.storyengine.infrastructure.security.authorization.adventure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.core.port.inbound.AssetPermissionsData;
@@ -108,17 +106,16 @@ public class ManageAdventurePermissionsAuthorizerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenAdventureIsNotFound() {
+    void shouldNotAuthorizeWhenAdventureIsNotFound() {
 
         // given
         when(reader.getAuthorizationData(any())).thenReturn(Optional.empty());
 
         // when
-        var context = contextWith(principal(Role.PLAYER));
+        var isAuthorized = authorizer.authorize(contextWith(principal(Role.PLAYER)));
 
         // then
-        assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> authorizer.authorize(context));
+        assertThat(isAuthorized).isFalse();
     }
 
     private MoiraiPrincipal principal(Role role) {

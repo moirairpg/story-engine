@@ -1,8 +1,10 @@
 package me.moirai.storyengine.core.application.command.world;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.world.World;
 import me.moirai.storyengine.core.domain.world.WorldLorebookEntry;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldLorebookEntry;
@@ -10,6 +12,7 @@ import me.moirai.storyengine.core.port.inbound.world.WorldLorebookEntryDetails;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#request.worldId")
 public class UpdateWorldLorebookEntryHandler
         extends AbstractCommandHandler<UpdateWorldLorebookEntry, WorldLorebookEntryDetails> {
 

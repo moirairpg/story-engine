@@ -1,13 +1,16 @@
 package me.moirai.storyengine.core.application.command.character;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.character.RemovePlayerCharacterImage;
 import me.moirai.storyengine.core.port.outbound.character.PlayerCharacterRepository;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_PLAYER_CHARACTER, fields = "#request.characterId")
 public class RemovePlayerCharacterImageHandler extends AbstractCommandHandler<RemovePlayerCharacterImage, Void> {
 
     private final PlayerCharacterRepository repository;

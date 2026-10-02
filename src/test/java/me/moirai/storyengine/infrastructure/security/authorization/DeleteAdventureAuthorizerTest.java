@@ -1,7 +1,6 @@
 package me.moirai.storyengine.infrastructure.security.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -16,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.storyengine.common.enums.Visibility;
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.enums.Role;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
@@ -117,7 +115,7 @@ class DeleteAdventureAuthorizerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenAdventureNotFound() {
+    void shouldDenyWhenAdventureNotFound() {
 
         // given
         var adventureId = UUID.randomUUID();
@@ -126,9 +124,11 @@ class DeleteAdventureAuthorizerTest {
 
         when(reader.getAuthorizationData(adventureId)).thenReturn(Optional.empty());
 
+        // when
+        var result = authorizer.authorize(context);
+
         // then
-        assertThatThrownBy(() -> authorizer.authorize(context))
-                .isInstanceOf(NotFoundException.class);
+        assertThat(result).isFalse();
     }
 
     private AssetPermissionsData adventureWithPermissions() {

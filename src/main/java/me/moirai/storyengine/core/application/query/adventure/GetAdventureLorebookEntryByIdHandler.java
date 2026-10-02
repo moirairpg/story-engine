@@ -1,13 +1,16 @@
 package me.moirai.storyengine.core.application.query.adventure;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureLorebookEntryDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureLorebookEntryById;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureLorebookReader;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#request.adventureId")
 public class GetAdventureLorebookEntryByIdHandler
         extends AbstractQueryHandler<GetAdventureLorebookEntryById, AdventureLorebookEntryDetails> {
 

@@ -1,14 +1,17 @@
 package me.moirai.storyengine.core.application.command.notification;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.NotificationStatus;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.notification.ReadNotification;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.VIEW_NOTIFICATION, fields = "#request.notificationId")
 public class ReadNotificationHandler extends AbstractCommandHandler<ReadNotification, Void> {
 
     private static final String NOTIFICATION_NOT_FOUND = "Notification to be read was not found";

@@ -6,15 +6,18 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.adventure.InviteUserToAdventure;
 import me.moirai.storyengine.core.port.inbound.adventure.InviteUserToAdventureResult;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.INVITE_TO_ADVENTURE, fields = "#request.adventureId")
 public class InviteUserToAdventureHandler
         extends AbstractCommandHandler<InviteUserToAdventure, InviteUserToAdventureResult> {
 

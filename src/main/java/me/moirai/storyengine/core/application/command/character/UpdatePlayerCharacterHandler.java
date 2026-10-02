@@ -2,10 +2,12 @@ package me.moirai.storyengine.core.application.command.character;
 
 import java.util.Map;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.rules.CharacterSheetRules;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.character.PlayerCharacter;
 import me.moirai.storyengine.core.port.inbound.character.PlayerCharacterDetails;
 import me.moirai.storyengine.core.port.inbound.character.UpdatePlayerCharacter;
@@ -16,6 +18,7 @@ import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.UPDATE_PLAYER_CHARACTER, fields = "#request.characterId")
 public class UpdatePlayerCharacterHandler
         extends AbstractCommandHandler<UpdatePlayerCharacter, PlayerCharacterDetails> {
 

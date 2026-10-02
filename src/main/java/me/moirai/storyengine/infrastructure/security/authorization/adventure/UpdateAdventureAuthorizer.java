@@ -4,7 +4,6 @@ import static me.moirai.storyengine.common.enums.Role.ADMIN;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authentication.MoiraiPrincipal;
 import me.moirai.storyengine.common.security.authorization.AuthorizationContext;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
@@ -32,10 +31,9 @@ public class UpdateAdventureAuthorizer implements OperationAuthorizer {
         var adventureId = context.getFieldAsUuid("adventureId");
         var principal = context.getPrincipal();
 
-        var authData = reader.getAuthorizationData(adventureId)
-                .orElseThrow(() -> new NotFoundException("Adventure not found"));
-
-        return canWrite(authData, principal);
+        return reader.getAuthorizationData(adventureId)
+                .map(authData -> canWrite(authData, principal))
+                .orElse(false);
     }
 
     private boolean canWrite(AssetPermissionsData authData, MoiraiPrincipal principal) {

@@ -2,16 +2,19 @@ package me.moirai.storyengine.core.application.query.character;
 
 import java.util.Map;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.rules.CharacterSheetRules;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.character.GetPlayerCharacterById;
 import me.moirai.storyengine.core.port.inbound.character.PlayerCharacterDetails;
 import me.moirai.storyengine.core.port.outbound.character.PlayerCharacterReader;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.VIEW_PLAYER_CHARACTER, fields = "#request.characterId")
 public class GetPlayerCharacterByIdHandler
         extends AbstractQueryHandler<GetPlayerCharacterById, PlayerCharacterDetails> {
 

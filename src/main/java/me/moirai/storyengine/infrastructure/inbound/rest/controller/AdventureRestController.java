@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.CursorResult;
@@ -51,7 +50,6 @@ import me.moirai.storyengine.infrastructure.inbound.rest.request.JoinAdventureWi
 import me.moirai.storyengine.infrastructure.inbound.rest.request.UploadImageRequest;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
-import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.util.Functions;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureCatchUp;
@@ -125,7 +123,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
     public AdventureDetails getAdventureById(
             @PathVariable(required = true) UUID adventureId) {
 
@@ -182,7 +179,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public AdventureDetails updateAdventure(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
@@ -226,7 +222,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PatchMapping("/{adventureId}/authors-note")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void updateAuthorsNote(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureAuthorsNoteRequest request) {
@@ -236,7 +231,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PatchMapping("/{adventureId}/bump")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void updateBump(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureBumpRequest request) {
@@ -246,7 +240,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PatchMapping("/{adventureId}/nudge")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void updateNudge(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureNudgeRequest request) {
@@ -256,7 +249,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PatchMapping("/{adventureId}/scene")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void updateScene(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAdventureSceneRequest request) {
@@ -266,7 +258,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @DeleteMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DELETE_ADVENTURE, fields = "#adventureId")
     public void deleteAdventure(
             @PathVariable(required = true) UUID adventureId) {
 
@@ -276,7 +267,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}/permissions")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.MANAGE_ADVENTURE_PERMISSIONS, fields = "#adventureId")
     public List<AssetMember> getAdventureMembers(@PathVariable(required = true) UUID adventureId) {
 
         return queryRunner.run(new GetAdventureMembers(adventureId));
@@ -284,7 +274,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PutMapping("/{adventureId}/permissions")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.MANAGE_ADVENTURE_PERMISSIONS, fields = "#adventureId")
     public List<AssetMember> updateAdventurePermissions(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody UpdateAssetPermissionsRequest request) {
@@ -298,7 +287,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}/messages")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
     public CursorResult<MessageSummary> getMessages(
             @PathVariable UUID adventureId,
             @RequestParam(required = false) UUID lastMessageId,
@@ -309,7 +297,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}/catchup")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#adventureId")
     public CatchUpResult getCatchUp(@PathVariable UUID adventureId) {
 
         return queryRunner.run(new AdventureCatchUp(adventureId));
@@ -317,7 +304,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PutMapping(value = "/{adventureId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public ImageResult uploadAdventureImage(
             @PathVariable UUID adventureId,
             @Valid @ModelAttribute UploadImageRequest request) throws IOException {
@@ -333,14 +319,12 @@ public class AdventureRestController extends SecurityContextAware {
 
     @DeleteMapping("/{adventureId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#adventureId")
     public void removeAdventureImage(@PathVariable UUID adventureId) {
         commandRunner.run(new RemoveAdventureImage(adventureId));
     }
 
     @PostMapping("/{adventureId}/invitations")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.INVITE_TO_ADVENTURE, fields = "#adventureId")
     public InviteUserToAdventureResult invite(
             @PathVariable(required = true) UUID adventureId,
             @Valid @RequestBody InviteUserToAdventureRequest request) {
@@ -361,7 +345,6 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PostMapping("/invitations/{invitationId}/join")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.JOIN_ADVENTURE_WITH_CHARACTER, fields = { "#invitationId", "#request.playerCharacterId" })
     public void join(
             @PathVariable(required = true) UUID invitationId,
             @Valid @RequestBody JoinAdventureWithCharacterRequest request) {
@@ -374,14 +357,12 @@ public class AdventureRestController extends SecurityContextAware {
 
     @PostMapping("/invitations/{invitationId}/decline")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DECLINE_ADVENTURE_INVITATION, fields = "#invitationId")
     public void decline(@PathVariable(required = true) UUID invitationId) {
         commandRunner.run(new DeclineAdventureInvitation(invitationId));
     }
 
     @DeleteMapping("/{adventureId}/characters/{playerCharacterId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.REMOVE_CHARACTER_FROM_ADVENTURE, fields = { "#adventureId", "#playerCharacterId" })
     public void removeCharacter(
             @PathVariable(required = true) UUID adventureId,
             @PathVariable(required = true) UUID playerCharacterId) {

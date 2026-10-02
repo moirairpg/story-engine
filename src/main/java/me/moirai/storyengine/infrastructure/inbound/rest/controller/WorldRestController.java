@@ -23,13 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
 import me.moirai.storyengine.common.dto.PaginatedResult;
 import me.moirai.storyengine.common.enums.SearchView;
 import me.moirai.storyengine.common.enums.SortDirection;
-import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.common.dto.PermissionDto;
 import me.moirai.storyengine.core.port.inbound.ImageResult;
@@ -90,7 +88,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.VIEW_WORLD, fields = "#worldId")
     public WorldDetails getWorldById(@PathVariable(required = true) UUID worldId) {
 
         var query = new GetWorldById(worldId, authenticatedUserId());
@@ -126,7 +123,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public WorldDetails updateWorld(@PathVariable(required = true) UUID worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
@@ -157,7 +153,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @DeleteMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.DELETE_WORLD, fields = "#worldId")
     public void deleteWorld(@PathVariable(required = true) UUID worldId) {
 
         var command = new DeleteWorld(worldId);
@@ -166,7 +161,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @GetMapping("/{worldId}/permissions")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.MANAGE_WORLD_PERMISSIONS, fields = "#worldId")
     public List<AssetMember> getWorldMembers(@PathVariable(required = true) UUID worldId) {
 
         return queryRunner.run(new GetWorldMembers(worldId));
@@ -174,7 +168,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @PutMapping("/{worldId}/permissions")
     @ResponseStatus(code = HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.MANAGE_WORLD_PERMISSIONS, fields = "#worldId")
     public List<AssetMember> updateWorldPermissions(
             @PathVariable(required = true) UUID worldId,
             @Valid @RequestBody UpdateAssetPermissionsRequest request) {
@@ -188,7 +181,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @PutMapping(value = "/{worldId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public ImageResult uploadWorldImage(
             @PathVariable UUID worldId,
             @Valid @ModelAttribute UploadImageRequest request) throws IOException {
@@ -204,7 +196,6 @@ public class WorldRestController extends SecurityContextAware {
 
     @DeleteMapping("/{worldId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Authorize(operation = AuthorizationOperation.UPDATE_WORLD, fields = "#worldId")
     public void removeWorldImage(@PathVariable UUID worldId) {
         commandRunner.run(new RemoveWorldImage(worldId));
     }

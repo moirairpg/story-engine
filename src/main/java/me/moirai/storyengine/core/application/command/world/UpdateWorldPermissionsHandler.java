@@ -5,10 +5,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.AssetMember;
 import me.moirai.storyengine.core.port.inbound.world.UpdateWorldPermissions;
@@ -16,6 +18,7 @@ import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 import me.moirai.storyengine.core.port.outbound.world.WorldRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.MANAGE_WORLD_PERMISSIONS, fields = "#request.worldId")
 public class UpdateWorldPermissionsHandler
         extends AbstractCommandHandler<UpdateWorldPermissions, List<AssetMember>> {
 

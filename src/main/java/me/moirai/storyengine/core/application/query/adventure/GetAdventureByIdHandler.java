@@ -3,9 +3,11 @@ package me.moirai.storyengine.core.application.query.adventure;
 import static me.moirai.storyengine.common.enums.PermissionLevel.OWNER;
 import static me.moirai.storyengine.common.enums.PermissionLevel.WRITE;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureDetails;
 import me.moirai.storyengine.core.port.inbound.adventure.AdventureMembershipSummary;
 import me.moirai.storyengine.core.port.inbound.adventure.GetAdventureById;
@@ -14,6 +16,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRosterReader;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.VIEW_ADVENTURE, fields = "#request.adventureId")
 public class GetAdventureByIdHandler extends AbstractQueryHandler<GetAdventureById, AdventureDetails> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be viewed was not found";

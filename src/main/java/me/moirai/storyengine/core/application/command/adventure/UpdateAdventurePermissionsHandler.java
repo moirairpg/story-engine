@@ -5,10 +5,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.domain.userdetails.User;
 import me.moirai.storyengine.core.port.inbound.AssetMember;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventurePermissions;
@@ -16,6 +18,7 @@ import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.MANAGE_ADVENTURE_PERMISSIONS, fields = "#request.adventureId")
 public class UpdateAdventurePermissionsHandler
         extends AbstractCommandHandler<UpdateAdventurePermissions, List<AssetMember>> {
 

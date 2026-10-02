@@ -1,13 +1,16 @@
 package me.moirai.storyengine.core.application.query.notification;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.QueryHandler;
 import me.moirai.storyengine.common.cqs.query.AbstractQueryHandler;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.notification.GetNotification;
 import me.moirai.storyengine.core.port.inbound.notification.NotificationDetails;
 import me.moirai.storyengine.core.port.outbound.notification.NotificationReader;
 
 @QueryHandler
+@Authorize(operation = AuthorizationOperation.VIEW_NOTIFICATION, fields = "#request.notificationId")
 public class GetNotificationHandler extends AbstractQueryHandler<GetNotification, NotificationDetails> {
 
     private static final String NOTIFICATION_NOT_FOUND = "Notification to be viewed was not found";

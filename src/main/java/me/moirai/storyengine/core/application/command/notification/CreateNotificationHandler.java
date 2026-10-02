@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
 import me.moirai.storyengine.common.enums.NotificationType;
 import me.moirai.storyengine.common.exception.NotFoundException;
+import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.application.event.notification.NotificationCreatedEvent;
 import me.moirai.storyengine.core.domain.notification.Notification;
 import me.moirai.storyengine.core.domain.userdetails.User;
@@ -19,6 +21,7 @@ import me.moirai.storyengine.core.port.outbound.notification.NotificationReposit
 import me.moirai.storyengine.core.port.outbound.userdetails.UserRepository;
 
 @CommandHandler
+@Authorize(operation = AuthorizationOperation.MANAGE_NOTIFICATION)
 public class CreateNotificationHandler extends AbstractCommandHandler<CreateNotification, NotificationDetails> {
 
     private static final String SYSTEM_REQUIRES_TARGET = "SYSTEM notifications must have at least one target user";
