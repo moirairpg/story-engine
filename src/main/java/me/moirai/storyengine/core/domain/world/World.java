@@ -111,10 +111,6 @@ public class World extends ShareableAsset {
         return snapshot;
     }
 
-    public void communicateWorldDeleted() {
-        domainEvents.add(new WorldDeletedEvent(this.publicId, this.imageKey));
-    }
-
     @Override
     public void updatePermissions(Set<Permission> newPermissions) {
 

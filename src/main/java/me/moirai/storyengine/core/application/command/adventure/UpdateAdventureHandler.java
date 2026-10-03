@@ -5,6 +5,8 @@ import static me.moirai.storyengine.common.enums.PermissionLevel.OWNER;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
+
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
@@ -36,19 +38,22 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
     private final EmbeddingPort embeddingPort;
     private final LorebookVectorSearchPort vectorSearchPort;
     private final StoragePort storagePort;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UpdateAdventureHandler(
             AdventureRepository repository,
             UserRepository userRepository,
             EmbeddingPort embeddingPort,
             LorebookVectorSearchPort vectorSearchPort,
-            StoragePort storagePort) {
+            StoragePort storagePort,
+            ApplicationEventPublisher eventPublisher) {
 
         this.repository = repository;
         this.userRepository = userRepository;
         this.embeddingPort = embeddingPort;
         this.vectorSearchPort = vectorSearchPort;
         this.storagePort = storagePort;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -99,8 +104,7 @@ public class UpdateAdventureHandler extends AbstractCommandHandler<UpdateAdventu
                 .forEach(e -> adventure.addLorebookEntry(e.name(), e.description()));
 
         var saved = repository.save(adventure);
-
-        command.lorebookEntriesToDelete().forEach(vectorSearchPort::delete);
+        adventure.drainEvents().forEach(eventPublisher::publishEvent);
 
         if (!command.lorebookEntriesToUpdate().isEmpty()) {
             var updateTexts = command.lorebookEntriesToUpdate().stream()

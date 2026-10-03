@@ -7,6 +7,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import me.moirai.storyengine.core.domain.adventure.AdventureDeletedEvent;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRemovedEvent;
 import me.moirai.storyengine.core.port.outbound.adventure.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.adventure.LorebookVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
@@ -40,6 +41,12 @@ public class AdventureDeletedCleanupListener {
         removeImage(event);
         removeLorebookVectors(event);
         removeChronicleVectors(event);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onLorebookEntryRemoved(AdventureLorebookEntryRemovedEvent event) {
+
+        lorebookVectorSearchPort.delete(event.getEntryId());
     }
 
     private void removeImage(AdventureDeletedEvent event) {

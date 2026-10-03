@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.domain.Permission;
 import me.moirai.storyengine.common.enums.PermissionLevel;
@@ -274,32 +273,11 @@ public class WorldTest {
     }
 
     @Test
-    public void shouldRaiseADeletionEventCarryingItsIdentityWhenTheDeletionIsCommunicated() {
-
-        // given
-        var world = WorldFixture.privateWorldWithId();
-        ReflectionTestUtils.setField(world, "imageKey", "worlds/keep.png");
-
-        // when
-        world.communicateWorldDeleted();
-
-        // then
-        var events = world.drainEvents();
-
-        assertThat(events).singleElement().isInstanceOf(WorldDeletedEvent.class);
-
-        var event = (WorldDeletedEvent) events.getFirst();
-
-        assertThat(event.getPublicId()).isEqualTo(WorldFixture.PUBLIC_ID);
-        assertThat(event.getImageKey()).isEqualTo("worlds/keep.png");
-    }
-
-    @Test
     public void shouldEmptyTheEventListWhenEventsAreDrained() {
 
         // given
         var world = WorldFixture.privateWorldWithId();
-        world.communicateWorldDeleted();
+        world.updatePermissions(Set.of(new Permission(4444L, PermissionLevel.WRITE)));
 
         // when
         world.drainEvents();

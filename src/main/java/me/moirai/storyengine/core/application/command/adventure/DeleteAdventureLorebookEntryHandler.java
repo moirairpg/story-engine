@@ -1,5 +1,7 @@
 package me.moirai.storyengine.core.application.command.adventure;
 
+import org.springframework.context.ApplicationEventPublisher;
+
 import me.moirai.storyengine.common.annotation.Authorize;
 import me.moirai.storyengine.common.annotation.CommandHandler;
 import me.moirai.storyengine.common.cqs.command.AbstractCommandHandler;
@@ -7,7 +9,6 @@ import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.common.security.authorization.AuthorizationOperation;
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventureLorebookEntry;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
-import me.moirai.storyengine.core.port.outbound.adventure.LorebookVectorSearchPort;
 
 @CommandHandler
 @Authorize(operation = AuthorizationOperation.UPDATE_ADVENTURE, fields = "#request.adventureId")
@@ -18,14 +19,14 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractCommandHandler<
     private static final String ADVENTURE_TO_BE_UPDATED_WAS_NOT_FOUND = "Adventure to be updated was not found";
 
     private final AdventureRepository repository;
-    private final LorebookVectorSearchPort vectorSearchPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     public DeleteAdventureLorebookEntryHandler(
             AdventureRepository repository,
-            LorebookVectorSearchPort vectorSearchPort) {
+            ApplicationEventPublisher eventPublisher) {
 
         this.repository = repository;
-        this.vectorSearchPort = vectorSearchPort;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -48,8 +49,7 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractCommandHandler<
 
         adventure.removeLorebookEntry(command.entryId());
         repository.save(adventure);
-
-        vectorSearchPort.delete(command.entryId());
+        adventure.drainEvents().forEach(eventPublisher::publishEvent);
 
         return null;
     }

@@ -15,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureDeletedEvent;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRemovedEvent;
 import me.moirai.storyengine.core.port.outbound.adventure.ChronicleVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.adventure.LorebookVectorSearchPort;
 import me.moirai.storyengine.core.port.outbound.storage.StoragePort;
@@ -115,6 +116,26 @@ public class AdventureDeletedCleanupListenerTest {
         verify(storagePort).delete(IMAGE_KEY);
         verify(lorebookVectorSearchPort).deleteAllByAdventureId(AdventureFixture.PUBLIC_ID);
         verify(chronicleVectorSearchPort).deleteAllByAdventureId(AdventureFixture.PUBLIC_ID);
+    }
+
+    @Test
+    void shouldRemoveTheEntryVectorWhenALorebookEntryIsRemoved() {
+
+        // given
+        var adventure = AdventureFixture.privateAdventureWithId();
+        var entry = adventure.addLorebookEntry("Name", "Description");
+
+        adventure.removeLorebookEntry(entry.getPublicId());
+
+        var event = (AdventureLorebookEntryRemovedEvent) adventure.drainEvents().getFirst();
+
+        // when
+        listener.onLorebookEntryRemoved(event);
+
+        // then
+        verify(lorebookVectorSearchPort).delete(entry.getPublicId());
+        verify(storagePort, never()).delete(any());
+        verify(chronicleVectorSearchPort, never()).deleteAllByAdventureId(any());
     }
 
     private Adventure adventureWithImage(String imageKey) {
