@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import me.moirai.storyengine.common.cqs.command.CommandRunner;
 import me.moirai.storyengine.common.cqs.query.QueryRunner;
+import me.moirai.storyengine.common.security.authentication.AuthorizationStateCookie;
 import me.moirai.storyengine.common.security.authentication.SessionCookieWriter;
 import me.moirai.storyengine.common.web.SecurityContextAware;
 import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUser;
@@ -39,11 +41,20 @@ public class AuthenticationRestController extends SecurityContextAware {
 
     private static final String TOKEN_TYPE_HINT = "access_token";
     private static final String SESSION_COOKIE_NAME = "moirai_sstk";
+    private static final String STATE_COOKIE_NAME = "__Host-moirai_state";
+    private static final String CLIENT_ID_PARAM = "client_id";
+    private static final String RESPONSE_TYPE_PARAM = "response_type";
+    private static final String REDIRECT_URI_PARAM = "redirect_uri";
+    private static final String SCOPE_PARAM = "scope";
+    private static final String STATE_PARAM = "state";
+    private static final String CODE_RESPONSE_TYPE = "code";
+    private static final String IDENTIFY_SCOPE = "identify";
 
     private final String clientId;
     private final String clientSecret;
     private final String signInRedirectUri;
     private final String signUpRedirectUri;
+    private final String authorizeUrl;
     private final String successPath;
     private final String failPath;
     private final String logoutPath;
@@ -53,12 +64,14 @@ public class AuthenticationRestController extends SecurityContextAware {
     private final QueryRunner queryRunner;
     private final CommandRunner commandRunner;
     private final SessionCookieWriter sessionCookieWriter;
+    private final AuthorizationStateCookie authorizationStateCookie;
 
     public AuthenticationRestController(
             @Value("${moirai.discord.oauth.client-id}") String clientId,
             @Value("${moirai.discord.oauth.client-secret}") String clientSecret,
             @Value("${moirai.discord.oauth.signin-redirect-url}") String signInRedirectUri,
             @Value("${moirai.discord.oauth.signup-redirect-url}") String signUpRedirectUri,
+            @Value("${moirai.discord.oauth.authorize-url}") String authorizeUrl,
             @Value("${moirai.security.redirect-path.success}") String successPath,
             @Value("${moirai.security.redirect-path.fail}") String failPath,
             @Value("${moirai.security.redirect-path.logout}") String logoutPath,
@@ -67,12 +80,14 @@ public class AuthenticationRestController extends SecurityContextAware {
             DiscordAuthenticationPort discordAuthenticationPort,
             QueryRunner queryRunner,
             CommandRunner commandRunner,
-            SessionCookieWriter sessionCookieWriter) {
+            SessionCookieWriter sessionCookieWriter,
+            AuthorizationStateCookie authorizationStateCookie) {
 
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.signInRedirectUri = signInRedirectUri;
         this.signUpRedirectUri = signUpRedirectUri;
+        this.authorizeUrl = authorizeUrl;
         this.successPath = successPath;
         this.logoutPath = logoutPath;
         this.failPath = failPath;
@@ -82,15 +97,34 @@ public class AuthenticationRestController extends SecurityContextAware {
         this.queryRunner = queryRunner;
         this.commandRunner = commandRunner;
         this.sessionCookieWriter = sessionCookieWriter;
+        this.authorizationStateCookie = authorizationStateCookie;
+    }
+
+    @GetMapping("/signin/authorize")
+    @ResponseStatus(code = HttpStatus.FOUND)
+    public void signInAuthorize(HttpServletResponse response) throws IOException {
+
+        redirectToDiscord(response, signInRedirectUri);
+    }
+
+    @GetMapping("/signup/authorize")
+    @ResponseStatus(code = HttpStatus.FOUND)
+    public void signUpAuthorize(HttpServletResponse response) throws IOException {
+
+        redirectToDiscord(response, signUpRedirectUri);
     }
 
     @GetMapping("/signin/code")
     @ResponseStatus(code = HttpStatus.OK)
     public void signInCodeExchange(
             @RequestParam(required = true) String code,
+            @RequestParam(required = false) String state,
+            @CookieValue(name = STATE_COOKIE_NAME, required = false) String issuedState,
             HttpServletResponse response) throws IOException {
 
-        if (isBlank(code)) {
+        authorizationStateCookie.expire(response);
+
+        if (isBlank(code) || !authorizationStateCookie.matches(issuedState, state)) {
             response.sendRedirect(failPath);
             return;
         }
@@ -109,9 +143,13 @@ public class AuthenticationRestController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.OK)
     public void signUpCodeExchange(
             @RequestParam(required = true) String code,
+            @RequestParam(required = false) String state,
+            @CookieValue(name = STATE_COOKIE_NAME, required = false) String issuedState,
             HttpServletResponse response) throws IOException {
 
-        if (isBlank(code)) {
+        authorizationStateCookie.expire(response);
+
+        if (isBlank(code) || !authorizationStateCookie.matches(issuedState, state)) {
             response.sendRedirect(failPath);
             return;
         }
@@ -156,6 +194,21 @@ public class AuthenticationRestController extends SecurityContextAware {
         var query = new GetAuthenticatedUserDetails(getAuthenticatedUser().authorizationToken());
 
         return queryRunner.run(query);
+    }
+
+    private void redirectToDiscord(HttpServletResponse response, String redirectUri) throws IOException {
+
+        var state = authorizationStateCookie.issue(response);
+        var discordAuthorizeUrl = UriComponentsBuilder.fromUriString(authorizeUrl)
+                .queryParam(CLIENT_ID_PARAM, clientId)
+                .queryParam(RESPONSE_TYPE_PARAM, CODE_RESPONSE_TYPE)
+                .queryParam(REDIRECT_URI_PARAM, redirectUri)
+                .queryParam(SCOPE_PARAM, IDENTIFY_SCOPE)
+                .queryParam(STATE_PARAM, state)
+                .encode()
+                .toUriString();
+
+        response.sendRedirect(discordAuthorizeUrl);
     }
 
     private void handleSessionAuthentication(
