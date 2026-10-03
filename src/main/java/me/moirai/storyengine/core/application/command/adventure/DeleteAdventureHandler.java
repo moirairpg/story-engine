@@ -10,12 +10,6 @@ import me.moirai.storyengine.common.security.authorization.AuthorizationOperatio
 import me.moirai.storyengine.core.port.inbound.adventure.DeleteAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
 
-// TODO: the event itself cannot go — AdventureDeletedEvent has three consumers, and two of them are
-// cross-aggregate: MessageDomainEventListener deletes the adventure's messages and
-// NotificationDomainEventListener deletes its game notifications. Only the third,
-// AdventureDeletedCleanupListener (image, lorebook vectors, chronicle vectors, after commit), is the
-// part under review as possible bloat. Removing it means doing those three deletes inline again and
-// accepting that a rollback destroys data the database still considers live.
 @CommandHandler
 @Authorize(operation = AuthorizationOperation.DELETE_ADVENTURE, fields = "#request.adventureId")
 public class DeleteAdventureHandler extends AbstractCommandHandler<DeleteAdventure, Void> {

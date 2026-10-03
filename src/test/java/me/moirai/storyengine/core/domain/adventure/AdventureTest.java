@@ -895,6 +895,38 @@ public class AdventureTest {
     }
 
     @Test
+    public void shouldRecordTheRemovalWithTheEntryIdWhenALorebookEntryIsRemoved() {
+
+        // given
+        var adventure = AdventureFixture.privateAdventure().build();
+        var entry = adventure.addLorebookEntry("Winterhold", "A ruined city");
+
+        // when
+        adventure.removeLorebookEntry(entry.getPublicId());
+
+        // then
+        assertThat(adventure.getLorebook()).isEmpty();
+
+        var events = adventure.drainEvents();
+
+        assertThat(events).singleElement().isInstanceOf(AdventureLorebookEntryRemovedEvent.class);
+        assertThat(((AdventureLorebookEntryRemovedEvent) events.getFirst()).getEntryId())
+                .isEqualTo(entry.getPublicId());
+    }
+
+    @Test
+    public void shouldThrowAndRecordNothingWhenRemovingAnUnknownLorebookEntry() {
+
+        // given
+        var adventure = AdventureFixture.privateAdventure().build();
+        var unknownEntryId = UUID.randomUUID();
+
+        // then
+        assertThrows(NotFoundException.class, () -> adventure.removeLorebookEntry(unknownEntryId));
+        assertThat(adventure.drainEvents()).isEmpty();
+    }
+
+    @Test
     public void shouldReturnNoCharacterIdsWhenTheRosterIsEmpty() {
 
         // given

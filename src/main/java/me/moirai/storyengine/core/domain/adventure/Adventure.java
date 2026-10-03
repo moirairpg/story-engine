@@ -544,6 +544,8 @@ public class Adventure extends ShareableAsset {
 
         AdventureLorebookEntry entry = getLorebookEntryById(entryId);
         lorebook.remove(entry);
+
+        domainEvents.add(new AdventureLorebookEntryRemovedEvent(entryId));
     }
 
     public AdventureLorebookEntry getLorebookEntryById(UUID entryId) {

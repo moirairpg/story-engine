@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import me.moirai.storyengine.common.enums.ArtificialIntelligenceModel;
@@ -25,6 +27,7 @@ import me.moirai.storyengine.common.enums.Moderation;
 import me.moirai.storyengine.common.exception.NotFoundException;
 import me.moirai.storyengine.core.domain.adventure.Adventure;
 import me.moirai.storyengine.core.domain.adventure.AdventureFixture;
+import me.moirai.storyengine.core.domain.adventure.AdventureLorebookEntryRemovedEvent;
 import me.moirai.storyengine.core.port.inbound.UpdateAdventureFixture;
 import me.moirai.storyengine.core.port.inbound.adventure.UpdateAdventure;
 import me.moirai.storyengine.core.port.outbound.adventure.AdventureRepository;
@@ -51,6 +54,9 @@ public class UpdateAdventureHandlerTest {
 
     @Mock
     private StoragePort storagePort;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private UpdateAdventureHandler handler;
@@ -351,7 +357,7 @@ public class UpdateAdventureHandlerTest {
     }
 
     @Test
-    public void updateAdventure_whenLorebookEntriesToDelete_thenVectorsAreDeleted() {
+    public void updateAdventure_whenLorebookEntriesToDelete_thenRemovalIsPublishedAndVectorsAreNotDeletedDirectly() {
 
         // given
         var sample = UpdateAdventureFixture.sample();
@@ -387,7 +393,13 @@ public class UpdateAdventureHandlerTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(vectorSearchPort).delete(entryId);
+        assertThat(adventure.getLorebook()).isEmpty();
+
+        var publishedEvent = ArgumentCaptor.forClass(AdventureLorebookEntryRemovedEvent.class);
+        verify(eventPublisher).publishEvent(publishedEvent.capture());
+
+        assertThat(publishedEvent.getValue().getEntryId()).isEqualTo(entryId);
+        verify(vectorSearchPort, never()).delete(any());
     }
 
     @Test
