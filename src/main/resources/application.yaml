@@ -16,7 +16,7 @@ moirai:
       client-secret: ${DISCORD_BOT_CLIENT_SECRET}
       signin-redirect-url: ${DISCORD_BOT_SIGNIN_REDIRECT_URL}
       signup-redirect-url: ${DISCORD_BOT_SIGNUP_REDIRECT_URL}
-      authorize-url: https://discord.com/oauth2/authorize
+      authorize-url: ${AUTHORIZE_URL}
     api:
       base-url: ${DISCORD_API_BASE_URL:https://discord.com/api}
       bot-token: ${DISCORD_BOT_TOKEN}

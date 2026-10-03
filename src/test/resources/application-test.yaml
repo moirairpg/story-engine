@@ -25,6 +25,7 @@ moirai:
       client-secret: dummy_value
       signin-redirect-url: http://dummy_value
       signup-redirect-url: http://dummy_value
+      authorize-url: http://dummy_value
     api:
       bot-token: dummy_value
     api-base-url: https://discord.com/api
