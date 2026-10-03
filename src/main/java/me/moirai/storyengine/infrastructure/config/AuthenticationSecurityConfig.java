@@ -15,10 +15,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
 import me.moirai.storyengine.common.security.authentication.SessionRenewalService;
 import me.moirai.storyengine.common.security.authentication.filter.AuthenticationFilter;
+import me.moirai.storyengine.common.security.authentication.filter.CrossSiteRequestFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -58,6 +60,9 @@ public class AuthenticationSecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable())
                 .logout(logout -> logout.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .addFilterAfter(new CrossSiteRequestFilter(allowedOrigins), CorsFilter.class)
                 .addFilterBefore(new AuthenticationFilter(
                         unsecuredPaths, authenticationFailedPath, logoutPath,
                         userDetailsService, sessionRenewalService),
@@ -65,10 +70,7 @@ public class AuthenticationSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(unsecuredPaths).permitAll()
                         .anyRequest().authenticated())
-                // .oauth2Login(withDefaults())
                 .anonymous(anonymous -> anonymous.disable())
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(handler -> handler
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .build();

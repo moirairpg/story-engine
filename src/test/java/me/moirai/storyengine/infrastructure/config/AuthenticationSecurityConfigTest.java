@@ -11,12 +11,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import me.moirai.storyengine.common.security.authentication.MoiraiUserDetailsService;
 import me.moirai.storyengine.common.security.authentication.SessionRenewalService;
 import me.moirai.storyengine.common.security.authentication.filter.AuthenticationFilter;
+import me.moirai.storyengine.common.security.authentication.filter.CrossSiteRequestFilter;
 
 @TestConfiguration
 @EnableWebSecurity
 public class AuthenticationSecurityConfigTest {
 
     private static final String[] IGNORED_PATHS = { "/auth/code" };
+    private static final String[] ALLOWED_ORIGINS = { "http://localhost" };
     private static final String FAIL_PATH = "/fail";
     private static final String LOGOUT_PATH = "/logout";
 
@@ -30,14 +32,15 @@ public class AuthenticationSecurityConfigTest {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
-                .addFilterBefore(new AuthenticationFilter(
+                .csrf(csrf -> csrf.disable())
+                .addFilterBefore(new CrossSiteRequestFilter(ALLOWED_ORIGINS), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new AuthenticationFilter(
                         IGNORED_PATHS, FAIL_PATH, LOGOUT_PATH,
                         userDetailsService, sessionRenewalService),
-                        UsernamePasswordAuthenticationFilter.class)
+                        CrossSiteRequestFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(IGNORED_PATHS).permitAll()
                         .anyRequest().authenticated())
-                .csrf(csrf -> csrf.disable())
                 .anonymous(anonymous -> anonymous.disable())
                 .build();
     }

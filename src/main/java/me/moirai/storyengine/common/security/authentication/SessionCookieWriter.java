@@ -15,7 +15,7 @@ import me.moirai.storyengine.core.port.inbound.userdetails.AuthenticateUserResul
 @Component
 public class SessionCookieWriter {
 
-    private static final String NONE = "None";
+    private static final String STRICT = "Strict";
     private static final String ROOT = "/";
     private static final String SAME_SITE = "SameSite";
     private static final int EXPIRE_IMMEDIATELY = 0;
@@ -43,7 +43,7 @@ public class SessionCookieWriter {
         var servletCookie = new Cookie(cookie.getName(), cookieValue);
         servletCookie.setHttpOnly(cookie.isHttpOnly());
         servletCookie.setPath(ROOT);
-        servletCookie.setAttribute(SAME_SITE, NONE);
+        servletCookie.setAttribute(SAME_SITE, STRICT);
         servletCookie.setSecure(SECURE);
         servletCookie.setMaxAge(maxAge);
 

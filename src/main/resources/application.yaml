@@ -16,6 +16,7 @@ moirai:
       client-secret: ${DISCORD_BOT_CLIENT_SECRET}
       signin-redirect-url: ${DISCORD_BOT_SIGNIN_REDIRECT_URL}
       signup-redirect-url: ${DISCORD_BOT_SIGNUP_REDIRECT_URL}
+      authorize-url: ${AUTHORIZE_URL}
     api:
       base-url: ${DISCORD_API_BASE_URL:https://discord.com/api}
       bot-token: ${DISCORD_BOT_TOKEN}
@@ -60,6 +61,8 @@ moirai:
       signup: ${AUTH_SIGNUP_REDIRECT_URL}
       not-registered: ${AUTH_NOT_REGISTERED_REDIRECT_URL}
     unsecured-paths: >
+      /auth/signin/authorize,
+      /auth/signup/authorize,
       /auth/signin/code,
       /auth/signup/code,
       /auth/signup/details,
@@ -105,3 +108,4 @@ logging:
 springdoc:
   api-docs.path: /api/swagger/api-docs
   swagger-ui.path: /api/swagger/index.html
+  swagger-ui.supported-submit-methods: get
